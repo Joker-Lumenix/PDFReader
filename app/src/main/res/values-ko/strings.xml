@@ -97,7 +97,7 @@
     <string name="note">Note</string>
     <string name="notification_rationale">알림을 켜면 파일 변환 현황을 실시간으로 확인할 수 있어 중요한 문서를 놓치지 않습니다.</string>
     <string name="notification_title">변환 완료</string>
-    <string name="offline_badge">离线本地沙盒 · 零上传</string>
+    <string name="offline_badge">오프라인 로컬 샌드박스 · 업로드 없음</string>
     <string name="offline_ready">Ready locally</string>
     <string name="ok">확인</string>
     <string name="one_click_conversion">원클릭 빠른 변환</string>
@@ -117,7 +117,7 @@
     <string name="plain_text">일반 텍스트</string>
     <string name="print">PDF Print</string>
     <string name="print_now">Print now</string>
-    <string name="privacy_note">所有文件仅保存在本机沙盒，零云端上传</string>
+    <string name="privacy_note">모든 파일은 기기 샌드박스에 저장되며 업로드되지 않습니다</string>
     <string name="properties">Details</string>
     <string name="quick_clean_pitch">느려지나요? ⚡ 빠른 정리로 즉시 해결하세요!</string>
     <string name="quick_entry">빠른 진입</string>
@@ -137,7 +137,7 @@
     <string name="save_confirm_title">저장 확인</string>
     <string name="saved_successfully">저장됨</string>
     <string name="scan">Document scan</string>
-    <string name="scan_badge">Google 扫描</string>
+    <string name="scan_badge">Google 스캔</string>
     <string name="scan_to_pdf">문서 스캔 → PDF</string>
     <string name="scanner">스캐너</string>
     <string name="search">검색</string>

@@ -97,7 +97,7 @@
     <string name="note">便利貼</string>
     <string name="notification_rationale">開啟通知以隨時了解檔案轉換進度，不錯過重要文件。</string>
     <string name="notification_title">轉換完成</string>
-    <string name="offline_badge">离线本地沙盒 · 零上传</string>
+    <string name="offline_badge">離線本機沙盒 · 零上傳</string>
     <string name="offline_ready">本機已就緒</string>
     <string name="ok">確定</string>
     <string name="one_click_conversion">一鍵快速轉換</string>
@@ -117,7 +117,7 @@
     <string name="plain_text">純文字</string>
     <string name="print">PDF 列印</string>
     <string name="print_now">立即列印</string>
-    <string name="privacy_note">所有文件仅保存在本机沙盒，零云端上传</string>
+    <string name="privacy_note">所有檔案僅儲存在本機沙盒，零雲端上傳</string>
     <string name="properties">詳細屬性</string>
     <string name="quick_clean_pitch">當機了嗎？⚡ 快速清理立刻解決！</string>
     <string name="quick_entry">快捷入口</string>
@@ -137,7 +137,7 @@
     <string name="save_confirm_title">儲存確認</string>
     <string name="saved_successfully">儲存成功</string>
     <string name="scan">文件掃描</string>
-    <string name="scan_badge">Google 扫描</string>
+    <string name="scan_badge">Google 掃描</string>
     <string name="scan_to_pdf">掃描文件生成 PDF</string>
     <string name="scanner">掃描</string>
     <string name="search">搜尋</string>

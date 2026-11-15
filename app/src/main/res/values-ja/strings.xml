@@ -97,7 +97,7 @@
     <string name="note">Note</string>
     <string name="notification_rationale">通知をオンにしてファイル変換の状況をいつでも確認し、重要なドキュメントを見逃しません。</string>
     <string name="notification_title">変換が完了しました</string>
-    <string name="offline_badge">离线本地沙盒 · 零上传</string>
+    <string name="offline_badge">オフライン ローカルサンドボックス · アップロードなし</string>
     <string name="offline_ready">ローカル準備完了</string>
     <string name="ok">OK</string>
     <string name="one_click_conversion">ワンクリックで高速変換</string>
@@ -117,7 +117,7 @@
     <string name="plain_text">プレーンテキ스트</string>
     <string name="print">PDF Print</string>
     <string name="print_now">Print now</string>
-    <string name="privacy_note">所有文件仅保存在本机沙盒，零云端上传</string>
+    <string name="privacy_note">すべてのファイルは端末のサンドボックスに保存され、アップロードされません</string>
     <string name="properties">Details</string>
     <string name="quick_clean_pitch">動作が重いですか？⚡ クイッククリーンですぐに解決！</string>
     <string name="quick_entry">クイックエント리</string>
@@ -137,7 +137,7 @@
     <string name="save_confirm_title">保存の確認</string>
     <string name="saved_successfully">保存しました</string>
     <string name="scan">Document scan</string>
-    <string name="scan_badge">Google 扫描</string>
+    <string name="scan_badge">Google スキャン</string>
     <string name="scan_to_pdf">スキャンして PDF を作成</string>
     <string name="scanner">スキャナー</string>
     <string name="search">検索</string>

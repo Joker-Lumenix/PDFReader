@@ -97,7 +97,7 @@
     <string name="note">Note</string>
     <string name="notification_rationale">Включите уведомления, чтобы следить за конвертацией и не пропустить важный документ.</string>
     <string name="notification_title">Преобразование завершено</string>
-    <string name="offline_badge">离线本地沙盒 · 零上传</string>
+    <string name="offline_badge">Локальная песочница без сети · без загрузки</string>
     <string name="offline_ready">Ready locally</string>
     <string name="ok">ОК</string>
     <string name="one_click_conversion">Быстрое преобразование в одно касание</string>
@@ -117,7 +117,7 @@
     <string name="plain_text">Обычный текст</string>
     <string name="print">PDF Print</string>
     <string name="print_now">Print now</string>
-    <string name="privacy_note">所有文件仅保存在本机沙盒，零云端上传</string>
+    <string name="privacy_note">Все файлы остаются в песочнице устройства, ничего не отправляется</string>
     <string name="properties">Details</string>
     <string name="quick_clean_pitch">Тормозит? ⚡ Быстрая очистка решает это мгновенно!</string>
     <string name="quick_entry">Быстрый доступ</string>
@@ -137,7 +137,7 @@
     <string name="save_confirm_title">Подтвердить сохранение</string>
     <string name="saved_successfully">Успешно сохранено</string>
     <string name="scan">Document scan</string>
-    <string name="scan_badge">Google 扫描</string>
+    <string name="scan_badge">Google Сканирование</string>
     <string name="scan_to_pdf">Сканировать в PDF</string>
     <string name="scanner">Сканер</string>
     <string name="search">Поиск</string>

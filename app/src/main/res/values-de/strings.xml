@@ -97,7 +97,7 @@
     <string name="note">Note</string>
     <string name="notification_rationale">Aktivieren Sie Benachrichtigungen, um Konvertierungen zu verfolgen und keine wichtigen Dokumente zu verpassen.</string>
     <string name="notification_title">Konvertierung abgeschlossen</string>
-    <string name="offline_badge">离线本地沙盒 · 零上传</string>
+    <string name="offline_badge">Offline, lokale Sandbox · kein Upload</string>
     <string name="offline_ready">Ready locally</string>
     <string name="ok">OK</string>
     <string name="one_click_conversion">Schnellkonvertierung mit einem Klick</string>
@@ -117,7 +117,7 @@
     <string name="plain_text">Klartext</string>
     <string name="print">PDF Print</string>
     <string name="print_now">Print now</string>
-    <string name="privacy_note">所有文件仅保存在本机沙盒，零云端上传</string>
+    <string name="privacy_note">Alle Dateien bleiben in der Geräte-Sandbox, nichts wird hochgeladen</string>
     <string name="properties">Details</string>
     <string name="quick_clean_pitch">Läuft es langsam? ⚡ Schnellbereinigung behebt das sofort!</string>
     <string name="quick_entry">Schnellzugriff</string>
@@ -137,7 +137,7 @@
     <string name="save_confirm_title">Speichern bestätigen</string>
     <string name="saved_successfully">Erfolgreich gespeichert</string>
     <string name="scan">Document scan</string>
-    <string name="scan_badge">Google 扫描</string>
+    <string name="scan_badge">Google Scan</string>
     <string name="scan_to_pdf">Scannen als PDF</string>
     <string name="scanner">Scanner</string>
     <string name="search">Suchen</string>
