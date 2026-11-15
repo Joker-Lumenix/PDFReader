@@ -1,0 +1,78 @@
+selectFile	选择文件	Select file	選擇檔案	ファイルを選択	파일 선택	Seleccionar archivo	Sélectionner un fichier	Datei auswählen	Выбрать файл	Selecionar ficheiro
+selectFileAlt	选择一个文件	Select a file	選擇一個檔案	ファイルを選ぶ	파일 하나 선택	Elegir un archivo	Choisir un fichier	Eine Datei wählen	Выберите файл	Escolher um ficheiro
+selectedCount	已选择(%1$d)	Selected(%1$d)	已選擇(%1$d)	選択済み(%1$d)	선택됨(%1$d)	Seleccionado(%1$d)	Sélectionné(%1$d)	Ausgewählt(%1$d)	Выбрано(%1$d)	Selecionado(%1$d)
+importCount	导入(%1$d)	Import(%1$d)	匯入(%1$d)	インポート(%1$d)	가져오기(%1$d)	Importar(%1$d)	Importer(%1$d)	Importieren(%1$d)	Импорт(%1$d)	Importar(%1$d)
+mergeCount	合并(%1$d)	Merge(%1$d)	合併(%1$d)	結合(%1$d)	병합(%1$d)	Fusionar(%1$d)	Fusionner(%1$d)	Zusammenführen(%1$d)	Объединить(%1$d)	Mesclar(%1$d)
+noItems	暂无项目	No items	暫無項目	項目がありません	항목 없음	Sin elementos	Aucun élément	Keine Elemente	Нет элементов	Sem itens
+noPermissions	无权限	No permissions	無權限	権限がありません	권한 없음	Sin permisos	Aucune autorisation	Keine Berechtigung	Нет разрешений	Sem permissões
+authorizationRequired	需要授权才能读取全部文件	Authorization required to read all files.	需要授權才能讀取全部檔案	すべてのファイルを読み取るには権限が必要です	모든 파일을 읽으려면 권한이 필요합니다	Se requiere autorización para leer todos los archivos.	Autorisation requise pour lire tous les fichiers.	Autorisierung erforderlich, um alle Dateien zu lesen.	Требуется авторизация для чтения всех файлов.	É necessária autorização para ler todos os ficheiros.
+permissionRequired	需要权限	Permission Required	需要權限	権限が必要です	권한 필요	Permiso requerido	Autorisation requise	Berechtigung erforderlich	Требуется разрешение	Permissão necessária
+permissionRationale	若要在本机读取和编辑文档，请允许 Let's PDF 访问全部文件。	To read and edit documents on your device, please allow Let's PDF to access all your files.	若要在本機讀取和編輯文件，請允許 Let's PDF 存取全部檔案。	端末の文書を読み書きするには、Let's PDF にすべてのファイルへのアクセスを許可してください。	기기에서 문서를 읽고 편집하려면 Let's PDF가 모든 파일에 접근하도록 허용하세요.	Para leer y editar documentos en tu dispositivo, permite que Let's PDF acceda a todos tus archivos.	Pour lire et modifier les documents de votre appareil, autorisez Let's PDF à accéder à tous vos fichiers.	Um Dokumente auf Ihrem Gerät zu lesen und zu bearbeiten, erlauben Sie Let's PDF den Zugriff auf alle Ihre Dateien.	Чтобы читать и редактировать документы на устройстве, разрешите Let's PDF доступ ко всем файлам.	Para ler e editar documentos no seu dispositivo, permita que o Let's PDF aceda a todos os seus ficheiros.
+allow	允许	Allow	允許	許可	허용	Permitir	Autoriser	Erlauben	Разрешить	Permitir
+turnOnNow	立即开启	Turn On Now	立即開啟	今すぐオン	지금 켜기	Activar ahora	Activer maintenant	Jetzt einschalten	Включить сейчас	Ativar agora
+turnOnNotifications	开启通知	Turn on Notifications	開啟通知	通知をオン	알림 켜기	Activar notificaciones	Activer les notifications	Benachrichtigungen aktivieren	Включить уведомления	Ativar notificações
+notificationRationale	开启通知以随时了解文件转换进度，不错过重要文档。	Turn on notifications to stay informed about file conversions. Never miss an urgent document!	開啟通知以隨時了解檔案轉換進度，不錯過重要文件。	通知をオンにしてファイル変換の状況をいつでも確認し、重要なドキュメントを見逃しません。	알림을 켜면 파일 변환 현황을 실시간으로 확인할 수 있어 중요한 문서를 놓치지 않습니다.	Activa las notificaciones para seguir al día las conversiones y no perderte ningún documento importante.	Activez les notifications pour suivre les conversions et ne manquer aucun document important.	Aktivieren Sie Benachrichtigungen, um Konvertierungen zu verfolgen und keine wichtigen Dokumente zu verpassen.	Включите уведомления, чтобы следить за конвертацией и не пропустить важный документ.	Ative as notificações para acompanhar as conversões e não perder nenhum documento importante.
+rate	评分	Rate	評分	評価	평가	Valorar	Noter	Bewerten	Оценить	Avaliar
+rateOnPlay	到 Google Play 评分	Rate On Google Play	到 Google Play 評分	Google Play で評価	Google Play에서 평가	Valorar en Google Play	Noter sur Google Play	In Google Play bewerten	Оценить в Google Play	Avaliar no Google Play
+feedback	反馈	Feedback	回饋	フィードバック	피드백	Comentarios	Commentaires	Feedback	Обратная связь	Comentários
+justOnce	仅一次	Just once	僅一次	一度だけ	한 번만	Solo una vez	Une seule fois	Nur einmal	Только один раз	Apenas uma vez
+always	始终	Always	始終	常に	항상	Siempre	Toujours	Immer	Всегда	Sempre
+before	压缩前	Before	壓縮前	圧縮前	압축 전	Antes	Avant	Vorher	До	Antes
+after	压缩后	After	壓縮後	圧縮後	압축 후	Después	Après	Nachher	После	Depois
+clean	清理	Clean	清理	クリーン	정리	Limpiar	Nettoyer	Bereinigen	Очистить	Limpar
+cleanOptimizer	清理优化器	Clean optimizer	清理最佳化工具	クリーン最適化	정리 최적화	Optimizador de limpieza	Optimiseur de nettoyage	Bereinigungs-Optimierer	Оптимизатор очистки	Otimizador de limpeza
+quickCleanPitch	卡顿了吗？⚡ 快速清理立刻解决！	Wait, that lag? ⚡ Quick Clean fixes it instantly!	當機了嗎？⚡ 快速清理立刻解決！	動作が重いですか？⚡ クイッククリーンですぐに解決！	느려지나요? ⚡ 빠른 정리로 즉시 해결하세요!	¿Va lento? ⚡ ¡Limpieza rápida lo arregla al instante!	Ça rame ? ⚡ Le nettoyage rapide corrige ça instantanément !	Läuft es langsam? ⚡ Schnellbereinigung behebt das sofort!	Тормозит? ⚡ Быстрая очистка решает это мгновенно!	Está lento? ⚡ A limpeza rápida resolve já!
+oneClickConversion	一键快速转换	One-click fast conversion	一鍵快速轉換	ワンクリックで高速変換	원클릭 빠른 변환	Conversión rápida con un clic	Conversion rapide en un clic	Schnellkonvertierung mit einem Klick	Быстрое преобразование в одно касание	Conversão rápida com um toque
+oneStopManagement	一站式管理	One-Stop Management	一站式管理	ワンストップ管理	원스톱 관리	Gestión integral	Gestion tout-en-un	Alles-in-einem-Management	Всё в одном управлении	Gestão completa
+variousPdfTools	多种 PDF 工具	Various PDF tools	多種 PDF ツール	豊富な PDF ツール	다양한 PDF 도구	Variedad de herramientas PDF	Une variété d'outils PDF	Vielfältige PDF-Werkzeuge	Различные инструменты для PDF	Variedade de ferramentas PDF
+readEditScanResults	读取并编辑扫描结果	Read & Edit Scan Results	讀取並編輯掃描結果	スキャン結果の閲覧と編集	스캔 결과 읽기 및 편집	Leer y editar resultados del escaneo	Lire et modifier les résultats du scan	Scan-Ergebnisse lesen und bearbeiten	Читать и редактировать результаты сканирования	Ler e editar resultados da digitalização
+cropDrawFilter	裁剪、绘制、加文字与滤镜	Crop, draw, add text and filters	裁剪、繪製、加文字與濾鏡	切り取り・描画・文字追加・フィルター	자르기, 그리기, 텍스트 추가, 필터	Recortar, dibujar, añadir texto y filtros	Recadrer, dessiner, ajouter du texte et des filtres	Zuschneiden, zeichnen, Text und Filter hinzufügen	Обрезка, рисование, добавление текста и фильтров	Cortar, desenhar, adicionar texto e filtros
+convertImageToPdf	图片转 PDF	Convert Image to PDF	圖片轉 PDF	画像を PDF に変換	이미지를 PDF로 변환	Convertir imagen a PDF	Convertir une image en PDF	Bild in PDF umwandeln	Конвертировать изображение в PDF	Converter imagem em PDF
+selectPageHint	请选择需要的页面。	Select the page you need.	請選擇需要的頁面。	必要なページを選択してください。	필요한 페이지를 선택하세요.	Selecciona la página que necesitas.	Sélectionnez la page dont vous avez besoin.	Wählen Sie die benötigte Seite.	Выберите нужную страницу.	Selecione a página de que precisa.
+dragImageHint	拖动图片可调整位置。	Drag the image to change its position.	拖動圖片可調整位置。	画像をドラッグして位置を変更できます.	이미지를 드래그해 위치를 변경하세요.	Arrastra la imagen para cambiar su posición.	Faites glisser l'image pour modifier sa position.	Ziehen Sie das Bild, um seine Position zu ändern.	Перетащите изображение, чтобы изменить положение.	Arraste a imagem para alterar a sua posição.
+exitRetentionTitle	离开前想先试试吗？	Want to try it before you go?	離開前想先試試嗎？	閉じる前に試してみますか？	나가기 전에 한 번 더 써볼까요?	¿Quieres probarlo antes de salir?	Voulez-vous l'essayer avant de partir ?	Möchten Sie es vor dem Verlassen ausprobieren?	Хотите попробовать перед выходом?	Quer experimentá-lo antes de sair?
+thankYou	感谢使用本应用	Thank you for using the app	感謝使用本應用	应用程序をご利用いただきありがとうございます	앱을 사용해 주셔서 감사합니다	Gracias por usar la aplicación	Merci d'utiliser l'application	Vielen Dank für die Nutzung der App	Спасибо за использование приложения	Obrigado por usar a aplicação
+good	很好	Good	很好	とても良い	좋음	Bien	Bien	Gut	Хорошо	Bom
+notReally	不太行	Not really	不太行	良くない	별로 아님	No es mucho	Pas vraiment	Nicht wirklich	Не совсем	Não muito
+install	安装	Install	安裝	インストール	설치	Instalar	Installer	Installieren	Установить	Instalar
+result	结果	Result	結果	結果	결과	Resultado	Résultat	Ergebnis	Результат	Resultado
+view	查看	View	查看	表示	보기	Ver	Voir	Ansehen	Просмотр	Ver
+signHere	在此签名	Sign here	在此簽名	ここに署名	여기에 서명	Firma aquí	Signez ici	Hier unterschreiben	Подпишите здесь	Assine aqui
+pdfLocked	PDF 已加密	PDF locked	PDF 已加密	PDF はロックされています	PDF가 잠겨 있습니다	PDF bloqueado	PDF verrouillé	PDF gesperrt	PDF заблокирован	PDF bloqueado
+pdfUnlocked	PDF 已解锁	PDF Unlocked	PDF 已解鎖	PDF のロックが解除されました	PDF 잠금 해제됨	PDF desbloqueado	PDF déverrouillé	PDF entsperrt	PDF разблокирован	PDF desbloqueado
+success	操作成功	Successfully!	操作成功	成功しました！	성공했습니다!	¡Con éxito!	Réussi !	Erfolgreich!	Успешно!	Com sucesso!
+mergedSuccess	合并成功	Merged Successfully!	合併成功	結合が完了しました！	병합 완료!	¡Fusionado con éxito!	Fusion réussie !	Zusammenführung erfolgreich!	Объединение выполнено!	Mesclado com sucesso!
+auto	自动	Auto	自動	自動	자동	Automático	Auto	Automatisch	Авто	Automático
+next	下一步	Next	下一步	次へ	다음	Siguiente	Suivant	Weiter	Далее	Seguinte
+apply	应用	Apply	套用	適用	적용	Aplicar	Appliquer	Anwenden	Применить	Aplicar
+submit	提交	submit	提交	送信	제출	Enviar	Soumettre	Senden	Отправить	Enviar
+ok	确定	OK	確定	OK	확인	Aceptar	OK	OK	ОК	OK
+emptyFilesHint	快速访问常用文件	Quick access your favorite files here	快速存取常用檔案	お気に入りファイルにすばやくアクセス	자주 쓰는 파일에 빠르게 접근하세요	Acceso rápido a tus archivos favoritos	Accès rapide à vos fichiers favoris	Schnellzugriff auf Ihre Lieblingsdateien	Быстрый доступ к избранным файлам	Acesso rápido aos seus ficheiros favoritos
+appCache	应用缓存	App Cache	應用程式快取	アプリのキャッシュ	앱 캐시	Caché de la aplicación	Cache de l'application	App-Cache	Кэш приложения	Cache da aplicação
+scanner	扫描	Scanner	掃描	スキャナー	스캐너	Escáner	Scanner	Scanner	Сканер	Scanner
+upgradeSlow	运行缓慢	Upgrade runs slow	執行緩慢	動作が遅い	실행이 느려요	La actualización va lenta	La mise à niveau est lente	Upgrade läuft langsam	Обновление работает медленно	A atualização está lenta
+importSuccess	导入成功	Imported	匯入成功	インポート完了	가져오기 완료	Importado	Importé	Importiert	Импортировано	Importado
+selectAllFiles	全选文件	Select all files	全選檔案	すべてのファイルを選択	모든 파일 선택	Seleccionar todos los archivos	Sélectionner tous les fichiers	Alle Dateien auswählen	Выбрать все файлы	Selecionar todos os ficheiros
+quickEntry	快捷入口	Quick entry	快捷入口	クイックエント리	빠른 진입	Acceso rápido	Accès rapide	Schnellzugriff	Быстрый доступ	Atalho rápido
+mergedDocument	合并文档	Merged document	合併文件	結合ドキュメント	병합된 문서	Documento fusionado	Document fusionné	Zusammengeführtes Dokument	Объединённый документ	Documento mesclado
+splitDocument	拆分文档	Split document	拆分文件	ドキュメントを分割	문서 분할	Dividir documento	Diviser le document	Dokument teilen	Разделить документ	Dividir documento
+savedSuccessfully	保存成功	Saved successfully	儲存成功	保存しました	저장됨	Guardado correctamente	Enregistré	Erfolgreich gespeichert	Успешно сохранено	Guardado com sucesso
+fileSizeAfter	压缩后大小	Size after	壓縮後大小	圧縮後のサイズ	압축 후 크기	Tamaño después	Taille après	Größe nachher	Размер после	Tamanho depois
+fileSizeBefore	压缩前大小	Size before	壓縮前大小	圧縮前のサイズ	압축 전 크기	Tamaño antes	Taille avant	Größe vorher	Размер до	Tamanho antes
+exportFormat	导出格式	Export format	匯出格式	エクスポート形式	내보내기 형식	Formato de exportación	Format d'export	Exportformat	Формат экспорта	Formato de exportação
+longImage	长图	Long image	長圖	ロング画像	긴 이미지	Imagen larga	Image longue	Langes Bild	Длинное изображение	Imagem longa
+originalFormat	原格式	Original	原格式	オリジナル	원본	Original	Original	Original	Оригинал	Original
+zipPackage	逐页图包	Page ZIP	逐頁圖包	ページ ZIP	페이지 ZIP	ZIP de páginas	ZIP de pages	Seiten-ZIP	ZIP страниц	ZIP de páginas
+plainText	纯文本	Plain text	純文字	プレーンテキ스트	일반 텍스트	Texto sin formato	Texte brut	Klartext	Обычный текст	Texto simples
+lanTransfer	局域网传输	LAN transfer	區域網路傳輸	LAN 転送	LAN 전송	Transferencia LAN	Transfert LAN	LAN-Übertragung	Передача по LAN	Transferência LAN
+systemShare	系统分享	System share	系統分享	システム共有	시스템 공유	Compartir del sistema	Partage système	Systemfreigabe	Системная отправка	Partilha do sistema
+readAndEdit	阅读与编辑	Read & edit	閱讀與編輯	閲覧と編集	읽기 및 편집	Leer y editar	Lire et modifier	Lesen und bearbeiten	Читать и редактировать	Ler e editar
+fileType	文件类型	File type	檔案類型	ファイル形式	파일 형식	Tipo de archivo	Type de fichier	Dateityp	Тип файла	Tipo de ficheiro
+storageUsed	已用空间	Used storage	已用空間	使用容量	사용 용량	Espacio usado	Espace utilisé	Belegter Speicher	Занятое место	Espaço utilizado
+clearAll	清空	Clear all	清空	すべてクリア	전체 삭제	Vaciar todo	Tout effacer	Alles löschen	Очистить всё	Limpar tudo
+confirmDeleteTitle	删除确认	Confirm delete	刪除確認	削除の確認	삭제 확인	Confirmar borrado	Confirmer la suppression	Löschen bestätigen	Подтвердить удаление	Confirmar eliminação
+confirmDeleteMessage	确定要删除所选文件吗？	Are you sure you want to delete the selected files?	確定要刪除所選檔案嗎？	選択したファイルを削除しますか？	선택한 파일을 삭제할까요?	¿Seguro que quieres eliminar los archivos seleccionados?	Voulez-vous vraiment supprimer les fichiers sélectionnés ?	Möchten Sie die ausgewählten Dateien wirklich löschen?	Удалить выбранные файлы?	Tem a certeza de que quer eliminar os ficheiros selecionados?
+saveConfirmTitle	保存确认	Confirm save	儲存確認	保存の確認	저장 확인	Confirmar guardado	Confirmer l'enregistrement	Speichern bestätigen	Подтвердить сохранение	Confirmar gravação
+saveConfirmMessage	文件已保存，是否继续？	The file has been saved. Continue?	檔案已儲存，是否繼續？	ファイルを保存しました。続行しますか？	파일이 저장되었습니다. 계속할까요?	El archivo se ha guardado. ¿Continuar?	Le fichier a été enregistré. Continuer ?	Die Datei wurde gespeichert. Fortfahren?	Файл сохранён. Продолжить?	O ficheiro foi guardado. Continuar?
+notificationTitle	转换完成	Conversion complete	轉換完成	変換が完了しました	변환 완료	Conversión completada	Conversion terminée	Konvertierung abgeschlossen	Преобразование завершено	Conversão concluída
+languageSelection	语言选择	Language selection	語言選擇	言語選択	언어 선택	Selección de idioma	Sélection de la langue	Sprachauswahl	Выбор языка	Seleção de idioma

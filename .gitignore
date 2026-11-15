@@ -1,0 +1,18 @@
+*.iml
+.gradle
+/local.properties
+/.idea
+.DS_Store
+/build
+build/
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# Local tool caches
+.kotlin/
+.kilocode/
+
+# Moonvy design tree cache - regenerate with moonvy_sync_project
+.moonvy-mcp/trees/

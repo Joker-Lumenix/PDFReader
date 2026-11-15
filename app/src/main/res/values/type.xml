@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Typography scale extracted from the Moonvy design (57 combinations).
+  Named <size>_<weight>; the design families Freeman / Poppins / Qwigley have no
+  system counterpart, the system sans-serif is used instead (see the comment).
+-->
+<resources>
+    <style name="design_text_172_900" parent="@android:style/TextAppearance">
+        android:textSize="172sp"
+        android:fontFamily="sans-serif"
+        android:letterSpacing="2"
+    </style>
+    <style name="design_text_84_400" parent="@android:style/TextAppearance">
+        android:textSize="84sp"
+        android:fontFamily="Qwigley"
+        android:letterSpacing="-0.42"
+    </style> <!-- design font: Qwigley -->
+    <style name="design_text_75_400" parent="@android:style/TextAppearance">
+        android:textSize="75sp"
+        android:fontFamily="Qwigley"
+        android:letterSpacing="-0.21"
+    </style> <!-- design font: Qwigley -->
+    <style name="design_text_42_400" parent="@android:style/TextAppearance">
+        android:textSize="42sp"
+        android:fontFamily="Qwigley"
+        android:letterSpacing="-0.21"
+    </style> <!-- design font: Qwigley -->
+    <style name="design_text_30_700" parent="@android:style/TextAppearance">
+        android:textSize="30sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_24_900" parent="@android:style/TextAppearance">
+        android:textSize="24sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_24_400" parent="@android:style/TextAppearance">
+        android:textSize="24sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_24_700" parent="@android:style/TextAppearance">
+        android:textSize="24sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_20_700" parent="@android:style/TextAppearance">
+        android:textSize="20sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_20_600" parent="@android:style/TextAppearance">
+        android:textSize="20sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_20_900" parent="@android:style/TextAppearance">
+        android:textSize="20sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_20_400" parent="@android:style/TextAppearance">
+        android:textSize="20sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_20_500" parent="@android:style/TextAppearance">
+        android:textSize="20sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_18_600" parent="@android:style/TextAppearance">
+        android:textSize="18sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_18_600_lh21" parent="@android:style/TextAppearance">
+        android:textSize="18sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_18_500" parent="@android:style/TextAppearance">
+        android:textSize="18sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_17_33_500" parent="@android:style/TextAppearance">
+        android:textSize="17.33sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_17_500" parent="@android:style/TextAppearance">
+        android:textSize="17sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_16_500" parent="@android:style/TextAppearance">
+        android:textSize="16sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_16_400" parent="@android:style/TextAppearance">
+        android:textSize="16sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_16_600" parent="@android:style/TextAppearance">
+        android:textSize="16sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_16_400_lh20" parent="@android:style/TextAppearance">
+        android:textSize="16sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_16_400_lh22" parent="@android:style/TextAppearance">
+        android:textSize="16sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_16_600_lh19" parent="@android:style/TextAppearance">
+        android:textSize="16sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_16_400_lh24" parent="@android:style/TextAppearance">
+        android:textSize="16sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_15_65_400" parent="@android:style/TextAppearance">
+        android:textSize="15.65sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_15_600" parent="@android:style/TextAppearance">
+        android:textSize="15sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_15_600_lh18" parent="@android:style/TextAppearance">
+        android:textSize="15sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_15_400" parent="@android:style/TextAppearance">
+        android:textSize="15sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_15_500" parent="@android:style/TextAppearance">
+        android:textSize="15sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_15_600_lh20" parent="@android:style/TextAppearance">
+        android:textSize="15sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_14_55_600" parent="@android:style/TextAppearance">
+        android:textSize="14.55sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_14_500" parent="@android:style/TextAppearance">
+        android:textSize="14sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_14_600" parent="@android:style/TextAppearance">
+        android:textSize="14sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_14_400" parent="@android:style/TextAppearance">
+        android:textSize="14sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_14_900" parent="@android:style/TextAppearance">
+        android:textSize="14sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_14_400_lh26" parent="@android:style/TextAppearance">
+        android:textSize="14sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_14_700" parent="@android:style/TextAppearance">
+        android:textSize="14sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_14_400_lh24" parent="@android:style/TextAppearance">
+        android:textSize="14sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_13_04_500" parent="@android:style/TextAppearance">
+        android:textSize="13.04sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_12_8_400" parent="@android:style/TextAppearance">
+        android:textSize="12.8sp"
+        android:fontFamily="Freeman"
+    </style> <!-- design font: Freeman -->
+    <style name="design_text_12_25_500" parent="@android:style/TextAppearance">
+        android:textSize="12.25sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_12_500" parent="@android:style/TextAppearance">
+        android:textSize="12sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_12_400" parent="@android:style/TextAppearance">
+        android:textSize="12sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_12_600" parent="@android:style/TextAppearance">
+        android:textSize="12sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_12_500_lh14" parent="@android:style/TextAppearance">
+        android:textSize="12sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_12_400_lh14" parent="@android:style/TextAppearance">
+        android:textSize="12sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_12_400_lh16" parent="@android:style/TextAppearance">
+        android:textSize="12sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_12_500_lh18" parent="@android:style/TextAppearance">
+        android:textSize="12sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_11_3_400" parent="@android:style/TextAppearance">
+        android:textSize="11.3sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_11_400" parent="@android:style/TextAppearance">
+        android:textSize="11sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_10_700" parent="@android:style/TextAppearance">
+        android:textSize="10sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_10_500" parent="@android:style/TextAppearance">
+        android:textSize="10sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_10_400" parent="@android:style/TextAppearance">
+        android:textSize="10sp"
+        android:fontFamily="sans-serif-medium"
+    </style> <!-- design font: Poppins -->
+    <style name="design_text_10_400_lh12" parent="@android:style/TextAppearance">
+        android:textSize="10sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_8_7_700" parent="@android:style/TextAppearance">
+        android:textSize="8.7sp"
+        android:fontFamily="sans-serif"
+    </style>
+    <style name="design_text_5_4_500" parent="@android:style/TextAppearance">
+        android:textSize="5.4sp"
+        android:fontFamily="sans-serif"
+    </style>
+</resources>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Spacing / radius tokens extracted from the Moonvy design. -->
+<resources>
+    <!-- Spacing scale (M3 4dp grid, from the design system) -->
+    <dimen name="space_xxs">2dp</dimen>
+    <dimen name="space_xs">4dp</dimen>
+    <dimen name="space_s">8dp</dimen>
+    <dimen name="space_m">12dp</dimen>
+    <dimen name="space_ml">16dp</dimen>
+    <dimen name="space_l">20dp</dimen>
+    <dimen name="space_xl">24dp</dimen>
+    <dimen name="space_xxl">32dp</dimen>
+    <!-- Screen layout -->
+    <dimen name="screen_margin">16dp</dimen>
+    <dimen name="screen_margin_tablet">24dp</dimen>
+    <dimen name="gutter_sm">8dp</dimen>
+    <dimen name="gutter">16dp</dimen>
+    <dimen name="top_bar_height">64dp</dimen>
+    <dimen name="nav_bar_height">80dp</dimen>
+    <!-- Corner radii -->
+    <dimen name="radius_xs">2dp</dimen>
+    <dimen name="radius_s">4dp</dimen>
+    <dimen name="radius_m">8dp</dimen>
+    <dimen name="radius_l">12dp</dimen>
+    <dimen name="radius_xl">16dp</dimen>
+    <dimen name="radius_xxl">20dp</dimen>
+    <dimen name="radius_full">999dp</dimen>
+
+    <!-- Exact corner radii observed in the design -->
+    <dimen name="dsg_radius_0_18">0.18dp</dimen>
+    <dimen name="dsg_radius_0_5">0.5dp</dimen>
+    <dimen name="dsg_radius_0_87">0.87dp</dimen>
+    <dimen name="dsg_radius_1">1dp</dimen>
+    <dimen name="dsg_radius_2">2dp</dimen>
+    <dimen name="dsg_radius_3_08">3.08dp</dimen>
+    <dimen name="dsg_radius_3_11">3.11dp</dimen>
+    <dimen name="dsg_radius_3_2">3.2dp</dimen>
+    <dimen name="dsg_radius_3_56">3.56dp</dimen>
+    <dimen name="dsg_radius_3_6">3.6dp</dimen>
+    <dimen name="dsg_radius_4">4dp</dimen>
+    <dimen name="dsg_radius_4_31">4.31dp</dimen>
+    <dimen name="dsg_radius_4_67">4.67dp</dimen>
+    <dimen name="dsg_radius_5">5dp</dimen>
+    <dimen name="dsg_radius_5_22">5.22dp</dimen>
+    <dimen name="dsg_radius_5_4">5.4dp</dimen>
+    <dimen name="dsg_radius_5_83">5.83dp</dimen>
+    <dimen name="dsg_radius_6">6dp</dimen>
+    <dimen name="dsg_radius_6_4">6.4dp</dimen>
+    <dimen name="dsg_radius_7">7dp</dimen>
+    <dimen name="dsg_radius_8">8dp</dimen>
+    <dimen name="dsg_radius_11_18">11.18dp</dimen>
+    <dimen name="dsg_radius_11_7">11.7dp</dimen>
+    <dimen name="dsg_radius_12">12dp</dimen>
+    <dimen name="dsg_radius_13">13dp</dimen>
+    <dimen name="dsg_radius_16">16dp</dimen>
+    <dimen name="dsg_radius_17_14">17.14dp</dimen>
+    <dimen name="dsg_radius_20">20dp</dimen>
+    <dimen name="dsg_radius_20_3">20.3dp</dimen>
+    <dimen name="dsg_radius_23_2">23.2dp</dimen>
+    <dimen name="dsg_radius_24">24dp</dimen>
+    <dimen name="dsg_radius_26_09">26.09dp</dimen>
+    <dimen name="dsg_radius_27">27dp</dimen>
+    <dimen name="dsg_radius_31">31dp</dimen>
+    <dimen name="dsg_radius_36">36dp</dimen>
+</resources>
