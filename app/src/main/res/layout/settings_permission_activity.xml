@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  "Allow access to all files" page: the hero illustration, the state card with
+  the permission switch, the rationale and the allow button.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/surface_card"
+    android:orientation="vertical">
+
+    <com.peng.pdfreader.appcore.widget.PageTitleBar
+        android:id="@+id/titleBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="286dp"
+        android:layout_marginTop="21dp">
+
+        <ImageView
+            android:id="@+id/ivIllustration"
+            android:layout_width="320dp"
+            android:layout_height="286dp"
+            android:layout_gravity="center_horizontal"
+            android:contentDescription="@null"
+            android:scaleType="centerCrop"
+            android:src="@mipmap/bg_file_access" />
+
+        <LinearLayout
+            android:id="@+id/llPermissionCard"
+            android:layout_width="320dp"
+            android:layout_height="58dp"
+            android:layout_gravity="center_horizontal|bottom"
+            android:layout_marginBottom="40dp"
+            android:background="@drawable/bg_card_r8"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/space_ml"
+            android:paddingEnd="@dimen/space_ml">
+
+            <TextView
+                android:id="@+id/tvPermissionLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/permission_allow_all_files"
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switchPermission"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="false"
+                android:focusable="false" />
+        </LinearLayout>
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/screen_margin"
+        android:layout_marginTop="36dp"
+        android:layout_marginEnd="@dimen/screen_margin"
+        android:text="@string/permission_required"
+        android:textColor="@color/text_secondary"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvBody"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/screen_margin"
+        android:layout_marginTop="@dimen/space_s"
+        android:layout_marginEnd="@dimen/screen_margin"
+        android:lineSpacingExtra="4dp"
+        android:text="@string/permission_rationale"
+        android:textColor="@color/text_tertiary"
+        android:textSize="14sp" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnAllow"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="@dimen/space_xxl"
+        android:background="@drawable/gradient_red"
+        android:backgroundTint="@null"
+        android:letterSpacing="0"
+        android:stateListAnimator="@null"
+        android:text="@string/allow"
+        android:textColor="@color/text_on_tint"
+        android:textSize="16sp" />
+
+</LinearLayout>

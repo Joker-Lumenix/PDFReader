@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Signature editor.
+  Top bar: back, undo, redo and the confirm pill.
+  Content: the signing canvas and the floating colour palette.
+  Bottom: the colour bar of the design.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/surface_blue_tint"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="87dp"
+            android:background="@color/surface_card"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp">
+
+            <ImageView
+                android:id="@+id/ivBack"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="@string/preview_cd_back"
+                android:src="@mipmap/ic_back" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <ImageView
+                android:id="@+id/ivUndo"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="16dp"
+                android:contentDescription="@string/preview_cd_undo"
+                android:src="@mipmap/ic_undo_unable" />
+
+            <ImageView
+                android:id="@+id/ivRedo"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="16dp"
+                android:contentDescription="@string/preview_cd_redo"
+                android:src="@mipmap/ic_clockwise" />
+
+            <TextView
+                android:id="@+id/tvDone"
+                android:layout_width="55dp"
+                android:layout_height="24dp"
+                android:background="@drawable/gradient_red"
+                android:clickable="true"
+                android:contentDescription="@string/preview_cd_done"
+                android:focusable="true"
+                android:gravity="center"
+                android:text="✓"
+                android:textColor="@color/text_on_tint"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/surface_hairline" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <com.peng.pdfreader.appcore.widget.SignatureCanvasView
+            android:id="@+id/canvas"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <LinearLayout
+            android:id="@+id/llPalette"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginBottom="52dp"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:visibility="gone">
+
+            <com.peng.pdfreader.appcore.widget.ColorPaletteView
+                android:id="@+id/palette"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent" />
+        </LinearLayout>
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="44dp"
+        android:background="@color/white"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="20dp">
+
+        <TextView
+            android:id="@+id/tvColorLabel"
+            style="@style/TextAppearance.AppCore.Meta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:focusable="true"
+            android:text="@string/preview_color"
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tvColorSwatch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:contentDescription="@string/preview_cd_color"
+            android:text="●"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+</LinearLayout>

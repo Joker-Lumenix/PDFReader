@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copy of the home tab.
+  Only strings that are owned by the home feature live here; the shared file
+  type names (PDF / Word / Excel / PPT) and the generic "All" come from the
+  common string table so that every tab speaks the same language.
+-->
+<resources>
+    <!-- quick action cards -->
+    <string name="home_quick_image_to_pdf">Изображение в PDF</string>
+    <string name="home_quick_merge_pdf">Объединить PDF</string>
+    <string name="home_quick_more">Ещё</string>
+
+    <!-- empty state -->
+    <string name="home_empty_title">Нет разрешений</string>
+    <string name="home_empty_hint">Для чтения всех файлов нужно разрешение.</string>
+    <string name="home_empty_action">Перейти к настройкам</string>
+
+    <!-- title bar actions / scan button -->
+    <string name="home_share">Поделиться</string>
+    <string name="home_print">Печать</string>
+    <string name="home_more">Ещё</string>
+    <string name="home_scan">Сканировать</string>
+</resources>

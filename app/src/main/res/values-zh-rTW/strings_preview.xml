@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copy of the document preview and of the annotation editors.
+  The strings live in their own file so the shared table stays untouched.
+-->
+<resources>
+
+    <!-- bottom toolbar of the reader -->
+    <string name="preview_favorite">收藏</string>
+    <string name="preview_annotate">批註</string>
+    <string name="preview_open_with">開啟方式</string>
+    <string name="preview_share">分享</string>
+    <string name="preview_more">更多</string>
+
+    <!-- reader -->
+    <string name="preview_page_indicator">%1$d / %2$d</string>
+    <string name="preview_outline">目錄大綱</string>
+    <string name="preview_add_bookmark">加入目前頁書籤</string>
+    <string name="preview_reading_mode">閱讀視覺模式</string>
+    <string name="preview_mode_light">標準</string>
+    <string name="preview_mode_sepia">米黃</string>
+    <string name="preview_mode_night">夜間</string>
+    <string name="preview_mode_black">全黑</string>
+    <string name="preview_bookmark_added">已加入書籤</string>
+
+    <!-- annotation tools -->
+    <string name="preview_tool_highlight">螢光筆</string>
+    <string name="preview_tool_underline">底線</string>
+    <string name="preview_tool_strikethrough">刪除線</string>
+    <string name="preview_tool_draw">手繪</string>
+    <string name="preview_tool_note">便利貼</string>
+    <string name="preview_tool_signature">電子簽名</string>
+    <string name="preview_select_area">在頁面上拖曳以選取區域</string>
+    <string name="preview_note_hint">輸入批註內容</string>
+    <string name="preview_note_save">儲存批註</string>
+
+    <!-- editors -->
+    <string name="preview_color">顏色</string>
+    <string name="preview_save_to_document">儲存到文件</string>
+    <string name="preview_signature_saved">簽名已儲存</string>
+    <string name="preview_draw_saved">標註已儲存，並已產生批註版文件</string>
+
+    <!-- states -->
+    <string name="preview_loading">正在解析文件…</string>
+    <string name="preview_load_failed">無法預覽此文件</string>
+    <string name="preview_load_failed_hint">檔案可能已損毀或格式尚未支援</string>
+    <string name="preview_retry">重試</string>
+    <string name="preview_rename_hint">輸入新的檔案名稱</string>
+
+    <!-- content descriptions -->
+    <string name="preview_cd_back">返回</string>
+    <string name="preview_cd_more">更多操作</string>
+    <string name="preview_cd_rename">重新命名</string>
+    <string name="preview_cd_undo">復原</string>
+    <string name="preview_cd_redo">重做</string>
+    <string name="preview_cd_done">完成</string>
+    <string name="preview_cd_color">選擇顏色</string>
+    <string name="preview_cd_size">選擇粗細</string>
+    <string name="preview_cd_favorite">收藏</string>
+    <string name="preview_cd_share">分享</string>
+    <string name="preview_cd_open_with">開啟方式</string>
+    <string name="preview_cd_annotate">批註</string>
+    <string name="preview_cd_page">第 %1$d 頁</string>
+    <string name="preview_cd_slide">第 %1$d 張</string>
+
+</resources>

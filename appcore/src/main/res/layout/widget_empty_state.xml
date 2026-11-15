@@ -15,7 +15,7 @@
 
     <TextView
         android:id="@+id/tvTitle"
-        style="@style/TextAppearance.AppCore.PageTitle"
+        style="@style/TextAppearance.AppCore.EmptyTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
@@ -34,7 +34,7 @@
         android:id="@+id/tvAction"
         style="@style/TextAppearance.AppCore.Button"
         android:layout_width="wrap_content"
-        android:layout_height="48dp"
+        android:layout_height="43dp"
         android:layout_marginTop="16dp"
         android:background="@drawable/gradient_red"
         android:clickable="true"

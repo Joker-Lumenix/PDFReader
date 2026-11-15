@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="error_pdf_unreadable">파일을 읽을 수 없습니다. 아직 존재하는지 확인하세요</string>
+    <string name="error_pdf_unwritable">파일을 저장할 수 없습니다. 여유 공간을 확인하세요</string>
+    <string name="error_cancelled">작업이 취소되었습니다</string>
+    <string name="error_pdf_structure">이 PDF의 구조를解析할 수 없습니다</string>
+    <string name="error_pdf_encrypted">암호화된 문서는 처리할 수 없습니다</string>
+    <string name="error_no_files">처리할 파일이 없습니다</string>
+    <string name="error_no_pages">처리할 페이지가 없습니다</string>
+    <string name="error_no_images">변환할 이미지가 없습니다</string>
+    <string name="error_wrong_password">비밀번호가 올바르지 않습니다</string>
+    <string name="error_not_encrypted">이 문서는 앱에서 암호화한 문서가 아닙니다</string>
+    <string name="error_weak_password">비밀번호는 4자 이상이어야 합니다</string>
+    <string name="error_io">파일을 읽거나 쓰지 못했습니다. 다시 시도하세요</string>
+    <string name="annotated_suffix">주석</string>
+</resources>

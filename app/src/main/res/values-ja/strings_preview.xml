@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copy of the document preview and of the annotation editors.
+  The strings live in their own file so the shared table stays untouched.
+-->
+<resources>
+
+    <!-- bottom toolbar of the reader -->
+    <string name="preview_favorite">お気に入り</string>
+    <string name="preview_annotate">注釈</string>
+    <string name="preview_open_with">開く</string>
+    <string name="preview_share">共有</string>
+    <string name="preview_more">その他</string>
+
+    <!-- reader -->
+    <string name="preview_page_indicator">%1$d / %2$d</string>
+    <string name="preview_outline">目次</string>
+    <string name="preview_add_bookmark">このページにブックマークを追加</string>
+    <string name="preview_reading_mode">閲覧モード</string>
+    <string name="preview_mode_light">標準</string>
+    <string name="preview_mode_sepia">セピア</string>
+    <string name="preview_mode_night">ダーク</string>
+    <string name="preview_mode_black">純黒</string>
+    <string name="preview_bookmark_added">ブックマークを追加しました</string>
+
+    <!-- annotation tools -->
+    <string name="preview_tool_highlight">ハイライト</string>
+    <string name="preview_tool_underline">下線</string>
+    <string name="preview_tool_strikethrough">取り消し線</string>
+    <string name="preview_tool_draw">手描き</string>
+    <string name="preview_tool_note">ノート</string>
+    <string name="preview_tool_signature">署名</string>
+    <string name="preview_select_area">ページ上でドラッグして範囲選択</string>
+    <string name="preview_note_hint">注釈を入力</string>
+    <string name="preview_note_save">注釈を保存</string>
+
+    <!-- editors -->
+    <string name="preview_color">色</string>
+    <string name="preview_save_to_document">ドキュメントに保存</string>
+    <string name="preview_signature_saved">署名を保存しました</string>
+    <string name="preview_draw_saved">注釈を保存し、注釈付きのコピーを作成しました</string>
+
+    <!-- states -->
+    <string name="preview_loading">ドキュメントを読み込み中…</string>
+    <string name="preview_load_failed">このドキュメントを表示できません</string>
+    <string name="preview_load_failed_hint">ファイルが破損しているか、まだ対応していない形式です</string>
+    <string name="preview_retry">再試行</string>
+    <string name="preview_rename_hint">新しいファイル名を入力</string>
+
+    <!-- content descriptions -->
+    <string name="preview_cd_back">戻る</string>
+    <string name="preview_cd_more">その他の操作</string>
+    <string name="preview_cd_rename">名前を変更</string>
+    <string name="preview_cd_undo">元に戻す</string>
+    <string name="preview_cd_redo">やり直す</string>
+    <string name="preview_cd_done">完了</string>
+    <string name="preview_cd_color">色を選択</string>
+    <string name="preview_cd_size">太さを選択</string>
+    <string name="preview_cd_favorite">お気に入り</string>
+    <string name="preview_cd_share">共有</string>
+    <string name="preview_cd_open_with">開く</string>
+    <string name="preview_cd_annotate">注釈</string>
+    <string name="preview_cd_page">%1$d ページ</string>
+    <string name="preview_cd_slide">%1$d 枚目</string>
+
+</resources>

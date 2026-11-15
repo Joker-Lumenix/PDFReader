@@ -109,6 +109,78 @@ object PdfEngine {
         out.length()
     }
 
+    // ------------------------------------------------------------------ documents
+
+    /** True when the file starts with the PDF magic. */
+    fun isPdf(file: File): Boolean = runCatching {
+        file.inputStream().use { input ->
+            val header = ByteArray(5)
+            if (input.read(header) != header.size) return false
+            String(header, Charsets.ISO_8859_1) == "%PDF-"
+        }
+    }.getOrDefault(false)
+
+    /** Copies a file, used by the tools that produce a new document. */
+    fun copyTo(source: File, target: File): Boolean = runCatching {
+        target.parentFile?.let { if (!it.exists()) it.mkdirs() }
+        source.inputStream().use { input ->
+            target.outputStream().use { output -> input.copyTo(output) }
+        }
+        true
+    }.getOrDefault(false)
+
+    // ------------------------------------------------------------------ processing
+
+    /**
+     * Concatenates documents into a new one.
+     *
+     * The work runs on a worker thread, see [PdfProcessor].
+     */
+    fun merge(
+        sources: List<File>,
+        out: File,
+        insertBlankOnOdd: Boolean = false,
+        onProgress: (PdfProgress) -> Unit = {},
+        onResult: (Result<Long>) -> Unit,
+    ): PdfJob = PdfProcessor.merge(sources, out, insertBlankOnOdd, onProgress, onResult)
+
+    /** Writes every page range into its own document. */
+    fun split(
+        source: File,
+        outDir: File,
+        ranges: List<IntRange>,
+        onProgress: (PdfProgress) -> Unit = {},
+        onResult: (Result<List<File>>) -> Unit,
+    ): PdfJob = PdfProcessor.split(source, outDir, ranges, onProgress, onResult)
+
+    /** Writes every page into its own document. */
+    fun splitEveryPage(
+        source: File,
+        outDir: File,
+        onProgress: (PdfProgress) -> Unit = {},
+        onResult: (Result<List<File>>) -> Unit,
+    ): PdfJob = PdfProcessor.splitEveryPage(source, outDir, onProgress, onResult)
+
+    /** Recompresses the streams of a document. */
+    fun compress(
+        source: File,
+        out: File,
+        quality: Int,
+        onProgress: (PdfProgress) -> Unit = {},
+        onResult: (Result<CompressResult>) -> Unit,
+    ): PdfJob = PdfProcessor.compress(source, out, quality, onProgress, onResult)
+
+    /** Places images into a new document. */
+    fun imagesToPdf(
+        images: List<File>,
+        out: File,
+        layout: ImageLayout = ImageLayout.Single,
+        marginMm: Int = 10,
+        landscape: Boolean = false,
+        onProgress: (PdfProgress) -> Unit = {},
+        onResult: (Result<Long>) -> Unit,
+    ): PdfJob = PdfProcessor.imagesToPdf(images, out, layout, marginMm, landscape, onProgress, onResult)
+
     // ------------------------------------------------------------------ text / outline
 
     fun extractOutline(file: File): List<OutlineNode> =

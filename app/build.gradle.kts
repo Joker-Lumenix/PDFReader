@@ -64,5 +64,6 @@ dependencies {
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
+    // The instrumented test parses the Office samples with the appcore parsers.
+    androidTestImplementation(project(":appcore"))
 }

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copy of the home tab.
+  Only strings that are owned by the home feature live here; the shared file
+  type names (PDF / Word / Excel / PPT) and the generic "All" come from the
+  common string table so that every tab speaks the same language.
+-->
+<resources>
+    <!-- quick action cards -->
+    <string name="home_quick_image_to_pdf">이미지 → PDF</string>
+    <string name="home_quick_merge_pdf">PDF 병합</string>
+    <string name="home_quick_more">더보기</string>
+
+    <!-- empty state -->
+    <string name="home_empty_title">권한 없음</string>
+    <string name="home_empty_hint">모든 파일을 읽으려면 권한이 필요합니다.</string>
+    <string name="home_empty_action">설정으로</string>
+
+    <!-- title bar actions / scan button -->
+    <string name="home_share">공유</string>
+    <string name="home_print">인쇄</string>
+    <string name="home_more">더보기</string>
+    <string name="home_scan">스캔</string>
+</resources>

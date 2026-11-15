@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="error_pdf_unreadable">Die Datei kann nicht gelesen werden, bitte prüfen, ob sie noch existiert</string>
+    <string name="error_pdf_unwritable">Die Datei kann nicht geschrieben werden, bitte Speicherplatz prüfen</string>
+    <string name="error_cancelled">Vorgang abgebrochen</string>
+    <string name="error_pdf_structure">Die Struktur dieser PDF kann nicht gelesen werden</string>
+    <string name="error_pdf_encrypted">Verschlüsselte Dokumente können nicht verarbeitet werden</string>
+    <string name="error_no_files">Es gibt keine Datei zum Bearbeiten</string>
+    <string name="error_no_pages">Es gibt keine Seite zum Bearbeiten</string>
+    <string name="error_no_images">Es gibt kein Bild zum Umwandeln</string>
+    <string name="error_wrong_password">Falsches Passwort</string>
+    <string name="error_not_encrypted">Dieses Dokument wurde nicht von dieser App verschlüsselt</string>
+    <string name="error_weak_password">Das Passwort braucht mindestens 4 Zeichen</string>
+    <string name="error_io">Die Datei konnte nicht gelesen oder geschrieben werden, bitte erneut versuchen</string>
+    <string name="annotated_suffix">kommentiert</string>
+</resources>

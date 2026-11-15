@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copy of the Files tab.
+
+  Only the strings that the shared library does not already provide live here;
+  everything else is reused from the app string table so the existing
+  translations keep working.
+-->
+<resources>
+
+    <!-- filter / sort sheets -->
+    <string name="files_sort_title">Isih mengikut</string>
+    <string name="files_filter_title">Jenis fail</string>
+    <string name="files_sort_section_time">Baru diubah</string>
+    <string name="files_sort_section_name">Nama</string>
+    <string name="files_sort_section_size">Saiz fail</string>
+
+    <!-- file action sheet -->
+    <string name="files_open_with">Buka dengan aplikasi lain</string>
+    <string name="files_share">Kongsi</string>
+    <string name="files_print">Cetak</string>
+    <string name="files_feature_unavailable">Ciri ini sedang dibangunkan</string>
+
+    <!-- dialogs -->
+    <string name="files_rename_hint">Masukkan nama fail baharu</string>
+    <string name="files_delete_message">Padam fail ini? Tindakan ini tidak boleh dibatalkan.</string>
+    <string name="files_save_message">Simpan perubahan pada fail ini? Tindakan ini tidak boleh dibatalkan.</string>
+
+</resources>

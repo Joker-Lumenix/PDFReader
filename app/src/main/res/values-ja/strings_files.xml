@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copy of the Files tab.
+
+  Only the strings that the shared library does not already provide live here;
+  everything else is reused from the app string table so the existing
+  translations keep working.
+-->
+<resources>
+
+    <!-- filter / sort sheets -->
+    <string name="files_sort_title">並べ替え</string>
+    <string name="files_filter_title">ファイル形式</string>
+    <string name="files_sort_section_time">更新日時</string>
+    <string name="files_sort_section_name">名前</string>
+    <string name="files_sort_section_size">ファイルサイズ</string>
+
+    <!-- file action sheet -->
+    <string name="files_open_with">別のアプリで開く</string>
+    <string name="files_share">共有</string>
+    <string name="files_print">印刷</string>
+    <string name="files_feature_unavailable">この機能は開発中です</string>
+
+    <!-- dialogs -->
+    <string name="files_rename_hint">新しいファイル名を入力</string>
+    <string name="files_delete_message">このファイルを削除しますか？元に戻せません。</string>
+    <string name="files_save_message">このファイルへの変更を保存しますか？元に戻せません。</string>
+
+</resources>

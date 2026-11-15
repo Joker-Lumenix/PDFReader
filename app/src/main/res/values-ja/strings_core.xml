@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="error_pdf_unreadable">ファイルを読み込めません。存在するか確認してください</string>
+    <string name="error_pdf_unwritable">ファイルを書き込めません。空き容量を確認してください</string>
+    <string name="error_cancelled">操作をキャンセルしました</string>
+    <string name="error_pdf_structure">この PDF の構造を解析できません</string>
+    <string name="error_pdf_encrypted">暗号化されたドキュメントは処理できません</string>
+    <string name="error_no_files">処理できるファイルがありません</string>
+    <string name="error_no_pages">処理できるページがありません</string>
+    <string name="error_no_images">変換できる画像がありません</string>
+    <string name="error_wrong_password">パスワードが違います</string>
+    <string name="error_not_encrypted">このドキュメントは当アプリで暗号化されていません</string>
+    <string name="error_weak_password">パスワードは 4 文字以上で入力してください</string>
+    <string name="error_io">ファイルの読み書きに失敗しました。もう一度お試しください</string>
+    <string name="annotated_suffix">注釈付き</string>
+</resources>

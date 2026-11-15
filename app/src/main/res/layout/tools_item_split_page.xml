@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  A page tile of the split screen (design "Split PDF").
+  The tile is 104x124 with radius 4 and carries the page number badge in its
+  top left corner (18x18, radius 4). The badge colour is applied in code -
+  green when the page is selected, translucent black when it is not.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="104dp"
+    android:layout_height="124dp"
+    android:clickable="true"
+    android:focusable="true">
+
+    <ImageView
+        android:id="@+id/ivPage"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_card_r4"
+        android:contentDescription="@string/tools_split_title"
+        android:scaleType="centerCrop" />
+
+    <TextView
+        android:id="@+id/tvNumber"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:layout_gravity="top|start"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="4dp"
+        android:autoSizeMaxTextSize="14sp"
+        android:autoSizeMinTextSize="9sp"
+        android:autoSizeTextType="uniform"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center"
+        android:maxLines="1"
+        android:textColor="@color/white" />
+
+</FrameLayout>

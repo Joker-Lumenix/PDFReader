@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Narrow "more" card of the quick action row (50x82).
+  Two overlapping chevrons, exactly like the design.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="50dp"
+    android:layout_height="82dp"
+    android:background="@drawable/bg_card_r8"
+    android:clickable="true"
+    android:focusable="true"
+    android:gravity="center"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:contentDescription="@null"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_chevron_right"
+        android:tint="@color/surface_neutral_600" />
+
+    <ImageView
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="-12dp"
+        android:contentDescription="@null"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_chevron_right"
+        android:tint="@color/surface_neutral_600" />
+
+</LinearLayout>

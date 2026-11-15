@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copy of the settings / language / feedback / onboarding feature.
+
+  Every key is prefixed with the feature it belongs to so it can never
+  collide with the base string table; base keys that already carry the same
+  wording are reused instead of being duplicated here.
+-->
+<resources>
+
+    <!-- ==================== settings ==================== -->
+    <string name="settings_share_app">مشاركة التطبيق</string>
+    <string name="settings_share_message">إليك أداة PDF سهلة الاستخدام: %1$s</string>
+    <string name="settings_follow_system">اتّباع النظام</string>
+    <string name="settings_privacy_policy">سياسة الخصوصية</string>
+    <string name="settings_terms_of_use">شروط الاستخدام</string>
+    <string name="settings_version_format">الإصدار: v%1$s</string>
+    <string name="settings_action_more">المزيد</string>
+    <string name="settings_close">إغلاق</string>
+    <string name="settings_screen_missing">هذه الشاشة غير متاحة حاليًا</string>
+
+    <!-- ==================== language ==================== -->
+    <!-- Endonyms: they are written the way the language itself writes it. -->
+    <string name="language_en" translatable="false">English</string>
+    <string name="language_fr" translatable="false">Français</string>
+    <string name="language_ms" translatable="false">Bahasa Melayu</string>
+    <string name="language_es" translatable="false">Español</string>
+    <string name="language_pt" translatable="false">Português</string>
+    <string name="language_de" translatable="false">Deutsch</string>
+    <string name="language_ja" translatable="false">日本語</string>
+    <string name="language_ko" translatable="false">한국인</string>
+    <string name="language_ru" translatable="false">Русский</string>
+    <string name="language_ar" translatable="false">اللغة العربية</string>
+    <string name="language_zh_cn" translatable="false">简体中文</string>
+    <string name="language_zh_tw" translatable="false">繁體中文</string>
+
+    <!-- ==================== feedback ==================== -->
+    <string name="feedback_heading">ما المشكلات التي واجهتك؟</string>
+    <string name="feedback_input_hint">اكتب هنا…</string>
+    <string name="feedback_mail_subject">ملاحظات Let\'s PDF</string>
+    <string name="feedback_mail_opened">تم فتح تطبيق البريد</string>
+    <string name="feedback_no_mail_app">لم يتم العثور على تطبيق بريد، يرجى تثبيته ثم المحاولة</string>
+
+    <!-- ==================== rating ==================== -->
+    <string name="rating_question">هل أعجبك Let\'s PDF؟</string>
+    <string name="rating_hint">قيّم التطبيق من فضلك!</string>
+    <string name="rating_neutral">مقبول</string>
+    <string name="rating_later">لاحقًا</string>
+    <string name="rating_store_missing">لم يتم العثور على متجر التطبيقات</string>
+
+    <!-- ==================== onboarding ==================== -->
+    <string name="onboarding_skip">تخطٍّ</string>
+    <string name="onboarding_start">ابدأ</string>
+
+    <!-- ==================== permission ==================== -->
+    <string name="permission_allow_all_files">السماح بالوصول إلى جميع الملفات</string>
+
+    <!-- ==================== default reader sheet ==================== -->
+    <string name="set_default_title">تعيينه كقارئ PDF الافتراضي</string>
+    <string name="set_default_subtitle">اختر «Let\'s PDF: View &amp; Sign» ثم اضغط «دائمًا»</string>
+    <string name="set_default_mock_once">مرة واحدة فقط</string>
+    <string name="set_default_mock_always">دائمًا</string>
+
+    <!-- ==================== quick entry popup ==================== -->
+    <string name="quick_entry_scan">مسح PDF</string>
+    <string name="quick_entry_merge">دمج PDF</string>
+    <string name="quick_entry_print">طباعة PDF</string>
+
+    <!-- ==================== notices ==================== -->
+    <!-- Placeholder copy: the final legal text has to be supplied by the app owner. -->
+    <string name="notice_privacy_body">نحن نهتم بخصوصيتك. تبقى جميع الملفات داخل هذا التطبيق محفوظة في البيئة المعزولة للجهاز فقط، دون رفعها إلى أي خادم، ودون جمع أي بيانات شخصية. ستُضاف الصياغة النهائية لسياسة الخصوصية بعد اعتمادها من القسم القانوني.</string>
+    <string name="notice_terms_body">باستخدامك هذا التطبيق فإنك توافق على شروط الاستخدام التالية. ستُضاف الصياغة النهائية لشروط الخدمة بعد اعتمادها من القسم القانوني.</string>
+
+</resources>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="error_pdf_unreadable">Impossible de lire le fichier, vérifiez qu\'il existe toujours</string>
+    <string name="error_pdf_unwritable">Impossible d\'écrire le fichier, vérifiez l\'espace disponible</string>
+    <string name="error_cancelled">Opération annulée</string>
+    <string name="error_pdf_structure">La structure de ce PDF ne peut pas être analysée</string>
+    <string name="error_pdf_encrypted">Les documents chiffrés ne peuvent pas être traités</string>
+    <string name="error_no_files">Aucun fichier à traiter</string>
+    <string name="error_no_pages">Aucune page à traiter</string>
+    <string name="error_no_images">Aucune image à convertir</string>
+    <string name="error_wrong_password">Mot de passe incorrect</string>
+    <string name="error_not_encrypted">Ce document n\'a pas été chiffré par cette application</string>
+    <string name="error_weak_password">Le mot de passe doit contenir au moins 4 caractères</string>
+    <string name="error_io">Le fichier n\'a pas pu être lu ou écrit, réessayez</string>
+    <string name="annotated_suffix">annoté</string>
+</resources>

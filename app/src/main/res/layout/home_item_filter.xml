@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  One segment of the file type filter strip.
+  Label 14sp / 500, active indicator 44x2 brand pill under the label.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/filterLabel"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="bottom|center_horizontal"
+        android:includeFontPadding="false"
+        android:textColor="@color/text_disabled"
+        android:textSize="14sp" />
+
+    <!-- bg_type_chip is a rounded shape, tinted to the brand red it becomes the
+         44x2 pill the design shows below the active label. -->
+    <View
+        android:id="@+id/filterIndicator"
+        android:layout_width="44dp"
+        android:layout_height="2dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/bg_type_chip"
+        android:backgroundTint="@color/brand_primary" />
+
+</LinearLayout>

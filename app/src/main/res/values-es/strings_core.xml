@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="error_pdf_unreadable">No se puede leer el archivo, comprueba que aún exista</string>
+    <string name="error_pdf_unwritable">No se puede escribir el archivo, comprueba el espacio libre</string>
+    <string name="error_cancelled">Operación cancelada</string>
+    <string name="error_pdf_structure">No se puede analizar la estructura de este PDF</string>
+    <string name="error_pdf_encrypted">Los documentos cifrados no se pueden procesar</string>
+    <string name="error_no_files">No hay ningún archivo con el que trabajar</string>
+    <string name="error_no_pages">No hay ninguna página con la que trabajar</string>
+    <string name="error_no_images">No hay ninguna imagen que convertir</string>
+    <string name="error_wrong_password">Contraseña incorrecta</string>
+    <string name="error_not_encrypted">Este documento no fue cifrado por esta aplicación</string>
+    <string name="error_weak_password">La contraseña necesita al menos 4 caracteres</string>
+    <string name="error_io">No se pudo leer o escribir el archivo, inténtalo de nuevo</string>
+    <string name="annotated_suffix">anotado</string>
+</resources>

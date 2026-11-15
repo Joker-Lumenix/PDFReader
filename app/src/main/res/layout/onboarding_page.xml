@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  One page of the onboarding: the illustration on top, the title and the
+  subtitle underneath.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/ivIllustration"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:contentDescription="@null"
+        android:scaleType="fitCenter"
+        tools:src="@mipmap/bg_guide_1" />
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_l"
+        android:layout_marginEnd="@dimen/space_l"
+        android:gravity="center"
+        android:textColor="@color/text_secondary"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        tools:text="Convert Image to PDF" />
+
+    <TextView
+        android:id="@+id/tvSubtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_l"
+        android:layout_marginTop="@dimen/space_s"
+        android:layout_marginEnd="@dimen/space_l"
+        android:gravity="center"
+        android:textColor="@color/text_tertiary"
+        android:textSize="14sp"
+        tools:text="One-click fast conversion" />
+
+</LinearLayout>

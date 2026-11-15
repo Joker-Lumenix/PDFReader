@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copy of the settings / language / feedback / onboarding feature.
+
+  Every key is prefixed with the feature it belongs to so it can never
+  collide with the base string table; base keys that already carry the same
+  wording are reused instead of being duplicated here.
+-->
+<resources>
+
+    <!-- ==================== settings ==================== -->
+    <string name="settings_share_app">分享应用</string>
+    <string name="settings_share_message">推荐给你一个顺手的 PDF 工具：%1$s</string>
+    <string name="settings_follow_system">跟随系统</string>
+    <string name="settings_privacy_policy">隐私政策</string>
+    <string name="settings_terms_of_use">使用条款</string>
+    <string name="settings_version_format">版本：v%1$s</string>
+    <string name="settings_action_more">更多</string>
+    <string name="settings_close">关闭</string>
+    <string name="settings_screen_missing">页面暂不可用</string>
+
+    <!-- ==================== language ==================== -->
+    <!-- Endonyms: they are written the way the language itself writes it. -->
+    <string name="language_en" translatable="false">English</string>
+    <string name="language_fr" translatable="false">Français</string>
+    <string name="language_ms" translatable="false">Bahasa Melayu</string>
+    <string name="language_es" translatable="false">Español</string>
+    <string name="language_pt" translatable="false">Português</string>
+    <string name="language_de" translatable="false">Deutsch</string>
+    <string name="language_ja" translatable="false">日本語</string>
+    <string name="language_ko" translatable="false">한국인</string>
+    <string name="language_ru" translatable="false">Русский</string>
+    <string name="language_ar" translatable="false">اللغة العربية</string>
+    <string name="language_zh_cn" translatable="false">简体中文</string>
+    <string name="language_zh_tw" translatable="false">繁體中文</string>
+
+    <!-- ==================== feedback ==================== -->
+    <string name="feedback_heading">遇到了哪些问题？</string>
+    <string name="feedback_input_hint">请在此输入…</string>
+    <string name="feedback_mail_subject">Let\'s PDF 用户反馈</string>
+    <string name="feedback_mail_opened">已打开邮件应用</string>
+    <string name="feedback_no_mail_app">未检测到邮件应用，请先安装后再试</string>
+
+    <!-- ==================== rating ==================== -->
+    <string name="rating_question">你喜欢 Let\'s PDF 吗？</string>
+    <string name="rating_hint">欢迎给我们打个分！</string>
+    <string name="rating_neutral">还不错</string>
+    <string name="rating_later">以后再说</string>
+    <string name="rating_store_missing">未检测到应用商店</string>
+
+    <!-- ==================== onboarding ==================== -->
+    <string name="onboarding_skip">跳过</string>
+    <string name="onboarding_start">开始使用</string>
+
+    <!-- ==================== permission ==================== -->
+    <string name="permission_allow_all_files">允许访问全部文件</string>
+
+    <!-- ==================== default reader sheet ==================== -->
+    <string name="set_default_title">设为默认 PDF 阅读器</string>
+    <string name="set_default_subtitle">选择“Let\'s PDF: View &amp; Sign”，然后点击“始终”</string>
+    <string name="set_default_mock_once">仅一次</string>
+    <string name="set_default_mock_always">始终</string>
+
+    <!-- ==================== quick entry popup ==================== -->
+    <string name="quick_entry_scan">扫描 PDF</string>
+    <string name="quick_entry_merge">合并 PDF</string>
+    <string name="quick_entry_print">打印 PDF</string>
+
+    <!-- ==================== notices ==================== -->
+    <!-- Placeholder copy: the final legal text has to be supplied by the app owner. -->
+    <string name="notice_privacy_body">我们重视你的隐私。本应用中的所有文件仅保存在本机沙盒内，不会上传到任何服务器，也不会收集你的个人数据。正式的隐私政策文本待法务确认后补充。</string>
+    <string name="notice_terms_body">使用本应用即表示你同意以下使用条款。正式的服务条款文本待法务确认后补充。</string>
+
+</resources>

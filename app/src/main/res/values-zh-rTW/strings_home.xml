@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copy of the home tab.
+  Only strings that are owned by the home feature live here; the shared file
+  type names (PDF / Word / Excel / PPT) and the generic "All" come from the
+  common string table so that every tab speaks the same language.
+-->
+<resources>
+    <!-- quick action cards -->
+    <string name="home_quick_image_to_pdf">圖片轉 PDF</string>
+    <string name="home_quick_merge_pdf">合併 PDF</string>
+    <string name="home_quick_more">更多</string>
+
+    <!-- empty state -->
+    <string name="home_empty_title">無權限</string>
+    <string name="home_empty_hint">需要授權才能讀取全部檔案。</string>
+    <string name="home_empty_action">前往設定</string>
+
+    <!-- title bar actions / scan button -->
+    <string name="home_share">分享</string>
+    <string name="home_print">列印</string>
+    <string name="home_more">更多</string>
+    <string name="home_scan">掃描</string>
+</resources>

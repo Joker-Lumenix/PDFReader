@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copy of the lock / unlock flow.
+
+  The page titles, the sheet titles and the error messages follow the design
+  (Moonvy "lock PDF", "lock password input", "lock error", "password input",
+  "password error", "Unlock", "Unlock-empty"). Everything that already exists
+  in the base strings (cancel / ok / view / share / result / no_items) is
+  reused instead of being duplicated here.
+-->
+<resources>
+
+    <!-- page titles -->
+    <string name="lock_page_encrypt">Sulitkan PDF</string>
+    <string name="lock_page_decrypt">Nyahsulit PDF</string>
+
+    <!-- password sheet -->
+    <string name="lock_set_password">Tetapkan kata laluan</string>
+    <string name="lock_set_password_hint">Kata laluan diperlukan untuk membuka fail ini</string>
+    <string name="lock_remove_password">Buang kata laluan</string>
+    <string name="lock_remove_password_hint">Fail tidak lagi dilindungi kata laluan</string>
+    <string name="lock_password_hint">Masukkan kata laluan</string>
+    <string name="lock_password_too_short">Kata laluan mestilah sekurang-kurangnya 4 aksara</string>
+    <string name="lock_clear_password">Padam kata laluan</string>
+    <string name="lock_toggle_password">Tunjukkan kata laluan</string>
+
+    <!-- states -->
+    <string name="lock_wrong_password">Kata laluan salah</string>
+    <string name="lock_not_encrypted">Fail ini tidak disulit</string>
+    <string name="lock_operation_failed">Operasi gagal, sila cuba lagi</string>
+    <string name="lock_working">Memproses…</string>
+    <string name="lock_badge_encrypted">Disulit</string>
+
+    <!-- file list -->
+    <string name="lock_empty_hint">Belum ada fail PDF dalam kotak pasir untuk diproses</string>
+    <string name="lock_import">Import PDF</string>
+
+    <!-- result -->
+    <string name="lock_result_path">Laluan: %1$s</string>
+    <string name="lock_open_failed">Tiada aplikasi yang boleh membuka fail ini ditemui</string>
+
+</resources>

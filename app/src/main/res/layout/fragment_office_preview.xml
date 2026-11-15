@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Offline Office preview.
+  The format specific preview view is added to the content container at runtime,
+  the loading and the error state are shown until the document is parsed.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/surface_card"
+    android:orientation="vertical">
+
+    <com.peng.pdfreader.appcore.widget.PageTitleBar
+        android:id="@+id/titleBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <FrameLayout
+            android:id="@+id/content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <LinearLayout
+            android:id="@+id/llLoading"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <ProgressBar
+                android:layout_width="32dp"
+                android:layout_height="32dp" />
+
+            <TextView
+                style="@style/TextAppearance.AppCore.Meta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="@string/preview_loading" />
+        </LinearLayout>
+
+        <FrameLayout
+            android:id="@+id/flEmpty"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/surface_card"
+            android:visibility="gone">
+
+            <com.peng.pdfreader.appcore.widget.EmptyStateView
+                android:id="@+id/emptyState"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center" />
+        </FrameLayout>
+
+    </FrameLayout>
+
+</LinearLayout>

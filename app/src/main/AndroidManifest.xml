@@ -45,6 +45,92 @@
                 <data android:mimeType="application/vnd.openxmlformats-officedocument.presentationml.presentation" />
             </intent-filter>
         </activity>
+
+        <!-- Preview and annotation editors -->
+        <activity
+            android:name=".feature.preview.activity.PreviewActivity"
+            android:exported="false"
+            android:launchMode="singleTop" />
+
+        <activity
+            android:name=".feature.preview.activity.SignatureActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".feature.preview.activity.DrawActivity"
+            android:exported="false" />
+
+        <!-- PDF tools -->
+        <activity
+            android:name=".feature.tools.activity.MergeActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".feature.tools.activity.SplitActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".feature.tools.activity.ImageToPdfActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".feature.tools.activity.CompressActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".feature.tools.scanner.ScanActivity"
+            android:exported="false" />
+
+        <!-- Encryption -->
+        <activity
+            android:name=".feature.lock.activity.LockActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".feature.lock.activity.UnlockActivity"
+            android:exported="false" />
+
+        <!-- Settings, language, feedback and onboarding -->
+        <activity
+            android:name=".feature.language.LanguageActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".feature.feedback.FeedbackActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".feature.settings.notice.NoticeActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".feature.settings.rating.RatingActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".feature.settings.permission.StoragePermissionActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".feature.onboarding.OnboardingActivity"
+            android:exported="false" />
+
+        <!-- Keeps the chosen app locale across restarts on Android 12 and below. -->
+        <service
+            android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"
+            android:enabled="false"
+            android:exported="false">
+            <meta-data
+                android:name="autoStoreLocales"
+                android:value="true" />
+        </service>
+
+        <!-- Grants temporary read access to a sandbox file when it is shared. -->
+        <provider
+            android:name=".base.ShareFileProvider"
+            android:authorities="com.peng.pdfreader.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true" />
     </application>
 
 </manifest>

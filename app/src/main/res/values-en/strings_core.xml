@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="error_pdf_unreadable">The file cannot be read, please check that it still exists</string>
+    <string name="error_pdf_unwritable">The file cannot be written, please check the free space</string>
+    <string name="error_cancelled">Operation cancelled</string>
+    <string name="error_pdf_structure">The structure of this PDF cannot be parsed</string>
+    <string name="error_pdf_encrypted">Encrypted documents cannot be processed</string>
+    <string name="error_no_files">There is no file to work on</string>
+    <string name="error_no_pages">There is no page to work on</string>
+    <string name="error_no_images">There is no image to convert</string>
+    <string name="error_wrong_password">Wrong password</string>
+    <string name="error_not_encrypted">This document was not encrypted by this app</string>
+    <string name="error_weak_password">The password needs at least 4 characters</string>
+    <string name="error_io">The file could not be read or written, please try again</string>
+    <string name="annotated_suffix">annotated</string>
+</resources>

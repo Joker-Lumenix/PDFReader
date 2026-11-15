@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copy of the lock / unlock flow.
+
+  The page titles, the sheet titles and the error messages follow the design
+  (Moonvy "lock PDF", "lock password input", "lock error", "password input",
+  "password error", "Unlock", "Unlock-empty"). Everything that already exists
+  in the base strings (cancel / ok / view / share / result / no_items) is
+  reused instead of being duplicated here.
+-->
+<resources>
+
+    <!-- page titles -->
+    <string name="lock_page_encrypt">Encrypt PDF</string>
+    <string name="lock_page_decrypt">Decrypt PDF</string>
+
+    <!-- password sheet -->
+    <string name="lock_set_password">Set password</string>
+    <string name="lock_set_password_hint">A password will be required to open this file</string>
+    <string name="lock_remove_password">Remove password</string>
+    <string name="lock_remove_password_hint">The file will no longer be protected by a password</string>
+    <string name="lock_password_hint">Enter the password</string>
+    <string name="lock_password_too_short">The password must be at least 4 characters</string>
+    <string name="lock_clear_password">Clear password</string>
+    <string name="lock_toggle_password">Show password</string>
+
+    <!-- states -->
+    <string name="lock_wrong_password">Wrong password</string>
+    <string name="lock_not_encrypted">This file is not encrypted</string>
+    <string name="lock_operation_failed">Operation failed, please try again</string>
+    <string name="lock_working">Working…</string>
+    <string name="lock_badge_encrypted">Encrypted</string>
+
+    <!-- file list -->
+    <string name="lock_empty_hint">No PDF files to work with in the sandbox yet</string>
+    <string name="lock_import">Import PDF</string>
+
+    <!-- result -->
+    <string name="lock_result_path">Path: %1$s</string>
+    <string name="lock_open_failed">No app found that can open this file</string>
+
+</resources>

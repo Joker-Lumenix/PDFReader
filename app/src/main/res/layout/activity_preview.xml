@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Preview host: the format specific fragment fills this container. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/previewContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/surface_blue_tint" />

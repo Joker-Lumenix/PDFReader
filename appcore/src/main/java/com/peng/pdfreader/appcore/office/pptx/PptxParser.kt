@@ -608,7 +608,7 @@ object PptxParser {
     private fun readTitle(pkg: OoxmlPackage): String {
         val core = pkg.node("docProps/core.xml")
         val title = core?.descendants("title")?.firstOrNull()?.text?.trim()
-        return if (title.isNullOrEmpty()) "演示文稿" else title
+        return title.orEmpty()
     }
 
     private fun parseNotes(context: SlideContext): String? {

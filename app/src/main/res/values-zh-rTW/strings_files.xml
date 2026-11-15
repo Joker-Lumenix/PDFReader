@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copy of the Files tab.
+
+  Only the strings that the shared library does not already provide live here;
+  everything else is reused from the app string table so the existing
+  translations keep working.
+-->
+<resources>
+
+    <!-- filter / sort sheets -->
+    <string name="files_sort_title">排序方式</string>
+    <string name="files_filter_title">檔案類型</string>
+    <string name="files_sort_section_time">最近修改</string>
+    <string name="files_sort_section_name">名稱</string>
+    <string name="files_sort_section_size">檔案大小</string>
+
+    <!-- file action sheet -->
+    <string name="files_open_with">其他應用程式開啟</string>
+    <string name="files_share">分享</string>
+    <string name="files_print">列印</string>
+    <string name="files_feature_unavailable">此功能正在開發中</string>
+
+    <!-- dialogs -->
+    <string name="files_rename_hint">請輸入新的檔案名稱</string>
+    <string name="files_delete_message">確定要刪除此檔案嗎？刪除後無法復原。</string>
+    <string name="files_save_message">確定要儲存對此檔案的變更嗎？儲存後無法復原。</string>
+
+</resources>

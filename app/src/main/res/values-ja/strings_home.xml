@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copy of the home tab.
+  Only strings that are owned by the home feature live here; the shared file
+  type names (PDF / Word / Excel / PPT) and the generic "All" come from the
+  common string table so that every tab speaks the same language.
+-->
+<resources>
+    <!-- quick action cards -->
+    <string name="home_quick_image_to_pdf">画像から PDF</string>
+    <string name="home_quick_merge_pdf">PDF 結合</string>
+    <string name="home_quick_more">その他</string>
+
+    <!-- empty state -->
+    <string name="home_empty_title">権限がありません</string>
+    <string name="home_empty_hint">すべてのファイルを読み取るには権限が必要です。</string>
+    <string name="home_empty_action">設定へ</string>
+
+    <!-- title bar actions / scan button -->
+    <string name="home_share">共有</string>
+    <string name="home_print">印刷</string>
+    <string name="home_more">その他</string>
+    <string name="home_scan">スキャン</string>
+</resources>

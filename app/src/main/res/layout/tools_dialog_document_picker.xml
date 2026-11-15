@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Bottom sheet that lets the user pick a PDF document out of the sandbox.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingTop="20dp">
+
+    <TextView
+        android:id="@+id/tvTitle"
+        style="@style/TextAppearance.AppCore.SheetTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:text="@string/tools_pick_document" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvDocuments"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:clipToPadding="false"
+        android:maxHeight="360dp"
+        android:overScrollMode="never"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="20dp"
+        android:scrollbars="none" />
+
+    <TextView
+        android:id="@+id/tvEmpty"
+        style="@style/TextAppearance.AppCore.Body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:paddingStart="20dp"
+        android:paddingTop="24dp"
+        android:paddingEnd="20dp"
+        android:paddingBottom="32dp"
+        android:text="@string/tools_empty_documents"
+        android:textColor="@color/text_tertiary"
+        android:visibility="gone" />
+
+</LinearLayout>

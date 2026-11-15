@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Free hand annotation editor.
+  Top bar: back, undo, redo and the confirm pill.
+  Content: the page with the ink on top of it.
+  Bottom: the dark tool bar with the stroke sizes and the colours.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/surface_blue_tint"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="87dp"
+            android:background="@color/surface_card"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp">
+
+            <ImageView
+                android:id="@+id/ivBack"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="@string/preview_cd_back"
+                android:src="@mipmap/ic_back" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <ImageView
+                android:id="@+id/ivUndo"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="16dp"
+                android:contentDescription="@string/preview_cd_undo"
+                android:src="@mipmap/ic_undo_unable" />
+
+            <ImageView
+                android:id="@+id/ivRedo"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="16dp"
+                android:contentDescription="@string/preview_cd_redo"
+                android:src="@mipmap/ic_clockwise" />
+
+            <TextView
+                android:id="@+id/tvDone"
+                android:layout_width="55dp"
+                android:layout_height="24dp"
+                android:background="@drawable/gradient_red"
+                android:clickable="true"
+                android:contentDescription="@string/preview_save_to_document"
+                android:focusable="true"
+                android:gravity="center"
+                android:text="✓"
+                android:textColor="@color/text_on_tint"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/surface_hairline" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <com.peng.pdfreader.appcore.widget.DrawCanvasView
+            android:id="@+id/canvas"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/toolBar"
+        android:layout_width="match_parent"
+        android:layout_height="117dp"
+        android:orientation="vertical"
+        android:paddingTop="19dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="24dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="20dp">
+
+            <ImageView
+                android:id="@+id/ivSize"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="@string/preview_cd_size"
+                android:src="@mipmap/ic_size" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="24dp"
+                android:layout_marginStart="13dp"
+                android:background="@color/surface_neutral_strong" />
+
+            <LinearLayout
+                android:id="@+id/llSizes"
+                android:layout_width="wrap_content"
+                android:layout_height="24dp"
+                android:layout_marginStart="57dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:layout_marginTop="32dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="20dp">
+
+            <ImageView
+                android:id="@+id/ivDraw"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="@string/preview_tool_draw"
+                android:src="@mipmap/ic_draw" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="24dp"
+                android:layout_marginStart="13dp"
+                android:background="@color/surface_neutral_strong" />
+
+            <com.peng.pdfreader.appcore.widget.ColorPaletteView
+                android:id="@+id/palette"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:layout_marginStart="14dp" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

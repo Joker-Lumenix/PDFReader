@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  One row of the settings list: 44dp tall, 24dp icon on a white circle,
+  title (15/600), optional subtitle (12/400) and a chevron on the right.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    style="@style/Widget.AppCore.SettingsRow"
+    android:layout_width="match_parent"
+    android:layout_height="44dp">
+
+    <FrameLayout
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:background="@drawable/bg_white_r36">
+
+        <ImageView
+            android:id="@+id/ivRowIcon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="@null"
+            android:padding="3dp"
+            android:scaleType="fitCenter"
+            tools:src="@mipmap/ic_share_app" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvRowTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCore.ItemTitle"
+            tools:text="Share app" />
+
+        <TextView
+            android:id="@+id/tvRowSubtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textColor="@color/text_error_pink"
+            android:textSize="12sp"
+            android:visibility="gone"
+            tools:text="Follow the system"
+            tools:visibility="visible" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/ivRowChevron"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:contentDescription="@null"
+        android:src="@drawable/ic_chevron_right" />
+
+</LinearLayout>

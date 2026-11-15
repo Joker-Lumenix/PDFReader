@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copy that is shared by several features: the messages of the PDF engine
+  errors and the file name suffix of an annotated document.
+-->
+<resources>
+    <string name="error_pdf_unreadable">无法读取该文件，请确认它仍然存在</string>
+    <string name="error_pdf_unwritable">无法写入该文件，请检查沙盒空间</string>
+    <string name="error_cancelled">操作已取消</string>
+    <string name="error_pdf_structure">无法解析该 PDF 的结构</string>
+    <string name="error_pdf_encrypted">加密文档无法处理</string>
+    <string name="error_no_files">没有可处理的文件</string>
+    <string name="error_no_pages">没有可处理的页面</string>
+    <string name="error_no_images">没有可转换的图片</string>
+    <string name="error_wrong_password">密码错误</string>
+    <string name="error_not_encrypted">该文件不是本应用加密的文档</string>
+    <string name="error_weak_password">密码至少需要 4 位</string>
+    <string name="error_io">文件读写失败，请重试</string>
+    <string name="annotated_suffix">批注</string>
+</resources>

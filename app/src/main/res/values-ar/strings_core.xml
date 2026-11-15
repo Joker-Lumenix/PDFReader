@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="error_pdf_unreadable">تعذّرت قراءة الملف، تأكّد من أنه ما زال موجودًا</string>
+    <string name="error_pdf_unwritable">تعذّرت كتابة الملف، تحقّق من المساحة المتاحة</string>
+    <string name="error_cancelled">تم إلغاء العملية</string>
+    <string name="error_pdf_structure">تعذّر تحليل بنية ملف PDF هذا</string>
+    <string name="error_pdf_encrypted">لا يمكن معالجة المستندات المشفّرة</string>
+    <string name="error_no_files">لا توجد ملفات للعمل عليها</string>
+    <string name="error_no_pages">لا توجد صفحات للعمل عليها</string>
+    <string name="error_no_images">لا توجد صور لتحويلها</string>
+    <string name="error_wrong_password">كلمة المرور غير صحيحة</string>
+    <string name="error_not_encrypted">لم يشفّر هذا المستند بواسطة هذا التطبيق</string>
+    <string name="error_weak_password">يجب ألّا تقل كلمة المرور عن 4 أحرف</string>
+    <string name="error_io">تعذّرت قراءة الملف أو كتابته، حاول مرة أخرى</string>
+    <string name="annotated_suffix">مُعلَّم</string>
+</resources>

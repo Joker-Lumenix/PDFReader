@@ -2,12 +2,12 @@ package com.peng.pdfreader
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.peng.pdfreader.office.OoxmlPackage
-import com.peng.pdfreader.office.docx.DocxBlock
-import com.peng.pdfreader.office.docx.DocxParser
-import com.peng.pdfreader.office.pptx.PptxParser
-import com.peng.pdfreader.office.pptx.PptxShape
-import com.peng.pdfreader.office.xlsx.XlsxParser
+import com.peng.pdfreader.appcore.office.OoxmlPackage
+import com.peng.pdfreader.appcore.office.docx.DocxBlock
+import com.peng.pdfreader.appcore.office.docx.DocxParser
+import com.peng.pdfreader.appcore.office.pptx.PptxParser
+import com.peng.pdfreader.appcore.office.pptx.PptxShape
+import com.peng.pdfreader.appcore.office.xlsx.XlsxParser
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue

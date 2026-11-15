@@ -98,21 +98,21 @@ class FileListItemView @JvmOverloads constructor(
     }
 }
 
-/**
- * Everything a file row can show.
- *
- * @param name file name, 15sp / 600
- * @param meta secondary line, 12sp / 400 / #999999
- * @param typeLabel file type pill label, 10sp / 700
- * @param typeColor colour of the type label
- * @param thumbnail 48x48 thumbnail / file type logo
- * @param showType show the type pill
- * @param showMore show the "more" affordance
- * @param showCheckbox multi select mode
- * @param checked checkbox state
- * @param badge small coloured badge next to the title (advertising rows)
- * @param inlineAction inline pill button rendered next to the title
- */
+    /**
+     * Everything a file row can show.
+     *
+     * @param name file name, 15sp / 600
+     * @param meta secondary line, 12sp / 400 / #999999
+     * @param typeLabel file type pill label, 10sp / 700
+     * @param typeColor colour of the type label
+     * @param thumbnail 48x48 thumbnail / file type logo
+     * @param showType show the type pill
+     * @param showMore show the "more" affordance
+     * @param showCheckbox multi select mode
+     * @param checked checkbox state
+     * @param badge small coloured badge next to the title (advertising rows)
+     * @param inlineAction inline pill button rendered next to the title
+     */
 data class FileItemUiState(
     val name: String,
     val meta: String? = null,
@@ -127,3 +127,20 @@ data class FileItemUiState(
     val badge: String? = null,
     val inlineActionText: String? = null,
 )
+
+/** Height of a document row, measured from the design. */
+const val FILE_LIST_ROW_HEIGHT_DP = 72
+
+/**
+ * Creates a row for a [androidx.recyclerview.widget.RecyclerView].
+ *
+ * The row is the one shared template, so a feature never needs its own item
+ * layout - it only binds a different [FileItemUiState].
+ */
+fun createForList(context: Context): FileListItemView =
+    FileListItemView(context).apply {
+        layoutParams = androidx.recyclerview.widget.RecyclerView.LayoutParams(
+            androidx.recyclerview.widget.RecyclerView.LayoutParams.MATCH_PARENT,
+            (FILE_LIST_ROW_HEIGHT_DP * resources.displayMetrics.density).toInt(),
+        )
+    }

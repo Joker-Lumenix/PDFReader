@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  One tool card of the tools grid (133x82, #fafafa, radius 8).
+
+  The artwork (the white app icon plus the coloured badge) is a single exported
+  image of 80x44, the design places it at (27, 8) inside the card. The label
+  sits 56dp below the top edge of the card.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="133dp"
+    android:layout_height="82dp"
+    android:background="@drawable/bg_card_r8"
+    android:clickable="true"
+    android:focusable="true">
+
+    <ImageView
+        android:id="@+id/ivIcon"
+        android:layout_width="80dp"
+        android:layout_height="44dp"
+        android:layout_gravity="top|start"
+        android:layout_marginStart="27dp"
+        android:layout_marginTop="8dp"
+        android:contentDescription="@string/tools" />
+
+    <TextView
+        android:id="@+id/tvLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="12dp"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center"
+        android:maxLines="1"
+        android:textColor="@color/text_secondary"
+        android:textSize="12sp" />
+
+</FrameLayout>

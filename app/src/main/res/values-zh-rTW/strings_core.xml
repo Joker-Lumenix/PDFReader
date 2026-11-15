@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="error_pdf_unreadable">無法讀取該檔案，請確認它仍然存在</string>
+    <string name="error_pdf_unwritable">無法寫入該檔案，請檢查沙盒空間</string>
+    <string name="error_cancelled">操作已取消</string>
+    <string name="error_pdf_structure">無法解析該 PDF 的結構</string>
+    <string name="error_pdf_encrypted">加密文件無法處理</string>
+    <string name="error_no_files">沒有可處理的檔案</string>
+    <string name="error_no_pages">沒有可處理的頁面</string>
+    <string name="error_no_images">沒有可轉換的圖片</string>
+    <string name="error_wrong_password">密碼錯誤</string>
+    <string name="error_not_encrypted">該文件不是本應用加密的文件</string>
+    <string name="error_weak_password">密碼至少需要 4 位</string>
+    <string name="error_io">檔案讀寫失敗，請重試</string>
+    <string name="annotated_suffix">批註</string>
+</resources>

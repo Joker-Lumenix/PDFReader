@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  One language row: 48dp tall, the endonym on the left and the radio button
+  on the right (18dp circle, 3dp from the trailing edge of the card).
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:background="?attr/selectableItemBackground"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="20dp"
+    android:paddingEnd="23dp">
+
+    <TextView
+        android:id="@+id/tvLanguage"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/text_secondary"
+        android:textSize="14sp"
+        tools:text="English" />
+
+    <View
+        android:id="@+id/vRadio"
+        android:layout_width="18dp"
+        android:layout_height="18dp" />
+
+</LinearLayout>

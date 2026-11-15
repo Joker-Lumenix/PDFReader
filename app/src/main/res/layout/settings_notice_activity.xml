@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Notice page used for the privacy policy and the terms of use.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/surface_subtle"
+    android:orientation="vertical">
+
+    <com.peng.pdfreader.appcore.widget.PageTitleBar
+        android:id="@+id/titleBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/space_m"
+            android:layout_marginTop="@dimen/space_m"
+            android:layout_marginEnd="@dimen/space_m"
+            android:layout_marginBottom="@dimen/space_xl"
+            android:background="@drawable/bg_card_r8"
+            android:orientation="vertical"
+            android:padding="@dimen/space_l">
+
+            <TextView
+                android:id="@+id/tvNoticeTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.AppCore.SectionTitle"
+                tools:text="Privacy policy" />
+
+            <TextView
+                android:id="@+id/tvNoticeBody"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_m"
+                android:lineSpacingExtra="4dp"
+                android:textColor="@color/text_tertiary"
+                android:textSize="14sp"
+                tools:text="All files stay on this device." />
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

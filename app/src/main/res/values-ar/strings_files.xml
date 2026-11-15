@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copy of the Files tab.
+
+  Only the strings that the shared library does not already provide live here;
+  everything else is reused from the app string table so the existing
+  translations keep working.
+-->
+<resources>
+
+    <!-- filter / sort sheets -->
+    <string name="files_sort_title">الترتيب حسب</string>
+    <string name="files_filter_title">نوع الملف</string>
+    <string name="files_sort_section_time">آخر تعديل</string>
+    <string name="files_sort_section_name">الاسم</string>
+    <string name="files_sort_section_size">حجم الملف</string>
+
+    <!-- file action sheet -->
+    <string name="files_open_with">فتح بتطبيق آخر</string>
+    <string name="files_share">مشاركة</string>
+    <string name="files_print">طباعة</string>
+    <string name="files_feature_unavailable">هذه الميزة قيد التطوير</string>
+
+    <!-- dialogs -->
+    <string name="files_rename_hint">أدخل اسم الملف الجديد</string>
+    <string name="files_delete_message">هل تريد حذف هذا الملف؟ لا يمكن التراجع عن ذلك.</string>
+    <string name="files_save_message">هل تريد حفظ التغييرات على هذا الملف؟ لا يمكن التراجع عن ذلك.</string>
+
+</resources>

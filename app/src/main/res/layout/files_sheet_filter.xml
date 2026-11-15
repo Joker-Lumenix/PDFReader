@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Type filter sheet (design: files-筛选).
+
+  One card with the five type options, every option carries the number of
+  matching documents and a radio on the right.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingTop="24dp"
+    android:paddingBottom="24dp">
+
+    <TextView
+        style="@style/TextAppearance.AppCore.SheetTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/files_filter_title" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="20dp"
+        android:background="@drawable/bg_card_r8"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/rowAll"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp">
+
+            <TextView
+                android:id="@+id/tvAll"
+                style="@style/TextAppearance.AppCore.Body"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="12sp" />
+
+            <ImageView
+                android:id="@+id/radioAll"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="@null"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/ic_checkbox_circle_unselect" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/rowPdf"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp">
+
+            <TextView
+                android:id="@+id/tvPdf"
+                style="@style/TextAppearance.AppCore.Body"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="12sp" />
+
+            <ImageView
+                android:id="@+id/radioPdf"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="@null"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/ic_checkbox_circle_unselect" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/rowWord"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp">
+
+            <TextView
+                android:id="@+id/tvWord"
+                style="@style/TextAppearance.AppCore.Body"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="12sp" />
+
+            <ImageView
+                android:id="@+id/radioWord"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="@null"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/ic_checkbox_circle_unselect" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/rowExcel"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp">
+
+            <TextView
+                android:id="@+id/tvExcel"
+                style="@style/TextAppearance.AppCore.Body"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="12sp" />
+
+            <ImageView
+                android:id="@+id/radioExcel"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="@null"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/ic_checkbox_circle_unselect" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/rowPpt"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp">
+
+            <TextView
+                android:id="@+id/tvPpt"
+                style="@style/TextAppearance.AppCore.Body"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="12sp" />
+
+            <ImageView
+                android:id="@+id/radioPpt"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:contentDescription="@null"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/ic_checkbox_circle_unselect" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

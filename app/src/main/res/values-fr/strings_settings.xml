@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copy of the settings / language / feedback / onboarding feature.
+
+  Every key is prefixed with the feature it belongs to so it can never
+  collide with the base string table; base keys that already carry the same
+  wording are reused instead of being duplicated here.
+-->
+<resources>
+
+    <!-- ==================== settings ==================== -->
+    <string name="settings_share_app">Partager l\'app</string>
+    <string name="settings_share_message">Un outil PDF qui vous plaira : %1$s</string>
+    <string name="settings_follow_system">Suivre le système</string>
+    <string name="settings_privacy_policy">Politique de confidentialité</string>
+    <string name="settings_terms_of_use">Conditions d\'utilisation</string>
+    <string name="settings_version_format">Version : v%1$s</string>
+    <string name="settings_action_more">Plus</string>
+    <string name="settings_close">Fermer</string>
+    <string name="settings_screen_missing">Cet écran n\'est pas disponible pour le moment</string>
+
+    <!-- ==================== language ==================== -->
+    <!-- Endonyms: they are written the way the language itself writes it. -->
+    <string name="language_en" translatable="false">English</string>
+    <string name="language_fr" translatable="false">Français</string>
+    <string name="language_ms" translatable="false">Bahasa Melayu</string>
+    <string name="language_es" translatable="false">Español</string>
+    <string name="language_pt" translatable="false">Português</string>
+    <string name="language_de" translatable="false">Deutsch</string>
+    <string name="language_ja" translatable="false">日本語</string>
+    <string name="language_ko" translatable="false">한국인</string>
+    <string name="language_ru" translatable="false">Русский</string>
+    <string name="language_ar" translatable="false">اللغة العربية</string>
+    <string name="language_zh_cn" translatable="false">简体中文</string>
+    <string name="language_zh_tw" translatable="false">繁體中文</string>
+
+    <!-- ==================== feedback ==================== -->
+    <string name="feedback_heading">Quels problèmes avez-vous rencontrés ?</string>
+    <string name="feedback_input_hint">Saisissez votre texte…</string>
+    <string name="feedback_mail_subject">Let\'s PDF - Commentaires</string>
+    <string name="feedback_mail_opened">App de messagerie ouverte</string>
+    <string name="feedback_no_mail_app">Aucune app de messagerie détectée, installez-en une puis réessayez</string>
+
+    <!-- ==================== rating ==================== -->
+    <string name="rating_question">Aimez-vous Let\'s PDF ?</string>
+    <string name="rating_hint">Donnez-nous une note !</string>
+    <string name="rating_neutral">C\'est correct</string>
+    <string name="rating_later">Plus tard</string>
+    <string name="rating_store_missing">Aucun magasin d\'apps trouvé</string>
+
+    <!-- ==================== onboarding ==================== -->
+    <string name="onboarding_skip">Passer</string>
+    <string name="onboarding_start">Commencer</string>
+
+    <!-- ==================== permission ==================== -->
+    <string name="permission_allow_all_files">Autoriser l\'accès à tous les fichiers</string>
+
+    <!-- ==================== default reader sheet ==================== -->
+    <string name="set_default_title">Définir comme lecteur PDF par défaut</string>
+    <string name="set_default_subtitle">Choisissez « Let\'s PDF: View &amp; Sign », puis appuyez sur « Toujours »</string>
+    <string name="set_default_mock_once">Une seule fois</string>
+    <string name="set_default_mock_always">Toujours</string>
+
+    <!-- ==================== quick entry popup ==================== -->
+    <string name="quick_entry_scan">Scanner un PDF</string>
+    <string name="quick_entry_merge">Fusionner des PDF</string>
+    <string name="quick_entry_print">Imprimer un PDF</string>
+
+    <!-- ==================== notices ==================== -->
+    <!-- Placeholder copy: the final legal text has to be supplied by the app owner. -->
+    <string name="notice_privacy_body">Votre confidentialité compte pour nous. Tous les fichiers de cette app restent dans le bac à sable de l\'appareil, ne sont envoyés vers aucun serveur et aucune donnée personnelle n\'est collectée. Le texte définitif de la politique de confidentialité sera ajouté après validation par le service juridique.</string>
+    <string name="notice_terms_body">En utilisant cette app, vous acceptez les conditions d\'utilisation ci-dessous. Le texte définitif des conditions de service sera ajouté après validation par le service juridique.</string>
+
+</resources>

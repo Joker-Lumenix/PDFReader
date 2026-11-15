@@ -85,6 +85,14 @@
         <item name="android:textColor">@color/text_secondary</item>
     </style>
 
+    <!-- Empty state title: 20sp / 600 / #333333 -->
+    <style name="TextAppearance.AppCore.EmptyTitle" parent="TextAppearance.MaterialComponents.Headline6">
+        <item name="android:textSize">20sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
     <!-- ==================== widgets ==================== -->
 
     <!-- Primary CTA: brand gradient, 16dp radius, 48dp tall -->

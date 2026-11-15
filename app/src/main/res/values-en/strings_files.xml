@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copy of the Files tab.
+
+  Only the strings that the shared library does not already provide live here;
+  everything else is reused from the app string table so the existing
+  translations keep working.
+-->
+<resources>
+
+    <!-- filter / sort sheets -->
+    <string name="files_sort_title">Sort by</string>
+    <string name="files_filter_title">File type</string>
+    <string name="files_sort_section_time">Recently modified</string>
+    <string name="files_sort_section_name">Name</string>
+    <string name="files_sort_section_size">File size</string>
+
+    <!-- file action sheet -->
+    <string name="files_open_with">Open with another app</string>
+    <string name="files_share">Share</string>
+    <string name="files_print">Print</string>
+    <string name="files_feature_unavailable">This feature is under development</string>
+
+    <!-- dialogs -->
+    <string name="files_rename_hint">Enter a new file name</string>
+    <string name="files_delete_message">Delete this file? This cannot be undone.</string>
+    <string name="files_save_message">Save the changes to this file? This cannot be undone.</string>
+
+</resources>

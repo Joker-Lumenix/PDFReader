@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copy of the home tab.
+  Only strings that are owned by the home feature live here; the shared file
+  type names (PDF / Word / Excel / PPT) and the generic "All" come from the
+  common string table so that every tab speaks the same language.
+-->
+<resources>
+    <!-- quick action cards -->
+    <string name="home_quick_image_to_pdf">Imagen a PDF</string>
+    <string name="home_quick_merge_pdf">Fusionar PDF</string>
+    <string name="home_quick_more">Más</string>
+
+    <!-- empty state -->
+    <string name="home_empty_title">Sin permisos</string>
+    <string name="home_empty_hint">Se necesita permiso para leer todos los archivos.</string>
+    <string name="home_empty_action">Ir a Ajustes</string>
+
+    <!-- title bar actions / scan button -->
+    <string name="home_share">Compartir</string>
+    <string name="home_print">Imprimir</string>
+    <string name="home_more">Más</string>
+    <string name="home_scan">Escanear</string>
+</resources>

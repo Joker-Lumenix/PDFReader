@@ -1,0 +1,72 @@
+package com.peng.pdfreader.feature.language
+
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.peng.pdfreader.R
+import com.peng.pdfreader.base.BaseActivity
+import com.peng.pdfreader.data.prefs.AppPrefs
+import com.peng.pdfreader.databinding.LanguageActivityBinding
+
+/**
+ * Language selection page.
+ *
+ * The choice is written to [AppPrefs.language] and applied right away through
+ * [AppCompatDelegate.setApplicationLocales]; the activity is recreated by the
+ * framework afterwards, so the whole app switches to the new language.
+ */
+class LanguageActivity : BaseActivity() {
+
+    private lateinit var binding: LanguageActivityBinding
+
+    private val adapter = LanguageAdapter { option -> onOptionClicked(option) }
+
+    private var selected: LanguageOption? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = LanguageActivityBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        binding.titleBar.title = getString(R.string.language_selection)
+        binding.titleBar.showBack = true
+        binding.titleBar.onBackClick = { finish() }
+
+        binding.rvLanguages.layoutManager = LinearLayoutManager(this)
+        binding.rvLanguages.adapter = adapter
+
+        binding.btnNext.setOnClickListener { applySelection() }
+
+        restoreSelection()
+    }
+
+    private fun restoreSelection() {
+        val option = LanguageCatalog.find(AppPrefs.get(this).language)
+        selected = option
+        adapter.select(option)
+        updateNextState()
+    }
+
+    private fun onOptionClicked(option: LanguageOption) {
+        selected = option
+        adapter.select(option)
+        updateNextState()
+    }
+
+    private fun updateNextState() {
+        val hasSelection = selected != null
+        binding.btnNext.isEnabled = hasSelection
+        binding.btnNext.setBackgroundResource(
+            if (hasSelection) R.drawable.gradient_red else R.drawable.bg_btn_unable_r16,
+        )
+    }
+
+    private fun applySelection() {
+        val option = selected ?: return
+        AppPrefs.get(this).language = option.code
+        AppCompatDelegate.setApplicationLocales(
+            LocaleListCompat.forLanguageTags(LanguageCatalog.toLanguageTag(option.code)),
+        )
+    }
+}

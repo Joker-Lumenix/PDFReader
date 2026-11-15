@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Rating page: the "how do you like the app" screen with the three emoji
+  options (negative / neutral / positive).
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/surface_subtle"
+    android:orientation="vertical">
+
+    <com.peng.pdfreader.appcore.widget.PageTitleBar
+        android:id="@+id/titleBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <ImageView
+        android:id="@+id/ivIllustration"
+        android:layout_width="match_parent"
+        android:layout_height="196dp"
+        android:contentDescription="@null"
+        android:scaleType="centerCrop"
+        android:src="@mipmap/bg_rate" />
+
+    <TextView
+        android:id="@+id/tvQuestion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/screen_margin"
+        android:layout_marginTop="@dimen/space_m"
+        android:layout_marginEnd="@dimen/screen_margin"
+        android:textColor="@color/text_secondary"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        tools:text="Do you like Let\'s PDF?" />
+
+    <TextView
+        android:id="@+id/tvHint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/screen_margin"
+        android:layout_marginTop="@dimen/space_s"
+        android:layout_marginEnd="@dimen/screen_margin"
+        android:text="@string/rating_hint"
+        android:textColor="@color/text_tertiary"
+        android:textSize="14sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_xl"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/space_l"
+        android:paddingEnd="@dimen/space_l">
+
+        <LinearLayout
+            android:id="@+id/llBad"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackground"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingTop="@dimen/space_s"
+            android:paddingBottom="@dimen/space_s">
+
+            <ImageView
+                android:id="@+id/ivBad"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:contentDescription="@null"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/emoji_cry" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_s"
+                android:text="@string/not_really"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llNeutral"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackground"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingTop="@dimen/space_s"
+            android:paddingBottom="@dimen/space_s">
+
+            <ImageView
+                android:id="@+id/ivNeutral"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:contentDescription="@null"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/emoji_normal" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_s"
+                android:text="@string/rating_neutral"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llGood"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="?attr/selectableItemBackground"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingTop="@dimen/space_s"
+            android:paddingBottom="@dimen/space_s">
+
+            <ImageView
+                android:id="@+id/ivGood"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:contentDescription="@null"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/emoji_laugh" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_s"
+                android:text="@string/good"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnRate"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="@dimen/space_m"
+        android:background="@drawable/gradient_red"
+        android:backgroundTint="@null"
+        android:letterSpacing="0"
+        android:stateListAnimator="@null"
+        android:text="@string/rate_on_play"
+        android:textColor="@color/text_on_tint"
+        android:textSize="16sp" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnLater"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="@dimen/space_xl"
+        android:background="@drawable/bg_btn_unable_r16"
+        android:backgroundTint="@null"
+        android:letterSpacing="0"
+        android:stateListAnimator="@null"
+        android:text="@string/rating_later"
+        android:textColor="@color/text_on_tint"
+        android:textSize="16sp" />
+
+</LinearLayout>

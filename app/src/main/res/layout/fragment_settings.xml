@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  Settings tab: page title bar plus the settings card.
+
+  The card is 569dp tall, exactly like the design, so the version line sits
+  on the lower edge of the card with a large empty area in between.
+-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/surface_subtle"
@@ -10,10 +18,96 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <FrameLayout
-        android:id="@+id/content"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:scrollbars="none">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="@dimen/space_m"
+            android:paddingTop="@dimen/space_m"
+            android:paddingEnd="@dimen/space_m"
+            android:paddingBottom="@dimen/space_xl">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cardSettings"
+                android:layout_width="0dp"
+                android:layout_height="569dp"
+                android:background="@drawable/bg_card_r8"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <include
+                    android:id="@+id/rowShare"
+                    layout="@layout/settings_row"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_marginTop="24dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <include
+                    android:id="@+id/rowLanguage"
+                    layout="@layout/settings_row"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_marginTop="24dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/rowShare" />
+
+                <include
+                    android:id="@+id/rowFeedback"
+                    layout="@layout/settings_row"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_marginTop="24dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/rowLanguage" />
+
+                <include
+                    android:id="@+id/rowPrivacy"
+                    layout="@layout/settings_row"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_marginTop="24dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/rowFeedback" />
+
+                <include
+                    android:id="@+id/rowTerms"
+                    layout="@layout/settings_row"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_marginTop="24dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/rowPrivacy" />
+
+                <TextView
+                    android:id="@+id/tvVersion"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    android:gravity="center"
+                    android:textColor="@color/text_error_rose"
+                    android:textSize="12sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    tools:text="Version: v1.0.0" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
 
 </LinearLayout>

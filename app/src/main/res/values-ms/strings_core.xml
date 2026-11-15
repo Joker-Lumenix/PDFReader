@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="error_pdf_unreadable">Failur tidak dapat membaca fail, sila sahkan ia masih wujud</string>
+    <string name="error_pdf_unwritable">Failur tidak dapat menulis fail, sila semak ruang kosong</string>
+    <string name="error_cancelled">Operasi dibatalkan</string>
+    <string name="error_pdf_structure">Struktur PDF ini tidak dapat dianalisis</string>
+    <string name="error_pdf_encrypted">Dokumen yang disulitkan tidak boleh diproses</string>
+    <string name="error_no_files">Tiada fail untuk diproses</string>
+    <string name="error_no_pages">Tiada halaman untuk diproses</string>
+    <string name="error_no_images">Tiada imej untuk ditukar</string>
+    <string name="error_wrong_password">Kata laluan salah</string>
+    <string name="error_not_encrypted">Dokumen ini tidak disulitkan oleh aplikasi ini</string>
+    <string name="error_weak_password">Kata laluan memerlukan sekurang-kurangnya 4 aksara</string>
+    <string name="error_io">Fail tidak dapat dibaca atau ditulis, sila cuba lagi</string>
+    <string name="annotated_suffix">beranotasi</string>
+</resources>

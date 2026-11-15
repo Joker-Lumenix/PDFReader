@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copy of the lock / unlock flow.
+
+  The page titles, the sheet titles and the error messages follow the design
+  (Moonvy "lock PDF", "lock password input", "lock error", "password input",
+  "password error", "Unlock", "Unlock-empty"). Everything that already exists
+  in the base strings (cancel / ok / view / share / result / no_items) is
+  reused instead of being duplicated here.
+-->
+<resources>
+
+    <!-- page titles -->
+    <string name="lock_page_encrypt">Шифрование PDF</string>
+    <string name="lock_page_decrypt">Расшифровка PDF</string>
+
+    <!-- password sheet -->
+    <string name="lock_set_password">Задать пароль</string>
+    <string name="lock_set_password_hint">После этого для открытия файла потребуется пароль</string>
+    <string name="lock_remove_password">Убрать пароль</string>
+    <string name="lock_remove_password_hint">Файл больше не будет защищён паролем</string>
+    <string name="lock_password_hint">Введите пароль</string>
+    <string name="lock_password_too_short">Пароль должен содержать не менее 4 символов</string>
+    <string name="lock_clear_password">Очистить пароль</string>
+    <string name="lock_toggle_password">Показать пароль</string>
+
+    <!-- states -->
+    <string name="lock_wrong_password">Неверный пароль</string>
+    <string name="lock_not_encrypted">Этот файл не зашифрован</string>
+    <string name="lock_operation_failed">Операция не удалась, попробуйте ещё раз</string>
+    <string name="lock_working">Обработка…</string>
+    <string name="lock_badge_encrypted">Зашифровано</string>
+
+    <!-- file list -->
+    <string name="lock_empty_hint">В песочнице пока нет PDF-файлов для обработки</string>
+    <string name="lock_import">Импорт PDF</string>
+
+    <!-- result -->
+    <string name="lock_result_path">Путь: %1$s</string>
+    <string name="lock_open_failed">Не найдено приложение, которое может открыть этот файл</string>
+
+</resources>

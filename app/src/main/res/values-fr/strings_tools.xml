@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Copy of the tool screens (Tools tab + the PDF tool flows).
+
+  The tool tab reuses the terminology of the main string table wherever it
+  exists (R.string.merge / split / image_to_pdf / encrypt / decrypt / print),
+  only the copy that the tool screens need on their own lives here.
+-->
+<resources>
+
+    <!-- ==================== tools tab ==================== -->
+
+    <string name="tools_scan_to_pdf">Scanner en PDF</string>
+    <string name="tools_zip_file">Archive ZIP</string>
+    <string name="tools_not_available">Cette fonctionnalité n\'est pas encore disponible</string>
+    <string name="tools_failed">Échec de l\'opération : %1$s</string>
+    <string name="tools_working">Traitement…</string>
+    <string name="tools_pick_document">Sélectionnez un document PDF</string>
+    <string name="tools_empty_documents">Aucun document PDF dans le bac à sable</string>
+
+    <!-- ==================== merge ==================== -->
+
+    <string name="tools_merge_title">Fusionner des PDF</string>
+    <string name="tools_merge_running">Fusion en cours…</string>
+    <string name="tools_merge_empty">Aucun document à fusionner</string>
+    <string name="tools_merge_add">Ajouter un document</string>
+    <string name="tools_merge_remove">Retirer</string>
+    <string name="tools_merge_success_hint">Fusion réussie, fichier enregistré dans le bac à sable</string>
+
+    <!-- ==================== split ==================== -->
+
+    <string name="tools_split_title">Diviser un PDF</string>
+    <string name="tools_split_action">Diviser</string>
+    <string name="tools_split_running">Division en cours…</string>
+    <string name="tools_split_empty">Sélectionnez d\'abord un document PDF</string>
+    <string name="tools_split_range">Plage</string>
+    <string name="tools_split_range_hint">Plage de pages, par exemple 1-3,5</string>
+    <string name="tools_split_range_invalid">Plage de pages incorrecte</string>
+    <string name="tools_split_done">Divisé en %1$d documents</string>
+
+    <!-- ==================== image to pdf ==================== -->
+
+    <string name="tools_image_to_pdf_title">Image en PDF</string>
+    <string name="tools_image_select">Sélectionnez des images</string>
+    <string name="tools_image_running">Création du PDF…</string>
+    <string name="tools_image_failed">Échec de la conversion de l\'image</string>
+    <string name="tools_image_go_to_set">Aller aux paramètres</string>
+    <string name="tools_image_added">%1$d images ajoutées</string>
+
+    <!-- ==================== compress ==================== -->
+
+    <string name="tools_compress_title">Compresser un PDF</string>
+    <string name="tools_compress_result_title">Résultat</string>
+    <string name="tools_compress_running">Compression en cours…</string>
+    <string name="tools_compress_empty">Sélectionnez d\'abord un document PDF</string>
+
+    <!-- ==================== scan ==================== -->
+
+    <string name="tools_scan_title">Scanner en PDF</string>
+    <string name="tools_scan_no_camera">Aucune app de caméra trouvée</string>
+    <string name="tools_scan_failed">Échec de la capture</string>
+    <string name="tools_scan_done">Document scanné créé</string>
+
+    <!-- ==================== print ==================== -->
+
+    <string name="tools_print_title">Imprimer un PDF</string>
+    <string name="tools_print_no_printer">Aucune imprimante trouvée</string>
+    <string name="tools_print_failed">Impossible de lancer le service d\'impression</string>
+
+    <!-- ==================== lock / unlock ==================== -->
+
+    <string name="tools_lock_title">Définir un mot de passe</string>
+    <string name="tools_unlock_title">Saisir le mot de passe</string>
+    <string name="tools_lock_done">Document chiffré</string>
+    <string name="tools_unlock_done">Document déchiffré</string>
+    <string name="tools_unlock_failed">Échec du déchiffrement, vérifiez le mot de passe</string>
+
+    <!-- ==================== result page ==================== -->
+
+    <string name="tools_result_more">Plus</string>
+    <string name="tools_result_open_with">Ouvrir avec une autre app</string>
+    <string name="tools_result_compress">Compresser</string>
+    <string name="tools_result_print">Imprimer</string>
+    <string name="tools_result_sign">Signer</string>
+    <string name="tools_result_draw">Dessiner</string>
+    <string name="tools_result_lock">Chiffrer</string>
+    <string name="tools_result_share">Partager</string>
+    <string name="tools_result_view">Voir</string>
+    <string name="tools_result_feedback">« Image en PDF » répond-il à vos besoins ?</string>
+    <string name="tools_result_not_really">Pas vraiment</string>
+    <string name="tools_result_good">Très bien</string>
+    <string name="tools_result_close">Fermer</string>
+    <string name="tools_result_path">Chemin : %1$s</string>
+    <string name="tools_result_pages">%1$d pages</string>
+    <string name="tools_result_share_unavailable">Le partage n\'est pas encore disponible</string>
+    <string name="tools_zip_done">Archive ZIP créée : %1$s</string>
+
+</resources>

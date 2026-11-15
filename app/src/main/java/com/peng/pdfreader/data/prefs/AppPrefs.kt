@@ -2,6 +2,7 @@ package com.peng.pdfreader.data.prefs
 
 import android.content.Context
 import androidx.core.content.edit
+import com.peng.pdfreader.appcore.widget.ReadingMode
 import com.peng.pdfreader.data.model.DocType
 
 /**
@@ -44,12 +45,18 @@ class AppPrefs private constructor(context: Context) {
             .getOrDefault(FileSort.MODIFIED)
         set(value) = prefs.edit { putString(KEY_FILE_SORT, value.name) }
 
+    /** Whether the onboarding has already been shown. */
+    var onboardingShown: Boolean
+        get() = prefs.getBoolean(KEY_ONBOARDING_SHOWN, false)
+        set(value) = prefs.edit { putBoolean(KEY_ONBOARDING_SHOWN, value) }
+
     companion object {
         private const val KEY_LANGUAGE = "language"
         private const val KEY_KEEP_SCREEN_ON = "keep_screen_on"
         private const val KEY_READING_MODE = "reading_mode"
         private const val KEY_FILE_FILTER = "file_filter"
         private const val KEY_FILE_SORT = "file_sort"
+        private const val KEY_ONBOARDING_SHOWN = "onboarding_shown"
 
         const val DEFAULT_LANGUAGE = "zh-CN"
 
@@ -61,14 +68,6 @@ class AppPrefs private constructor(context: Context) {
                 instance ?: AppPrefs(context).also { instance = it }
             }
     }
-}
-
-/** Visual reading mode of the PDF reader. */
-enum class ReadingMode {
-    LIGHT,
-    SEPIA,
-    NIGHT_INVERT,
-    BLACK,
 }
 
 /** Sort order of the file list. */
