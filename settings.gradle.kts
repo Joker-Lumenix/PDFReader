@@ -24,3 +24,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "PdfReader"
 include(":app")
+include(":appcore")

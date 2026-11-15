@@ -15,7 +15,6 @@
     <string name="annotations">Annotations</string>
     <string name="app_cache">App-Cache</string>
     <string name="app_lock">App lock</string>
-    <string name="app_name">PDF Reader</string>
     <string name="apply">Anwenden</string>
     <string name="authorization_required">Autorisierung erforderlich, um alle Dateien zu lesen.</string>
     <string name="auto">Automatisch</string>
@@ -35,7 +34,6 @@
     <string name="confirm_delete_message">Möchten Sie die ausgewählten Dateien wirklich löschen?</string>
     <string name="confirm_delete_title">Löschen bestätigen</string>
     <string name="convert_format">Convert to other format</string>
-    <string name="convert_image_to_pdf">Bild in PDF umwandeln</string>
     <string name="copies">Copies</string>
     <string name="created_at">Created</string>
     <string name="crop_draw_filter">Zuschneiden, zeichnen, Text und Filter hinzufügen</string>
@@ -53,7 +51,6 @@
     <string name="encrypt">PDF Encrypt</string>
     <string name="encrypted">Verschlüsselt</string>
     <string name="eraser">Eraser</string>
-    <string name="excel">Excel</string>
     <string name="exit_retention_title">Möchten Sie es vor dem Verlassen ausprobieren?</string>
     <string name="export_annotations">Export annotations</string>
     <string name="export_format">Exportformat</string>
@@ -112,14 +109,12 @@
     <string name="page_of">Seite %1$d / %2$d</string>
     <string name="pages">Seiten</string>
     <string name="paper_size">Paper size</string>
-    <string name="pdf">PDF</string>
     <string name="pdf_locked">PDF gesperrt</string>
     <string name="pdf_unlocked">PDF entsperrt</string>
     <string name="pen">Pen</string>
     <string name="permission_rationale">Um Dokumente auf Ihrem Gerät zu lesen und zu bearbeiten, erlauben Sie Let\'s PDF den Zugriff auf alle Ihre Dateien.</string>
     <string name="permission_required">Berechtigung erforderlich</string>
     <string name="plain_text">Klartext</string>
-    <string name="ppt">PPT</string>
     <string name="print">PDF Print</string>
     <string name="print_now">Print now</string>
     <string name="privacy_note">所有文件仅保存在本机沙盒，零云端上传</string>
@@ -188,6 +183,9 @@
     <string name="various_pdf_tools">Vielfältige PDF-Werkzeuge</string>
     <string name="version">Version</string>
     <string name="view">Ansehen</string>
-    <string name="word">Word</string>
     <string name="zip_package">Seiten-ZIP</string>
+    <string name="nav_home">Start</string>
+    <string name="nav_files">Dateien</string>
+    <string name="nav_tools">Werkzeuge</string>
+    <string name="nav_settings">Einstellungen</string>
 </resources>

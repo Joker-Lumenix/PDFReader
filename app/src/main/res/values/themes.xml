@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.PdfReader" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- The app theme: everything comes from the shared design system in :appcore. -->
+    <style name="Theme.PdfReader" parent="Theme.AppCore">
+        <item name="android:windowBackground">@color/surface_subtle</item>
+    </style>
+
 </resources>

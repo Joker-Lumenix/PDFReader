@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Library level strings.
+  These are accessibility labels for icon-only controls that every screen of
+  this app type needs; the user facing copy lives in the app module.
+-->
+<resources>
+    <string name="appcore_back" translatable="false">Back</string>
+    <string name="appcore_more" translatable="false">More</string>
+    <string name="appcore_select" translatable="false">Select</string>
+    <string name="appcore_file_icon" translatable="false">File</string>
+    <string name="appcore_tab_icon" translatable="false">Tab</string>
+    <string name="appcore_empty_state" translatable="false">Empty</string>
+</resources>

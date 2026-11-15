@@ -15,7 +15,6 @@
     <string name="annotations">Annotations</string>
     <string name="app_cache">App Cache</string>
     <string name="app_lock">App lock</string>
-    <string name="app_name">PDF Reader</string>
     <string name="apply">Apply</string>
     <string name="authorization_required">Authorization required to read all files.</string>
     <string name="auto">Auto</string>
@@ -35,7 +34,6 @@
     <string name="confirm_delete_message">Are you sure you want to delete the selected files?</string>
     <string name="confirm_delete_title">Confirm delete</string>
     <string name="convert_format">Convert to other format</string>
-    <string name="convert_image_to_pdf">Convert Image to PDF</string>
     <string name="copies">Copies</string>
     <string name="created_at">Created</string>
     <string name="crop_draw_filter">Crop, draw, add text and filters</string>
@@ -53,7 +51,6 @@
     <string name="encrypt">PDF Encrypt</string>
     <string name="encrypted">Encrypted</string>
     <string name="eraser">Eraser</string>
-    <string name="excel">Excel</string>
     <string name="exit_retention_title">Want to try it before you go?</string>
     <string name="export_annotations">Export annotations</string>
     <string name="export_format">Export format</string>
@@ -112,14 +109,12 @@
     <string name="page_of">Page %1$d / %2$d</string>
     <string name="pages">pages</string>
     <string name="paper_size">Paper size</string>
-    <string name="pdf">PDF</string>
     <string name="pdf_locked">PDF locked</string>
     <string name="pdf_unlocked">PDF Unlocked</string>
     <string name="pen">Pen</string>
     <string name="permission_rationale">To read and edit documents on your device, please allow Let\'s PDF to access all your files.</string>
     <string name="permission_required">Permission Required</string>
     <string name="plain_text">Plain text</string>
-    <string name="ppt">PPT</string>
     <string name="print">PDF Print</string>
     <string name="print_now">Print now</string>
     <string name="privacy_note">所有文件仅保存在本机沙盒，零云端上传</string>
@@ -188,6 +183,9 @@
     <string name="various_pdf_tools">Various PDF tools</string>
     <string name="version">Version</string>
     <string name="view">View</string>
-    <string name="word">Word</string>
     <string name="zip_package">Page ZIP</string>
+    <string name="nav_home">Home</string>
+    <string name="nav_files">Files</string>
+    <string name="nav_tools">Tools</string>
+    <string name="nav_settings">Settings</string>
 </resources>

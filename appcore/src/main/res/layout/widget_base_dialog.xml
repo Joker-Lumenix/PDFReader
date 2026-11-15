@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Container for the centred dialog body (336dp card, 16dp radius). -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/dialogContainer"
+    android:layout_width="336dp"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_dialog_r16" />

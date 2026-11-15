@@ -15,7 +15,6 @@
     <string name="annotations">Annotations</string>
     <string name="app_cache">アプリのキャッシュ</string>
     <string name="app_lock">App lock</string>
-    <string name="app_name">PDF Reader</string>
     <string name="apply">適用</string>
     <string name="authorization_required">すべてのファイルを読み取るには権限が必要です</string>
     <string name="auto">自動</string>
@@ -35,7 +34,6 @@
     <string name="confirm_delete_message">選択したファイルを削除しますか？</string>
     <string name="confirm_delete_title">削除の確認</string>
     <string name="convert_format">Convert to other format</string>
-    <string name="convert_image_to_pdf">画像を PDF に変換</string>
     <string name="copies">Copies</string>
     <string name="created_at">Created</string>
     <string name="crop_draw_filter">切り取り・描画・文字追加・フィルター</string>
@@ -53,7 +51,6 @@
     <string name="encrypt">PDF Encrypt</string>
     <string name="encrypted">暗号化済み</string>
     <string name="eraser">Eraser</string>
-    <string name="excel">Excel</string>
     <string name="exit_retention_title">閉じる前に試してみますか？</string>
     <string name="export_annotations">Export annotations</string>
     <string name="export_format">エクスポート形式</string>
@@ -112,14 +109,12 @@
     <string name="page_of">%1$d / %2$d ページ</string>
     <string name="pages">ページ</string>
     <string name="paper_size">Paper size</string>
-    <string name="pdf">PDF</string>
     <string name="pdf_locked">PDF はロックされています</string>
     <string name="pdf_unlocked">PDF のロックが解除されました</string>
     <string name="pen">Pen</string>
     <string name="permission_rationale">端末の文書を読み書きするには、Let\'s PDF にすべてのファイルへのアクセスを許可してください。</string>
     <string name="permission_required">権限が必要です</string>
     <string name="plain_text">プレーンテキ스트</string>
-    <string name="ppt">PPT</string>
     <string name="print">PDF Print</string>
     <string name="print_now">Print now</string>
     <string name="privacy_note">所有文件仅保存在本机沙盒，零云端上传</string>
@@ -188,6 +183,9 @@
     <string name="various_pdf_tools">豊富な PDF ツール</string>
     <string name="version">Version</string>
     <string name="view">表示</string>
-    <string name="word">Word</string>
     <string name="zip_package">ページ ZIP</string>
+    <string name="nav_home">ホーム</string>
+    <string name="nav_files">ファイル</string>
+    <string name="nav_tools">ツール</string>
+    <string name="nav_settings">設定</string>
 </resources>

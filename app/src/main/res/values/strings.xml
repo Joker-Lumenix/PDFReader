@@ -15,7 +15,7 @@
     <string name="annotations">批注</string>
     <string name="app_cache">应用缓存</string>
     <string name="app_lock">应用锁保护</string>
-    <string name="app_name">PDF Reader</string>
+    <string name="app_name" translatable="false">Let\'s PDF</string>
     <string name="apply">应用</string>
     <string name="authorization_required">需要授权才能读取全部文件</string>
     <string name="auto">自动</string>
@@ -35,7 +35,6 @@
     <string name="confirm_delete_message">确定要删除所选文件吗？</string>
     <string name="confirm_delete_title">删除确认</string>
     <string name="convert_format">转换为其他格式</string>
-    <string name="convert_image_to_pdf">图片转 PDF</string>
     <string name="copies">份数</string>
     <string name="created_at">创建时间</string>
     <string name="crop_draw_filter">裁剪、绘制、加文字与滤镜</string>
@@ -53,7 +52,7 @@
     <string name="encrypt">PDF 加密</string>
     <string name="encrypted">已加密</string>
     <string name="eraser">橡皮擦</string>
-    <string name="excel">Excel</string>
+    <string name="file_type_excel" translatable="false">Excel</string>
     <string name="exit_retention_title">离开前想先试试吗？</string>
     <string name="export_annotations">导出批注</string>
     <string name="export_format">导出格式</string>
@@ -112,14 +111,14 @@
     <string name="page_of">第 %1$d / %2$d 页</string>
     <string name="pages">页</string>
     <string name="paper_size">纸张规格</string>
-    <string name="pdf">PDF</string>
+    <string name="file_type_pdf" translatable="false">PDF</string>
     <string name="pdf_locked">PDF 已加密</string>
     <string name="pdf_unlocked">PDF 已解锁</string>
     <string name="pen">手绘笔</string>
     <string name="permission_rationale">若要在本机读取和编辑文档，请允许 Let\'s PDF 访问全部文件。</string>
     <string name="permission_required">需要权限</string>
     <string name="plain_text">纯文本</string>
-    <string name="ppt">PPT</string>
+    <string name="file_type_ppt" translatable="false">PPT</string>
     <string name="print">PDF 打印</string>
     <string name="print_now">立即打印</string>
     <string name="privacy_note">所有文件仅保存在本机沙盒，零云端上传</string>
@@ -188,6 +187,12 @@
     <string name="various_pdf_tools">多种 PDF 工具</string>
     <string name="version">版本信息</string>
     <string name="view">查看</string>
-    <string name="word">Word</string>
+    <string name="file_type_word" translatable="false">Word</string>
     <string name="zip_package">逐页图包</string>
+    <string name="file_type_txt" translatable="false">TXT</string>
+    <string name="file_type_other" translatable="false">Other</string>
+    <string name="nav_home">首页</string>
+    <string name="nav_files">文件</string>
+    <string name="nav_tools">工具</string>
+    <string name="nav_settings">设置</string>
 </resources>

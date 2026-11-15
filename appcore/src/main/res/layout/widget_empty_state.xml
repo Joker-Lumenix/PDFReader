@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Empty state block used by the file list, the tools grid and the preview shells. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:padding="32dp">
+
+    <ImageView
+        android:id="@+id/ivIllustration"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:contentDescription="@string/appcore_empty_state" />
+
+    <TextView
+        android:id="@+id/tvTitle"
+        style="@style/TextAppearance.AppCore.PageTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center" />
+
+    <TextView
+        android:id="@+id/tvHint"
+        style="@style/TextAppearance.AppCore.Body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:gravity="center"
+        android:textColor="@color/text_tertiary" />
+
+    <TextView
+        android:id="@+id/tvAction"
+        style="@style/TextAppearance.AppCore.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/gradient_red"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:minWidth="137dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:visibility="gone" />
+
+</LinearLayout>

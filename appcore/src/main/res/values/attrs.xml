@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="PageTitleBar">
+        <!-- Title text, 20sp / 700 -->
+        <attr name="title" format="string" />
+        <!-- Optional subtitle, 12sp / 400 / #999999 -->
+        <attr name="subtitle" format="string" />
+        <!-- Show the back arrow on the left -->
+        <attr name="showBack" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="FileListItemView">
+        <!-- File name, 15sp / 600 -->
+        <attr name="itemTitle" format="string" />
+        <!-- Secondary line, 12sp / 400 / #999999 -->
+        <attr name="itemMeta" format="string" />
+        <!-- File type label shown inside the pill, 10sp / 700 -->
+        <attr name="itemTypeLabel" format="string" />
+        <!-- Colour of the type label -->
+        <attr name="itemTypeColor" format="color" />
+        <!-- Show the "more" affordance on the right -->
+        <attr name="itemShowMore" format="boolean" />
+        <!-- Show the selection checkbox (multi select mode) -->
+        <attr name="itemShowCheckbox" format="boolean" />
+        <!-- Checkbox state -->
+        <attr name="itemChecked" format="boolean" />
+        <!-- Show the type pill -->
+        <attr name="itemShowType" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="EmptyStateView">
+        <attr name="emptyTitle" format="string" />
+        <attr name="emptyHint" format="string" />
+        <attr name="emptyActionText" format="string" />
+    </declare-styleable>
+
+</resources>
