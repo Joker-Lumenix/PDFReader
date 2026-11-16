@@ -3,7 +3,7 @@ package com.peng.pdfreader.feature.tools.view
 import android.content.Context
 import android.view.View
 import com.peng.pdfreader.R
-import com.peng.pdfreader.data.model.Document
+import com.peng.pdfreader.data.Document
 import com.peng.pdfreader.databinding.ActivityResultBinding
 import com.peng.pdfreader.feature.tools.util.ToolFormatters
 import com.peng.pdfreader.feature.tools.util.ToolShapes

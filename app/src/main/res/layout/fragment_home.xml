@@ -7,38 +7,159 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/surface_muted"
     android:orientation="vertical">
 
-    <!-- The bar covers the status bar as well, so it carries the card surface. -->
-    <com.peng.pdfreader.appcore.widget.PageTitleBar
-        android:id="@+id/titleBar"
+    <!-- 标题 -->
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/surface_card" />
+        android:layout_height="63dp"
+        android:background="@color/surface_card"
+        >
 
-    <!--
-      quick action cards, the row is wider than the screen so it scrolls.
-      The bar of the shared title bar is 89 tall (24 status + 64 + 1 hairline),
-      the cards of the design start at y=99.
-    -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/quickActions"
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            tools:text="let's PDF"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginLeft="20dp"
+            />
+
+        <ImageView
+            android:id="@+id/ivSearch"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@mipmap/ic_search_red"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="100dp"
+            />
+
+        <ImageView
+            android:id="@+id/ivFileSelect"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@mipmap/ic_file_choose"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="60dp"
+            />
+
+        <ImageView
+            android:id="@+id/ivSort"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@mipmap/ic_sort"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="20dp"
+            />
+
+    </RelativeLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="82dp"
-        android:layout_marginTop="11dp"
-        android:clipToPadding="false"
         android:orientation="horizontal"
-        android:paddingStart="12dp"
-        android:paddingEnd="8dp"
-        android:scrollbars="none" />
+        android:layout_marginTop="12dp"
+        >
+
+        <LinearLayout
+            android:id="@+id/toolsImageToPdf"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:background="@drawable/bg_card_r8"
+            android:layout_marginLeft="12dp"
+            >
+            
+            <ImageView
+                android:layout_width="80dp"
+                android:layout_height="44dp"
+                android:src="@mipmap/ic_tools_image_to_pdf"
+                android:layout_marginTop="8dp"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/image_to_pdf"
+                android:layout_marginTop="4dp"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/toolsMergePdf"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:background="@drawable/bg_card_r8"
+            android:layout_marginLeft="12dp"
+            >
+
+            <ImageView
+                android:layout_width="80dp"
+                android:layout_height="44dp"
+                android:src="@mipmap/ic_tools_merge_pdf"
+                android:layout_marginTop="8dp"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/merge_to_pdf"
+                android:layout_marginTop="4dp"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/toTools"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="@drawable/bg_card_r8"
+            android:layout_marginLeft="12dp"
+            android:layout_marginRight="8dp"
+            >
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@mipmap/ic_go_to_setting"
+                android:layout_marginTop="8dp"
+                />
+
+        </LinearLayout>
+    </LinearLayout>
 
     <!-- file type filter strip: All / PDF / Word / Excel / PPT -->
+    <!--
+      todo 可以将这个封装为一个自定义View，支持如下属性：
+      1、支持设定选中/未选中时颜色，
+      2、文本字体大小，单位sp
+      3、指示器宽高、圆角，单位dp
+      4、指示器具体文本的距离，单位dp
+      5、支持设定每一个条目的宽高，单位dp
+      注：该自定义View需要加中文注释以及用法，之后可能对该自定义View进行升级
+       -->
     <LinearLayout
         android:id="@+id/filterStrip"
         android:layout_width="match_parent"
         android:layout_height="44dp"
         android:layout_marginTop="4dp"
+        android:layout_marginBottom="12dp"
         android:orientation="horizontal">
 
         <include
@@ -78,28 +199,10 @@
 
     </LinearLayout>
 
-    <FrameLayout
+    <!-- one page per file type, swiped horizontally -->
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/documentPager"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <!-- one page per file type, swiped horizontally -->
-        <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/documentPager"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-        <ImageView
-            android:id="@+id/fabScan"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:layout_gravity="bottom|end"
-            android:layout_margin="12dp"
-            android:clickable="true"
-            android:contentDescription="@string/home_scan"
-            android:focusable="true"
-            android:src="@mipmap/ic_google_scan" />
-
-    </FrameLayout>
+        android:layout_height="match_parent" />
 
 </LinearLayout>

@@ -9,11 +9,28 @@
     android:background="@color/surface_subtle"
     android:orientation="vertical">
 
-    <FrameLayout
-        android:id="@+id/fragmentContainer"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+   <FrameLayout
+       android:layout_width="match_parent"
+       android:layout_height="0dp"
+       android:layout_weight="1">
+
+       <FrameLayout
+           android:id="@+id/fragmentContainer"
+           android:layout_width="match_parent"
+           android:layout_height="match_parent" />
+
+       <ImageView
+           android:id="@+id/fabScan"
+           android:layout_width="64dp"
+           android:layout_height="64dp"
+           android:layout_gravity="bottom|end"
+           android:layout_margin="12dp"
+           android:clickable="true"
+           android:contentDescription="@string/home_scan"
+           android:focusable="true"
+           android:src="@mipmap/ic_google_scan" />
+
+   </FrameLayout>
 
     <com.peng.pdfreader.appcore.widget.BottomNavBar
         android:id="@+id/bottomNav"

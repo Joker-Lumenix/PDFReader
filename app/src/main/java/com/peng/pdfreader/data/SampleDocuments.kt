@@ -1,7 +1,6 @@
 package com.peng.pdfreader.data
 
 import android.content.Context
-import com.peng.pdfreader.data.model.DocType
 import java.io.File
 
 /**

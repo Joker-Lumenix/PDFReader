@@ -2,6 +2,7 @@ package com.peng.pdfreader.feature.tools.scanner
 
 import android.content.Intent
 import androidx.fragment.app.Fragment
+import com.peng.pdfreader.ui.activities.ScanActivity
 
 /**
  * Starts the "scan to PDF" flow.

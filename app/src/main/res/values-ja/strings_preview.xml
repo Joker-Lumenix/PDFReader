@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="preview_open_invalid">ファイルが破損しているか、有効な PDF ではありません</string>
+    <string name="preview_open_invalid">このファイルは解析できません。有効な PDF でないか、ダウンロードが不完全です</string>
     <string name="preview_open_failed">ファイルを開けません。もう一度お試しください</string>
     <string name="preview_favorite">お気に入り</string>
     <string name="preview_annotate">注釈</string>

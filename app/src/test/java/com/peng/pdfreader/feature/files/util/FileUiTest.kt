@@ -1,7 +1,8 @@
 package com.peng.pdfreader.feature.files.util
 
-import com.peng.pdfreader.data.model.DocType
-import com.peng.pdfreader.data.model.Document
+import com.peng.pdfreader.data.DocType
+import com.peng.pdfreader.data.Document
+import com.peng.pdfreader.utils.FileUi
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

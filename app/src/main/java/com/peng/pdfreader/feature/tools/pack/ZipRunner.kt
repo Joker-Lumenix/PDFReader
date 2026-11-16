@@ -4,9 +4,9 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.peng.pdfreader.R
-import com.peng.pdfreader.data.model.DocType
-import com.peng.pdfreader.data.model.Document
-import com.peng.pdfreader.data.repository.DocumentRepository
+import com.peng.pdfreader.data.DocType
+import com.peng.pdfreader.data.Document
+import com.peng.pdfreader.data.DocumentRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

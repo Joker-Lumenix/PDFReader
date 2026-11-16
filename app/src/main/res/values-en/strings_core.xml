@@ -8,6 +8,7 @@
     <string name="error_no_files">There is no file to work on</string>
     <string name="error_no_pages">There is no page to work on</string>
     <string name="error_no_images">There is no image to convert</string>
+    <string name="error_pdf_too_large">The file is too large to be processed on the phone</string>
     <string name="error_wrong_password">Wrong password</string>
     <string name="error_not_encrypted">This document was not encrypted by this app</string>
     <string name="error_weak_password">The password needs at least 4 characters</string>

@@ -8,6 +8,7 @@
     <string name="error_no_files">Não há ficheiros para processar</string>
     <string name="error_no_pages">Não há páginas para processar</string>
     <string name="error_no_images">Não há imagens para converter</string>
+    <string name="error_pdf_too_large">O ficheiro é demasiado grande para ser processado no telemóvel</string>
     <string name="error_wrong_password">Palavra-passe incorreta</string>
     <string name="error_not_encrypted">Este documento não foi cifrado por esta aplicação</string>
     <string name="error_weak_password">A palavra-passe precisa de pelo menos 4 caracteres</string>

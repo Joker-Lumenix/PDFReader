@@ -8,6 +8,7 @@
     <string name="error_no_files">処理できるファイルがありません</string>
     <string name="error_no_pages">処理できるページがありません</string>
     <string name="error_no_images">変換できる画像がありません</string>
+    <string name="error_pdf_too_large">ファイルが大きすぎて、端末では処理できません</string>
     <string name="error_wrong_password">パスワードが違います</string>
     <string name="error_not_encrypted">このドキュメントは当アプリで暗号化されていません</string>
     <string name="error_weak_password">パスワードは 4 文字以上で入力してください</string>

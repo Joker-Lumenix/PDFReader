@@ -19,7 +19,7 @@
         android:shortcutLongLabel="@string/scan_to_pdf">
         <intent
             android:action="com.peng.pdfreader.action.SCAN"
-            android:targetClass="com.peng.pdfreader.MainActivity"
+            android:targetClass="com.peng.pdfreader.ui.activities.MainActivity"
             android:targetPackage="com.peng.pdfreader" />
     </shortcut>
 
@@ -31,7 +31,7 @@
         android:shortcutLongLabel="@string/merge">
         <intent
             android:action="com.peng.pdfreader.action.MERGE"
-            android:targetClass="com.peng.pdfreader.MainActivity"
+            android:targetClass="com.peng.pdfreader.ui.activities.MainActivity"
             android:targetPackage="com.peng.pdfreader" />
     </shortcut>
 
@@ -43,7 +43,7 @@
         android:shortcutLongLabel="@string/image_to_pdf">
         <intent
             android:action="com.peng.pdfreader.action.IMAGE_TO_PDF"
-            android:targetClass="com.peng.pdfreader.MainActivity"
+            android:targetClass="com.peng.pdfreader.ui.activities.MainActivity"
             android:targetPackage="com.peng.pdfreader" />
     </shortcut>
 
@@ -55,7 +55,7 @@
         android:shortcutLongLabel="@string/print">
         <intent
             android:action="com.peng.pdfreader.action.OPEN_FILES"
-            android:targetClass="com.peng.pdfreader.MainActivity"
+            android:targetClass="com.peng.pdfreader.ui.activities.MainActivity"
             android:targetPackage="com.peng.pdfreader" />
     </shortcut>
 

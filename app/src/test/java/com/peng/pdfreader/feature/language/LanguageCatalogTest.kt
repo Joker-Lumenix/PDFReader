@@ -1,6 +1,7 @@
 package com.peng.pdfreader.feature.language
 
 import com.peng.pdfreader.R
+import com.peng.pdfreader.ui.uiData.language.LanguageCatalog
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull

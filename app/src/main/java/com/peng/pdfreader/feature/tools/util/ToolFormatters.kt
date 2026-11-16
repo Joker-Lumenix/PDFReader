@@ -2,7 +2,7 @@ package com.peng.pdfreader.feature.tools.util
 
 import android.content.Context
 import com.peng.pdfreader.R
-import com.peng.pdfreader.data.model.Document
+import com.peng.pdfreader.data.Document
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

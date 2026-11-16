@@ -23,6 +23,7 @@ object EngineErrors {
         PdfError.CODE_NO_FILES -> context.getString(R.string.error_no_files)
         PdfError.CODE_NO_PAGES -> context.getString(R.string.error_no_pages)
         PdfError.CODE_NO_IMAGES -> context.getString(R.string.error_no_images)
+    PdfError.CODE_TOO_LARGE -> context.getString(R.string.error_pdf_too_large)
         PdfVault.CODE_WRONG_PASSWORD -> context.getString(R.string.error_wrong_password)
         PdfVault.CODE_NOT_ENCRYPTED -> context.getString(R.string.error_not_encrypted)
         PdfVault.CODE_WEAK_PASSWORD -> context.getString(R.string.error_weak_password)

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="preview_open_invalid">O ficheiro está danificado ou não é um PDF válido</string>
+    <string name="preview_open_invalid">Não é possível analisar este ficheiro - pode não ser um PDF válido ou o download está incompleto</string>
     <string name="preview_open_failed">Não é possível abrir o ficheiro, tente novamente</string>
     <string name="preview_favorite">Favorito</string>
     <string name="preview_annotate">Anotar</string>

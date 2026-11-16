@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.peng.pdfreader.appcore.pdf.PdfEngine
-import com.peng.pdfreader.data.repository.DocumentRepository
+import com.peng.pdfreader.data.DocumentRepository
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test

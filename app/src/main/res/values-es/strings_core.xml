@@ -8,6 +8,7 @@
     <string name="error_no_files">No hay ningún archivo con el que trabajar</string>
     <string name="error_no_pages">No hay ninguna página con la que trabajar</string>
     <string name="error_no_images">No hay ninguna imagen que convertir</string>
+    <string name="error_pdf_too_large">El archivo es demasiado grande para procesarlo en el teléfono</string>
     <string name="error_wrong_password">Contraseña incorrecta</string>
     <string name="error_not_encrypted">Este documento no fue cifrado por esta aplicación</string>
     <string name="error_weak_password">La contraseña necesita al menos 4 caracteres</string>

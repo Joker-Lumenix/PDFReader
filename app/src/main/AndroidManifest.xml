@@ -41,9 +41,8 @@
         android:theme="@style/Theme.PdfReader"
         android:requestLegacyExternalStorage="true">
 
-        <!-- The start up screen is the entry point of the app. -->
         <activity
-            android:name=".ui.splash.SplashActivity"
+            android:name=".ui.activities.SplashActivity"
             android:exported="true"
             android:theme="@style/Theme.PdfReader">
             <intent-filter>
@@ -51,17 +50,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!--
-              The quick access of the launcher: the shortcuts show up when the
-              app icon is pressed and held in the system launcher.
-            -->
             <meta-data
                 android:name="android.app.shortcuts"
                 android:resource="@xml/shortcuts" />
         </activity>
 
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.activities.MainActivity"
             android:exported="true"
             android:launchMode="singleTask"
             android:theme="@style/Theme.PdfReader"
@@ -91,83 +86,83 @@
 
         <!-- Preview and annotation editors -->
         <activity
-            android:name=".feature.preview.activity.PreviewActivity"
+            android:name=".ui.activities.PreviewActivity"
             android:exported="false"
             android:launchMode="singleTop" />
 
         <activity
-            android:name=".feature.preview.activity.SignatureActivity"
+            android:name=".ui.activities.SignatureActivity"
             android:exported="false" />
 
         <activity
-            android:name=".feature.preview.activity.DrawActivity"
+            android:name=".ui.activities.DrawActivity"
             android:exported="false" />
 
         <!-- PDF tools -->
         <activity
-            android:name=".feature.tools.activity.MergeActivity"
+            android:name=".ui.activities.MergeActivity"
             android:exported="false" />
 
         <activity
-            android:name=".feature.tools.activity.SplitActivity"
+            android:name=".ui.activities.SplitActivity"
             android:exported="false" />
 
         <activity
-            android:name=".feature.tools.activity.ImageToPdfActivity"
+            android:name=".ui.activities.ImageToPdfActivity"
             android:exported="false" />
 
         <activity
-            android:name=".feature.tools.activity.CompressActivity"
+            android:name=".ui.activities.CompressActivity"
             android:exported="false" />
 
         <activity
-            android:name=".feature.tools.scanner.ScanActivity"
+            android:name=".ui.activities.ScanActivity"
             android:exported="false" />
 
         <!-- Encryption -->
         <activity
-            android:name=".feature.lock.activity.LockActivity"
+            android:name=".ui.activities.LockActivity"
             android:exported="false" />
 
         <activity
-            android:name=".feature.lock.activity.UnlockActivity"
+            android:name=".ui.activities.UnlockActivity"
             android:exported="false" />
 
         <!-- Settings, language, feedback and onboarding -->
         <activity
-            android:name=".feature.language.LanguageActivity"
+            android:name=".ui.activities.LanguageActivity"
             android:exported="false" />
 
         <activity
-            android:name=".feature.feedback.FeedbackActivity"
+            android:name=".ui.activities.FeedbackActivity"
             android:exported="false" />
 
         <activity
-            android:name=".feature.settings.notice.NoticeActivity"
+            android:name=".ui.activities.NoticeActivity"
             android:exported="false" />
 
         <activity
-            android:name=".feature.settings.rating.RatingActivity"
+            android:name=".ui.activities.RatingActivity"
             android:exported="false" />
 
         <!-- The file permission step of the start up flow. -->
         <activity
-            android:name=".ui.permission.PermissionActivity"
+            android:name=".ui.activities.PermissionActivity"
             android:exported="false" />
 
         <!-- The guide of the first start. -->
         <activity
-            android:name=".feature.guide.GuideActivity"
+            android:name=".ui.activities.GuideActivity"
             android:exported="false" />
 
         <!-- The file search and the file picker of the home tab. -->
         <activity
-            android:name=".feature.files.activity.FileSearchActivity"
+            android:name=".ui.activities.FileSearchActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
         <activity
-            android:name=".feature.files.activity.FileSelectActivity"
+            android:name=".ui.activities.FileSelectActivity"
             android:exported="false" />
 
         <!--
@@ -175,11 +170,11 @@
           running job, the result page shows what it produced.
         -->
         <activity
-            android:name=".feature.tools.activity.ToolProgressActivity"
+            android:name=".ui.activities.ToolProgressActivity"
             android:exported="false" />
 
         <activity
-            android:name=".feature.tools.activity.ResultActivity"
+            android:name=".ui.activities.ResultActivity"
             android:exported="false" />
 
         <!-- Keeps the chosen app locale across restarts on Android 12 and below. -->

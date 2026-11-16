@@ -23,6 +23,14 @@ import java.util.zip.Inflater
  */
 internal object PdfCompressor {
 
+    /**
+     * The biggest document the compressor works on.
+     *
+     * The compressor rewrites the file, so it holds the source and the result
+     * in the memory. A bigger document does not fit into the heap of a phone.
+     */
+    private const val MAX_SOURCE_BYTES = 32L * 1024 * 1024
+
     fun compress(
         source: File,
         out: File,
@@ -32,6 +40,12 @@ internal object PdfCompressor {
     ): Result<CompressResult> = runCatching {
         if (!source.exists() || !source.isFile) {
             throw PdfError.UnreadableSource(source.absolutePath)
+        }
+        // The compressor rewrites the document, so it needs the whole file in
+        // the memory. A document that does not fit into it is refused with a
+        // clear message instead of killing the app.
+        if (source.length() > MAX_SOURCE_BYTES) {
+            throw PdfError.Unsupported(PdfError.CODE_TOO_LARGE)
         }
         val quality = jpegQuality.coerceIn(1, 100)
         val original = source.readBytes()

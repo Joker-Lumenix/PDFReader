@@ -105,19 +105,13 @@
             android:gravity="center_horizontal"
             android:orientation="vertical">
 
-            <FrameLayout
+            <ImageView
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:background="@drawable/bg_icon_tile">
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_gravity="center"
-                    android:contentDescription="@null"
-                    android:scaleType="fitCenter"
-                    android:src="@mipmap/ic_rename_black" />
-            </FrameLayout>
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/ic_rename_red" />
 
             <TextView
                 style="@style/TextAppearance.AppCore.Body"
@@ -141,19 +135,13 @@
             android:gravity="center_horizontal"
             android:orientation="vertical">
 
-            <FrameLayout
+            <ImageView
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:background="@drawable/bg_icon_tile">
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_gravity="center"
-                    android:contentDescription="@null"
-                    android:scaleType="fitCenter"
-                    android:src="@mipmap/ic_open_with" />
-            </FrameLayout>
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/ic_open_with" />
 
             <TextView
                 style="@style/TextAppearance.AppCore.Body"
@@ -177,19 +165,13 @@
             android:gravity="center_horizontal"
             android:orientation="vertical">
 
-            <FrameLayout
+            <ImageView
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:background="@drawable/bg_icon_tile">
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_gravity="center"
-                    android:contentDescription="@null"
-                    android:scaleType="fitCenter"
-                    android:src="@mipmap/ic_share_red" />
-            </FrameLayout>
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/ic_share_red" />
 
             <TextView
                 style="@style/TextAppearance.AppCore.Body"
@@ -213,19 +195,13 @@
             android:gravity="center_horizontal"
             android:orientation="vertical">
 
-            <FrameLayout
+            <ImageView
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:background="@drawable/bg_icon_tile">
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_gravity="center"
-                    android:contentDescription="@null"
-                    android:scaleType="fitCenter"
-                    android:src="@mipmap/ic_print" />
-            </FrameLayout>
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/ic_print" />
 
             <TextView
                 style="@style/TextAppearance.AppCore.Body"
@@ -246,10 +222,8 @@
         android:layout_marginStart="20dp"
         android:layout_marginTop="28dp"
         android:layout_marginEnd="20dp"
-        android:background="@drawable/bg_card_r8"
-        android:backgroundTint="@color/surface_disabled"
-        android:orientation="vertical"
-        android:paddingTop="12dp">
+        android:background="@drawable/bg_card_gray_r8"
+        android:orientation="vertical">
 
         <LinearLayout
             android:id="@+id/rowSplit"
@@ -258,7 +232,7 @@
             android:background="?android:attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
-            android:gravity="top"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingStart="12dp"
             android:paddingEnd="12dp">
@@ -267,9 +241,8 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:background="@drawable/bg_card_r4"
-                android:backgroundTint="@color/white"
                 android:contentDescription="@null"
-                android:padding="3dp"
+
                 android:scaleType="fitCenter"
                 android:src="@mipmap/ic_split_pdf" />
 
@@ -278,7 +251,6 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="3dp"
                 android:layout_weight="1"
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/split"
@@ -293,7 +265,7 @@
             android:background="?android:attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
-            android:gravity="top"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingStart="12dp"
             android:paddingEnd="12dp">
@@ -302,9 +274,8 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:background="@drawable/bg_card_r4"
-                android:backgroundTint="@color/white"
                 android:contentDescription="@null"
-                android:padding="3dp"
+
                 android:scaleType="fitCenter"
                 android:src="@mipmap/ic_compress" />
 
@@ -313,7 +284,6 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="3dp"
                 android:layout_weight="1"
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/compress"
@@ -328,7 +298,7 @@
             android:background="?android:attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
-            android:gravity="top"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingStart="12dp"
             android:paddingEnd="12dp">
@@ -337,9 +307,8 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:background="@drawable/bg_card_r4"
-                android:backgroundTint="@color/white"
                 android:contentDescription="@null"
-                android:padding="3dp"
+
                 android:scaleType="fitCenter"
                 android:src="@mipmap/ic_merge_pdf" />
 
@@ -348,7 +317,6 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="3dp"
                 android:layout_weight="1"
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/merge"
@@ -363,7 +331,7 @@
             android:background="?android:attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
-            android:gravity="top"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingStart="12dp"
             android:paddingEnd="12dp">
@@ -372,9 +340,8 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:background="@drawable/bg_card_r4"
-                android:backgroundTint="@color/white"
                 android:contentDescription="@null"
-                android:padding="3dp"
+
                 android:scaleType="fitCenter"
                 android:src="@mipmap/ic_lock" />
 
@@ -383,7 +350,6 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="3dp"
                 android:layout_weight="1"
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/encrypt"
@@ -398,7 +364,7 @@
             android:background="?android:attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
-            android:gravity="top"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingStart="12dp"
             android:paddingEnd="12dp">
@@ -407,18 +373,16 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:background="@drawable/bg_card_r4"
-                android:backgroundTint="@color/white"
                 android:contentDescription="@null"
-                android:padding="3dp"
+
                 android:scaleType="fitCenter"
-                android:src="@mipmap/ic_delete_black" />
+                android:src="@mipmap/ic_delete_red" />
 
             <TextView
                 style="@style/TextAppearance.AppCore.Body"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="3dp"
                 android:layout_weight="1"
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/delete"

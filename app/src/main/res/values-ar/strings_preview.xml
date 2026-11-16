@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="preview_open_invalid">الملف تالف أو ليس ملف PDF صالحًا</string>
+    <string name="preview_open_invalid">لا يمكن تحليل هذا الملف، قد لا يكون PDF صالحًا أو أن الملف غير مكتمل</string>
     <string name="preview_open_failed">لا يمكن فتح الملف، يرجى المحاولة مرة أخرى</string>
     <string name="preview_favorite">المفضلة</string>
     <string name="preview_annotate">تعليق</string>

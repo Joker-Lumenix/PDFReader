@@ -3,8 +3,9 @@ package com.peng.pdfreader
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.peng.pdfreader.data.model.DocType
-import com.peng.pdfreader.data.repository.DocumentRepository
+import com.peng.pdfreader.data.DocType
+import com.peng.pdfreader.data.DocumentRepository
+import com.peng.pdfreader.data.FileSort
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -75,11 +76,11 @@ class DocumentRepositoryTest {
 
     @Test
     fun theQueryFiltersByTypeAndKeyword() {
-        val pdfs = repository.query(DocType.PDF, com.peng.pdfreader.data.prefs.FileSort.MODIFIED, null)
+        val pdfs = repository.query(DocType.PDF, FileSort.MODIFIED, null)
         assertTrue(pdfs.all { it.type == DocType.PDF })
 
         val keyword = repository.all().first().name.take(4)
-        val found = repository.query(null, com.peng.pdfreader.data.prefs.FileSort.MODIFIED, keyword)
+        val found = repository.query(null, FileSort.MODIFIED, keyword)
         assertTrue(found.isNotEmpty())
         assertTrue(found.all { it.name.contains(keyword, ignoreCase = true) })
     }

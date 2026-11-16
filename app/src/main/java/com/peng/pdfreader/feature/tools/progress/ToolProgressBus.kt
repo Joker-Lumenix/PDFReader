@@ -68,7 +68,7 @@ data class ToolProgressState(
  * the hero differs.
  *
  * @param documentId the document the tool has produced
- * @param mode the state of the hero, see [com.peng.pdfreader.feature.tools.activity.ResultActivity]
+ * @param mode the state of the hero, see [com.peng.pdfreader.ui.activities.ResultActivity]
  * @param title the success title of the hero
  * @param sizeBefore the size of the document before the tool ran
  * @param sizeAfter the size of the document after the tool ran

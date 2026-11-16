@@ -8,6 +8,7 @@
     <string name="error_no_files">Нет файлов для обработки</string>
     <string name="error_no_pages">Нет страниц для обработки</string>
     <string name="error_no_images">Нет изображений для конвертации</string>
+    <string name="error_pdf_too_large">Файл слишком большой для обработки на телефоне</string>
     <string name="error_wrong_password">Неверный пароль</string>
     <string name="error_not_encrypted">Этот документ не был зашифрован этим приложением</string>
     <string name="error_weak_password">Пароль должен содержать не менее 4 символов</string>

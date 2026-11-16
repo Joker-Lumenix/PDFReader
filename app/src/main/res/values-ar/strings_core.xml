@@ -8,6 +8,7 @@
     <string name="error_no_files">لا توجد ملفات للعمل عليها</string>
     <string name="error_no_pages">لا توجد صفحات للعمل عليها</string>
     <string name="error_no_images">لا توجد صور لتحويلها</string>
+    <string name="error_pdf_too_large">الملف كبير جدًا ولا يمكن معالجته على الهاتف</string>
     <string name="error_wrong_password">كلمة المرور غير صحيحة</string>
     <string name="error_not_encrypted">لم يشفّر هذا المستند بواسطة هذا التطبيق</string>
     <string name="error_weak_password">يجب ألّا تقل كلمة المرور عن 4 أحرف</string>

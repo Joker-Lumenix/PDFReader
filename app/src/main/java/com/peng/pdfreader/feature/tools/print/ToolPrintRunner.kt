@@ -7,7 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.peng.pdfreader.R
 import com.peng.pdfreader.appcore.pdf.PdfEngine
-import com.peng.pdfreader.data.model.Document
+import com.peng.pdfreader.data.Document
 import java.io.File
 
 /**

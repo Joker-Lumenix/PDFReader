@@ -91,6 +91,9 @@ sealed class PdfError(code: String, cause: Throwable? = null) : Exception(code, 
 
         /** There is no image to work on. */
         const val CODE_NO_IMAGES = "NO_IMAGES"
+
+        /** The document is too big to be processed on the phone. */
+        const val CODE_TOO_LARGE = "PDF_TOO_LARGE"
     }
 }
 

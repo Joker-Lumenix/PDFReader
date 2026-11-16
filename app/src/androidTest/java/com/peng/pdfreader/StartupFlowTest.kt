@@ -4,9 +4,10 @@ import android.content.Intent
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.peng.pdfreader.data.repository.DocumentRepository
+import com.peng.pdfreader.data.DocumentRepository
+import com.peng.pdfreader.ui.activities.MainActivity
 import com.peng.pdfreader.ui.flow.AppFlow
-import com.peng.pdfreader.ui.splash.SplashActivity
+import com.peng.pdfreader.ui.activities.SplashActivity
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test

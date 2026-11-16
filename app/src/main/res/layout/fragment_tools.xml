@@ -1,92 +1,305 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  Tools tab.
-
-  Layout per design "tools" (360x760):
-  - app bar 0..87 (#fafafa) with the title at x=20
-  - hero illustration 320x157 at (20, 95)
-  - yellow panel 320x420 at (20, 236), radius 13
-  - 2 x 4 grid of 133x82 tool cards, first card at (37, 252)
-
-  The shared title bar ends at 89 (24 status bar + 64 bar + 1 hairline), the
-  offsets below are therefore 2 smaller than the y of the design.
-
-  The yellow panel is drawn behind the illustration and behind the grid, which
-  is how the design stacks them; the radius is applied in code because the
-  panel colour only exists in the design.
--->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/surface_subtle"
     android:orientation="vertical">
 
-    <com.peng.pdfreader.appcore.widget.PageTitleBar
-        android:id="@+id/titleBar"
+    <TextView
+        android:id="@+id/title"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="63dp"
+        android:gravity="center_vertical"
+        android:paddingLeft="20dp"
+        android:text="@string/tools"
+        android:textColor="#ff060606"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:background="#fffafafa"
+        app:layout_constraintTop_toTopOf="parent"
+        />
 
-    <androidx.core.widget.NestedScrollView
+    <ScrollView
         android:id="@+id/scroll"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:fillViewport="true"
-        android:layout_marginHorizontal="@dimen/dsg_radius_20"
-        android:overScrollMode="never">
+        android:layout_marginTop="8dp"
+        android:overScrollMode="never"
+        app:layout_constraintTop_toBottomOf="@+id/title"
+        app:layout_constraintBottom_toTopOf="@+id/adBanner"
+        >
 
-        <FrameLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="20dp"
+            android:orientation="vertical">
 
-            <!-- yellow panel, the surface of the tool grid -->
-            <View
-                android:id="@+id/panel"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="420dp"
-                android:layout_gravity="top|start"
-                android:layout_marginHorizontal="20dp"
-                android:layout_marginTop="147dp" />
+                android:layout_height="wrap_content">
 
-            <!-- the 2 x 4 grid of the tools -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvTools"
-                android:layout_width="match_parent"
-                android:layout_height="388dp"
-                android:layout_gravity="top|start"
-                android:layout_marginTop="163dp"
-                android:clipToPadding="false"
-                android:overScrollMode="never"
-                android:scrollbars="none" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="420dp"
+                    android:background="@drawable/bg_yellow_r13"
+                    android:orientation="vertical"
+                    android:layout_marginTop="141dp"
+                    android:paddingHorizontal="17dp">
 
-            <!-- hero illustration, drawn on top of the yellow panel -->
-            <ImageView
-                android:id="@+id/ivIllustration"
-                android:layout_width="320dp"
-                android:layout_height="157dp"
-                android:layout_gravity="top|start"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="6dp"
-                android:contentDescription="@string/tools"
-                android:src="@mipmap/bg_tools" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:orientation="horizontal">
 
-            <!--
-              banner ad of the design, it sits below the grid of the tools.
-              The app does not bundle an ad sdk, the slot only reserves the
-              space and renders the local sample.
-            -->
-            <com.peng.pdfreader.appcore.widget.AdSlotView
-                android:id="@+id/adBanner"
-                android:layout_width="match_parent"
-                android:layout_height="72dp"
-                android:layout_gravity="top|start"
-                android:layout_marginStart="12dp"
-                android:layout_marginTop="563dp"
-                android:layout_marginEnd="12dp" />
+                        <LinearLayout
+                            android:id="@+id/llImageToPDF"
+                            android:layout_width="0dp"
+                            android:layout_height="82dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_card_r8"
+                            android:gravity="center_horizontal"
+                            android:orientation="vertical">
 
-        </FrameLayout>
+                            <ImageView
+                                android:layout_width="80dp"
+                                android:layout_height="44dp"
+                                android:layout_marginTop="8dp"
+                                android:src="@mipmap/ic_tools_image_to_pdf" />
 
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="@string/image_to_pdf" />
 
-    </androidx.core.widget.NestedScrollView>
+                        </LinearLayout>
 
-</LinearLayout>
+                        <View
+                            android:layout_width="20dp"
+                            android:layout_height="1dp" />
+
+                        <LinearLayout
+                            android:id="@+id/llMergePDF"
+                            android:layout_width="0dp"
+                            android:layout_height="82dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_card_r8"
+                            android:gravity="center_horizontal"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:layout_width="80dp"
+                                android:layout_height="44dp"
+                                android:layout_marginTop="8dp"
+                                android:src="@mipmap/ic_tools_merge_pdf" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="@string/merge_to_pdf" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:id="@+id/llSplitPDF"
+                            android:layout_width="0dp"
+                            android:layout_height="82dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_card_r8"
+                            android:gravity="center_horizontal"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:layout_width="80dp"
+                                android:layout_height="44dp"
+                                android:layout_marginTop="8dp"
+                                android:src="@mipmap/ic_tools_split_pdf" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="@string/split" />
+
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="20dp"
+                            android:layout_height="1dp" />
+
+                        <LinearLayout
+                            android:id="@+id/llScanPDF"
+                            android:layout_width="0dp"
+                            android:layout_height="82dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_card_r8"
+                            android:gravity="center_horizontal"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:layout_width="80dp"
+                                android:layout_height="44dp"
+                                android:layout_marginTop="8dp"
+                                android:src="@mipmap/ic_tools_scan" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="@string/scan_to_pdf" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:id="@+id/llLockPDF"
+                            android:layout_width="0dp"
+                            android:layout_height="82dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_card_r8"
+                            android:gravity="center_horizontal"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:layout_width="80dp"
+                                android:layout_height="44dp"
+                                android:layout_marginTop="8dp"
+                                android:src="@mipmap/ic_tools_lock" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="@string/tools_label_lock" />
+
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="20dp"
+                            android:layout_height="1dp" />
+
+                        <LinearLayout
+                            android:id="@+id/llUnlockPDF"
+                            android:layout_width="0dp"
+                            android:layout_height="82dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_card_r8"
+                            android:gravity="center_horizontal"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:layout_width="80dp"
+                                android:layout_height="44dp"
+                                android:layout_marginTop="8dp"
+                                android:src="@mipmap/ic_tools_unlock" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="@string/tools_label_unlock" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:id="@+id/llPrintPDF"
+                            android:layout_width="0dp"
+                            android:layout_height="82dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_card_r8"
+                            android:gravity="center_horizontal"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:layout_width="80dp"
+                                android:layout_height="44dp"
+                                android:layout_marginTop="8dp"
+                                android:src="@mipmap/ic_tools_print_pdf" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="@string/tools_print_title" />
+
+                        </LinearLayout>
+
+                        <View
+                            android:layout_width="20dp"
+                            android:layout_height="1dp" />
+
+                        <LinearLayout
+                            android:id="@+id/llCompressPDF"
+                            android:layout_width="0dp"
+                            android:layout_height="82dp"
+                            android:layout_weight="1"
+                            android:background="@drawable/bg_card_r8"
+                            android:gravity="center_horizontal"
+                            android:orientation="vertical">
+
+                            <ImageView
+                                android:layout_width="80dp"
+                                android:layout_height="44dp"
+                                android:layout_marginTop="8dp"
+                                android:src="@mipmap/ic_tools_compress" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="4dp"
+                                android:text="@string/compress" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/ivIllustration"
+                    android:layout_width="match_parent"
+                    android:layout_height="157dp"
+                    android:layout_gravity="top|start"
+                    android:contentDescription="@string/tools"
+                    android:src="@mipmap/bg_tools" />
+
+            </FrameLayout>
+        </LinearLayout>
+
+    </ScrollView>
+
+    <com.peng.pdfreader.appcore.widget.AdSlotView
+        android:id="@+id/adBanner"
+        android:layout_width="match_parent"
+        android:layout_height="72dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

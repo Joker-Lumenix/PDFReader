@@ -8,6 +8,7 @@
     <string name="error_no_files">Aucun fichier à traiter</string>
     <string name="error_no_pages">Aucune page à traiter</string>
     <string name="error_no_images">Aucune image à convertir</string>
+    <string name="error_pdf_too_large">Le fichier est trop volumineux pour être traité sur le téléphone</string>
     <string name="error_wrong_password">Mot de passe incorrect</string>
     <string name="error_not_encrypted">Ce document n\'a pas été chiffré par cette application</string>
     <string name="error_weak_password">Le mot de passe doit contenir au moins 4 caractères</string>

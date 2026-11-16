@@ -2,8 +2,8 @@ package com.peng.pdfreader.feature.tools.util
 
 import android.app.Activity
 import com.peng.pdfreader.appcore.util.Logger
-import com.peng.pdfreader.feature.tools.activity.ResultActivity
-import com.peng.pdfreader.feature.tools.activity.ToolProgressActivity
+import com.peng.pdfreader.ui.activities.ResultActivity
+import com.peng.pdfreader.ui.activities.ToolProgressActivity
 import com.peng.pdfreader.feature.tools.progress.ToolJobResult
 import com.peng.pdfreader.feature.tools.progress.ToolProgressBus
 

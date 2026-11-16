@@ -8,6 +8,7 @@
     <string name="error_no_files">Es gibt keine Datei zum Bearbeiten</string>
     <string name="error_no_pages">Es gibt keine Seite zum Bearbeiten</string>
     <string name="error_no_images">Es gibt kein Bild zum Umwandeln</string>
+    <string name="error_pdf_too_large">Die Datei ist zu groß für die Verarbeitung auf dem Handy</string>
     <string name="error_wrong_password">Falsches Passwort</string>
     <string name="error_not_encrypted">Dieses Dokument wurde nicht von dieser App verschlüsselt</string>
     <string name="error_weak_password">Das Passwort braucht mindestens 4 Zeichen</string>
