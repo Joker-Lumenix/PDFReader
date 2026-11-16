@@ -75,10 +75,11 @@
             android:layout_width="143dp"
             android:layout_height="43dp"
             android:layout_marginTop="20dp"
-            android:layout_marginEnd="24dp"
+            android:layout_marginEnd="55dp"
             android:background="@mipmap/ic_chat_bg"
             android:fontFamily="sans-serif-medium"
             android:gravity="center"
+            android:paddingBottom="8dp"
             android:text="@string/rating_top_rating"
             android:textColor="@color/white"
             android:textSize="16sp"
@@ -94,25 +95,10 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvBubble">
 
-            <!-- The two halos behind the fifth star are drawn in code. -->
-            <View
-                android:id="@+id/vStarHalo"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:layout_gravity="end|center_vertical"
-                android:layout_marginEnd="29dp" />
-
-            <View
-                android:id="@+id/vStarCore"
-                android:layout_width="46dp"
-                android:layout_height="46dp"
-                android:layout_gravity="end|center_vertical"
-                android:layout_marginEnd="41dp" />
-
             <LinearLayout
                 android:id="@+id/llStarRow"
                 android:layout_width="match_parent"
-                android:layout_height="36dp"
+                android:layout_height="match_parent"
                 android:layout_gravity="center_vertical"
                 android:gravity="center"
                 android:orientation="horizontal">
@@ -145,16 +131,39 @@
                     android:id="@+id/ivStar4"
                     android:layout_width="36dp"
                     android:layout_height="36dp"
-                    android:layout_marginEnd="22dp"
                     android:contentDescription="@null"
+                    android:layout_marginEnd="12dp"
                     android:src="@mipmap/ic_star_unselect" />
 
-                <ImageView
-                    android:id="@+id/ivStar5"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:contentDescription="@null"
-                    android:src="@mipmap/ic_star_unselect" />
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    >
+
+                    <!-- The two halos behind the fifth star are drawn in code. -->
+                    <View
+                        android:id="@+id/vStarHalo"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
+                        android:layout_gravity="center"
+                        />
+
+                    <View
+                        android:id="@+id/vStarCore"
+                        android:layout_width="46dp"
+                        android:layout_height="46dp"
+                        android:layout_gravity="center"/>
+
+                    <ImageView
+                        android:id="@+id/ivStar5"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:contentDescription="@null"
+                        android:layout_gravity="center"
+                        android:src="@mipmap/ic_star_unselect" />
+
+                </FrameLayout>
+
             </LinearLayout>
         </FrameLayout>
 
