@@ -155,7 +155,7 @@ class HomeFragment : BaseFragment() {
             addView(titleAction(R.mipmap.ic_file_choose, R.string.home_print) {
                 onPrintClick?.invoke()
             })
-            addView(titleAction(R.mipmap.ic_sort, R.string.home_more) {
+            addView(titleAction(R.mipmap.bg_permission, R.string.home_more) {
                 onMoreClick?.invoke()
             })
         }
