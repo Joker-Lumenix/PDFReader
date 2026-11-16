@@ -17,12 +17,15 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.viewpager2.widget.ViewPager2
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.peng.pdfreader.R
 import com.peng.pdfreader.appcore.util.Logger
+import com.peng.pdfreader.appcore.widget.EmptyStateView
 import com.peng.pdfreader.appcore.util.SystemBarInsets
 import com.peng.pdfreader.appcore.util.Thumbnails
 import com.peng.pdfreader.appcore.widget.FileItemUiState
@@ -33,8 +36,12 @@ import com.peng.pdfreader.data.model.DocType
 import com.peng.pdfreader.data.model.Document
 import com.peng.pdfreader.data.prefs.AppPrefs
 import com.peng.pdfreader.data.repository.DocumentRepository
+import com.peng.pdfreader.data.storage.SharedStorage
+import com.peng.pdfreader.databinding.FilesPageScopeBinding
 import com.peng.pdfreader.databinding.FragmentFilesBinding
 import com.peng.pdfreader.feature.files.FileActions
+import com.peng.pdfreader.feature.files.activity.FileSearchActivity
+import com.peng.pdfreader.feature.files.activity.FileSelectActivity
 import com.peng.pdfreader.feature.files.adapter.AdBannerAdapter
 import com.peng.pdfreader.feature.files.adapter.FileListAdapter
 import com.peng.pdfreader.feature.files.dialog.DeleteConfirmDialog
@@ -43,6 +50,7 @@ import com.peng.pdfreader.feature.files.print.DocumentPrintAdapter
 import com.peng.pdfreader.feature.files.sheet.FileActionSheet
 import com.peng.pdfreader.feature.files.sheet.FileFilterMenu
 import com.peng.pdfreader.feature.files.sheet.SortSheet
+import com.peng.pdfreader.ui.permission.PermissionActivity
 import com.peng.pdfreader.feature.files.util.FileScope
 import com.peng.pdfreader.feature.files.util.FileSortOption
 import com.peng.pdfreader.feature.files.util.FileUi
@@ -89,19 +97,29 @@ class FilesFragment : BaseFragment() {
     /** Ids of the documents picked in the multi select mode. */
     private val selectedIds = mutableSetOf<String>()
 
+    /** The scopes of the tab, they are the pages of the pager. */
+    private val scopePages = listOf(FileScope.ALL, FileScope.RECENT, FileScope.FAVORITES)
+
+    /** The list of every page of the pager. */
+    private val pageAdapters = mutableMapOf<Int, FileListAdapter>()
+
+    /** The empty state of every page of the pager. */
+    private val pageEmptyStates = mutableMapOf<Int, EmptyStateView>()
+
     private var selectionMode = false
-    private var searchVisible = false
-    private var keyword: String? = null
     private var scope = FileScope.ALL
 
-    /** The action that opens the type filter popover. */
+    /** The action that opens the type filter popover, next to the scope tabs. */
     private var filterAction: View? = null
 
-    /** The share action of the title bar. */
-    private var shareAction: View? = null
+    /** The search action of the title bar. */
+    private var searchAction: View? = null
 
-    /** The print action of the title bar. */
-    private var printAction: View? = null
+    /** The file selection action of the title bar. */
+    private var selectAction: View? = null
+
+    /** The sort action of the title bar. */
+    private var sortAction: View? = null
 
     /** The thumbnails are cached so the diff of the list stays stable. */
     private val thumbnails = mutableMapOf<String, Drawable>()
@@ -127,10 +145,8 @@ class FilesFragment : BaseFragment() {
 
         setupTitleBar()
         setupScopeTabs()
-        setupSearch()
-        setupList()
+        setupPager()
         setupSelectBar()
-        setupEmptyState()
         registerResults()
         load()
     }
@@ -144,18 +160,15 @@ class FilesFragment : BaseFragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         filterAction = null
-        shareAction = null
-        printAction = null
+        searchAction = null
+        selectAction = null
+        sortAction = null
         _binding = null
     }
 
     override fun handleBackPressed(): Boolean {
         if (selectionMode) {
             exitSelection()
-            return true
-        }
-        if (searchVisible) {
-            toggleSearch(false)
             return true
         }
         return false
@@ -170,34 +183,34 @@ class FilesFragment : BaseFragment() {
         binding.titleBar.findViewById<ImageView>(R.id.ivBack)?.imageTintList =
             ColorStateList.valueOf(Color.argb(128, 39, 38, 54))
 
-        // The design puts three actions on the right hand side of the title
-        // bar: share (x=236), print (x=276) and the type filter switch
-        // (x=316), every icon 24dp wide with a 16dp gap.
-        val share = ImageView(requireContext()).apply {
-            setImageResource(R.mipmap.ic_share_red)
-            contentDescription = getString(R.string.files_share)
-            setOnClickListener { shareListed() }
+        // The three actions of the title bar (design: files):
+        // the search opens the search page, the file selection opens the
+        // selection page and the sort opens the rules of the order.
+        val search = ImageView(requireContext()).apply {
+            setImageResource(R.mipmap.ic_search_red)
+            contentDescription = getString(R.string.search)
+            setOnClickListener { openSearchPage() }
         }
-        val print = ImageView(requireContext()).apply {
-            setImageResource(R.drawable.ic_print_red)
-            contentDescription = getString(R.string.files_print)
-            setOnClickListener { printListed() }
+        val select = ImageView(requireContext()).apply {
+            setImageResource(R.mipmap.ic_file_choose)
+            contentDescription = getString(R.string.select_file)
+            setOnClickListener { openSelectPage() }
         }
-        val filter = ImageView(requireContext()).apply {
-            setImageResource(R.drawable.ic_switch_red)
-            contentDescription = getString(R.string.all)
-            setOnClickListener { openFilterMenu() }
+        val sort = ImageView(requireContext()).apply {
+            setImageResource(R.mipmap.ic_sort)
+            contentDescription = getString(R.string.files_sort_title)
+            setOnClickListener { openSortSheet() }
         }
         val actions = LinearLayout(requireContext()).apply {
             orientation = LinearLayout.HORIZONTAL
-            addView(share, actionParams(endMargin = dp(16)))
-            addView(print, actionParams(endMargin = dp(16)))
-            addView(filter, actionParams())
+            addView(search, actionParams(endMargin = dp(16)))
+            addView(select, actionParams(endMargin = dp(16)))
+            addView(sort, actionParams())
         }
         binding.titleBar.addAction(actions)
-        shareAction = share
-        printAction = print
-        filterAction = filter
+        searchAction = search
+        selectAction = select
+        sortAction = sort
     }
 
     private fun actionParams(endMargin: Int = 0): LinearLayout.LayoutParams =
@@ -207,66 +220,98 @@ class FilesFragment : BaseFragment() {
         binding.tabAll.setOnClickListener { setScope(FileScope.ALL) }
         binding.tabRecent.setOnClickListener { setScope(FileScope.RECENT) }
         binding.tabFavorites.setOnClickListener { setScope(FileScope.FAVORITES) }
-        binding.ivSearch.setOnClickListener { toggleSearch(true) }
+        // The icon next to the scope tabs filters by the type of the file
+        // (design: files-筛选), the search lives in its own page.
+        binding.ivFilter.setOnClickListener { openFilterMenu() }
+        filterAction = binding.ivFilter
         renderScope()
     }
 
-    private fun setupSearch() {
-        // The search field replaces the title strip but has to stay below the
-        // status bar, so the overlay is pushed down by the status bar inset.
-        binding.searchBar.setOnApplyWindowInsetsListener { view, insets ->
-            val top = SystemBarInsets.top(insets)
-            val params = view.layoutParams as? ViewGroup.MarginLayoutParams
-            if (params != null && params.topMargin != top) {
-                params.topMargin = top
-                view.layoutParams = params
+    /**
+     * The tabs 全部 / 最近 / 收藏 are pages of a pager.
+     *
+     * The list can be swiped horizontally, the tab row follows the pager and
+     * the other way round.
+     */
+    private fun setupPager() {
+        binding.pager.adapter = ScopePagerAdapter()
+        binding.pager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                val value = scopePages[position]
+                if (scope == value) return
+                scope = value
+                filesPrefs.scope = value
+                renderScope()
             }
-            insets
-        }
-        binding.searchBar.requestApplyInsets()
-        binding.etSearch.doAfterTextChanged { text ->
-            val value = text?.toString().orEmpty().trim()
-            if (value == keyword.orEmpty()) return@doAfterTextChanged
-            keyword = value.ifEmpty { null }
-            load()
-        }
-        binding.tvSearchCancel.setOnClickListener { toggleSearch(false) }
+        })
+        binding.pager.setCurrentItem(scopePages.indexOf(scope).coerceAtLeast(0), false)
     }
 
-    private fun setupList() {
-        adapter = FileListAdapter(
-            object : FileListAdapter.Callbacks {
-                override fun onRowClick(document: Document) {
-                    if (selectionMode) {
-                        toggleSelection(document.id)
-                    } else {
-                        PreviewActivity.start(requireContext(), document.id)
-                    }
-                }
+    /** One page of the pager, it carries its own list and its own empty state. */
+    private inner class ScopePagerAdapter : RecyclerView.Adapter<FilesFragment.PageHolder>() {
 
-                override fun onRowMore(document: Document) {
-                    FileActionSheet.show(childFragmentManager, document.id)
-                }
+        override fun getItemCount(): Int = scopePages.size
 
-                override fun onRowChecked(document: Document, checked: Boolean) {
-                    setSelected(document.id, checked)
-                }
+        override fun getItemViewType(position: Int): Int = position
 
-                override fun onRowLongPressed(document: Document) {
-                    enterSelection(document.id)
-                }
-            },
-        )
-        binding.recycler.layoutManager = LinearLayoutManager(requireContext())
-        // The ad banner of the design is the first entry of the list, it
-        // scrolls with the documents.
-        binding.recycler.adapter = ConcatAdapter(
-            AdBannerAdapter(AdSamples.banner(requireContext())),
-            adapter,
-        )
-        binding.recycler.setHasFixedSize(true)
-        binding.recycler.addItemDecoration(FileListItemDecoration(dp(ROW_GAP)))
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PageHolder {
+            val page = FilesPageScopeBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false,
+            )
+            val listAdapter = buildAdapter()
+            page.recycler.layoutManager = LinearLayoutManager(parent.context)
+            // The ad banner of the design is the first entry of the list, it
+            // scrolls with the documents.
+            page.recycler.adapter = ConcatAdapter(
+                AdBannerAdapter(AdSamples.banner(parent.context)),
+                listAdapter,
+            )
+            page.recycler.setHasFixedSize(true)
+            page.recycler.addItemDecoration(FileListItemDecoration(dp(ROW_GAP)))
+            pageAdapters[viewType] = listAdapter
+            pageEmptyStates[viewType] = page.emptyState
+            page.emptyState.illustrationDrawable =
+                ContextCompat.getDrawable(parent.context, R.mipmap.bg_empty)
+            return PageHolder(page, viewType)
+        }
+
+        override fun onBindViewHolder(holder: PageHolder, position: Int) {
+            renderPage(position)
+        }
     }
+
+    /** One page of the pager, it carries its own list and its own empty state. */
+    private class PageHolder(
+        val page: FilesPageScopeBinding,
+        val index: Int,
+    ) : RecyclerView.ViewHolder(page.root)
+
+    /** The list of a page, every page shares the callbacks of the tab. */
+    private fun buildAdapter() = FileListAdapter(
+        object : FileListAdapter.Callbacks {
+            override fun onRowClick(document: Document) {
+                if (selectionMode) {
+                    toggleSelection(document.id)
+                } else {
+                    PreviewActivity.start(requireContext(), document.id)
+                }
+            }
+
+            override fun onRowMore(document: Document) {
+                FileActionSheet.show(childFragmentManager, document.id)
+            }
+
+            override fun onRowChecked(document: Document, checked: Boolean) {
+                setSelected(document.id, checked)
+            }
+
+            override fun onRowLongPressed(document: Document) {
+                enterSelection(document.id)
+            }
+        },
+    )
 
     private fun setupSelectBar() {
         binding.actionSelectShare.setOnClickListener { shareSelected() }
@@ -277,19 +322,6 @@ class FilesFragment : BaseFragment() {
         binding.actionSelectDelete.setOnClickListener {
             DeleteConfirmDialog.show(childFragmentManager, selectedIds.toList())
         }
-    }
-
-    private fun setupEmptyState() {
-        binding.emptyState.illustrationDrawable =
-            ContextCompat.getDrawable(requireContext(), R.mipmap.bg_empty)
-        // The design draws the illustration 148x148.
-        binding.emptyState.findViewById<ImageView>(R.id.ivIllustration)?.let { illustration ->
-            illustration.layoutParams = illustration.layoutParams.apply {
-                width = dp(EMPTY_ILLUSTRATION)
-                height = dp(EMPTY_ILLUSTRATION)
-            }
-        }
-        renderEmptyState()
     }
 
     private fun registerResults() {
@@ -331,13 +363,14 @@ class FilesFragment : BaseFragment() {
         if (view == null) return
         val filter = prefs.fileFilter
         val option = filesPrefs.sortOption
-        val query = keyword?.trim()?.takeIf { it.isNotEmpty() }
         viewLifecycleOwner.lifecycleScope.launch {
             val result = withContext(Dispatchers.IO) {
                 repositoryLock.withLock {
-                    val base = repository.query(filter, option.sort, query)
-                    val scoped = applyScope(base)
-                    if (option.reverse) scoped.reversed() else scoped
+                    // The documents of the device come first, the app only
+                    // needs the access to all files for that.
+                    repository.syncSharedDocuments(requireContext().applicationContext)
+                    val base = repository.query(filter, option.sort, null)
+                    if (option.reverse) base.reversed() else base
                 }
             }
             documents = result
@@ -345,8 +378,8 @@ class FilesFragment : BaseFragment() {
         }
     }
 
-    /** Narrows the query down to the active tab. */
-    private fun applyScope(list: List<Document>): List<Document> = when (scope) {
+    /** Narrows the query down to a scope of the tab. */
+    private fun applyScope(list: List<Document>, value: FileScope): List<Document> = when (value) {
         FileScope.ALL -> list
         FileScope.RECENT -> list
             .filter { it.lastReadAt > 0L }
@@ -355,17 +388,17 @@ class FilesFragment : BaseFragment() {
     }
 
     private fun renderList() {
-        // A search hit paints the name in the light brand colour (design:
-        // files-搜索).
-        val hitColor = if (!keyword.isNullOrBlank()) {
-            ContextCompat.getColor(requireContext(), R.color.brand_primary_light)
-        } else {
-            null
-        }
-        val rows = documents.map { document ->
+        scopePages.forEachIndexed { index, value -> renderPage(index, value) }
+        updateScopeRow()
+    }
+
+    /** Fills the list of one page of the pager. */
+    private fun renderPage(index: Int, value: FileScope = scopePages[index]) {
+        val scoped = applyScope(documents, value)
+        val rows = scoped.map { document ->
+            val checked = document.id in selectedIds
             FileListAdapter.Row(
                 document = document,
-                titleColor = hitColor,
                 state = FileItemUiState(
                     name = document.name,
                     meta = FileUi.meta(document),
@@ -377,20 +410,21 @@ class FilesFragment : BaseFragment() {
                     thumbnail = thumbnail(document),
                     showThumbnail = true,
                     showType = true,
-                    showMore = !selectionMode,
-                    showCheckbox = selectionMode,
+                    // The design shows the "more" affordance on every row that
+                    // is not selected, the selection mark takes its place.
+                    showMore = !checked,
+                    showCheckbox = checked,
                     checkboxAtEnd = true,
-                    checked = document.id in selectedIds,
+                    checked = checked,
                 ),
             )
         }
-        adapter.submitList(rows)
+        pageAdapters[index]?.submitList(rows)
 
-        renderEmptyState()
-        val empty = documents.isEmpty()
-        binding.emptyState.visibility = if (empty) View.VISIBLE else View.GONE
-        binding.recycler.visibility = if (empty) View.GONE else View.VISIBLE
-        updateScopeRow()
+        val emptyState = pageEmptyStates[index] ?: return
+        val empty = scoped.isEmpty()
+        emptyState.visibility = if (empty) View.VISIBLE else View.GONE
+        renderEmptyState(emptyState)
     }
 
     private fun thumbnail(document: Document): Drawable? {
@@ -424,7 +458,11 @@ class FilesFragment : BaseFragment() {
         scope = value
         filesPrefs.scope = value
         renderScope()
-        load()
+        // The scope is a page of the pager, the list is swiped to it.
+        val index = scopePages.indexOf(value)
+        if (index >= 0 && binding.pager.currentItem != index) {
+            binding.pager.setCurrentItem(index, true)
+        }
     }
 
     private fun renderScope() {
@@ -461,62 +499,66 @@ class FilesFragment : BaseFragment() {
         }
     }
 
-    // ------------------------------------------------------------------ search
+    // ------------------------------------------------------------------ pages
 
-    private fun toggleSearch(show: Boolean) {
-        searchVisible = show
-        binding.searchBar.visibility = if (show) View.VISIBLE else View.GONE
-        if (show) {
-            if (selectionMode) exitSelection()
-            binding.searchBar.requestApplyInsets()
-            binding.etSearch.setText(keyword.orEmpty())
-            binding.etSearch.setSelection(binding.etSearch.text.length)
-            binding.etSearch.requestFocus()
-        } else {
-            // Clearing the field resets the keyword and reloads the list.
-            binding.etSearch.setText("")
-        }
-        renderEmptyState()
-        updateTitle()
-        updateTitleBarActions()
-        updateScopeRow()
+    /** The search page of the design (files-搜索). */
+    private fun openSearchPage() {
+        FileSearchActivity.start(requireContext())
+    }
+
+    /** The page that picks files of the library (files-Selected). */
+    private fun openSelectPage() {
+        FileSelectActivity.start(requireContext())
+    }
+
+    /** The rules of the order of the list. */
+    private fun openSortSheet() {
+        SortSheet.show(childFragmentManager)
     }
 
     /**
      * The scope row only belongs to the plain list.
      *
-     * The search field and the selection take the space over, the empty state
-     * keeps the row (design: files-搜索 / files-Selected / files空).
+     * The selection takes the space over, the empty state keeps the row
+     * (design: files-Selected / files空).
      */
     private fun updateScopeRow() {
-        val visible = !searchVisible && !selectionMode
-        binding.tabRow.visibility = if (visible) View.VISIBLE else View.GONE
+        binding.tabRow.visibility = if (selectionMode) View.GONE else View.VISIBLE
     }
 
-    /** Share and print disappear while the selection is active. */
+    /** The three actions of the title bar disappear while the selection is active. */
     private fun updateTitleBarActions() {
-        val visible = !searchVisible
-        shareAction?.visibility = if (visible && !selectionMode) View.VISIBLE else View.GONE
-        printAction?.visibility = if (visible && !selectionMode) View.VISIBLE else View.GONE
-        filterAction?.visibility = if (visible) View.VISIBLE else View.GONE
+        val visible = !selectionMode
+        searchAction?.visibility = if (visible) View.VISIBLE else View.GONE
+        selectAction?.visibility = if (visible) View.VISIBLE else View.GONE
+        sortAction?.visibility = if (visible) View.VISIBLE else View.GONE
     }
 
     private fun updateTitle() {
         binding.titleBar.title = when {
             selectionMode -> getString(R.string.selected_count, selectedIds.size)
-            searchVisible -> ""
             else -> getString(R.string.nav_files)
         }
     }
 
-    private fun renderEmptyState() {
-        val searching = !keyword.isNullOrBlank()
-        binding.emptyState.title = getString(
-            if (searching) R.string.files_search_empty_title else R.string.files_empty_title,
-        )
-        binding.emptyState.hint = getString(
-            if (searching) R.string.files_search_empty_hint else R.string.files_empty_hint,
-        )
+    private fun renderEmptyState(emptyState: EmptyStateView) {
+        emptyState.title = getString(R.string.files_empty_title)
+        // Without the file access the app cannot see the documents of the
+        // device - the empty state says so and offers the permission page.
+        if (SharedStorage.canRead(requireContext())) {
+            emptyState.hint = getString(R.string.files_empty_hint)
+            emptyState.actionText = null
+            emptyState.onActionClick = null
+        } else {
+            emptyState.hint = getString(R.string.authorization_required)
+            emptyState.actionText = getString(R.string.home_empty_action)
+            emptyState.onActionClick = { openPermissionPage() }
+        }
+    }
+
+    /** The page that asks for the access to the files. */
+    private fun openPermissionPage() {
+        startActivity(Intent(requireContext(), PermissionActivity::class.java))
     }
 
     // ------------------------------------------------------------------ select
@@ -640,25 +682,6 @@ class FilesFragment : BaseFragment() {
             Logger.e(TAG, "print of $docId failed", error)
             toast(getString(R.string.files_feature_unavailable))
         }
-    }
-
-    /** The share action of the title bar hands over every listed document. */
-    private fun shareListed() {
-        if (documents.isEmpty()) {
-            toast(getString(R.string.files_feature_unavailable))
-            return
-        }
-        shareDocuments(documents)
-    }
-
-    /** The print action of the title bar prints the first listed document. */
-    private fun printListed() {
-        val document = documents.firstOrNull()
-        if (document == null) {
-            toast(getString(R.string.files_feature_unavailable))
-            return
-        }
-        printDocument(document.id)
     }
 
     /** The share action of the selection bar. */

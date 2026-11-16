@@ -19,9 +19,12 @@
     <!-- The notifications are a runtime permission on Android 13 and above. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
-    <!-- The scanner of the tools uses the camera. -->
-    <uses-permission android:name="android.permission.CAMERA" />
-
+    <!--
+      The app does not use the camera api itself, the Google document scanner
+      and the system camera do the capture. So the camera permission must not
+      be declared - a declared but not granted permission would block the
+      camera intent.
+    -->
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
@@ -35,7 +38,8 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.PdfReader">
+        android:theme="@style/Theme.PdfReader"
+        android:requestLegacyExternalStorage="true">
 
         <!-- The start up screen is the entry point of the app. -->
         <activity
@@ -164,6 +168,18 @@
 
         <activity
             android:name=".feature.files.activity.FileSelectActivity"
+            android:exported="false" />
+
+        <!--
+          The pages the tools of the app share: the progress page shows the
+          running job, the result page shows what it produced.
+        -->
+        <activity
+            android:name=".feature.tools.activity.ToolProgressActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".feature.tools.activity.ResultActivity"
             android:exported="false" />
 
         <!-- Keeps the chosen app locale across restarts on Android 12 and below. -->

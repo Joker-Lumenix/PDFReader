@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.view.inputmethod.EditorInfo
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import com.peng.pdfreader.R
@@ -64,6 +65,16 @@ class PasswordSheet : BaseBottomSheetDialog() {
         views.ivToggle.setOnClickListener { toggleVisibility() }
         views.btnCancel.setOnClickListener { dismiss() }
         views.btnOk.setOnClickListener { submit() }
+        // The keyboard of the design carries the confirm button, so the enter
+        // key of the keyboard confirms the password as well.
+        views.etPassword.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                submit()
+                true
+            } else {
+                false
+            }
+        }
 
         return views.root
     }

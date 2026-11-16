@@ -12,31 +12,23 @@ import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.peng.pdfreader.R
-import com.peng.pdfreader.appcore.pdf.PdfEngine
 import com.peng.pdfreader.appcore.widget.FileListItemDecoration
 import com.peng.pdfreader.base.BaseActivity
-import com.peng.pdfreader.base.EngineErrors
 import com.peng.pdfreader.base.ShareFileProvider
 import com.peng.pdfreader.data.model.DocType
+
 import com.peng.pdfreader.data.model.Document
 import com.peng.pdfreader.data.repository.DocumentRepository
 import com.peng.pdfreader.databinding.ToolsActivityMergeBinding
-import com.peng.pdfreader.feature.lock.activity.LockActivity
-import com.peng.pdfreader.feature.preview.activity.DrawActivity
-import com.peng.pdfreader.feature.preview.activity.PreviewActivity
-import com.peng.pdfreader.feature.preview.activity.SignatureActivity
 import com.peng.pdfreader.feature.tools.adapter.DocumentPickAdapter
 import com.peng.pdfreader.feature.tools.adapter.MergeOrderAdapter
 import com.peng.pdfreader.feature.tools.dialog.ToolTextInputDialog
 import com.peng.pdfreader.feature.tools.engine.ToolEngines
-import com.peng.pdfreader.feature.tools.print.ToolPrintRunner
+import com.peng.pdfreader.feature.tools.util.ToolFlow
 import com.peng.pdfreader.feature.tools.util.ToolOutput
 import com.peng.pdfreader.feature.tools.util.ToolShapes
-import com.peng.pdfreader.feature.tools.view.ToolsResultActions
-import com.peng.pdfreader.feature.tools.view.ToolsResultBinder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.File
 
 /**
@@ -100,11 +92,7 @@ class MergeActivity : BaseActivity() {
         binding.rvOrder.adapter = orderAdapter
         binding.btnAction.setOnClickListener { onPrimaryAction() }
 
-        // the progress bar of the design: a 240x6 track with a handle
-        binding.progressTrack.background = ToolShapes.roundRect(this, TRACK_COLOR, 3f)
-        binding.progressFill.background =
-            ToolShapes.gradientPill(this, R.drawable.gradient_red, 16f)
-        binding.progressKnob.setImageDrawable(ToolShapes.progressKnob(this))
+
 
         loadDocuments()
         showStep(Step.SELECT)
@@ -117,31 +105,21 @@ class MergeActivity : BaseActivity() {
 
     // ------------------------------------------------------------------ steps
 
-    private enum class Step { SELECT, ORDER, PROGRESS, RESULT }
+    private enum class Step { SELECT, ORDER }
 
     private fun showStep(step: Step) {
         binding.rvFiles.visibility = if (step == Step.SELECT) View.VISIBLE else View.GONE
         binding.rvOrder.visibility = if (step == Step.ORDER) View.VISIBLE else View.GONE
-        binding.stepProgress.visibility = if (step == Step.PROGRESS) View.VISIBLE else View.GONE
-        binding.resultPage.root.visibility = if (step == Step.RESULT) View.VISIBLE else View.GONE
-        binding.bottomBar.visibility =
-            if (step == Step.SELECT || step == Step.ORDER) View.VISIBLE else View.GONE
+        binding.bottomBar.visibility = View.VISIBLE
         shareAction.visibility = if (step == Step.SELECT) View.VISIBLE else View.GONE
         addAction.visibility = if (step == Step.ORDER) View.VISIBLE else View.GONE
 
         when (step) {
             Step.SELECT -> refreshSelectStep()
             Step.ORDER -> refreshOrderStep()
-            Step.PROGRESS -> {
-                // the design of the running job shows an empty app bar
-                binding.titleBar.title = ""
-                binding.tvProgressPercent.text = "0%"
-                binding.tvProgressLabel.setText(R.string.tools_merge_running)
-                showProgress(0, 0)
-            }
-            Step.RESULT -> binding.titleBar.title = getString(R.string.result)
         }
     }
+
 
     private fun refreshSelectStep() {
         binding.titleBar.title = getString(R.string.selected_count, selection.size)
@@ -172,129 +150,61 @@ class MergeActivity : BaseActivity() {
     private fun onPrimaryAction() {
         when (currentStep()) {
             Step.SELECT -> if (selection.isNotEmpty()) showStep(Step.ORDER)
-            Step.ORDER -> startMerge()
+            Step.ORDER -> askForName()
             else -> Unit
         }
     }
 
     private fun currentStep(): Step = when {
         binding.rvFiles.visibility == View.VISIBLE -> Step.SELECT
-        binding.rvOrder.visibility == View.VISIBLE -> Step.ORDER
-        binding.resultPage.root.visibility == View.VISIBLE -> Step.RESULT
-        else -> Step.PROGRESS
+        else -> Step.ORDER
     }
 
     // ------------------------------------------------------------------ merge
 
-    private fun startMerge() {
+    /**
+     * Asks for the name of the document.
+     *
+     * The name is asked before the job starts, so the dialog of the design is
+     * in the front - the progress page covers the tool while it runs.
+     */
+    private fun askForName() {
+        ToolTextInputDialog.show(
+            manager = supportFragmentManager,
+            title = getString(R.string.save),
+            initial = ToolOutput.uniqueName("merged", ".pdf"),
+            onConfirmed = { name -> startMerge(name) },
+        )
+    }
+
+    /**
+     * Runs the merge behind the shared progress page.
+     *
+     * The progress page opens the result page as soon as the job is done.
+     */
+    private fun startMerge(name: String) {
         val files = selectedDocuments().map { repository.fileOf(it) }
         if (files.isEmpty()) {
             Toast.makeText(this, R.string.tools_merge_empty, Toast.LENGTH_SHORT).show()
             return
         }
-        showStep(Step.PROGRESS)
         val out = ToolOutput.file(this, "merged.pdf")
         lifecycleScope.launch {
-            val outcome = engine.merge(files, out) { current, total ->
-                lifecycleScope.launch(Dispatchers.Main) { showProgress(current, total) }
+            ToolFlow.run(this@MergeActivity, getString(R.string.tools_merge_running)) { report ->
+                val outcome = engine.merge(files, out) { current, total ->
+                    report(if (total <= 0) 0 else current * 100 / total)
+                }
+                outcome.getOrThrow()
+                val document = repository.addExisting(name, DocType.PDF, out)
+                ToolFlow.success(document.id, getString(R.string.merged_success))
             }
-            outcome.fold(
-                onSuccess = { showResult(out) },
-                onFailure = { error ->
-                    showStep(Step.ORDER)
-                    toast(R.string.tools_failed, EngineErrors.localize(this@MergeActivity, error))
-                },
-            )
-        }
-    }
-
-    private fun showProgress(current: Int, total: Int) {
-        val percent = if (total <= 0) 0 else (current * 100 / total)
-        binding.tvProgressPercent.text = "$percent%"
-        val track = dp(TRACK_WIDTH_DP)
-        val filled = (track * percent / 100).coerceAtLeast(if (percent > 0) dp(8) else 0)
-        binding.progressFill.layoutParams = binding.progressFill.layoutParams.apply {
-            width = filled
-        }
-        binding.progressKnob.translationX = (filled - dp(KNOB_SIZE_DP / 2)).toFloat()
-    }
-
-    private fun showResult(file: File) {
-        // the design asks for the name of the document before it is stored
-        showStep(Step.ORDER)
-        ToolTextInputDialog.show(
-            manager = supportFragmentManager,
-            title = getString(R.string.save),
-            initial = ToolOutput.uniqueName("merged", ".pdf"),
-            onConfirmed = { name -> storeResult(file, name) },
-        )
-    }
-
-    private fun storeResult(file: File, name: String) {
-        val document = repository.addExisting(name, DocType.PDF, file)
-        showStep(Step.RESULT)
-        ToolsResultBinder.bindDocument(this, binding.resultPage, document)
-        ToolsResultBinder.bindSuccess(this, binding.resultPage, getString(R.string.merged_success))
-        ToolsResultBinder.bindActions(
-            this,
-            binding.resultPage,
-            ToolsResultActions(
-                onOpenWith = { openWith(document) },
-                onCompress = { CompressActivity.start(this, document.id) },
-                onPrint = { ToolPrintRunner.print(this, document) },
-                onSign = { startActivity(SignatureActivity.createIntent(this)) },
-                onDraw = { startActivity(DrawActivity.createIntent(this, repository.fileOf(document), 1, false)) },
-                onLock = { LockActivity.start(this) },
-                onShare = { shareDocument(document) },
-                onView = { PreviewActivity.start(this, document.id) },
-                onRename = { rename(document) },
-                onFeedback = { binding.resultPage.feedbackCard.visibility = View.GONE },
-            ),
-        )
-        loadPreview(document)
-    }
-
-    private fun loadPreview(document: Document) {
-        lifecycleScope.launch {
-            val thumbnail = withContext(Dispatchers.IO) {
-                PdfEngine.renderThumbnail(repository.fileOf(document), 0, 240)
-            }
-            binding.resultPage.ivPreview.setImageBitmap(thumbnail)
-        }
-    }
-
-    private fun rename(document: Document) {
-        ToolTextInputDialog.show(
-            manager = supportFragmentManager,
-            title = getString(R.string.rename),
-            initial = document.name,
-        ) { newName ->
-            repository.rename(document, newName)
-            ToolsResultBinder.bindDocument(this, binding.resultPage, document)
-        }
-    }
-
-    /** Hands the result to another app through the file provider. */
-    private fun shareDocument(document: Document) {
-        val intent = Intent(Intent.ACTION_SEND)
-            .setType("application/pdf")
-            .putExtra(Intent.EXTRA_STREAM, ShareFileProvider.uriFor(this, repository.fileOf(document)))
-            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        runCatching {
-            startActivity(Intent.createChooser(intent, getString(R.string.share)))
-        }.onFailure { toast(R.string.tools_not_available) }
-    }
-
-    private fun openWith(document: Document) {
-        val intent = Intent(Intent.ACTION_VIEW)
-            .setDataAndType(ShareFileProvider.uriFor(this, repository.fileOf(document)), "application/pdf")
-            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        runCatching { startActivity(intent) }.onFailure {
-            toast(R.string.tools_not_available)
+            // The job is done, the progress page takes over with the result.
+            finish()
         }
     }
 
     /** The share action of the design shares every picked document at once. */
+
     private fun shareSelection() {
         val files = selectedDocuments()
             .map { repository.fileOf(it) }
@@ -345,27 +255,15 @@ class MergeActivity : BaseActivity() {
                 showStep(Step.SELECT)
                 true
             }
-            Step.PROGRESS, Step.RESULT -> {
-                finish()
-                true
-            }
             else -> false
         }
     }
 
     companion object {
-        /** Width of the progress track of the design. */
-        private const val TRACK_WIDTH_DP = 240
-
-        /** Size of the handle of the progress track. */
-        private const val KNOB_SIZE_DP = 24
-
-        /** Colour of the progress track of the design. */
-        private const val TRACK_COLOR = 0xFFE1E1E1.toInt()
-
         /** Opens the merge flow. */
         fun start(context: Context) {
             context.startActivity(Intent(context, MergeActivity::class.java))
         }
     }
 }
+

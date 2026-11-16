@@ -31,6 +31,6 @@ object ToolFormatters {
     /** The meta line of a file row: page count, date and size. */
     fun meta(context: Context, doc: Document): String {
         val pages = context.getString(R.string.pages)
-        return "$doc.pageCount $pages · ${date(doc.modifiedAt)} · ${size(doc.sizeBytes)}"
+        return "${doc.pageCount} $pages · ${date(doc.modifiedAt)} · ${size(doc.sizeBytes)}"
     }
 }

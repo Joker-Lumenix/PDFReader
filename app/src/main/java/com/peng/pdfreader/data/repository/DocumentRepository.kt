@@ -3,10 +3,12 @@ package com.peng.pdfreader.data.repository
 import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
+import com.peng.pdfreader.appcore.util.Logger
 import com.peng.pdfreader.data.SampleDocuments
 import com.peng.pdfreader.data.model.DocType
 import com.peng.pdfreader.data.model.Document
 import com.peng.pdfreader.data.prefs.FileSort
+import com.peng.pdfreader.data.storage.SharedStorage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
@@ -27,6 +29,9 @@ class DocumentRepository private constructor(private val appContext: Context) {
     private val documents = mutableListOf<Document>()
     private val annotations = mutableMapOf<String, MutableList<Annotation>>()
     private val bookmarks = mutableMapOf<String, MutableList<Bookmark>>()
+
+    /** When the shared storage was scanned the last time. */
+    private var lastSharedSyncAt = 0L
 
     lateinit var sandboxDir: File
         private set
@@ -129,6 +134,85 @@ class DocumentRepository private constructor(private val appContext: Context) {
         return doc
     }
 
+    // ---------------------------------------------------------------- shared storage
+
+    /**
+     * Brings the documents of the shared storage into the list.
+     *
+     * The files stay where the user put them, the app only remembers them, so
+     * the preview and the tools work on the original file. Files that are gone
+     * in the meantime leave the list again.
+     *
+     * @param context the context the permission is checked with
+     * @return the number of files that were added to the list
+     */
+    fun syncSharedDocuments(context: Context): Int {
+        val granted = SharedStorage.canRead(context)
+        if (!granted) {
+            Logger.i(TAG, "the shared storage is not accessible yet, the permission is missing")
+            return 0
+        }
+        val now = System.currentTimeMillis()
+        if (now - lastSharedSyncAt < SHARED_SYNC_THROTTLE_MS) return 0
+        lastSharedSyncAt = now
+
+        val found = SharedStorage.scan()
+        Logger.i(TAG, "shared storage: ${found.size} files found, ${documents.size} documents known")
+        val known = documents.associateBy { it.path }
+        var added = 0
+        var changed = false
+
+        found.forEach { shared ->
+            val path = shared.file.absolutePath
+            val size = shared.file.length()
+            val modified = shared.file.lastModified()
+            val existing = known[path]
+            if (existing == null) {
+                documents.add(
+                    Document(
+                        id = UUID.randomUUID().toString(),
+                        name = shared.file.name,
+                        type = shared.type,
+                        path = path,
+                        sizeBytes = size,
+                        createdAt = modified,
+                        modifiedAt = modified,
+                    ),
+                )
+                added++
+                changed = true
+            } else if (existing.sizeBytes != size || existing.modifiedAt != modified) {
+                // The file changed outside of the app, the list follows it.
+                val index = documents.indexOfFirst { it.id == existing.id }
+                if (index >= 0) {
+                    documents[index] = existing.copy(
+                        sizeBytes = size,
+                        modifiedAt = modified,
+                    )
+                    changed = true
+                }
+            }
+        }
+
+        // Files of the shared storage that are gone - or that the app does not
+        // support anymore - must not stay in the list. The documents of the
+        // sandbox are never touched by the scan.
+        val paths = found.mapTo(mutableSetOf()) { it.file.absolutePath }
+        val removed = documents.removeAll { doc ->
+            !isInSandbox(doc.path) && doc.path !in paths
+        }
+        if (removed) changed = true
+
+        if (changed) persist()
+        Logger.i(TAG, "shared storage: $added files added, ${documents.size} documents known")
+        return added
+    }
+
+    /** Whether a path points into the private sandbox of the app. */
+    private fun isInSandbox(path: String): Boolean =
+        path.startsWith(sandboxDir.absolutePath + File.separator) ||
+            path == sandboxDir.absolutePath
+
     fun update(doc: Document) {
         val index = documents.indexOfFirst { it.id == doc.id }
         if (index >= 0) {
@@ -139,7 +223,13 @@ class DocumentRepository private constructor(private val appContext: Context) {
 
     fun rename(doc: Document, newName: String) {
         val source = File(doc.path)
-        val target = File(sandboxDir, "${doc.id}_$newName")
+        // A document of the shared storage keeps its place, only the sandbox
+        // stores its files with the id of the document.
+        val target = if (isInSandbox(doc.path)) {
+            File(sandboxDir, "${doc.id}_$newName")
+        } else {
+            File(source.parentFile ?: sandboxDir, newName)
+        }
         if (source.exists() && source.absolutePath != target.absolutePath) {
             // The record has to follow the file, otherwise the document would
             // point at a path that no longer exists.
@@ -358,6 +448,17 @@ class DocumentRepository private constructor(private val appContext: Context) {
     }
 
     companion object {
+        /** The tag of the log of the repository. */
+        private const val TAG = "DocumentRepository"
+
+        /**
+         * The shortest time between two scans of the shared storage.
+         *
+         * The scan walks the folders of the device, so it does not run on
+         * every reload of a list.
+         */
+        private const val SHARED_SYNC_THROTTLE_MS = 2_000L
+
         @Volatile
         private var instance: DocumentRepository? = null
 

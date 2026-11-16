@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="preview_open_invalid">Failures rosak atau bukan PDF yang sah</string>
+    <string name="preview_open_failed">Failures tidak dapat dibuka, sila cuba lagi</string>
     <string name="preview_favorite">Kegemaran</string>
     <string name="preview_annotate">Anotasi</string>
     <string name="preview_open_with">Buka dengan</string>

@@ -18,7 +18,8 @@ import com.peng.pdfreader.appcore.util.Logger
 import com.peng.pdfreader.base.BaseActivity
 import com.peng.pdfreader.data.model.DocType
 import com.peng.pdfreader.data.repository.DocumentRepository
-import com.peng.pdfreader.feature.preview.activity.PreviewActivity
+import com.peng.pdfreader.feature.tools.activity.ResultActivity
+import com.peng.pdfreader.feature.tools.util.ToolFlow
 import com.peng.pdfreader.feature.tools.engine.ToolEngines
 import com.peng.pdfreader.feature.tools.util.ToolOutput
 import kotlinx.coroutines.Dispatchers
@@ -62,7 +63,12 @@ class ScanActivity : BaseActivity() {
             } else {
                 Toast.makeText(this@ScanActivity, R.string.tools_scan_done, Toast.LENGTH_SHORT)
                     .show()
-                PreviewActivity.start(this@ScanActivity, document.id)
+                // The scan is done, the result page shows the document.
+                ResultActivity.startSuccess(
+                    this@ScanActivity,
+                    document.id,
+                    getString(R.string.tools_scan_done),
+                )
                 finish()
             }
         }
@@ -130,6 +136,8 @@ class ScanActivity : BaseActivity() {
                 return
             } catch (error: ActivityNotFoundException) {
                 Logger.w(TAG, "the google scanner could not be started")
+            } catch (error: SecurityException) {
+                Logger.w(TAG, "the google scanner could not be started")
             }
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -144,12 +152,22 @@ class ScanActivity : BaseActivity() {
                 } catch (error: ActivityNotFoundException) {
                     pendingUri = null
                     discardMediaEntry(uri)
+                } catch (error: SecurityException) {
+                    // The camera app refuses the intent, the app must not crash.
+                    pendingUri = null
+                    discardMediaEntry(uri)
+                    Toast.makeText(this, R.string.tools_scan_no_camera, Toast.LENGTH_SHORT).show()
+                    finish()
+                    return
                 }
             }
         }
         try {
             capturePreview.launch(null)
         } catch (error: ActivityNotFoundException) {
+            Toast.makeText(this, R.string.tools_scan_no_camera, Toast.LENGTH_SHORT).show()
+            finish()
+        } catch (error: SecurityException) {
             Toast.makeText(this, R.string.tools_scan_no_camera, Toast.LENGTH_SHORT).show()
             finish()
         }
@@ -197,31 +215,19 @@ class ScanActivity : BaseActivity() {
     private fun buildPdf(image: File) {
         val out = ToolOutput.file(this, "scan.pdf")
         lifecycleScope.launch {
-            val outcome = engine.imagesToPdf(listOf(image), out)
-            outcome.fold(
-                onSuccess = {
-                    val document = repository.addExisting(
-                        ToolOutput.uniqueName("scan", ".pdf"),
-                        DocType.PDF,
-                        out,
-                    )
-                    Toast.makeText(
-                        this@ScanActivity,
-                        R.string.tools_scan_done,
-                        Toast.LENGTH_SHORT,
-                    ).show()
-                    PreviewActivity.start(this@ScanActivity, document.id)
-                    finish()
-                },
-                onFailure = { error ->
-                    Toast.makeText(
-                        this@ScanActivity,
-                        getString(R.string.tools_failed, error.message.orEmpty()),
-                        Toast.LENGTH_SHORT,
-                    ).show()
-                    finish()
-                },
-            )
+            // The job runs behind the shared progress page.
+            ToolFlow.run(this@ScanActivity, getString(R.string.tools_image_running)) { _ ->
+                val outcome = engine.imagesToPdf(listOf(image), out)
+                outcome.getOrThrow()
+                val document = repository.addExisting(
+                    ToolOutput.uniqueName("scan", ".pdf"),
+                    DocType.PDF,
+                    out,
+                )
+                ToolFlow.success(document.id, getString(R.string.tools_scan_done))
+            }
+            // The job is done, the progress page takes over with the result.
+            finish()
         }
     }
 

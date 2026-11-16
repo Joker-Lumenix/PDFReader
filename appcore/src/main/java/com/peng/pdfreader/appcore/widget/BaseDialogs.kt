@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.fragment.app.DialogFragment
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.peng.pdfreader.appcore.R
@@ -72,6 +73,14 @@ abstract class BaseBottomSheetDialog(
         // background has to go.
         dialog?.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)?.apply {
             background = ColorDrawable(Color.TRANSPARENT)
+            // The sheet has to grow with its content and it has to stay above
+            // the keyboard, the design shows it right above it.
+            val behavior = BottomSheetBehavior.from(this)
+            behavior.isFitToContents = true
+            behavior.skipCollapsed = true
+            if (behavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
+                behavior.state = BottomSheetBehavior.STATE_EXPANDED
+            }
         }
     }
 

@@ -32,7 +32,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
-            android:visibility="gone">
+            android:visibility="visible">
 
             <!-- the info banner of the design, its content is centred -->
             <LinearLayout
@@ -49,6 +49,7 @@
                     android:id="@+id/bannerIcon"
                     android:layout_width="14dp"
                     android:layout_height="14dp"
+                    android:src="@mipmap/ic_warn"
                     android:contentDescription="@string/tools_split_reorder" />
 
                 <TextView
@@ -80,9 +81,10 @@
             android:layout_height="wrap_content"
             android:layout_gravity="top" />
 
-        <include
-            android:id="@+id/resultPage"
-            layout="@layout/tools_result_body" />
+        <!--
+          The running job and the result have their own pages: the shared
+          progress page and the shared result page.
+        -->
 
     </FrameLayout>
 

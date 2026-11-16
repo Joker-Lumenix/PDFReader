@@ -1,6 +1,7 @@
 package com.peng.pdfreader.feature.files.activity
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -80,9 +81,13 @@ class FileSelectActivity : BaseActivity() {
         binding.titleBar.onBackClick = { finishWithSelection() }
         updateTitle()
 
-        // The design puts the type filter on the right hand side of the bar.
+        // The design puts the type filter on the right hand side of the bar,
+        // it is painted in the brand red.
         val filter = ImageView(this).apply {
-            setImageResource(R.drawable.ic_switch_red)
+            setImageResource(R.mipmap.ic_filter)
+            imageTintList = ColorStateList.valueOf(
+                ContextCompat.getColor(this@FileSelectActivity, R.color.brand_primary),
+            )
             contentDescription = getString(R.string.all)
             setOnClickListener { openFilterMenu() }
         }
@@ -155,6 +160,8 @@ class FileSelectActivity : BaseActivity() {
         val sort = prefs.fileSort
         lifecycleScope.launch {
             val documents = withContext(Dispatchers.IO) {
+                // The documents of the device are part of the list as well.
+                repository.syncSharedDocuments(applicationContext)
                 repository.query(filter, sort, null)
             }
             render(documents)
@@ -163,6 +170,7 @@ class FileSelectActivity : BaseActivity() {
 
     private fun render(documents: List<Document>) {
         val rows = documents.map { document ->
+            val checked = document.id in selectedIds
             FileListAdapter.Row(
                 document = document,
                 state = FileItemUiState(
@@ -173,10 +181,12 @@ class FileSelectActivity : BaseActivity() {
                     thumbnail = thumbnails.of(this, document),
                     showThumbnail = true,
                     showType = true,
-                    showMore = true,
-                    showCheckbox = true,
+                    // The design shows the "more" affordance on every row that
+                    // is not selected, the selection mark takes its place.
+                    showMore = !checked,
+                    showCheckbox = checked,
                     checkboxAtEnd = true,
-                    checked = document.id in selectedIds,
+                    checked = checked,
                 ),
             )
         }

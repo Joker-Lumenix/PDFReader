@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="preview_open_invalid">파일이 손상되었거나 유효한 PDF가 아닙니다</string>
+    <string name="preview_open_failed">파일을 열 수 없습니다. 다시 시도해 주세요</string>
     <string name="preview_favorite">즐겨찾기</string>
     <string name="preview_annotate">주석</string>
     <string name="preview_open_with">열기</string>

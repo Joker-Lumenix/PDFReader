@@ -251,11 +251,18 @@ abstract class BaseLockActivity : BaseActivity() {
         panel.ivDocAction.setOnClickListener { openDocument(document) }
         panel.resultCard.background = GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE
+            // the radii need eight values - two per corner
+            val top = dp(16).toFloat()
+            val bottom = dp(8).toFloat()
             cornerRadii = floatArrayOf(
-                dp(16).toFloat(),
-                dp(16).toFloat(),
-                dp(8).toFloat(),
-                dp(8).toFloat(),
+                top,
+                top,
+                top,
+                top,
+                bottom,
+                bottom,
+                bottom,
+                bottom,
             )
             setColor(ContextCompat.getColor(this@BaseLockActivity, R.color.surface_card))
         }

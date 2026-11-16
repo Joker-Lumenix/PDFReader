@@ -6,6 +6,8 @@
 <resources>
 
     <!-- bottom toolbar of the reader -->
+    <string name="preview_open_invalid">文件已损坏或不是有效的 PDF</string>
+    <string name="preview_open_failed">文件暂时无法打开，请重试</string>
     <string name="preview_favorite">收藏</string>
     <string name="preview_annotate">批注</string>
     <string name="preview_open_with">打开方式</string>

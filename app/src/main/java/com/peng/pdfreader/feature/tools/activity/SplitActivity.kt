@@ -12,26 +12,19 @@ import androidx.recyclerview.widget.RecyclerView
 import com.peng.pdfreader.R
 import com.peng.pdfreader.appcore.pdf.PdfEngine
 import com.peng.pdfreader.base.BaseActivity
-import com.peng.pdfreader.base.ShareFileProvider
 import com.peng.pdfreader.data.model.DocType
 import com.peng.pdfreader.data.model.Document
 import com.peng.pdfreader.data.repository.DocumentRepository
 import com.peng.pdfreader.databinding.ToolsActivitySplitBinding
-import com.peng.pdfreader.feature.lock.activity.LockActivity
-import com.peng.pdfreader.feature.preview.activity.DrawActivity
-import com.peng.pdfreader.feature.preview.activity.PreviewActivity
-import com.peng.pdfreader.feature.preview.activity.SignatureActivity
 import com.peng.pdfreader.feature.tools.adapter.PitchGridDecoration
 import com.peng.pdfreader.feature.tools.adapter.SplitPageAdapter
 import com.peng.pdfreader.feature.tools.dialog.ToolDocumentPickerDialog
 import com.peng.pdfreader.feature.tools.dialog.ToolTextInputDialog
 import com.peng.pdfreader.feature.tools.engine.ToolEngines
-import com.peng.pdfreader.feature.tools.print.ToolPrintRunner
+import com.peng.pdfreader.feature.tools.util.ToolFlow
 import com.peng.pdfreader.feature.tools.util.ToolOutput
 import com.peng.pdfreader.feature.tools.util.ToolShapes
 import com.peng.pdfreader.feature.tools.view.InfoGlyphDrawable
-import com.peng.pdfreader.feature.tools.view.ToolsResultActions
-import com.peng.pdfreader.feature.tools.view.ToolsResultBinder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -105,23 +98,14 @@ class SplitActivity : BaseActivity() {
 
     private fun showEmpty() {
         binding.stepPages.visibility = View.GONE
-        binding.resultPage.root.visibility = View.GONE
         binding.emptyState.visibility = View.VISIBLE
         binding.bottomBar.visibility = View.GONE
     }
 
     private fun showPages() {
         binding.stepPages.visibility = View.VISIBLE
-        binding.resultPage.root.visibility = View.GONE
         binding.emptyState.visibility = View.GONE
         binding.bottomBar.visibility = View.VISIBLE
-    }
-
-    private fun showResult() {
-        binding.stepPages.visibility = View.GONE
-        binding.resultPage.root.visibility = View.VISIBLE
-        binding.emptyState.visibility = View.GONE
-        binding.bottomBar.visibility = View.GONE
     }
 
     // ------------------------------------------------------------------ pages
@@ -229,57 +213,26 @@ class SplitActivity : BaseActivity() {
         val ranges = rangesOf(selected)
         val outDir = ToolOutput.dir(this)
         lifecycleScope.launch {
-            val outcome = engine.split(repository.fileOf(doc), outDir, ranges) { current, total ->
-                lifecycleScope.launch(Dispatchers.Main) {
-                    binding.titleBar.subtitle = "$current/$total"
+            // The job runs behind the shared progress page.
+            ToolFlow.run(this@SplitActivity, getString(R.string.tools_split_running)) { report ->
+                val outcome = engine.split(repository.fileOf(doc), outDir, ranges) { current, total ->
+                    report(if (total <= 0) 0 else current * 100 / total)
                 }
+                val files = outcome.getOrThrow()
+                if (files.isEmpty()) {
+                    throw IllegalStateException(getString(R.string.tools_split_empty))
+                }
+                val stored = files.map { file ->
+                    repository.addExisting(file.name, DocType.PDF, file)
+                }
+                ToolFlow.success(
+                    stored.first().id,
+                    getString(R.string.tools_split_done, stored.size),
+                )
             }
-            outcome.fold(
-                onSuccess = { files -> showResults(files) },
-                onFailure = { error ->
-                    Toast.makeText(
-                        this@SplitActivity,
-                        getString(R.string.tools_failed, error.message.orEmpty()),
-                        Toast.LENGTH_SHORT,
-                    ).show()
-                },
-            )
+            // The job is done, the progress page takes over with the result.
+            finish()
         }
-    }
-
-    private fun showResults(files: List<File>) {
-        if (files.isEmpty()) {
-            Toast.makeText(this, R.string.tools_split_empty, Toast.LENGTH_SHORT).show()
-            return
-        }
-        val stored = files.map { file ->
-            repository.addExisting(file.name, DocType.PDF, file)
-        }
-        Toast.makeText(
-            this,
-            getString(R.string.tools_split_done, stored.size),
-            Toast.LENGTH_SHORT,
-        ).show()
-        val first = stored.first()
-        showResult()
-        ToolsResultBinder.bindDocument(this, binding.resultPage, first)
-        ToolsResultBinder.bindSuccess(this, binding.resultPage, getString(R.string.tools_split_done, stored.size))
-        ToolsResultBinder.bindActions(
-            this,
-            binding.resultPage,
-            ToolsResultActions(
-                onOpenWith = { openWith(first) },
-                onCompress = { CompressActivity.start(this, first.id) },
-                onPrint = { ToolPrintRunner.print(this, first) },
-                onSign = { startActivity(SignatureActivity.createIntent(this)) },
-                onDraw = { startActivity(DrawActivity.createIntent(this, repository.fileOf(first), 1, false)) },
-                onLock = { LockActivity.start(this) },
-                onShare = { shareDocument(first) },
-                onView = { PreviewActivity.start(this, first.id) },
-                onRename = { rename(first) },
-                onFeedback = { binding.resultPage.feedbackCard.visibility = View.GONE },
-            ),
-        )
     }
 
     private fun rangesOf(pages: List<Int>): List<IntRange> {
@@ -309,48 +262,7 @@ class SplitActivity : BaseActivity() {
         }
     }
 
-    private fun rename(doc: Document) {
-        ToolTextInputDialog.show(
-            manager = supportFragmentManager,
-            title = getString(R.string.rename),
-            initial = doc.name,
-        ) { newName ->
-            repository.rename(doc, newName)
-            ToolsResultBinder.bindDocument(this, binding.resultPage, doc)
-        }
-    }
-
-    /** Hands the result to another app through the file provider. */
-    private fun shareDocument(document: Document) {
-        val intent = Intent(Intent.ACTION_SEND)
-            .setType("application/pdf")
-            .putExtra(Intent.EXTRA_STREAM, ShareFileProvider.uriFor(this, repository.fileOf(document)))
-            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        runCatching {
-            startActivity(Intent.createChooser(intent, getString(R.string.share)))
-        }.onFailure { toastNotAvailable() }
-    }
-
-    private fun openWith(doc: Document) {
-        val intent = Intent(Intent.ACTION_VIEW)
-            .setDataAndType(ShareFileProvider.uriFor(this, repository.fileOf(doc)), "application/pdf")
-            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        runCatching { startActivity(intent) }.onFailure { toastNotAvailable() }
-    }
-
-    private fun toastNotAvailable() {
-        Toast.makeText(this, R.string.tools_not_available, Toast.LENGTH_SHORT).show()
-    }
-
     private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
-
-    override fun handleBackPressed(): Boolean {
-        if (binding.resultPage.root.visibility == View.VISIBLE) {
-            showPages()
-            return true
-        }
-        return false
-    }
 
     companion object {
         private const val EXTRA_DOC_ID = "doc_id"

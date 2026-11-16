@@ -31,6 +31,7 @@
     <string name="tools_image_select">Выберите изображения</string>
     <string name="tools_image_running">Создание PDF…</string>
     <string name="tools_image_failed">Не удалось преобразовать изображение</string>
+    <string name="tools_image_done">PDF создан</string>
     <string name="tools_image_go_to_set">Перейти к настройкам</string>
     <string name="tools_image_added">Добавлено изображений: %1$d</string>
     <string name="tools_image_add">Добавить изображения</string>

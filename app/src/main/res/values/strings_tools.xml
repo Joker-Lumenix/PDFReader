@@ -51,6 +51,7 @@
     <string name="tools_image_select">选择图片</string>
     <string name="tools_image_running">正在生成 PDF…</string>
     <string name="tools_image_failed">图片转换失败</string>
+    <string name="tools_image_done">已生成 PDF</string>
     <string name="tools_image_go_to_set">去设置</string>
     <string name="tools_image_added">已添加 %1$d 张图片</string>
     <string name="tools_image_add">添加图片</string>

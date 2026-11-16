@@ -14,6 +14,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
@@ -38,6 +39,9 @@ import com.peng.pdfreader.feature.home.adapter.HomePagerAdapter
 import com.peng.pdfreader.feature.home.adapter.HomeQuickActionAdapter
 import com.peng.pdfreader.feature.home.model.QuickAction
 import com.peng.pdfreader.feature.home.util.HomeDocumentActions
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * Home tab.
@@ -67,13 +71,6 @@ class HomeFragment : BaseFragment() {
 
     /** Raised when the scan button is tapped. */
     var onScanClick: (() -> Unit)? = null
-
-    /**
-     * The round button opens the quick entry panel of the design.
-     *
-     * The anchor is the button itself, the panel positions itself above it.
-     */
-    var onQuickEntry: ((View) -> Unit)? = null
 
     /** Raised when the search action of the title bar is tapped. */
     var onSearchClick: (() -> Unit)? = null
@@ -118,9 +115,9 @@ class HomeFragment : BaseFragment() {
         setupFilterStrip()
         setupDocumentPager()
         registerResults()
-        // The round button opens the quick entry panel of the design.
+        // The round button starts the scanner of the system (design: home).
         binding.fabScan.setOnClickListener {
-            onQuickEntry?.invoke(binding.fabScan) ?: onScanClick?.invoke()
+            onScanClick?.invoke()
         }
         refreshDocuments()
     }
@@ -347,8 +344,16 @@ class HomeFragment : BaseFragment() {
         if (_binding == null || !::pagerAdapter.isInitialized) return
         // The list follows the sort order of the files feature.
         val option = FilesPrefs.get(requireContext()).sortOption
-        val documents = DocumentRepository.get(requireContext()).query(null, option.sort, null)
-        pagerAdapter.submit(if (option.reverse) documents.reversed() else documents)
+        viewLifecycleOwner.lifecycleScope.launch {
+            val repository = DocumentRepository.get(requireContext())
+            val documents = withContext(Dispatchers.IO) {
+                // The documents of the device are part of the list as well.
+                repository.syncSharedDocuments(requireContext().applicationContext)
+                repository.query(null, option.sort, null)
+            }
+            if (_binding == null || !::pagerAdapter.isInitialized) return@launch
+            pagerAdapter.submit(if (option.reverse) documents.reversed() else documents)
+        }
     }
 
     // ------------------------------------------------------------------ sort sheet

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="preview_open_invalid">檔案已損壞或不是有效的 PDF</string>
+    <string name="preview_open_failed">檔案暫時無法開啟，請重試</string>
     <string name="preview_favorite">收藏</string>
     <string name="preview_annotate">批註</string>
     <string name="preview_open_with">開啟方式</string>

@@ -31,6 +31,7 @@
     <string name="tools_image_select">Select images</string>
     <string name="tools_image_running">Creating PDF…</string>
     <string name="tools_image_failed">Image conversion failed</string>
+    <string name="tools_image_done">PDF created</string>
     <string name="tools_image_go_to_set">Go to settings</string>
     <string name="tools_image_added">%1$d images added</string>
     <string name="tools_image_add">Add images</string>

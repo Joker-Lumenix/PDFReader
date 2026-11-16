@@ -36,6 +36,11 @@
         <item name="android:windowIsFloating">false</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@color/surface_white_alt</item>
+        <!--
+          The sheets with a text field have to sit above the keyboard, the
+          design shows them right above it.
+        -->
+        <item name="android:windowSoftInputMode">adjustResize</item>
     </style>
 
     <style name="Widget.AppCore.BottomSheet" parent="Widget.MaterialComponents.BottomSheet.Modal">

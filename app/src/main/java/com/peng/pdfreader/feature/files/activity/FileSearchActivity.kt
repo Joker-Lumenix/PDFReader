@@ -126,11 +126,14 @@ class FileSearchActivity : BaseActivity() {
         val sort = AppPrefs.get(this).fileSort
         lifecycleScope.launch {
             val documents = withContext(Dispatchers.IO) {
+                // The documents of the device are searched as well.
+                repository.syncSharedDocuments(applicationContext)
                 repository.query(null, sort, query)
             }
             render(documents)
         }
     }
+
 
     private fun render(documents: List<Document>) {
         // A search hit paints the name in the light brand colour (design:

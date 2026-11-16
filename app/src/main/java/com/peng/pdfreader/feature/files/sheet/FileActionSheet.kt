@@ -102,7 +102,6 @@ class FileActionSheet : BaseBottomSheetDialog() {
         binding.rowMerge.setOnClickListener { send(doc, FileActions.MERGE) }
         binding.rowLock.setOnClickListener { send(doc, FileActions.LOCK) }
         binding.rowDelete.setOnClickListener { send(doc, FileActions.DELETE) }
-        binding.rowSort.setOnClickListener { send(doc, FileActions.SORT) }
     }
 
     private fun send(doc: Document, action: String) {

@@ -14,7 +14,9 @@ class LockActivity : BaseLockActivity() {
 
     override val mode: PasswordSheet.Mode = PasswordSheet.Mode.LOCK
 
-    override val titleRes: Int = R.string.lock_page_encrypt
+    // The design shows a file picker, the title is "Select file" (design:
+    // lock PDF).
+    override val titleRes: Int = R.string.lock_page_select
 
     override fun accepts(document: Document): Boolean = !isVaultFile(document)
 

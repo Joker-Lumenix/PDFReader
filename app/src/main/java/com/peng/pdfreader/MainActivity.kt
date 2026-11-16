@@ -81,9 +81,22 @@ class MainActivity : BaseActivity() {
             showTab(TAB_HOME)
         }
         handleIntent(intent)
+        // The documents of the device are collected right away, so the list is
+        // complete when the home screen is opened.
+        syncSharedDocuments()
         // The notification permission is asked for a moment after the home
         // screen was opened, see the notification permission handling.
         scheduleNotificationPermission()
+    }
+
+    /** Brings the documents of the shared storage into the library. */
+    private fun syncSharedDocuments() {
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                DocumentRepository.get(applicationContext)
+                    .syncSharedDocuments(applicationContext)
+            }
+        }
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -176,7 +189,6 @@ class MainActivity : BaseActivity() {
             onOpenDocument = { document -> openDocument(document) }
             onQuickAction = { action -> onQuickAction(action) }
             onScanClick = { openScanner() }
-            onQuickEntry = { anchor -> showQuickEntry(anchor) }
             onSearchClick = { FileSearchActivity.start(this@MainActivity) }
             onSelectClick = { FileSelectActivity.start(this@MainActivity) }
             onOpenSettings = { openStoragePermission() }
@@ -205,24 +217,8 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    /**
-     * The quick entry panel of the design: it opens above the round button of
-     * the home tab and offers Scan PDF, Merge PDF and Print PDF.
-     */
-    private fun showQuickEntry(anchor: View) {
-        val popup = QuickEntryPopupView(this)
-        popup.onEntryClick = { entry ->
-            popup.dismiss()
-            when (entry.id) {
-                "scan" -> openScanner()
-                "merge" -> MergeActivity.start(this)
-                "print" -> showTab(TAB_FILES)
-            }
-        }
-        popup.show(anchor)
-    }
-
     // ------------------------------------------------------- notification permission
+
 
     /**
      * Asks for the notification permission two seconds after the home screen

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="preview_open_invalid">Le fichier est endommagé ou n\'est pas un PDF valide</string>
+    <string name="preview_open_failed">Impossible d\'ouvrir le fichier, veuillez réessayer</string>
     <string name="preview_favorite">Favori</string>
     <string name="preview_annotate">Annoter</string>
     <string name="preview_open_with">Ouvrir avec</string>

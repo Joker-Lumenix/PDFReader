@@ -2,8 +2,11 @@
 <!--
   File action bottom sheet (design: home-more).
 
-  Header (thumbnail / name / meta / collect toggle), four quick actions and
-  the options card with the five document operations.
+  Geometry of the design (360x760), the sheet starts at y=316:
+  - thumbnail 48x48 at (16, 340), title at (72, 344), collect at (320, 344)
+  - type chip at (72, 370), meta line at (111, 368)
+  - four quick actions, 32x32 tiles at y=420, labels at y=460
+  - option card 320x224 at (20, 502) with five rows of 44dp
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -22,6 +25,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_gravity="start|top"
+            android:layout_marginStart="16dp"
             android:contentDescription="@null"
             android:scaleType="fitCenter" />
 
@@ -51,9 +55,10 @@
             android:scaleType="fitCenter"
             android:src="@mipmap/ic_collect_unselect" />
 
+        <!-- the type chip and the meta line share one row of 20dp -->
         <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="20dp"
             android:layout_gravity="start|top"
             android:layout_marginStart="72dp"
             android:layout_marginTop="28dp"
@@ -106,8 +111,8 @@
                 android:background="@drawable/bg_icon_tile">
 
                 <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
                     android:layout_gravity="center"
                     android:contentDescription="@null"
                     android:scaleType="fitCenter"
@@ -142,8 +147,8 @@
                 android:background="@drawable/bg_icon_tile">
 
                 <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
                     android:layout_gravity="center"
                     android:contentDescription="@null"
                     android:scaleType="fitCenter"
@@ -178,8 +183,8 @@
                 android:background="@drawable/bg_icon_tile">
 
                 <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
                     android:layout_gravity="center"
                     android:contentDescription="@null"
                     android:scaleType="fitCenter"
@@ -214,8 +219,8 @@
                 android:background="@drawable/bg_icon_tile">
 
                 <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
                     android:layout_gravity="center"
                     android:contentDescription="@null"
                     android:scaleType="fitCenter"
@@ -239,7 +244,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="26dp"
+        android:layout_marginTop="28dp"
         android:layout_marginEnd="20dp"
         android:background="@drawable/bg_card_r8"
         android:backgroundTint="@color/surface_disabled"
@@ -420,40 +425,7 @@
                 android:textColor="@color/text_secondary"
                 android:textSize="12sp" />
         </LinearLayout>
-        <LinearLayout
-            android:id="@+id/rowSort"
-            android:layout_width="match_parent"
-            android:layout_height="44dp"
-            android:background="?android:attr/selectableItemBackground"
-            android:clickable="true"
-            android:focusable="true"
-            android:gravity="top"
-            android:orientation="horizontal"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp">
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:background="@drawable/bg_card_r4"
-                android:backgroundTint="@color/white"
-                android:contentDescription="@null"
-                android:padding="3dp"
-                android:scaleType="fitCenter"
-                android:src="@mipmap/ic_sort" />
-
-            <TextView
-                style="@style/TextAppearance.AppCore.Body"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="3dp"
-                android:layout_weight="1"
-                android:fontFamily="sans-serif-medium"
-                android:text="@string/files_sort_title"
-                android:textColor="@color/text_secondary"
-                android:textSize="12sp" />
-        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>

@@ -37,6 +37,7 @@ import com.peng.pdfreader.feature.preview.adapter.PdfPagerAdapter
 import com.peng.pdfreader.feature.preview.annotation.AnnotationMarks
 import com.peng.pdfreader.feature.preview.annotation.AnnotationPayload
 import com.peng.pdfreader.feature.preview.dialog.MoreActionsSheet
+import com.peng.pdfreader.feature.preview.dialog.FailureDialog
 import com.peng.pdfreader.feature.preview.dialog.NoteDialog
 import com.peng.pdfreader.feature.preview.dialog.OutlineSheet
 import com.peng.pdfreader.feature.preview.dialog.RenameDialog
@@ -198,6 +199,12 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
                 if (doc.type == DocType.IMAGE) 1 else PdfEngine.pageCount(file)
             }
             if (_binding == null) return@launch
+            if (count <= 0 && doc.type != DocType.IMAGE) {
+                // The file is broken or it is not a PDF at all - the failure
+                // dialog of the design explains it.
+                showOpenFailure(doc)
+                return@launch
+            }
             pageCount = count.coerceAtLeast(1)
             val adapter = PdfPagerAdapter(
                 file,
@@ -220,13 +227,28 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
     // ------------------------------------------------------------------ locked documents
 
     /**
+     * The document cannot be opened.
+     *
+     * The dialog of the design explains it, the page stays open so the user
+     * can go back to the list.
+     */
+    private fun showOpenFailure(doc: Document) {
+        val message = if (doc.type == DocType.PDF) {
+            getString(R.string.preview_open_invalid)
+        } else {
+            getString(R.string.preview_open_failed)
+        }
+        FailureDialog.show(childFragmentManager, message)
+    }
+
+    /**
      * A locked document is a vault container, the renderer cannot open it.
      * The password sheet asks for the password, the decrypted copy is then
      * rendered from the cache.
      */
     private fun requestPassword(doc: Document, file: File, errorMessage: String? = null) {
         passwordSheet?.dismiss()
-        val sheet = PasswordSheet.newInstance(PasswordSheet.Mode.UNLOCK)
+        val sheet = PasswordSheet.newInstance(PasswordSheet.Mode.ENTER)
         passwordSheet = sheet
         errorMessage?.let { message ->
             sheet.showErrorOnShow = message

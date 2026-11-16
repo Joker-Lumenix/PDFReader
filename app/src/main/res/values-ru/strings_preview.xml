@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="preview_open_invalid">Файл повреждён или не является корректным PDF</string>
+    <string name="preview_open_failed">Не удалось открыть файл, попробуйте ещё раз</string>
     <string name="preview_favorite">Избранное</string>
     <string name="preview_annotate">Аннотации</string>
     <string name="preview_open_with">Открыть с помощью</string>

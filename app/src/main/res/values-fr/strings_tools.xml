@@ -31,6 +31,7 @@
     <string name="tools_image_select">Sélectionnez des images</string>
     <string name="tools_image_running">Création du PDF…</string>
     <string name="tools_image_failed">Échec de la conversion de l\'image</string>
+    <string name="tools_image_done">PDF créé</string>
     <string name="tools_image_go_to_set">Aller aux paramètres</string>
     <string name="tools_image_added">%1$d images ajoutées</string>
     <string name="tools_image_add">Ajouter des images</string>

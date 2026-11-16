@@ -31,6 +31,7 @@
     <string name="tools_image_select">Pilih imej</string>
     <string name="tools_image_running">Menjana PDF…</string>
     <string name="tools_image_failed">Penukaran imej gagal</string>
+    <string name="tools_image_done">PDF telah dicipta</string>
     <string name="tools_image_go_to_set">Pergi ke tetapan</string>
     <string name="tools_image_added">%1$d imej ditambah</string>
     <string name="tools_image_add">Tambah imej</string>

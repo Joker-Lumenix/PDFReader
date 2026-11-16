@@ -33,9 +33,10 @@
             android:paddingEnd="12dp"
             android:scrollbars="none" />
 
-        <include
-            android:id="@+id/resultPage"
-            layout="@layout/tools_result_body" />
+        <!--
+          The running job and the result have their own pages: the shared
+          progress page and the shared result page.
+        -->
 
     </FrameLayout>
 

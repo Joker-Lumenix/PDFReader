@@ -4,7 +4,7 @@ import android.content.Context
 import android.view.View
 import com.peng.pdfreader.R
 import com.peng.pdfreader.data.model.Document
-import com.peng.pdfreader.databinding.ToolsResultBodyBinding
+import com.peng.pdfreader.databinding.ActivityResultBinding
 import com.peng.pdfreader.feature.tools.util.ToolFormatters
 import com.peng.pdfreader.feature.tools.util.ToolShapes
 
@@ -33,7 +33,7 @@ object ToolsResultBinder {
     /** Shows the produced document on the result page. */
     fun bindDocument(
         context: Context,
-        binding: ToolsResultBodyBinding,
+        binding: ActivityResultBinding,
         document: Document,
     ) {
         binding.fileCard.background =
@@ -46,7 +46,7 @@ object ToolsResultBinder {
     }
 
     /** Shows the success title of the merge flow. */
-    fun bindSuccess(context: Context, binding: ToolsResultBodyBinding, title: String) {
+    fun bindSuccess(context: Context, binding: ActivityResultBinding, title: String) {
         binding.heroSuccess.visibility = View.VISIBLE
         binding.heroStats.visibility = View.GONE
         binding.tvHeroTitle.text = title
@@ -54,7 +54,7 @@ object ToolsResultBinder {
     }
 
     /** Shows the size comparison of the compress flow. */
-    fun bindSizes(context: Context, binding: ToolsResultBodyBinding, before: Long, after: Long) {
+    fun bindSizes(context: Context, binding: ActivityResultBinding, before: Long, after: Long) {
         binding.heroSuccess.visibility = View.GONE
         binding.heroStats.visibility = View.VISIBLE
         binding.tvSizeBefore.text = ToolFormatters.size(before)
@@ -68,7 +68,7 @@ object ToolsResultBinder {
     /** Wires every button of the result page. */
     fun bindActions(
         context: Context,
-        binding: ToolsResultBodyBinding,
+        binding: ActivityResultBinding,
         actions: ToolsResultActions,
     ) {
         // the two feedback buttons of the design are pills with a radius of 20

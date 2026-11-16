@@ -1,7 +1,9 @@
 package com.peng.pdfreader.ui.permission
 
+import android.Manifest
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
@@ -13,14 +15,20 @@ import android.provider.Settings
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import com.peng.pdfreader.MainActivity
 import com.peng.pdfreader.R
 import com.peng.pdfreader.appcore.util.Logger
 import com.peng.pdfreader.base.BaseActivity
+import com.peng.pdfreader.data.repository.DocumentRepository
 import com.peng.pdfreader.databinding.ActivityPermissionBinding
 import com.peng.pdfreader.feature.settings.notification.PersistentNotificationHelper
 import com.peng.pdfreader.feature.settings.permission.SetDefaultReaderSheet
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * The "allow access to all files" step of the start up flow.
@@ -38,6 +46,18 @@ class PermissionActivity : BaseActivity() {
     /** Whether the "set as default reader" hint has been shown already. */
     private var defaultReaderAsked = false
 
+    /**
+     * The runtime permission of the versions below Android 11.
+     *
+     * There the access to the files is a normal runtime permission instead of
+     * the "access all files" permission.
+     */
+    private val readStoragePermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            Logger.i(TAG, "read external storage granted: $granted")
+            updatePermissionState()
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPermissionBinding.inflate(layoutInflater)
@@ -50,13 +70,44 @@ class PermissionActivity : BaseActivity() {
 
         binding.llPermissionCard.setOnClickListener { openAllFilesSettings() }
         binding.btnAllow.setOnClickListener { openAllFilesSettings() }
+
+        askForReadPermissionIfNeeded()
+    }
+
+    /**
+     * Asks for the runtime permission of the versions below Android 11.
+     *
+     * From Android 11 on the "access all files" permission replaces it, the
+     * system screen of the design asks for that one.
+     */
+    private fun askForReadPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) return
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+            == PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
+        readStoragePermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
     }
 
     override fun onResume() {
         super.onResume()
         updatePermissionState()
-        if (hasStoragePermission() && exitToHomeAfterGrant()) {
-            goHome()
+        if (hasStoragePermission()) {
+            // The documents of the device are collected right away, so the
+            // list is complete when the home screen is opened.
+            syncSharedDocuments()
+            if (exitToHomeAfterGrant()) goHome()
+        }
+    }
+
+    /** Brings the documents of the shared storage into the list. */
+    private fun syncSharedDocuments() {
+        lifecycleScope.launch {
+            withContext(Dispatchers.IO) {
+                DocumentRepository.get(applicationContext)
+                    .syncSharedDocuments(applicationContext)
+            }
         }
     }
 
@@ -107,8 +158,11 @@ class PermissionActivity : BaseActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             Environment.isExternalStorageManager()
         } else {
-            // Below Android 11 the permission is granted at install time.
-            true
+            // Below Android 11 the access to the files is a runtime permission.
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+            ) == PackageManager.PERMISSION_GRANTED
         }
 
     private fun openAllFilesSettings() {

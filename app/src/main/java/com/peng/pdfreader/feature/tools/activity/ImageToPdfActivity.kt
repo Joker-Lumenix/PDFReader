@@ -23,13 +23,13 @@ import com.peng.pdfreader.base.BaseActivity
 import com.peng.pdfreader.data.model.DocType
 import com.peng.pdfreader.data.repository.DocumentRepository
 import com.peng.pdfreader.databinding.ToolsActivityImageToPdfBinding
-import com.peng.pdfreader.feature.preview.activity.PreviewActivity
 import com.peng.pdfreader.feature.tools.adapter.EdgeGapDecoration
 import com.peng.pdfreader.feature.tools.adapter.ImageRowAdapter
 import com.peng.pdfreader.feature.tools.adapter.ImageTileAdapter
 import com.peng.pdfreader.feature.tools.adapter.PitchGridDecoration
 import com.peng.pdfreader.feature.tools.engine.ToolEngines
 import com.peng.pdfreader.feature.tools.util.ToolFormatters
+import com.peng.pdfreader.feature.tools.util.ToolFlow
 import com.peng.pdfreader.feature.tools.util.ToolOutput
 import com.peng.pdfreader.feature.tools.util.ToolShapes
 import com.peng.pdfreader.feature.tools.view.ImageGlyphDrawable
@@ -207,31 +207,20 @@ class ImageToPdfActivity : BaseActivity() {
         showLoading(true)
         val out = ToolOutput.file(this, "images.pdf")
         lifecycleScope.launch {
-            val outcome = engine.imagesToPdf(images.toList(), out)
+            // The job runs behind the shared progress page.
+            ToolFlow.run(this@ImageToPdfActivity, getString(R.string.tools_image_running)) { _ ->
+                val outcome = engine.imagesToPdf(images.toList(), out)
+                outcome.getOrThrow()
+                val document = repository.addExisting(
+                    ToolOutput.uniqueName("images", ".pdf"),
+                    DocType.PDF,
+                    out,
+                )
+                ToolFlow.success(document.id, getString(R.string.tools_image_done))
+            }
             showLoading(false)
-            outcome.fold(
-                onSuccess = {
-                    val document = repository.addExisting(
-                        ToolOutput.uniqueName("images", ".pdf"),
-                        DocType.PDF,
-                        out,
-                    )
-                    Toast.makeText(
-                        this@ImageToPdfActivity,
-                        getString(R.string.tools_image_added, images.size),
-                        Toast.LENGTH_SHORT,
-                    ).show()
-                    PreviewActivity.start(this@ImageToPdfActivity, document.id)
-                    finish()
-                },
-                onFailure = { error ->
-                    Toast.makeText(
-                        this@ImageToPdfActivity,
-                        getString(R.string.tools_failed, error.message.orEmpty()),
-                        Toast.LENGTH_SHORT,
-                    ).show()
-                },
-            )
+            // The job is done, the progress page takes over with the result.
+            finish()
         }
     }
 
