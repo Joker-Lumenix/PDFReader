@@ -14,10 +14,35 @@
     android:background="@color/surface_muted"
     android:orientation="vertical">
 
-    <com.peng.pdfreader.appcore.widget.PageTitleBar
-        android:id="@+id/titleBar"
+
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="63dp"
+        android:background="#fffafafa"
+        >
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="63dp"
+            android:gravity="center_vertical"
+            android:paddingLeft="20dp"
+            android:text="@string/settings"
+            android:textColor="#ff060606"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+        <ImageView
+            android:id="@+id/ivZan"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="20dp"
+            android:src="@mipmap/ic_zan"
+            />
+    </RelativeLayout>
 
     <ScrollView
         android:layout_width="match_parent"

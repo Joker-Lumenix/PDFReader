@@ -43,10 +43,9 @@ class SettingsFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        binding.titleBar.title = getString(R.string.nav_settings)
-        binding.titleBar.addAction(buildRateAction())
-
+        binding.ivZan.setOnClickListener {
+            openRating()
+        }
         bindRows()
 
         binding.tvVersion.text = getString(R.string.settings_version_format, BuildConfig.VERSION_NAME)
@@ -117,17 +116,6 @@ class SettingsFragment : BaseFragment() {
         } else {
             getString(option.labelRes)
         }
-    }
-
-    /** The red thumbs up of the design opens the rating sheet. */
-    private fun buildRateAction(): View {
-        val action = ImageView(requireContext()).apply {
-            layoutParams = FrameLayout.LayoutParams(dp(24), dp(24))
-            setImageResource(R.mipmap.ic_zan)
-            contentDescription = getString(R.string.rate)
-            setOnClickListener { openRating() }
-        }
-        return action
     }
 
     private fun shareApp() {

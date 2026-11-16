@@ -145,9 +145,12 @@
 
             <TextView
                 style="@style/TextAppearance.AppCore.Body"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:gravity="center"
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/files_open_with"
                 android:textColor="@color/text_secondary"
