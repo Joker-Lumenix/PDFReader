@@ -8,12 +8,26 @@
 -->
 <resources>
 
-    <!-- filter / sort sheets -->
+    <!-- scope tabs of the file list -->
+    <string name="files_tab_all">Alle</string>
+    <string name="files_tab_recent">Zuletzt</string>
+    <string name="files_tab_favorites">Favoriten</string>
+
+    <!-- search -->
+    <string name="files_search_hint">Dateinamen suchen</string>
+
+    <!-- sort sheet -->
     <string name="files_sort_title">Sortieren nach</string>
-    <string name="files_filter_title">Dateityp</string>
     <string name="files_sort_section_time">Zuletzt geändert</string>
     <string name="files_sort_section_name">Name</string>
     <string name="files_sort_section_size">Dateigröße</string>
+    <string name="files_sort_new_to_old">Neueste zuerst</string>
+    <string name="files_sort_old_to_new">Älteste zuerst</string>
+    <string name="files_sort_a_to_z">A bis Z</string>
+    <string name="files_sort_z_to_a">Z bis A</string>
+    <string name="files_sort_large_to_small">Größte zuerst</string>
+    <string name="files_sort_small_to_large">Kleinste zuerst</string>
+    <string name="files_apply">Anwenden</string>
 
     <!-- file action sheet -->
     <string name="files_open_with">Mit anderer App öffnen</string>
@@ -21,9 +35,19 @@
     <string name="files_print">Drucken</string>
     <string name="files_feature_unavailable">Diese Funktion wird noch entwickelt</string>
 
+    <!-- multi select action bar -->
+    <string name="files_action_edit">Bearbeiten</string>
+    <string name="files_action_merge">Zusammenführen</string>
+
     <!-- dialogs -->
-    <string name="files_rename_hint">Neuen Dateinamen eingeben</string>
     <string name="files_delete_message">Diese Datei löschen? Das lässt sich nicht rückgängig machen.</string>
     <string name="files_save_message">Änderungen an dieser Datei speichern? Das lässt sich nicht rückgängig machen.</string>
+
+    <!-- empty states -->
+    <string name="files_empty_title">Noch keine Dateien</string>
+    <string name="files_empty_hint">Schnellzugriff auf häufige Dateien</string>
+    <string name="files_search_empty_title">Keine passenden Dateien</string>
+    <string name="files_search_empty_hint">Anderen Suchbegriff versuchen</string>
+    <string name="files_selected_count">%1$d ausgewählt</string>
 
 </resources>

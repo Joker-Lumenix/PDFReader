@@ -29,7 +29,7 @@
     <string name="clear_all">Kosongkan semua</string>
     <string name="clear_cache">Bersihkan sekarang</string>
     <string name="color_mode">Mod warna</string>
-    <string name="compress">Mampat PDF</string>
+    <string name="compress">Mampat</string>
     <string name="confirm">Sahkan</string>
     <string name="confirm_delete_message">Adakah anda pasti mahu memadam fail yang dipilih?</string>
     <string name="confirm_delete_title">Sahkan pemadaman</string>
@@ -79,7 +79,7 @@
     <string name="list_view">Paparan senarai</string>
     <string name="long_image">Imej panjang</string>
     <string name="md5">Semakan MD5</string>
-    <string name="merge">Gabungkan PDF</string>
+    <string name="merge">Gabung PDF</string>
     <string name="merge_count">Gabungkan(%1$d)</string>
     <string name="merge_to_pdf">Gabungkan ke PDF</string>
     <string name="merged_document">Dokumen digabungkan</string>
@@ -115,7 +115,7 @@
     <string name="permission_rationale">Untuk membaca dan menyunting dokumen pada peranti anda, sila benarkan Let\'s PDF mengakses semua fail anda.</string>
     <string name="permission_required">Kebenaran diperlukan</string>
     <string name="plain_text">Teks biasa</string>
-    <string name="print">Cetak PDF</string>
+    <string name="print">Cetak</string>
     <string name="print_now">Cetak sekarang</string>
     <string name="privacy_note">Semua fail kekal dalam kotak pasir peranti, tiada apa-apa dimuat naik</string>
     <string name="properties">Butiran</string>

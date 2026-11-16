@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  "Allow access to all files" page: the hero illustration, the state card with
-  the permission switch, the rationale and the allow button.
+  "Allow access to all files" page: the hero illustration with the state card
+  and the permission switch, the rationale and the allow button.
+
+  Geometry of the design: the hero 320x286dp with a 21dp gap below the title
+  bar, the white card 320x58dp inside the lower third of the hero, the
+  heading 36dp below the hero and the 312x48dp button at the bottom.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -26,7 +30,7 @@
             android:layout_height="286dp"
             android:layout_gravity="center_horizontal"
             android:contentDescription="@null"
-            android:scaleType="centerCrop"
+            android:scaleType="fitCenter"
             android:src="@mipmap/bg_file_access" />
 
         <LinearLayout
@@ -35,28 +39,28 @@
             android:layout_height="58dp"
             android:layout_gravity="center_horizontal|bottom"
             android:layout_marginBottom="40dp"
-            android:background="@drawable/bg_card_r8"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingStart="@dimen/space_ml"
-            android:paddingEnd="@dimen/space_ml">
+            android:paddingStart="@dimen/space_l"
+            android:paddingEnd="@dimen/space_l">
 
             <TextView
                 android:id="@+id/tvPermissionLabel"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:fontFamily="sans-serif-medium"
                 android:text="@string/permission_allow_all_files"
                 android:textColor="@color/text_secondary"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                android:textSize="14sp" />
 
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/switchPermission"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="40dp"
+                android:layout_height="22dp"
                 android:clickable="false"
-                android:focusable="false" />
+                android:focusable="false"
+                android:padding="0dp" />
         </LinearLayout>
     </FrameLayout>
 
@@ -64,9 +68,10 @@
         android:id="@+id/tvTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/screen_margin"
+        android:layout_marginStart="@dimen/space_l"
         android:layout_marginTop="36dp"
-        android:layout_marginEnd="@dimen/screen_margin"
+        android:layout_marginEnd="@dimen/space_l"
+        android:includeFontPadding="false"
         android:text="@string/permission_required"
         android:textColor="@color/text_secondary"
         android:textSize="24sp"
@@ -76,10 +81,10 @@
         android:id="@+id/tvBody"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/screen_margin"
-        android:layout_marginTop="@dimen/space_s"
-        android:layout_marginEnd="@dimen/screen_margin"
-        android:lineSpacingExtra="4dp"
+        android:layout_marginStart="@dimen/space_l"
+        android:layout_marginTop="14dp"
+        android:layout_marginEnd="@dimen/space_l"
+        android:lineSpacingExtra="7.5dp"
         android:text="@string/permission_rationale"
         android:textColor="@color/text_tertiary"
         android:textSize="14sp" />
@@ -98,6 +103,7 @@
         android:layout_marginBottom="@dimen/space_xxl"
         android:background="@drawable/gradient_red"
         android:backgroundTint="@null"
+        android:fontFamily="sans-serif-medium"
         android:letterSpacing="0"
         android:stateListAnimator="@null"
         android:text="@string/allow"

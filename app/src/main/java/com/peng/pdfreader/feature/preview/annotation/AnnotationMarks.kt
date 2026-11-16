@@ -49,6 +49,7 @@ object AnnotationMarks {
                             colour = stroke.color,
                             rect = RectF(0f, 0f, 1f, 1f),
                             ink = path,
+                            width = stroke.width,
                         )
                     }
                 }

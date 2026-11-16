@@ -8,6 +8,9 @@
   - yellow panel 320x420 at (20, 236), radius 13
   - 2 x 4 grid of 133x82 tool cards, first card at (37, 252)
 
+  The shared title bar ends at 89 (24 status bar + 64 bar + 1 hairline), the
+  offsets below are therefore 2 smaller than the y of the design.
+
   The yellow panel is drawn behind the illustration and behind the grid, which
   is how the design stacks them; the radius is applied in code because the
   panel colour only exists in the design.
@@ -42,7 +45,7 @@
                 android:layout_height="420dp"
                 android:layout_gravity="top|start"
                 android:layout_marginStart="20dp"
-                android:layout_marginTop="149dp" />
+                android:layout_marginTop="147dp" />
 
             <!-- the 2 x 4 grid of the tools -->
             <androidx.recyclerview.widget.RecyclerView
@@ -50,7 +53,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="388dp"
                 android:layout_gravity="top|start"
-                android:layout_marginTop="165dp"
+                android:layout_marginTop="163dp"
                 android:clipToPadding="false"
                 android:overScrollMode="never"
                 android:paddingStart="37dp"
@@ -64,7 +67,7 @@
                 android:layout_height="157dp"
                 android:layout_gravity="top|start"
                 android:layout_marginStart="20dp"
-                android:layout_marginTop="8dp"
+                android:layout_marginTop="6dp"
                 android:contentDescription="@string/tools"
                 android:src="@mipmap/bg_tools" />
 

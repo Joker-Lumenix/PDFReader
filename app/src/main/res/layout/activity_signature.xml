@@ -18,7 +18,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="87dp"
+            android:layout_height="@dimen/top_bar_height"
             android:background="@color/surface_card"
             android:gravity="center_vertical"
             android:orientation="horizontal"
@@ -51,20 +51,23 @@
                 android:layout_height="24dp"
                 android:layout_marginEnd="16dp"
                 android:contentDescription="@string/preview_cd_redo"
-                android:src="@mipmap/ic_clockwise" />
+                android:src="@mipmap/ic_restore_unable" />
 
-            <TextView
-                android:id="@+id/tvDone"
+            <FrameLayout
+                android:id="@+id/flDone"
                 android:layout_width="55dp"
                 android:layout_height="24dp"
                 android:background="@drawable/gradient_red"
                 android:clickable="true"
                 android:contentDescription="@string/preview_cd_done"
-                android:focusable="true"
-                android:gravity="center"
-                android:text="✓"
-                android:textColor="@color/text_on_tint"
-                android:textSize="14sp" />
+                android:focusable="true">
+
+                <com.peng.pdfreader.appcore.widget.CheckMarkView
+                    android:id="@+id/ivDone"
+                    android:layout_width="15dp"
+                    android:layout_height="10dp"
+                    android:layout_gravity="center" />
+            </FrameLayout>
         </LinearLayout>
 
         <View
@@ -83,21 +86,29 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
+        <!--
+          The floating palette of the design: 343dp wide, 48dp tall, four
+          pixels above the colour bar. It shares the dark surface of the
+          drawing tool bar of the free hand editor. The swatches start twelve
+          pixels inside the palette and the last one runs past the edge of the
+          screen, exactly as in the design.
+        -->
         <LinearLayout
             android:id="@+id/llPalette"
-            android:layout_width="wrap_content"
+            android:layout_width="343dp"
             android:layout_height="48dp"
-            android:layout_gravity="bottom|center_horizontal"
-            android:layout_marginBottom="52dp"
+            android:layout_gravity="bottom|start"
+            android:layout_marginStart="17dp"
+            android:layout_marginBottom="4dp"
             android:gravity="center"
             android:orientation="horizontal"
             android:paddingStart="12dp"
-            android:paddingEnd="12dp"
+            android:paddingEnd="0dp"
             android:visibility="gone">
 
             <com.peng.pdfreader.appcore.widget.ColorPaletteView
                 android:id="@+id/palette"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent" />
         </LinearLayout>
     </FrameLayout>
@@ -117,21 +128,20 @@
             android:layout_height="wrap_content"
             android:clickable="true"
             android:focusable="true"
+            android:fontFamily="sans-serif-medium"
             android:text="@string/preview_color"
             android:textColor="@color/text_secondary"
             android:textSize="12sp" />
 
-        <TextView
-            android:id="@+id/tvColorSwatch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <!-- The colour of the next stroke, a 10dp dot inside a 14dp box. -->
+        <com.peng.pdfreader.appcore.widget.ColorPaletteView
+            android:id="@+id/swatch"
+            android:layout_width="14dp"
+            android:layout_height="14dp"
             android:layout_marginStart="8dp"
             android:clickable="true"
-            android:focusable="true"
             android:contentDescription="@string/preview_cd_color"
-            android:text="●"
-            android:textColor="@color/text_secondary"
-            android:textSize="14sp" />
+            android:focusable="true" />
     </LinearLayout>
 
 </LinearLayout>

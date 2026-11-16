@@ -1,14 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  Copy of the settings / language / feedback / onboarding feature.
-
-  Every key is prefixed with the feature it belongs to so it can never
-  collide with the base string table; base keys that already carry the same
-  wording are reused instead of being duplicated here.
--->
 <resources>
-
-    <!-- ==================== settings ==================== -->
     <string name="settings_share_app">アプリを共有</string>
     <string name="settings_share_message">便利な PDF ツールをご紹介します: %1$s</string>
     <string name="settings_follow_system">システムに従う</string>
@@ -18,57 +9,41 @@
     <string name="settings_action_more">その他</string>
     <string name="settings_close">閉じる</string>
     <string name="settings_screen_missing">この画面は現在利用できません</string>
-
-    <!-- ==================== language ==================== -->
-    <!-- Endonyms: they are written the way the language itself writes it. -->
-    <string name="language_en" translatable="false">English</string>
-    <string name="language_fr" translatable="false">Français</string>
-    <string name="language_ms" translatable="false">Bahasa Melayu</string>
-    <string name="language_es" translatable="false">Español</string>
-    <string name="language_pt" translatable="false">Português</string>
-    <string name="language_de" translatable="false">Deutsch</string>
-    <string name="language_ja" translatable="false">日本語</string>
-    <string name="language_ko" translatable="false">한국인</string>
-    <string name="language_ru" translatable="false">Русский</string>
-    <string name="language_ar" translatable="false">اللغة العربية</string>
-    <string name="language_zh_cn" translatable="false">简体中文</string>
-    <string name="language_zh_tw" translatable="false">繁體中文</string>
-
-    <!-- ==================== feedback ==================== -->
+    <string name="language_en">English</string>
+    <string name="language_fr">Français</string>
+    <string name="language_ms">Bahasa Melayu</string>
+    <string name="language_es">Español</string>
+    <string name="language_pt">Português</string>
+    <string name="language_de">Deutsch</string>
+    <string name="language_ja">日本語</string>
+    <string name="language_ko">한국인</string>
+    <string name="language_ru">Русский</string>
+    <string name="language_ar">اللغة العربية</string>
+    <string name="language_zh_cn">简体中文</string>
+    <string name="language_zh_tw">繁體中文</string>
     <string name="feedback_heading">どのような問題がありましたか？</string>
     <string name="feedback_input_hint">ここに入力…</string>
     <string name="feedback_mail_subject">Let\'s PDF へのフィードバック</string>
     <string name="feedback_mail_opened">メールアプリを開きました</string>
     <string name="feedback_no_mail_app">メールアプリが見つかりません。インストールしてからお試しください</string>
-
-    <!-- ==================== rating ==================== -->
     <string name="rating_question">Let\'s PDF は気に入りましたか？</string>
     <string name="rating_hint">評価をお聞かせください！</string>
+    <string name="rating_top_rating">星5つで評価してください</string>
     <string name="rating_neutral">まあまあ</string>
     <string name="rating_later">後で</string>
     <string name="rating_store_missing">アプリストアが見つかりません</string>
-
-    <!-- ==================== onboarding ==================== -->
     <string name="onboarding_skip">スキップ</string>
     <string name="onboarding_start">はじめる</string>
-
-    <!-- ==================== permission ==================== -->
     <string name="permission_allow_all_files">すべてのファイルへのアクセスを許可</string>
-
-    <!-- ==================== default reader sheet ==================== -->
     <string name="set_default_title">既定の PDF リーダーに設定</string>
     <string name="set_default_subtitle">「Let\'s PDF: View &amp; Sign」を選択し、「常に」をタップしてください</string>
     <string name="set_default_mock_once">一度だけ</string>
     <string name="set_default_mock_always">常に</string>
-
-    <!-- ==================== quick entry popup ==================== -->
     <string name="quick_entry_scan">PDF をスキャン</string>
     <string name="quick_entry_merge">PDF を結合</string>
     <string name="quick_entry_print">PDF を印刷</string>
-
-    <!-- ==================== notices ==================== -->
-    <!-- Placeholder copy: the final legal text has to be supplied by the app owner. -->
+    <string name="quick_entry_header_alert">通知</string>
+    <string name="quick_entry_header_edit">編集</string>
     <string name="notice_privacy_body">プライバシーを大切にしています。本アプリのファイルはすべて端末のサンドボックス内に保存され、サーバーへのアップロードや個人データの収集は行いません。最終的なプライバシーポリシーの本文は、法務の確認後に追加します。</string>
     <string name="notice_terms_body">本アプリを使用することにより、以下の利用規約に同意したものとみなされます。最終的な利用規約の本文は、法務の確認後に追加します。</string>
-
 </resources>

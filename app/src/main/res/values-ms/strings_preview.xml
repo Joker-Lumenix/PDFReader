@@ -1,18 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  Copy of the document preview and of the annotation editors.
-  The strings live in their own file so the shared table stays untouched.
--->
 <resources>
-
-    <!-- bottom toolbar of the reader -->
     <string name="preview_favorite">Kegemaran</string>
     <string name="preview_annotate">Anotasi</string>
     <string name="preview_open_with">Buka dengan</string>
     <string name="preview_share">Kongsi</string>
     <string name="preview_more">Lagi</string>
-
-    <!-- reader -->
     <string name="preview_page_indicator">%1$d / %2$d</string>
     <string name="preview_outline">Kandungan</string>
     <string name="preview_add_bookmark">Tambah penanda halaman ini</string>
@@ -22,8 +14,6 @@
     <string name="preview_mode_night">Malam</string>
     <string name="preview_mode_black">Hitam</string>
     <string name="preview_bookmark_added">Penanda ditambah</string>
-
-    <!-- annotation tools -->
     <string name="preview_tool_highlight">Sorotan</string>
     <string name="preview_tool_underline">Garis bawah</string>
     <string name="preview_tool_strikethrough">Garisan lorek</string>
@@ -33,21 +23,19 @@
     <string name="preview_select_area">Seret pada halaman untuk memilih kawasan</string>
     <string name="preview_note_hint">Masukkan kandungan anotasi</string>
     <string name="preview_note_save">Simpan anotasi</string>
-
-    <!-- editors -->
     <string name="preview_color">Warna</string>
+    <string name="preview_add_signature">Tambah</string>
     <string name="preview_save_to_document">Simpan ke dokumen</string>
     <string name="preview_signature_saved">Tandatangan disimpan</string>
+    <string name="preview_signature_failed">Halaman belum sedia, sila cuba lagi</string>
     <string name="preview_draw_saved">Tanda disimpan dan salinan beranotasi telah dicipta</string>
-
-    <!-- states -->
+    <string name="preview_print">Cetak</string>
+    <string name="preview_feature_unavailable">Ciri ini tidak tersedia buat masa ini</string>
     <string name="preview_loading">Menguraikan dokumen…</string>
     <string name="preview_load_failed">Tidak dapat pratonton dokumen ini</string>
     <string name="preview_load_failed_hint">Fail mungkin rosak atau formatnya belum disokong</string>
     <string name="preview_retry">Cuba lagi</string>
     <string name="preview_rename_hint">Masukkan nama fail baharu</string>
-
-    <!-- content descriptions -->
     <string name="preview_cd_back">Kembali</string>
     <string name="preview_cd_more">Tindakan lain</string>
     <string name="preview_cd_rename">Tukar nama</string>
@@ -57,10 +45,11 @@
     <string name="preview_cd_color">Pilih warna</string>
     <string name="preview_cd_size">Pilih ketebalan</string>
     <string name="preview_cd_favorite">Kegemaran</string>
+    <string name="preview_cd_bookmark">Tambah penanda buku</string>
     <string name="preview_cd_share">Kongsi</string>
     <string name="preview_cd_open_with">Buka dengan</string>
     <string name="preview_cd_annotate">Anotasi</string>
+    <string name="preview_cd_add_signature">Tambah tandatangan pada dokumen</string>
     <string name="preview_cd_page">Halaman %1$d</string>
     <string name="preview_cd_slide">Slaid %1$d</string>
-
 </resources>

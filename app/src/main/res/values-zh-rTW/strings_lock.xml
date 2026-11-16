@@ -12,31 +12,32 @@
 
     <!-- page titles -->
     <string name="lock_page_encrypt">加密 PDF</string>
-    <string name="lock_page_decrypt">解密 PDF</string>
+    <string name="lock_page_select">選擇檔案</string>
 
     <!-- password sheet -->
     <string name="lock_set_password">設定密碼</string>
     <string name="lock_set_password_hint">設定密碼後，開啟此檔案需要驗證密碼</string>
     <string name="lock_remove_password">移除密碼</string>
     <string name="lock_remove_password_hint">移除後將不再受密碼保護</string>
+    <string name="lock_enter_password">輸入密碼</string>
+    <string name="lock_enter_password_hint">需要密碼才能開啟此檔案</string>
     <string name="lock_password_hint">請輸入密碼</string>
     <string name="lock_password_too_short">密碼至少需要 4 碼</string>
-    <string name="lock_clear_password">清除密碼</string>
     <string name="lock_toggle_password">顯示密碼</string>
 
     <!-- states -->
     <string name="lock_wrong_password">密碼錯誤</string>
     <string name="lock_not_encrypted">此檔案不是加密文件</string>
     <string name="lock_operation_failed">操作失敗，請重試</string>
-    <string name="lock_working">處理中…</string>
-    <string name="lock_badge_encrypted">已加密</string>
 
     <!-- file list -->
-    <string name="lock_empty_hint">沙盒內還沒有可處理的 PDF 檔案</string>
     <string name="lock_import">匯入 PDF</string>
+    <string name="lock_no_document">請先選擇一個檔案</string>
 
     <!-- result -->
     <string name="lock_result_path">路徑：%1$s</string>
+    <string name="lock_result_locked">PDF 已加密</string>
+    <string name="lock_result_unlocked">PDF 已解密</string>
     <string name="lock_open_failed">找不到可以開啟此檔案的應用程式</string>
 
 </resources>

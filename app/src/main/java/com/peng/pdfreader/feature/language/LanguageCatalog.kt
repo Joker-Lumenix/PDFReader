@@ -48,8 +48,9 @@ object LanguageCatalog {
      */
     fun toLanguageTag(code: String): String {
         val parts = code.split('-')
-        if (parts.size >= 2 && parts[1].equals("r", ignoreCase = true)) {
-            return (listOf(parts[0]) + parts.drop(2)).joinToString("-")
+        // `zh-rTW` is the resource qualifier form, BCP 47 wants `zh-TW`.
+        if (parts.size >= 2 && parts[1].length > 1 && parts[1][0].equals('r', ignoreCase = true)) {
+            return (listOf(parts[0], parts[1].drop(1)) + parts.drop(2)).joinToString("-")
         }
         return code
     }

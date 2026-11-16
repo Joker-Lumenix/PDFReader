@@ -29,7 +29,7 @@
     <string name="clear_all">清空</string>
     <string name="clear_cache">一鍵清理</string>
     <string name="color_mode">色彩模式</string>
-    <string name="compress">PDF 壓縮</string>
+    <string name="compress">壓縮</string>
     <string name="confirm">確認</string>
     <string name="confirm_delete_message">確定要刪除所選檔案嗎？</string>
     <string name="confirm_delete_title">刪除確認</string>
@@ -74,12 +74,12 @@
     <string name="just_once">僅一次</string>
     <string name="keep_screen_on">螢幕常亮保護</string>
     <string name="lan_transfer">區域網路傳輸</string>
-    <string name="language">多語言</string>
+    <string name="language">語言</string>
     <string name="language_selection">語言選擇</string>
     <string name="list_view">清單檢視</string>
     <string name="long_image">長圖</string>
     <string name="md5">MD5 完整性雜湊校驗碼</string>
-    <string name="merge">PDF 合併</string>
+    <string name="merge">合併 PDF</string>
     <string name="merge_count">合併(%1$d)</string>
     <string name="merge_to_pdf">合併為PDF</string>
     <string name="merged_document">合併文件</string>
@@ -115,7 +115,7 @@
     <string name="permission_rationale">若要在本機讀取和編輯文件，請允許 Let\'s PDF 存取全部檔案。</string>
     <string name="permission_required">需要權限</string>
     <string name="plain_text">純文字</string>
-    <string name="print">PDF 列印</string>
+    <string name="print">列印</string>
     <string name="print_now">立即列印</string>
     <string name="privacy_note">所有檔案僅儲存在本機沙盒，零雲端上傳</string>
     <string name="properties">詳細屬性</string>
@@ -160,7 +160,7 @@
     <string name="sort_modified">依修改時間</string>
     <string name="sort_name">依名稱</string>
     <string name="sort_size">依大小</string>
-    <string name="split">PDF 拆分</string>
+    <string name="split">拆分 PDF</string>
     <string name="split_document">拆分文件</string>
     <string name="start_page">預設啟動頁面</string>
     <string name="start_reading">開始閱讀</string>

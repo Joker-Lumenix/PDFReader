@@ -2,35 +2,34 @@ package com.peng.pdfreader.feature.tools.activity
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.view.Gravity
 import android.view.View
-import android.widget.FrameLayout
-import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
-import com.peng.pdfreader.base.ShareFileProvider
-import com.peng.pdfreader.feature.lock.activity.LockActivity
-import com.peng.pdfreader.feature.preview.activity.DrawActivity
-import com.peng.pdfreader.feature.preview.activity.SignatureActivity
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.peng.pdfreader.R
 import com.peng.pdfreader.appcore.pdf.PdfEngine
 import com.peng.pdfreader.base.BaseActivity
+import com.peng.pdfreader.base.ShareFileProvider
 import com.peng.pdfreader.data.model.DocType
 import com.peng.pdfreader.data.model.Document
 import com.peng.pdfreader.data.repository.DocumentRepository
 import com.peng.pdfreader.databinding.ToolsActivitySplitBinding
+import com.peng.pdfreader.feature.lock.activity.LockActivity
+import com.peng.pdfreader.feature.preview.activity.DrawActivity
 import com.peng.pdfreader.feature.preview.activity.PreviewActivity
+import com.peng.pdfreader.feature.preview.activity.SignatureActivity
+import com.peng.pdfreader.feature.tools.adapter.PitchGridDecoration
 import com.peng.pdfreader.feature.tools.adapter.SplitPageAdapter
-import com.peng.pdfreader.feature.tools.adapter.ToolGridDecoration
 import com.peng.pdfreader.feature.tools.dialog.ToolDocumentPickerDialog
 import com.peng.pdfreader.feature.tools.dialog.ToolTextInputDialog
 import com.peng.pdfreader.feature.tools.engine.ToolEngines
 import com.peng.pdfreader.feature.tools.print.ToolPrintRunner
 import com.peng.pdfreader.feature.tools.util.ToolOutput
 import com.peng.pdfreader.feature.tools.util.ToolShapes
+import com.peng.pdfreader.feature.tools.view.InfoGlyphDrawable
 import com.peng.pdfreader.feature.tools.view.ToolsResultActions
 import com.peng.pdfreader.feature.tools.view.ToolsResultBinder
 import kotlinx.coroutines.Dispatchers
@@ -39,10 +38,11 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 /**
- * Split flow (design "Split PDF").
+ * Split flow (designs "Split PDF", "Split PDF2", "Split PDF-rename").
  *
  * The screen shows the pages of the selected document, the user marks the
- * pages that have to become their own document.
+ * pages that have to become their own document and may drag the tiles to
+ * change the order of the result.
  */
 class SplitActivity : BaseActivity() {
 
@@ -53,6 +53,7 @@ class SplitActivity : BaseActivity() {
 
     private var document: Document? = null
     private var pageCount = 0
+    private var dragging = false
 
     private val adapter by lazy {
         SplitPageAdapter { page -> togglePage(page) }
@@ -64,23 +65,25 @@ class SplitActivity : BaseActivity() {
         setContentView(binding.root)
 
         binding.titleBar.showBack = true
-        binding.titleBar.title = getString(R.string.tools_split_title)
+        binding.titleBar.title = getString(R.string.split)
         binding.titleBar.onBackClick = { onBackPressedDispatcher.onBackPressed() }
-        binding.titleBar.addAction(buildRangeAction())
 
         binding.banner.background = ToolShapes.roundRect(this, ToolShapes.BANNER_BLUE, 8f)
-        binding.bannerDot.background = ToolShapes.infoDot(this)
+        binding.bannerIcon.setImageDrawable(InfoGlyphDrawable(dp(2).toFloat()))
+        binding.banner.setOnClickListener { openRangeDialog() }
 
         binding.rvPages.layoutManager = GridLayoutManager(this, 3)
         binding.rvPages.adapter = adapter
+        // the tiles of the design sit at x = 12 / 128 / 244, 12 apart
         binding.rvPages.addItemDecoration(
-            ToolGridDecoration(
-                spanCount = 3,
+            PitchGridDecoration(
                 cellWidthPx = dp(104),
+                pitchPx = dp(116),
+                startMarginPx = dp(12),
                 rowSpacingPx = dp(12),
-                itemCount = { adapter.itemCount },
             ),
         )
+        attachDragReorder()
 
         binding.btnSplit.setOnClickListener { startSplit() }
 
@@ -142,12 +145,58 @@ class SplitActivity : BaseActivity() {
                 }
             }
             adapter.submit(pages)
+            refreshBanner()
         }
     }
 
     private fun togglePage(page: Int) {
         val isSelected = page in adapter.selectedPages()
         adapter.setSelected(page, !isSelected)
+        refreshBanner()
+    }
+
+    /** The banner carries the state of the screen: the drag hint while a tile is dragged. */
+    private fun refreshBanner() {
+        binding.bannerText.text = if (dragging) {
+            getString(R.string.tools_split_banner_drag)
+        } else {
+            getString(R.string.select_page_hint)
+        }
+    }
+
+    /**
+     * Lets the user drag the tiles to change the order of the result, the
+     * design shows the drag hint in the banner while a tile is dragged.
+     */
+    private fun attachDragReorder() {
+        val helper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
+            ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.LEFT or
+                ItemTouchHelper.RIGHT,
+            0,
+        ) {
+            override fun isLongPressDragEnabled(): Boolean = true
+
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder,
+            ): Boolean {
+                val from = viewHolder.bindingAdapterPosition
+                val to = target.bindingAdapterPosition
+                if (from == RecyclerView.NO_POSITION || to == RecyclerView.NO_POSITION) return false
+                adapter.move(from, to)
+                return true
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) = Unit
+
+            override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
+                super.onSelectedChanged(viewHolder, actionState)
+                dragging = actionState == ItemTouchHelper.ACTION_STATE_DRAG
+                refreshBanner()
+            }
+        })
+        helper.attachToRecyclerView(binding.rvPages)
     }
 
     private fun openRangeDialog() {
@@ -164,6 +213,7 @@ class SplitActivity : BaseActivity() {
             }
             adapter.selectAll(false)
             pages.forEach { adapter.setSelected(it, true) }
+            refreshBanner()
         }
     }
 
@@ -215,6 +265,7 @@ class SplitActivity : BaseActivity() {
         ToolsResultBinder.bindDocument(this, binding.resultPage, first)
         ToolsResultBinder.bindSuccess(this, binding.resultPage, getString(R.string.tools_split_done, stored.size))
         ToolsResultBinder.bindActions(
+            this,
             binding.resultPage,
             ToolsResultActions(
                 onOpenWith = { openWith(first) },
@@ -225,7 +276,7 @@ class SplitActivity : BaseActivity() {
                 onLock = { LockActivity.start(this) },
                 onShare = { shareDocument(first) },
                 onView = { PreviewActivity.start(this, first.id) },
-                onRename = { toastNotAvailable() },
+                onRename = { rename(first) },
                 onFeedback = { binding.resultPage.feedbackCard.visibility = View.GONE },
             ),
         )
@@ -258,6 +309,17 @@ class SplitActivity : BaseActivity() {
         }
     }
 
+    private fun rename(doc: Document) {
+        ToolTextInputDialog.show(
+            manager = supportFragmentManager,
+            title = getString(R.string.rename),
+            initial = doc.name,
+        ) { newName ->
+            repository.rename(doc, newName)
+            ToolsResultBinder.bindDocument(this, binding.resultPage, doc)
+        }
+    }
+
     /** Hands the result to another app through the file provider. */
     private fun shareDocument(document: Document) {
         val intent = Intent(Intent.ACTION_SEND)
@@ -278,19 +340,6 @@ class SplitActivity : BaseActivity() {
 
     private fun toastNotAvailable() {
         Toast.makeText(this, R.string.tools_not_available, Toast.LENGTH_SHORT).show()
-    }
-
-    private fun buildRangeAction(): TextView = TextView(this).apply {
-        layoutParams = FrameLayout.LayoutParams(
-            FrameLayout.LayoutParams.WRAP_CONTENT,
-            FrameLayout.LayoutParams.WRAP_CONTENT,
-            Gravity.CENTER_VERTICAL,
-        )
-        setText(R.string.tools_split_range)
-        setTextColor(getColor(R.color.text_secondary))
-        textSize = 14f
-        setPadding(dp(8), 0, 0, 0)
-        setOnClickListener { openRangeDialog() }
     }
 
     private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()

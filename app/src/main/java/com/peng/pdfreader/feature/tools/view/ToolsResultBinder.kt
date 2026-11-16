@@ -66,7 +66,17 @@ object ToolsResultBinder {
     }
 
     /** Wires every button of the result page. */
-    fun bindActions(binding: ToolsResultBodyBinding, actions: ToolsResultActions) {
+    fun bindActions(
+        context: Context,
+        binding: ToolsResultBodyBinding,
+        actions: ToolsResultActions,
+    ) {
+        // the two feedback buttons of the design are pills with a radius of 20
+        binding.btnNotReally.background =
+            ToolShapes.roundRect(context, SURFACE_NEUTRAL, 20f)
+        binding.btnGood.background =
+            ToolShapes.gradientPill(context, R.drawable.gradient_red, 20f)
+
         binding.cellOpenWith.setOnClickListener { actions.onOpenWith() }
         binding.cellCompress.setOnClickListener { actions.onCompress() }
         binding.cellPrint.setOnClickListener { actions.onPrint() }
@@ -88,4 +98,7 @@ object ToolsResultBinder {
 
     /** Colour of the preview placeholder of the design. */
     private const val PREVIEW_TILE = 0xFFFFCECE.toInt()
+
+    /** Colour of the "not really" button of the design. */
+    private const val SURFACE_NEUTRAL = 0xFFC4C4C4.toInt()
 }

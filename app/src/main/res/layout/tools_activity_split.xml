@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Split flow (design "Split PDF").
+  Split flow (designs "Split PDF", "Split PDF2", "Split PDF-rename").
 
   The blue banner sits right below the app bar, the page grid fills the rest
   of the screen and the primary action stays at the bottom.
+
+  Geometry of the design (360x760):
+  - banner 336x30 at (12, 92), radius 8, #6d99f9
+  - page tiles 104x124 at x = 12 / 128 / 244, rows at y = 134 / 270
+  - primary action 312x48 at (24, 680), radius 16
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -29,31 +34,28 @@
             android:orientation="vertical"
             android:visibility="gone">
 
+            <!-- the info banner of the design, its content is centred -->
             <LinearLayout
                 android:id="@+id/banner"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:layout_marginStart="12dp"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="3dp"
                 android:layout_marginEnd="12dp"
                 android:gravity="center"
                 android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/bannerDot"
+                <ImageView
+                    android:id="@+id/bannerIcon"
                     android:layout_width="14dp"
                     android:layout_height="14dp"
-                    android:fontFamily="sans-serif-black"
-                    android:gravity="center"
-                    android:text="i"
-                    android:textColor="@color/status_info_blue6"
-                    android:textSize="10sp" />
+                    android:contentDescription="@string/tools_split_reorder" />
 
                 <TextView
                     android:id="@+id/bannerText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="7dp"
+                    android:layout_marginStart="8dp"
                     android:text="@string/select_page_hint"
                     android:textColor="@color/white"
                     android:textSize="12sp" />
@@ -67,9 +69,7 @@
                 android:layout_weight="1"
                 android:clipToPadding="false"
                 android:overScrollMode="never"
-                android:paddingStart="12dp"
                 android:paddingTop="12dp"
-                android:paddingEnd="12dp"
                 android:scrollbars="none" />
 
         </LinearLayout>

@@ -1,14 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  Copy of the settings / language / feedback / onboarding feature.
-
-  Every key is prefixed with the feature it belongs to so it can never
-  collide with the base string table; base keys that already carry the same
-  wording are reused instead of being duplicated here.
--->
 <resources>
-
-    <!-- ==================== settings ==================== -->
     <string name="settings_share_app">Share app</string>
     <string name="settings_share_message">Here is a handy PDF tool for you: %1$s</string>
     <string name="settings_follow_system">Follow system</string>
@@ -18,57 +9,41 @@
     <string name="settings_action_more">More</string>
     <string name="settings_close">Close</string>
     <string name="settings_screen_missing">This screen is not available right now</string>
-
-    <!-- ==================== language ==================== -->
-    <!-- Endonyms: they are written the way the language itself writes it. -->
-    <string name="language_en" translatable="false">English</string>
-    <string name="language_fr" translatable="false">Français</string>
-    <string name="language_ms" translatable="false">Bahasa Melayu</string>
-    <string name="language_es" translatable="false">Español</string>
-    <string name="language_pt" translatable="false">Português</string>
-    <string name="language_de" translatable="false">Deutsch</string>
-    <string name="language_ja" translatable="false">日本語</string>
-    <string name="language_ko" translatable="false">한국인</string>
-    <string name="language_ru" translatable="false">Русский</string>
-    <string name="language_ar" translatable="false">اللغة العربية</string>
-    <string name="language_zh_cn" translatable="false">简体中文</string>
-    <string name="language_zh_tw" translatable="false">繁體中文</string>
-
-    <!-- ==================== feedback ==================== -->
+    <string name="language_en">English</string>
+    <string name="language_fr">Français</string>
+    <string name="language_ms">Bahasa Melayu</string>
+    <string name="language_es">Español</string>
+    <string name="language_pt">Português</string>
+    <string name="language_de">Deutsch</string>
+    <string name="language_ja">日本語</string>
+    <string name="language_ko">한국인</string>
+    <string name="language_ru">Русский</string>
+    <string name="language_ar">اللغة العربية</string>
+    <string name="language_zh_cn">简体中文</string>
+    <string name="language_zh_tw">繁體中文</string>
     <string name="feedback_heading">What problems did you run into?</string>
     <string name="feedback_input_hint">Type here…</string>
     <string name="feedback_mail_subject">Let\'s PDF feedback</string>
     <string name="feedback_mail_opened">Mail app opened</string>
     <string name="feedback_no_mail_app">No mail app found, install one and try again</string>
-
-    <!-- ==================== rating ==================== -->
     <string name="rating_question">Do you like Let\'s PDF?</string>
     <string name="rating_hint">Give us a rating!</string>
+    <string name="rating_top_rating">Give us five stars</string>
     <string name="rating_neutral">It\'s OK</string>
     <string name="rating_later">Maybe later</string>
     <string name="rating_store_missing">No app store found</string>
-
-    <!-- ==================== onboarding ==================== -->
     <string name="onboarding_skip">Skip</string>
     <string name="onboarding_start">Get started</string>
-
-    <!-- ==================== permission ==================== -->
     <string name="permission_allow_all_files">Allow access to all files</string>
-
-    <!-- ==================== default reader sheet ==================== -->
     <string name="set_default_title">Set as default PDF reader</string>
     <string name="set_default_subtitle">Choose “Let\'s PDF: View &amp; Sign”, then tap “Always”</string>
     <string name="set_default_mock_once">Just once</string>
     <string name="set_default_mock_always">Always</string>
-
-    <!-- ==================== quick entry popup ==================== -->
     <string name="quick_entry_scan">Scan PDF</string>
     <string name="quick_entry_merge">Merge PDF</string>
     <string name="quick_entry_print">Print PDF</string>
-
-    <!-- ==================== notices ==================== -->
-    <!-- Placeholder copy: the final legal text has to be supplied by the app owner. -->
+    <string name="quick_entry_header_alert">Alert</string>
+    <string name="quick_entry_header_edit">Edit</string>
     <string name="notice_privacy_body">We take your privacy seriously. All files in this app stay in the on-device sandbox; nothing is uploaded to any server and no personal data is collected. The final privacy policy text will be added once it has been confirmed by legal.</string>
     <string name="notice_terms_body">By using this app you agree to the terms of use below. The final terms of service text will be added once it has been confirmed by legal.</string>
-
 </resources>

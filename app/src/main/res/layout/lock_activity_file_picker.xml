@@ -8,7 +8,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/surface_subtle"
+    android:background="@color/surface_muted"
     android:orientation="vertical">
 
     <com.peng.pdfreader.appcore.widget.PageTitleBar
@@ -36,7 +36,8 @@
             android:id="@+id/emptyState"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
+            android:layout_gravity="top|center_horizontal"
+            android:layout_marginTop="138dp"
             android:visibility="gone" />
 
         <include

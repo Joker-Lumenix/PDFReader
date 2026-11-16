@@ -1,9 +1,10 @@
-package com.peng.pdfreader.appcore.widget
+﻿package com.peng.pdfreader.appcore.widget
 
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.peng.pdfreader.appcore.R
@@ -86,6 +87,14 @@ class FileListItemView @JvmOverloads constructor(
         state.thumbnail?.let { thumbnail.setImageDrawable(it) }
 
         checkbox.visibility = if (state.showCheckbox) VISIBLE else GONE
+        // The design puts the selection mark on the right of the row in the
+        // multi select mode, it sits on the left otherwise. The checkbox lives
+        // in the inner row, so the move happens there.
+        if (state.showCheckbox && state.checkboxAtEnd) {
+            moveCheckboxToEnd()
+        } else if (!state.checkboxAtEnd) {
+            moveCheckboxToStart()
+        }
         isChecked = state.checked
 
         more.visibility = if (state.showMore) VISIBLE else GONE
@@ -95,6 +104,29 @@ class FileListItemView @JvmOverloads constructor(
 
         inlineAction.visibility = if (state.inlineActionText.isNullOrEmpty()) GONE else VISIBLE
         state.inlineActionText?.let { inlineAction.text = it }
+    }
+
+    /** Moves the selection mark to the end of the row, in front of the "more" button. */
+    private fun moveCheckboxToEnd() {
+        val row = innerRow()
+        val target = row.indexOfChild(more)
+        if (target < 0 || row.indexOfChild(checkbox) == target) return
+        row.removeView(checkbox)
+        row.addView(checkbox, target)
+    }
+
+    /** Moves the selection mark back to the start of the row. */
+    private fun moveCheckboxToStart() {
+        val row = innerRow()
+        if (row.indexOfChild(checkbox) == 0) return
+        row.removeView(checkbox)
+        row.addView(checkbox, 0)
+    }
+
+    /** The row the layout inflated into this view. */
+    private fun innerRow(): ViewGroup {
+        val child = getChildAt(0) as? ViewGroup ?: return this
+        return child
     }
 }
 
@@ -110,9 +142,10 @@ class FileListItemView @JvmOverloads constructor(
      * @param showMore show the "more" affordance
      * @param showCheckbox multi select mode
      * @param checked checkbox state
-     * @param badge small coloured badge next to the title (advertising rows)
-     * @param inlineAction inline pill button rendered next to the title
-     */
+ * @param badge small coloured badge next to the title (advertising rows)
+ * @param inlineAction inline pill button rendered next to the title
+ * @param checkboxAtEnd whether the selection mark sits on the right of the row
+ */
 data class FileItemUiState(
     val name: String,
     val meta: String? = null,
@@ -126,6 +159,7 @@ data class FileItemUiState(
     val checked: Boolean = false,
     val badge: String? = null,
     val inlineActionText: String? = null,
+    val checkboxAtEnd: Boolean = false,
 )
 
 /** Height of a document row, measured from the design. */

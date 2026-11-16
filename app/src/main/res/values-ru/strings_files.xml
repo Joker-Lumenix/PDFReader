@@ -8,12 +8,26 @@
 -->
 <resources>
 
-    <!-- filter / sort sheets -->
+    <!-- scope tabs of the file list -->
+    <string name="files_tab_all">Все</string>
+    <string name="files_tab_recent">Недавние</string>
+    <string name="files_tab_favorites">Избранное</string>
+
+    <!-- search -->
+    <string name="files_search_hint">Поиск по имени файла</string>
+
+    <!-- sort sheet -->
     <string name="files_sort_title">Сортировка</string>
-    <string name="files_filter_title">Тип файла</string>
     <string name="files_sort_section_time">Недавние изменения</string>
     <string name="files_sort_section_name">Имя</string>
     <string name="files_sort_section_size">Размер файла</string>
+    <string name="files_sort_new_to_old">Сначала новые</string>
+    <string name="files_sort_old_to_new">Сначала старые</string>
+    <string name="files_sort_a_to_z">От A до Z</string>
+    <string name="files_sort_z_to_a">От Z до A</string>
+    <string name="files_sort_large_to_small">Сначала большие</string>
+    <string name="files_sort_small_to_large">Сначала маленькие</string>
+    <string name="files_apply">Применить</string>
 
     <!-- file action sheet -->
     <string name="files_open_with">Открыть другим приложением</string>
@@ -21,9 +35,19 @@
     <string name="files_print">Печать</string>
     <string name="files_feature_unavailable">Эта функция в разработке</string>
 
+    <!-- multi select action bar -->
+    <string name="files_action_edit">Изменить</string>
+    <string name="files_action_merge">Объединить</string>
+
     <!-- dialogs -->
-    <string name="files_rename_hint">Введите новое имя файла</string>
     <string name="files_delete_message">Удалить этот файл? Отменить будет нельзя.</string>
     <string name="files_save_message">Сохранить изменения в этом файле? Отменить будет нельзя.</string>
+
+    <!-- empty states -->
+    <string name="files_empty_title">Пока нет файлов</string>
+    <string name="files_empty_hint">Быстрый доступ к часто используемым файлам</string>
+    <string name="files_search_empty_title">Подходящие файлы не найдены</string>
+    <string name="files_search_empty_hint">Попробуйте другое ключевое слово</string>
+    <string name="files_selected_count">Выбрано: %1$d</string>
 
 </resources>

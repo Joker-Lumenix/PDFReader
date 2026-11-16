@@ -2,7 +2,6 @@ package com.peng.pdfreader.feature.settings.permission
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.provider.Settings
@@ -18,15 +17,21 @@ import com.peng.pdfreader.databinding.SettingsSetDefaultSheetBinding
 /**
  * Explains how to make the app the default reader of PDF files and opens the
  * system screen where the default app is picked.
+ *
+ * The illustration of the design is a picture, so the sheet only carries the
+ * title, the subtitle and the button.
  */
 class SetDefaultReaderSheet : BaseBottomSheetDialog() {
 
     private var _binding: SettingsSetDefaultSheetBinding? = null
     private val binding get() = _binding!!
 
+    /** Raised once the sheet is gone, used by the start up flow to continue. */
+    var onDismissed: (() -> Unit)? = null
+
     override fun createContentView(inflater: LayoutInflater, container: ViewGroup?): View {
         _binding = SettingsSetDefaultSheetBinding.inflate(inflater, container, false)
-        applySurfaces()
+        applyIllustrationSurface()
         binding.btnOk.setOnClickListener {
             openDefaultAppSettings()
             dismiss()
@@ -34,17 +39,18 @@ class SetDefaultReaderSheet : BaseBottomSheetDialog() {
         return binding.root
     }
 
-    /** The illustration card is cream, the mocked system dialog is white. */
-    private fun applySurfaces() {
+    /** The illustration of the design sits on a peach card with a 16dp radius. */
+    private fun applyIllustrationSurface() {
         val density = resources.displayMetrics.density
-        binding.illustrationCard.background = GradientDrawable().apply {
+        binding.ivIllustration.background = GradientDrawable().apply {
             cornerRadius = 16f * density
             setColor(ContextCompat.getColor(requireContext(), R.color.accent_cream))
         }
-        binding.mockCard.background = GradientDrawable().apply {
-            cornerRadius = 14f * density
-            setColor(Color.WHITE)
-        }
+    }
+
+    override fun onDismiss(dialog: android.content.DialogInterface) {
+        super.onDismiss(dialog)
+        onDismissed?.invoke()
     }
 
     private fun openDefaultAppSettings() {

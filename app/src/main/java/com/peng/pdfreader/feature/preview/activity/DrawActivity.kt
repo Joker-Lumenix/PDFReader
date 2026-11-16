@@ -38,7 +38,7 @@ class DrawActivity : BaseActivity() {
         setContentView(binding.root)
 
         binding.ivBack.setOnClickListener { finish() }
-        binding.tvDone.setOnClickListener { confirm() }
+        binding.flDone.setOnClickListener { confirm() }
         binding.ivUndo.setOnClickListener {
             binding.canvas.undo()
             updateHistoryButtons()
@@ -56,11 +56,12 @@ class DrawActivity : BaseActivity() {
         binding.palette.colors = ColorPaletteView.DEFAULT_COLORS.take(PALETTE_COLOURS)
         binding.palette.swatchDiameter = dp(24f)
         binding.palette.itemSpacing = dp(20f)
+        binding.palette.ringColor = Color.WHITE
         binding.palette.selectedIndex = 0
         binding.palette.onColorSelected = { colour -> binding.canvas.strokeColor = colour }
 
         binding.canvas.strokeColor = binding.palette.selectedColor
-        binding.canvas.strokeWidth = dp(SIZE_PRESETS[0])
+        binding.canvas.strokeWidth = dp(STROKE_SIZES[0])
         binding.canvas.onStrokesChanged = { updateHistoryButtons() }
 
         buildSizePresets()
@@ -68,41 +69,38 @@ class DrawActivity : BaseActivity() {
         renderPage()
     }
 
+    /**
+     * Builds the three stroke sizes of the design.
+     *
+     * Every preset is a white ring with a white dot in the middle; the dot
+     * grows with the size of the stroke.
+     */
     private fun buildSizePresets() {
         binding.llSizes.removeAllViews()
-        SIZE_PRESETS.forEachIndexed { index, size ->
+        SIZE_DOTS.forEachIndexed { index, dot ->
             val frame = FrameLayout(this)
             val params = LinearLayout.LayoutParams(dp(24), dp(24))
-            if (index < SIZE_PRESETS.lastIndex) params.marginEnd = dp(30)
+            if (index < SIZE_DOTS.lastIndex) params.marginEnd = dp(30)
             frame.layoutParams = params
 
-            val dot = View(this)
-            dot.background = GradientDrawable().apply {
+            val ring = View(this)
+            ring.background = GradientDrawable().apply {
+                shape = GradientDrawable.OVAL
+                setColor(Color.TRANSPARENT)
+                setStroke(dp(1), Color.WHITE)
+            }
+            frame.addView(ring, FrameLayout.LayoutParams(dp(24), dp(24)))
+
+            val dotView = View(this)
+            dotView.background = GradientDrawable().apply {
                 shape = GradientDrawable.OVAL
                 setColor(Color.WHITE)
             }
-            val diameter = dp(size).toInt()
-            frame.addView(dot, FrameLayout.LayoutParams(diameter, diameter, Gravity.CENTER))
-            frame.setOnClickListener {
-                binding.canvas.strokeWidth = dp(size)
-                highlightSize(index)
-            }
-            binding.llSizes.addView(frame)
-        }
-        highlightSize(0)
-    }
+            val diameter = dp(dot).toInt()
+            frame.addView(dotView, FrameLayout.LayoutParams(diameter, diameter, Gravity.CENTER))
 
-    private fun highlightSize(selected: Int) {
-        for (index in 0 until binding.llSizes.childCount) {
-            val frame = binding.llSizes.getChildAt(index) as? FrameLayout ?: continue
-            frame.background = if (index == selected) {
-                GradientDrawable().apply {
-                    shape = GradientDrawable.OVAL
-                    setStroke(dp(1), Color.WHITE)
-                }
-            } else {
-                null
-            }
+            frame.setOnClickListener { binding.canvas.strokeWidth = dp(STROKE_SIZES[index]) }
+            binding.llSizes.addView(frame)
         }
     }
 
@@ -110,7 +108,9 @@ class DrawActivity : BaseActivity() {
         binding.ivUndo.setImageResource(
             if (binding.canvas.canUndo) R.mipmap.ic_undo_enable else R.mipmap.ic_undo_unable,
         )
-        binding.ivRedo.alpha = if (binding.canvas.canRedo) 1f else 0.4f
+        binding.ivRedo.setImageResource(
+            if (binding.canvas.canRedo) R.mipmap.ic_restore_enable else R.mipmap.ic_restore_unable,
+        )
     }
 
     private fun renderPage() {
@@ -136,7 +136,8 @@ class DrawActivity : BaseActivity() {
             File(cacheDir, "annotated").apply { mkdirs() },
             annotatedName(file.name),
         )
-        binding.tvDone.isEnabled = false
+        binding.flDone.isEnabled = false
+        binding.flDone.alpha = 0.5f
         lifecycleScope.launch {
             val result = withContext(Dispatchers.IO) {
                 if (overlay == null) {
@@ -183,7 +184,8 @@ class DrawActivity : BaseActivity() {
         /** The copy of the document that carries the annotation. */
         const val EXTRA_OUTPUT = "com.peng.pdfreader.extra.DRAW_OUTPUT"
 
-        private val SIZE_PRESETS = listOf(2f, 4f, 8f)
+        private val SIZE_DOTS = listOf(6f, 12f, 18f)
+        private val STROKE_SIZES = listOf(2f, 4f, 8f)
         private const val PALETTE_COLOURS = 7
         private const val TOOLBAR_BACKGROUND = 0xCC313131.toInt()
 

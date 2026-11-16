@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   The result page of the tool flows (designs "Merged Successfully!" and
-  "压缩结果页").
+  the compress result page).
 
   It is shared by the merge and the compress flow:
   - the hero carries the success title (merge) or the before / after sizes
@@ -9,9 +9,14 @@
   - the file card shows the produced document with its share / view actions
   - the "more" card offers the follow up actions
   - the feedback card asks the user how the tool behaved
+
+  Geometry of the design (360x760):
+  - hero 336x100 at (12, 93)
+  - file card 336x174 at (12, 193), only the bottom corners are rounded
+  - more card 336x204 at (12, 375)
+  - feedback card 336x118 at (12, 630)
 -->
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/resultScroll"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
@@ -30,7 +35,7 @@
             android:layout_width="match_parent"
             android:layout_height="100dp"
             android:layout_marginStart="12dp"
-            android:layout_marginTop="6dp"
+            android:layout_marginTop="4dp"
             android:layout_marginEnd="12dp">
 
             <ImageView
@@ -40,12 +45,14 @@
                 android:contentDescription="@string/tools_result_view"
                 android:src="@mipmap/bg_result" />
 
-            <!-- merge variant -->
+            <!-- merge variant, the title sits in the light band of the artwork -->
             <LinearLayout
                 android:id="@+id/heroSuccess"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                android:layout_gravity="top|end"
+                android:layout_marginTop="60dp"
+                android:layout_marginEnd="16dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:visibility="gone">
@@ -55,6 +62,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-black"
+                    android:includeFontPadding="false"
                     android:textColor="@color/status_success"
                     android:textSize="14sp" />
 
@@ -63,34 +71,40 @@
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:layout_marginStart="8dp"
-                    android:contentDescription="@string/merged_success" />
+                    android:contentDescription="@string/merged_success"
+                    android:src="@mipmap/ic_ok" />
 
             </LinearLayout>
 
-            <!-- compress variant -->
+            <!-- compress variant, the two size chips of the design -->
             <LinearLayout
                 android:id="@+id/heroStats"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical|end"
-                android:layout_marginEnd="14dp"
+                android:layout_gravity="top|end"
+                android:layout_marginTop="44dp"
+                android:layout_marginEnd="24dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:visibility="gone">
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:id="@+id/chipBefore"
+                    android:layout_width="70dp"
+                    android:layout_height="46dp"
+                    android:background="@color/surface_card"
                     android:gravity="center_horizontal"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp">
 
                     <TextView
                         android:id="@+id/tvSizeBefore"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-medium"
                         android:textColor="@color/status_warning"
-                        android:textSize="16sp" />
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/tvBeforePill"
@@ -107,24 +121,28 @@
                     android:id="@+id/ivArrow"
                     android:layout_width="16dp"
                     android:layout_height="16dp"
-                    android:layout_marginStart="12dp"
-                    android:layout_marginEnd="12dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
                     android:contentDescription="@string/before"
                     android:src="@mipmap/ic_size_arrow" />
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:id="@+id/chipAfter"
+                    android:layout_width="70dp"
+                    android:layout_height="46dp"
+                    android:background="@color/surface_card"
                     android:gravity="center_horizontal"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp">
 
                     <TextView
                         android:id="@+id/tvSizeAfter"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-medium"
                         android:textColor="@color/status_info_blue6"
-                        android:textSize="16sp" />
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/tvAfterPill"
@@ -175,26 +193,26 @@
             <TextView
                 android:id="@+id/tvFileName"
                 style="@style/TextAppearance.AppCore.ItemTitle"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|start"
                 android:layout_marginStart="86dp"
                 android:layout_marginTop="16dp"
-                android:layout_marginEnd="44dp"
-                android:ellipsize="middle"
+                android:layout_marginEnd="40dp"
+                android:ellipsize="end"
                 android:maxLines="2" />
 
             <TextView
                 android:id="@+id/tvFilePath"
                 style="@style/TextAppearance.AppCore.Meta"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|start"
                 android:layout_marginStart="86dp"
                 android:layout_marginTop="58dp"
                 android:layout_marginEnd="12dp"
                 android:ellipsize="middle"
-                android:maxLines="1" />
+                android:maxLines="2" />
 
             <FrameLayout
                 android:id="@+id/btnRename"
@@ -208,8 +226,8 @@
                 android:focusable="true">
 
                 <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
+                    android:layout_width="12dp"
+                    android:layout_height="14dp"
                     android:layout_gravity="center"
                     android:contentDescription="@string/rename_file"
                     android:src="@mipmap/ic_rename_black" />
@@ -228,6 +246,7 @@
                 android:focusable="true"
                 android:fontFamily="sans-serif-medium"
                 android:gravity="center"
+                android:text="@string/tools_result_share"
                 android:textColor="@color/text_on_tint"
                 android:textSize="12sp" />
 
@@ -243,6 +262,7 @@
                 android:focusable="true"
                 android:fontFamily="sans-serif-medium"
                 android:gravity="center"
+                android:text="@string/tools_result_view"
                 android:textColor="@color/text_on_tint"
                 android:textSize="12sp" />
 
@@ -264,9 +284,11 @@
             android:paddingEnd="20dp">
 
             <TextView
+                android:id="@+id/tvMoreTitle"
                 style="@style/TextAppearance.AppCore.SectionTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:includeFontPadding="false"
                 android:text="@string/tools_result_more" />
 
             <LinearLayout
@@ -283,19 +305,12 @@
                     android:gravity="center_horizontal"
                     android:orientation="vertical">
 
-                    <FrameLayout
+                    <ImageView
                         android:layout_width="32dp"
                         android:layout_height="32dp"
-                        android:background="@drawable/bg_icon_tile">
-
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:layout_gravity="center"
-                            android:contentDescription="@string/tools_result_open_with"
-                            android:src="@mipmap/ic_open_with" />
-
-                    </FrameLayout>
+                        android:background="@drawable/bg_icon_tile"
+                        android:contentDescription="@string/tools_result_open_with"
+                        android:src="@mipmap/ic_open_with" />
 
                     <TextView
                         style="@style/TextAppearance.AppCore.Meta"
@@ -303,7 +318,36 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:fontFamily="sans-serif-medium"
+                        android:includeFontPadding="false"
                         android:text="@string/tools_result_open_with"
+                        android:textColor="@color/text_secondary" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/cellCompress"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="32dp"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:background="@drawable/bg_icon_tile"
+                        android:contentDescription="@string/tools_result_compress"
+                        android:src="@mipmap/ic_compress" />
+
+                    <TextView
+                        style="@style/TextAppearance.AppCore.Meta"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:fontFamily="sans-serif-medium"
+                        android:includeFontPadding="false"
+                        android:text="@string/tools_result_compress"
                         android:textColor="@color/text_secondary" />
 
                 </LinearLayout>
@@ -312,23 +356,17 @@
                     android:id="@+id/cellPrint"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="32dp"
                     android:layout_weight="1"
                     android:gravity="center_horizontal"
                     android:orientation="vertical">
 
-                    <FrameLayout
+                    <ImageView
                         android:layout_width="32dp"
                         android:layout_height="32dp"
-                        android:background="@drawable/bg_icon_tile">
-
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:layout_gravity="center"
-                            android:contentDescription="@string/tools_result_print"
-                            android:src="@mipmap/ic_print" />
-
-                    </FrameLayout>
+                        android:background="@drawable/bg_icon_tile"
+                        android:contentDescription="@string/tools_result_print"
+                        android:src="@mipmap/ic_print" />
 
                     <TextView
                         style="@style/TextAppearance.AppCore.Meta"
@@ -336,40 +374,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:fontFamily="sans-serif-medium"
+                        android:includeFontPadding="false"
                         android:text="@string/tools_result_print"
-                        android:textColor="@color/text_secondary" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/cellDraw"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center_horizontal"
-                    android:orientation="vertical">
-
-                    <FrameLayout
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:background="@drawable/bg_icon_tile">
-
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:layout_gravity="center"
-                            android:contentDescription="@string/tools_result_draw"
-                            android:src="@mipmap/ic_draw_red" />
-
-                    </FrameLayout>
-
-                    <TextView
-                        style="@style/TextAppearance.AppCore.Meta"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:fontFamily="sans-serif-medium"
-                        android:text="@string/tools_result_draw"
                         android:textColor="@color/text_secondary" />
 
                 </LinearLayout>
@@ -383,39 +389,6 @@
                 android:orientation="horizontal">
 
                 <LinearLayout
-                    android:id="@+id/cellCompress"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center_horizontal"
-                    android:orientation="vertical">
-
-                    <FrameLayout
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:background="@drawable/bg_icon_tile">
-
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:layout_gravity="center"
-                            android:contentDescription="@string/tools_result_compress"
-                            android:src="@mipmap/ic_compress" />
-
-                    </FrameLayout>
-
-                    <TextView
-                        style="@style/TextAppearance.AppCore.Meta"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:fontFamily="sans-serif-medium"
-                        android:text="@string/tools_result_compress"
-                        android:textColor="@color/text_secondary" />
-
-                </LinearLayout>
-
-                <LinearLayout
                     android:id="@+id/cellSign"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -423,19 +396,12 @@
                     android:gravity="center_horizontal"
                     android:orientation="vertical">
 
-                    <FrameLayout
+                    <ImageView
                         android:layout_width="32dp"
                         android:layout_height="32dp"
-                        android:background="@drawable/bg_icon_tile">
-
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:layout_gravity="center"
-                            android:contentDescription="@string/tools_result_sign"
-                            android:src="@mipmap/ic_sign_red" />
-
-                    </FrameLayout>
+                        android:background="@drawable/bg_icon_tile"
+                        android:contentDescription="@string/tools_result_sign"
+                        android:src="@mipmap/ic_sign_red" />
 
                     <TextView
                         style="@style/TextAppearance.AppCore.Meta"
@@ -443,7 +409,36 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:fontFamily="sans-serif-medium"
+                        android:includeFontPadding="false"
                         android:text="@string/tools_result_sign"
+                        android:textColor="@color/text_secondary" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/cellDraw"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="32dp"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:background="@drawable/bg_icon_tile"
+                        android:contentDescription="@string/tools_result_draw"
+                        android:src="@mipmap/ic_draw_red" />
+
+                    <TextView
+                        style="@style/TextAppearance.AppCore.Meta"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:fontFamily="sans-serif-medium"
+                        android:includeFontPadding="false"
+                        android:text="@string/tools_result_draw"
                         android:textColor="@color/text_secondary" />
 
                 </LinearLayout>
@@ -452,23 +447,17 @@
                     android:id="@+id/cellLock"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="32dp"
                     android:layout_weight="1"
                     android:gravity="center_horizontal"
                     android:orientation="vertical">
 
-                    <FrameLayout
+                    <ImageView
                         android:layout_width="32dp"
                         android:layout_height="32dp"
-                        android:background="@drawable/bg_icon_tile">
-
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:layout_gravity="center"
-                            android:contentDescription="@string/tools_result_lock"
-                            android:src="@mipmap/ic_lock" />
-
-                    </FrameLayout>
+                        android:background="@drawable/bg_icon_tile"
+                        android:contentDescription="@string/tools_result_lock"
+                        android:src="@mipmap/ic_lock" />
 
                     <TextView
                         style="@style/TextAppearance.AppCore.Meta"
@@ -476,6 +465,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:fontFamily="sans-serif-medium"
+                        android:includeFontPadding="false"
                         android:text="@string/tools_result_lock"
                         android:textColor="@color/text_secondary" />
 
@@ -499,7 +489,7 @@
             <TextView
                 android:id="@+id/tvFeedback"
                 style="@style/TextAppearance.AppCore.ItemTitle"
-                android:layout_width="0dp"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|start"
                 android:layout_marginStart="32dp"
@@ -508,7 +498,7 @@
                 android:maxLines="2"
                 android:text="@string/tools_result_feedback" />
 
-            <TextView
+            <LinearLayout
                 android:id="@+id/btnNotReally"
                 android:layout_width="128dp"
                 android:layout_height="40dp"
@@ -518,13 +508,27 @@
                 android:background="@drawable/bg_btn_unable_r16"
                 android:clickable="true"
                 android:focusable="true"
-                android:fontFamily="sans-serif-medium"
                 android:gravity="center"
-                android:text="@string/tools_result_not_really"
-                android:textColor="@color/text_on_tint"
-                android:textSize="14sp" />
+                android:orientation="horizontal">
 
-            <TextView
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:contentDescription="@string/tools_result_not_really"
+                    android:src="@mipmap/emoji_cry" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/tools_result_not_really"
+                    android:textColor="@color/text_on_tint"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:id="@+id/btnGood"
                 android:layout_width="128dp"
                 android:layout_height="40dp"
@@ -534,11 +538,25 @@
                 android:background="@drawable/gradient_red"
                 android:clickable="true"
                 android:focusable="true"
-                android:fontFamily="sans-serif-medium"
                 android:gravity="center"
-                android:text="@string/tools_result_good"
-                android:textColor="@color/text_on_tint"
-                android:textSize="14sp" />
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:contentDescription="@string/tools_result_good"
+                    android:src="@mipmap/emoji_laugh" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="@string/tools_result_good"
+                    android:textColor="@color/text_on_tint"
+                    android:textSize="14sp" />
+
+            </LinearLayout>
 
             <ImageView
                 android:id="@+id/btnCloseFeedback"
@@ -546,7 +564,7 @@
                 android:layout_height="20dp"
                 android:layout_gravity="top|end"
                 android:layout_marginTop="4dp"
-                android:layout_marginEnd="12dp"
+                android:layout_marginEnd="4dp"
                 android:clickable="true"
                 android:contentDescription="@string/tools_result_close"
                 android:focusable="true"

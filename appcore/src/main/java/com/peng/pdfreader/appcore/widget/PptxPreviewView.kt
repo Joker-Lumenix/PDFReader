@@ -85,8 +85,15 @@ class PptxPreviewView @JvmOverloads constructor(
 
         var deck: PptxDeck? = null
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SlideHolder =
-            SlideHolder(PptxSlideView(parent.context))
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SlideHolder {
+            val view = PptxSlideView(parent.context)
+            // ViewPager2 only accepts pages that fill it completely.
+            view.layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT,
+            )
+            return SlideHolder(view)
+        }
 
         override fun onBindViewHolder(holder: SlideHolder, position: Int) {
             val current = deck ?: return

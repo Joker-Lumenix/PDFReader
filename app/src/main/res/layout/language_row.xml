@@ -1,32 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  One language row: 48dp tall, the endonym on the left and the radio button
-  on the right (18dp circle, 3dp from the trailing edge of the card).
+  One language row: 48dp tall plus the 12dp gap of the design, the endonym
+  20dp from the left edge of the card and the 18dp radio button at x=307, so
+  23dp from the right edge of the card.
+
+  The selected row of the design is a red gradient pill of 320x40dp that sits
+  8dp from the left and the right edge of the row and 4dp below its top edge.
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/rowLanguage"
     android:layout_width="match_parent"
     android:layout_height="48dp"
-    android:background="?attr/selectableItemBackground"
-    android:gravity="center_vertical"
-    android:orientation="horizontal"
-    android:paddingStart="20dp"
-    android:paddingEnd="23dp">
-
-    <TextView
-        android:id="@+id/tvLanguage"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:textColor="@color/text_secondary"
-        android:textSize="14sp"
-        tools:text="English" />
+    android:layout_marginBottom="12dp"
+    android:background="?attr/selectableItemBackground">
 
     <View
-        android:id="@+id/vRadio"
-        android:layout_width="18dp"
-        android:layout_height="18dp" />
+        android:id="@+id/vSelectedPill"
+        android:layout_width="320dp"
+        android:layout_height="40dp"
+        android:layout_gravity="center"
+        android:background="@drawable/gradient_red"
+        android:visibility="gone"
+        tools:visibility="visible" />
 
-</LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="20dp"
+        android:paddingEnd="23dp">
+
+        <TextView
+            android:id="@+id/tvLanguage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp"
+            tools:text="English" />
+
+        <View
+            android:id="@+id/vRadio"
+            android:layout_width="18dp"
+            android:layout_height="18dp" />
+
+    </LinearLayout>
+
+</FrameLayout>

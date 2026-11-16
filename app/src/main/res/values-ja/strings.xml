@@ -29,7 +29,7 @@
     <string name="clear_all">すべてクリア</string>
     <string name="clear_cache">Clear now</string>
     <string name="color_mode">Colour mode</string>
-    <string name="compress">PDF Compress</string>
+    <string name="compress">圧縮</string>
     <string name="confirm">確定</string>
     <string name="confirm_delete_message">選択したファイルを削除しますか？</string>
     <string name="confirm_delete_title">削除の確認</string>
@@ -79,7 +79,7 @@
     <string name="list_view">リスト表示</string>
     <string name="long_image">ロング画像</string>
     <string name="md5">MD5 checksum</string>
-    <string name="merge">PDF Merge</string>
+    <string name="merge">PDF を結合</string>
     <string name="merge_count">結合(%1$d)</string>
     <string name="merge_to_pdf">PDF に統合</string>
     <string name="merged_document">結合ドキュメント</string>
@@ -115,7 +115,7 @@
     <string name="permission_rationale">端末の文書を読み書きするには、Let\'s PDF にすべてのファイルへのアクセスを許可してください。</string>
     <string name="permission_required">権限が必要です</string>
     <string name="plain_text">プレーンテキ스트</string>
-    <string name="print">PDF Print</string>
+    <string name="print">印刷</string>
     <string name="print_now">Print now</string>
     <string name="privacy_note">すべてのファイルは端末のサンドボックスに保存され、アップロードされません</string>
     <string name="properties">Details</string>
@@ -160,7 +160,7 @@
     <string name="sort_modified">更新日時順</string>
     <string name="sort_name">名前順</string>
     <string name="sort_size">サイズ順</string>
-    <string name="split">PDF Split</string>
+    <string name="split">PDF を分割</string>
     <string name="split_document">ドキュメントを分割</string>
     <string name="start_page">Default start page</string>
     <string name="start_reading">Start reading</string>

@@ -17,7 +17,9 @@ import java.util.Locale
 object FileUi {
 
     private const val DATE_PATTERN = "MM-dd HH:mm"
-    private const val SEPARATOR = " · "
+
+    /** The separator between the date and the size of a meta line. */
+    const val SEPARATOR = " · "
 
     /** The secondary line of a file row. */
     fun meta(doc: Document): String = date(doc.modifiedAt) + SEPARATOR + size(doc.sizeBytes)

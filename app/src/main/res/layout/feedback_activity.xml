@@ -1,13 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Feedback page: heading and illustration on top of each other, a large
-  multi line input and the submit button.
+  Feedback page: the card with the heading and the illustration on top, the
+  large multi line input below them and the submit button.
+
+  Geometry of the design: card 336x649dp at 12dp from the screen edges, the
+  heading row 84dp tall (15dp below the card top), the heading 156dp wide at
+  x=40, the illustration 116x84dp at x=212, the input 296x466dp at x=32 and
+  the submit button 312x48dp floating over the lower edge of the card.
+
+  The card grows and shrinks with the window, so the input and the button
+  follow the keyboard up like in the "Feedback-enter" state of the design.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/surface_subtle"
+    android:background="@color/surface_muted"
     android:orientation="vertical">
 
     <com.peng.pdfreader.appcore.widget.PageTitleBar
@@ -15,75 +24,101 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginStart="@dimen/space_m"
-        android:layout_marginTop="@dimen/space_m"
-        android:layout_marginEnd="@dimen/space_m"
-        android:layout_weight="1"
-        android:background="@drawable/bg_card_r8"
-        android:orientation="vertical">
+        android:layout_weight="1">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:orientation="horizontal"
-            android:paddingStart="28dp"
-            android:paddingEnd="20dp">
-
-            <TextView
-                android:id="@+id/tvHeading"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:fontFamily="sans-serif-black"
-                android:textColor="@color/brand_primary"
-                android:textSize="20sp"
-                tools:text="What issues did you face?" />
-
-            <ImageView
-                android:id="@+id/ivIllustration"
-                android:layout_width="116dp"
-                android:layout_height="84dp"
-                android:contentDescription="@null"
-                android:scaleType="centerCrop"
-                android:src="@mipmap/bg_feedback" />
-        </LinearLayout>
-
-        <EditText
-            android:id="@+id/etFeedback"
-            android:layout_width="match_parent"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/cardFeedback"
+            android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:layout_weight="1"
-            android:background="@null"
-            android:gravity="top|start"
-            android:hint="@string/feedback_input_hint"
-            android:importantForAutofill="no"
-            android:inputType="textMultiLine|textCapSentences"
-            android:textColor="@color/text_secondary"
-            android:textColorHint="@color/text_placeholder_pink"
-            android:textSize="15sp" />
+            android:layout_marginStart="@dimen/space_m"
+            android:layout_marginTop="@dimen/space_m"
+            android:layout_marginEnd="@dimen/space_m"
+            android:background="@drawable/bg_card_r8"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHeight_max="649dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0">
 
-    </LinearLayout>
+            <LinearLayout
+                android:id="@+id/rowHeading"
+                android:layout_width="0dp"
+                android:layout_height="84dp"
+                android:layout_marginTop="15dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="28dp"
+                android:paddingEnd="@dimen/space_l"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btnSubmit"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="@dimen/space_m"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="@dimen/space_xxl"
-        android:background="@drawable/gradient_red"
-        android:backgroundTint="@null"
-        android:letterSpacing="0"
-        android:stateListAnimator="@null"
-        android:text="@string/submit"
-        android:textColor="@color/text_on_tint"
-        android:textSize="16sp" />
+                <TextView
+                    android:id="@+id/tvHeading"
+                    android:layout_width="156dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-black"
+                    android:textColor="@color/text_error_rose"
+                    android:textSize="20sp"
+                    tools:text="What issues did you face?" />
+
+                <ImageView
+                    android:id="@+id/ivIllustration"
+                    android:layout_width="116dp"
+                    android:layout_height="84dp"
+                    android:layout_marginStart="16dp"
+                    android:contentDescription="@null"
+                    android:scaleType="fitCenter"
+                    android:src="@mipmap/bg_feedback" />
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/etFeedback"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginStart="@dimen/space_l"
+                android:layout_marginEnd="@dimen/space_l"
+                android:layout_marginBottom="16dp"
+                android:background="@null"
+                android:gravity="top|start"
+                android:hint="@string/feedback_input_hint"
+                android:importantForAutofill="no"
+                android:inputType="textMultiLine|textCapSentences"
+                android:lineSpacingExtra="6.5dp"
+                android:padding="@dimen/space_l"
+                android:textColor="@color/text_error_pink"
+                android:textColorHint="@color/text_placeholder_pink"
+                android:textSize="15sp"
+                app:layout_constraintBottom_toTopOf="@id/btnSubmit"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHeight_max="466dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/rowHeading" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnSubmit"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="12dp"
+                android:layout_marginBottom="20dp"
+                android:background="@drawable/gradient_red"
+                android:backgroundTint="@null"
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="0"
+                android:stateListAnimator="@null"
+                android:text="@string/submit"
+                android:textColor="@color/text_on_tint"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </LinearLayout>

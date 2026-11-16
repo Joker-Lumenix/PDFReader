@@ -1,12 +1,14 @@
 package com.peng.pdfreader.feature.lock.sheet
 
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
-import androidx.core.widget.doAfterTextChanged
 import com.peng.pdfreader.R
 import com.peng.pdfreader.appcore.pdf.PdfVault
 import com.peng.pdfreader.appcore.widget.BaseBottomSheetDialog
@@ -15,17 +17,20 @@ import com.peng.pdfreader.databinding.LockSheetPasswordBinding
 /**
  * The password sheet of the lock and the unlock flow.
  *
- * The sheet owns the three states of the design: the neutral state, the error
- * state (wrong password) and the busy state while the operation runs. It only
- * reports the typed password, the work itself happens in the host page.
+ * The sheet owns the states of the design: the neutral state, the error state
+ * (wrong password) and the visible password state. It only reports the typed
+ * password, the work itself happens in the host page. The sheet stays open
+ * until the host confirms the operation, that way the error state of the
+ * design can be rendered inside the sheet.
  */
 class PasswordSheet : BaseBottomSheetDialog() {
 
     /** What the sheet is used for. */
-    enum class Mode { LOCK, UNLOCK }
+    enum class Mode { LOCK, UNLOCK, ENTER }
 
     private var binding: LockSheetPasswordBinding? = null
     private var pendingError: String? = null
+    private var passwordVisible = false
 
     /**
      * The message of the error state.
@@ -51,13 +56,11 @@ class PasswordSheet : BaseBottomSheetDialog() {
         binding = views
 
         applyTexts()
+        applyFieldBackground()
         applyNormalColors()
         pendingError?.let { showError(it) }
 
-        views.etPassword.doAfterTextChanged { text ->
-            views.ivClear.visibility = if (text.isNullOrEmpty()) View.INVISIBLE else View.VISIBLE
-        }
-        views.ivClear.setOnClickListener { views.etPassword.setText("") }
+        views.etPassword.transformationMethod = LockPasswordMask()
         views.ivToggle.setOnClickListener { toggleVisibility() }
         views.btnCancel.setOnClickListener { dismiss() }
         views.btnOk.setOnClickListener { submit() }
@@ -67,6 +70,10 @@ class PasswordSheet : BaseBottomSheetDialog() {
 
     override fun onStart() {
         super.onStart()
+        dialog?.window?.apply {
+            addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+            setDimAmount(SCRIM_ALPHA)
+        }
         binding?.etPassword?.requestFocus()
     }
 
@@ -84,9 +91,9 @@ class PasswordSheet : BaseBottomSheetDialog() {
     fun showError(message: String) {
         pendingError = message
         val views = binding ?: return
-        views.tvTitle.setTextColor(resources.getColor(R.color.brand_primary_light, null))
-        views.tvSubtitle.setTextColor(resources.getColor(R.color.text_accent_orange, null))
-        views.etPassword.setTextColor(resources.getColor(R.color.brand_primary_light, null))
+        views.tvTitle.setTextColor(color(R.color.brand_primary_light))
+        views.tvSubtitle.setTextColor(color(R.color.text_accent_orange))
+        views.etPassword.setTextColor(color(R.color.brand_primary_light))
         views.ivError.setImageDrawable(LockErrorIconDrawable())
         views.tvError.text = message
         views.errorRow.visibility = View.VISIBLE
@@ -98,7 +105,6 @@ class PasswordSheet : BaseBottomSheetDialog() {
         views.btnOk.isEnabled = !busy
         views.btnCancel.isEnabled = !busy
         views.btnOk.alpha = if (busy) 0.6f else 1f
-        views.btnOk.text = getString(if (busy) R.string.lock_working else R.string.ok)
     }
 
     // ------------------------------------------------------------------ internals
@@ -114,34 +120,54 @@ class PasswordSheet : BaseBottomSheetDialog() {
                 views.tvTitle.setText(R.string.lock_remove_password)
                 views.tvSubtitle.setText(R.string.lock_remove_password_hint)
             }
+            Mode.ENTER -> {
+                views.tvTitle.setText(R.string.lock_enter_password)
+                views.tvSubtitle.setText(R.string.lock_enter_password_hint)
+            }
+        }
+    }
+
+    /**
+     * The field of the design is #f4f4f4 with a 12dp radius, the shared drawable
+     * of :appcore rounds it with 16dp, so the sheet draws its own background.
+     */
+    private fun applyFieldBackground() {
+        val views = binding ?: return
+        views.etPassword.background = GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = dp(12).toFloat()
+            setColor(color(R.color.surface_disabled_alt))
         }
     }
 
     private fun applyNormalColors() {
         val views = binding ?: return
-        views.tvTitle.setTextColor(resources.getColor(R.color.text_secondary, null))
-        views.tvSubtitle.setTextColor(resources.getColor(R.color.text_placeholder, null))
-        views.etPassword.setTextColor(resources.getColor(R.color.text_secondary, null))
-        views.errorRow.visibility = View.GONE
-        views.ivClear.visibility = View.INVISIBLE
+        views.tvTitle.setTextColor(color(R.color.text_secondary))
+        views.tvSubtitle.setTextColor(color(R.color.text_placeholder))
+        views.etPassword.setTextColor(color(R.color.text_secondary))
+        views.errorRow.visibility = View.INVISIBLE
     }
 
+    /**
+     * Switches between the hidden and the visible password.
+     *
+     * The design shows the closed eye while the password is hidden and the
+     * open eye while it is shown.
+     */
     private fun toggleVisibility() {
         val views = binding ?: return
         val field = views.etPassword
-        // TYPE_MASK_VARIATION_VISIBLE_PASSWORD is hidden in the SDK, the
-        // public constant of the visible variation is used instead.
-        val visible = field.inputType and InputType.TYPE_MASK_VARIATION ==
-            InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-        field.inputType = if (visible) {
-            InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-        } else {
+        passwordVisible = !passwordVisible
+        field.inputType = if (passwordVisible) {
             InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+        } else {
+            InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
         }
-        views.ivToggle.setImageResource(
-            if (visible) R.mipmap.ic_eye_open else R.mipmap.ic_eye_close,
-        )
+        field.transformationMethod = if (passwordVisible) null else LockPasswordMask()
         field.setSelection(field.text?.length ?: 0)
+        views.ivToggle.setImageResource(
+            if (passwordVisible) R.mipmap.ic_eye_open else R.mipmap.ic_eye_close,
+        )
     }
 
     private fun submit() {
@@ -155,12 +181,16 @@ class PasswordSheet : BaseBottomSheetDialog() {
             showError(getString(R.string.lock_password_too_short))
             return
         }
+        setBusy(true)
         parentFragmentManager.setFragmentResult(
             RESULT_KEY,
             bundleOf(KEY_PASSWORD to password, KEY_MODE to mode.name),
         )
-        dismiss()
     }
+
+    private fun color(id: Int): Int = ContextCompat.getColor(requireContext(), id)
+
+    private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
 
     companion object {
         /** Tag used when the sheet is shown. */
@@ -176,6 +206,9 @@ class PasswordSheet : BaseBottomSheetDialog() {
         const val KEY_MODE = "mode"
 
         private const val ARG_MODE = "lock_mode"
+
+        /** The scrim of the design is rgba(0,0,0,0.75). */
+        private const val SCRIM_ALPHA = 0.75f
 
         /** Creates the sheet for the given [mode]. */
         fun newInstance(mode: Mode): PasswordSheet = PasswordSheet().apply {

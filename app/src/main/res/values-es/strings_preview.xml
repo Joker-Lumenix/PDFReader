@@ -1,18 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  Copy of the document preview and of the annotation editors.
-  The strings live in their own file so the shared table stays untouched.
--->
 <resources>
-
-    <!-- bottom toolbar of the reader -->
     <string name="preview_favorite">Favorito</string>
     <string name="preview_annotate">Anotar</string>
     <string name="preview_open_with">Abrir con</string>
     <string name="preview_share">Compartir</string>
     <string name="preview_more">Más</string>
-
-    <!-- reader -->
     <string name="preview_page_indicator">%1$d / %2$d</string>
     <string name="preview_outline">Índice</string>
     <string name="preview_add_bookmark">Añadir marcador de esta página</string>
@@ -22,8 +14,6 @@
     <string name="preview_mode_night">Nocturno</string>
     <string name="preview_mode_black">Negro</string>
     <string name="preview_bookmark_added">Marcador añadido</string>
-
-    <!-- annotation tools -->
     <string name="preview_tool_highlight">Resaltar</string>
     <string name="preview_tool_underline">Subrayar</string>
     <string name="preview_tool_strikethrough">Tachado</string>
@@ -33,21 +23,19 @@
     <string name="preview_select_area">Arrastra sobre la página para seleccionar una zona</string>
     <string name="preview_note_hint">Escribe la anotación</string>
     <string name="preview_note_save">Guardar anotación</string>
-
-    <!-- editors -->
     <string name="preview_color">Color</string>
+    <string name="preview_add_signature">Añadir</string>
     <string name="preview_save_to_document">Guardar en el documento</string>
     <string name="preview_signature_saved">Firma guardada</string>
+    <string name="preview_signature_failed">La página aún no está lista, inténtalo de nuevo</string>
     <string name="preview_draw_saved">Marcado guardado y copia anotada creada</string>
-
-    <!-- states -->
+    <string name="preview_print">Imprimir</string>
+    <string name="preview_feature_unavailable">Esta función no está disponible por ahora</string>
     <string name="preview_loading">Analizando el documento…</string>
     <string name="preview_load_failed">No se puede previsualizar este documento</string>
     <string name="preview_load_failed_hint">El archivo puede estar dañado o tener un formato aún no compatible</string>
     <string name="preview_retry">Reintentar</string>
     <string name="preview_rename_hint">Escribe un nuevo nombre de archivo</string>
-
-    <!-- content descriptions -->
     <string name="preview_cd_back">Atrás</string>
     <string name="preview_cd_more">Más acciones</string>
     <string name="preview_cd_rename">Renombrar</string>
@@ -57,10 +45,11 @@
     <string name="preview_cd_color">Elegir color</string>
     <string name="preview_cd_size">Elegir grosor</string>
     <string name="preview_cd_favorite">Favorito</string>
+    <string name="preview_cd_bookmark">Añadir marcador</string>
     <string name="preview_cd_share">Compartir</string>
     <string name="preview_cd_open_with">Abrir con</string>
     <string name="preview_cd_annotate">Anotar</string>
+    <string name="preview_cd_add_signature">Añadir firma al documento</string>
     <string name="preview_cd_page">Página %1$d</string>
     <string name="preview_cd_slide">Diapositiva %1$d</string>
-
 </resources>

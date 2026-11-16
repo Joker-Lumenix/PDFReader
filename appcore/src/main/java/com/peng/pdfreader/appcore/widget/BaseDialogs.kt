@@ -1,6 +1,6 @@
 package com.peng.pdfreader.appcore.widget
 
-import android.app.Dialog
+import android.content.DialogInterface
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -23,23 +23,33 @@ import com.peng.pdfreader.appcore.R
  * - the "tap outside to dismiss" and "back press to dismiss" switches
  *
  * Subclasses only provide their own layout and their own behaviour.
+ *
+ * @param dismissOnClickOutside whether tapping the scrim closes the sheet.
  */
-abstract class BaseBottomSheetDialog : BottomSheetDialogFragment() {
+abstract class BaseBottomSheetDialog(
+    dismissOnClickOutside: Boolean = true,
+) : BottomSheetDialogFragment() {
 
     /**
      * Whether tapping the scrim closes the sheet.
      *
-     * Subclasses may override it or pass it through the constructor.
+     * It is passed in through the constructor and kept in the fragment
+     * arguments, so it survives a recreation of the dialog.
      */
-    open val dismissOnClickOutside: Boolean get() = true
+    var dismissOnClickOutside: Boolean = dismissOnClickOutside
+        private set
 
     /** Whether the back button closes the sheet. */
-    open val dismissOnBackPress: Boolean get() = true
+    var dismissOnBackPress: Boolean = true
+        private set
 
-    /** Builds the sheet body. */
-    abstract fun createContentView(inflater: LayoutInflater, container: ViewGroup?): View
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.getBoolean(ARG_DISMISS_OUTSIDE)?.let { dismissOnClickOutside = it }
+        arguments?.getBoolean(ARG_DISMISS_ON_BACK)?.let { dismissOnBackPress = it }
+    }
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+    override fun onCreateDialog(savedInstanceState: Bundle?): android.app.Dialog {
         val dialog = BottomSheetDialog(requireContext(), theme)
         dialog.setCanceledOnTouchOutside(dismissOnClickOutside)
         isCancelable = dismissOnBackPress
@@ -64,6 +74,17 @@ abstract class BaseBottomSheetDialog : BottomSheetDialogFragment() {
             background = ColorDrawable(Color.TRANSPARENT)
         }
     }
+
+    /** Builds the sheet body. */
+    abstract fun createContentView(inflater: LayoutInflater, container: ViewGroup?): View
+
+    companion object {
+        /** Argument key of the "tap outside to dismiss" switch. */
+        const val ARG_DISMISS_OUTSIDE = "com.peng.pdfreader.appcore.DISMISS_OUTSIDE"
+
+        /** Argument key of the "back press to dismiss" switch. */
+        const val ARG_DISMISS_ON_BACK = "com.peng.pdfreader.appcore.DISMISS_ON_BACK"
+    }
 }
 
 /**
@@ -72,20 +93,32 @@ abstract class BaseBottomSheetDialog : BottomSheetDialogFragment() {
  * The base owns the card geometry (336dp wide, 16dp radius, #fffdfd surface),
  * the scrim and the fade + scale in / out animation. Subclasses provide their
  * own layout and their own interaction.
+ *
+ * @param dismissOnClickOutside whether tapping the scrim closes the dialog.
  */
-abstract class BaseAlertDialog : DialogFragment() {
+abstract class BaseAlertDialog(
+    dismissOnClickOutside: Boolean = true,
+) : DialogFragment() {
 
-    /** Whether tapping the scrim closes the dialog. */
-    open val dismissOnClickOutside: Boolean get() = true
+    /**
+     * Whether tapping the scrim closes the dialog.
+     *
+     * It is passed in through the constructor and kept in the fragment
+     * arguments, so it survives a recreation of the dialog.
+     */
+    var dismissOnClickOutside: Boolean = dismissOnClickOutside
+        private set
 
     /** Whether the back button closes the dialog. */
-    open val dismissOnBackPress: Boolean get() = true
-
-    /** Builds the dialog body. */
-    abstract fun createContentView(inflater: LayoutInflater, container: ViewGroup?): View
+    var dismissOnBackPress: Boolean = true
+        private set
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        arguments?.getBoolean(BaseBottomSheetDialog.ARG_DISMISS_OUTSIDE)
+            ?.let { dismissOnClickOutside = it }
+        arguments?.getBoolean(BaseBottomSheetDialog.ARG_DISMISS_ON_BACK)
+            ?.let { dismissOnBackPress = it }
         isCancelable = dismissOnBackPress
     }
 
@@ -101,12 +134,18 @@ abstract class BaseAlertDialog : DialogFragment() {
 
     override fun onStart() {
         super.onStart()
-        dialog?.window?.apply {
-            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            setLayout(screenWidth() - dp(24), ViewGroup.LayoutParams.WRAP_CONTENT)
-            setWindowAnimations(R.style.Animation_AppCore_Dialog)
+        dialog?.apply {
+            setCanceledOnTouchOutside(dismissOnClickOutside)
+            window?.apply {
+                setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+                setLayout(screenWidth() - dp(24), ViewGroup.LayoutParams.WRAP_CONTENT)
+                setWindowAnimations(R.style.Animation_AppCore_Dialog)
+            }
         }
     }
+
+    /** Builds the dialog body. */
+    abstract fun createContentView(inflater: LayoutInflater, container: ViewGroup?): View
 
     private fun screenWidth(): Int = resources.displayMetrics.widthPixels
 

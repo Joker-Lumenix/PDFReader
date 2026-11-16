@@ -29,7 +29,7 @@
     <string name="clear_all">مسح الكل</string>
     <string name="clear_cache">تنظيف الآن</string>
     <string name="color_mode">وضع الألوان</string>
-    <string name="compress">ضغط PDF</string>
+    <string name="compress">ضغط</string>
     <string name="confirm">تأكيد</string>
     <string name="confirm_delete_message">هل أنت متأكد من رغبتك في حذف الملفات المحددة؟</string>
     <string name="confirm_delete_title">تأكيد الحذف</string>
@@ -74,7 +74,7 @@
     <string name="just_once">مرة واحدة فقط</string>
     <string name="keep_screen_on">إبقاء الشاشة مضاءة</string>
     <string name="lan_transfer">نقل عبر الشبكة المحلية</string>
-    <string name="language">اللغات</string>
+    <string name="language">اللغة</string>
     <string name="language_selection">اختيار اللغة</string>
     <string name="list_view">عرض قائمة</string>
     <string name="long_image">صورة طويلة</string>
@@ -115,7 +115,7 @@
     <string name="permission_rationale">لقراءة المستندات وتحريرها على جهازك، يرجى السماح لـ Let\'s PDF بالوصول إلى جميع ملفاتك.</string>
     <string name="permission_required">التصريح مطلوب</string>
     <string name="plain_text">نص عادي</string>
-    <string name="print">طباعة PDF</string>
+    <string name="print">طباعة</string>
     <string name="print_now">اطبع الآن</string>
     <string name="privacy_note">تبقى جميع الملفات داخل البيئة المعزولة للجهاز، ولا يتم رفع أي منها</string>
     <string name="properties">التفاصيل</string>

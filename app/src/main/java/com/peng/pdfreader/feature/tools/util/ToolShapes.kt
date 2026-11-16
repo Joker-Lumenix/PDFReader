@@ -37,6 +37,27 @@ object ToolShapes {
     /** Colour of the "after" chip of the compress result. */
     const val SIZE_AFTER = 0xFF6D99F9.toInt()
 
+    /** Start colour of the brand gradient. */
+    const val BRAND_LIGHT = 0xFFFA4F78.toInt()
+
+    /** End colour of the brand gradient. */
+    const val BRAND_PRIMARY = 0xFFDA232F.toInt()
+
+    /** Colour behind a picture that has no own background. */
+    const val BACKDROP = 0xFFF2F2F2.toInt()
+
+    /** Colour of the camera tile of the design. */
+    const val CAMERA_TILE = 0xFFEC7878.toInt()
+
+    /** Colour of the handle of the progress track of the design. */
+    const val PROGRESS_KNOB = 0xFFFEC43C.toInt()
+
+    /** Colour of the surface of the bottom sheets of the design. */
+    const val SURFACE_SHEET = 0xFFFFFDFD.toInt()
+
+    /** Colour of the input field of the rename sheet of the design. */
+    const val INPUT_FIELD = 0xFFF4F4F4.toInt()
+
     /** A rounded rectangle of the given colour. */
     fun roundRect(context: Context, @ColorInt color: Int, radiusDp: Float): GradientDrawable =
         GradientDrawable().apply {
@@ -90,6 +111,17 @@ object ToolShapes {
 
     /** The white circle of the info banner. */
     fun infoDot(context: Context): GradientDrawable = roundRect(context, Color.WHITE, 7f)
+
+    /**
+     * The handle that rides on the progress track of the design.
+     *
+     * The design paints it as a yellow disc (#fec43c), so the handle is a
+     * filled circle instead of a bitmap.
+     */
+    fun progressKnob(context: Context): GradientDrawable = GradientDrawable().apply {
+        shape = GradientDrawable.OVAL
+        setColor(PROGRESS_KNOB)
+    }
 
     /** Converts dp into pixels. */
     fun dp(context: Context, value: Float): Float =

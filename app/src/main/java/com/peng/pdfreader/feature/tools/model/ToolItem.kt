@@ -44,9 +44,9 @@ object ToolCatalog {
         ToolItem(ToolAction.MERGE, R.string.merge, R.mipmap.ic_tools_merge_pdf),
         ToolItem(ToolAction.SPLIT, R.string.split, R.mipmap.ic_tools_split_pdf),
         ToolItem(ToolAction.SCAN, R.string.tools_scan_to_pdf, R.mipmap.ic_tools_scan),
-        ToolItem(ToolAction.LOCK, R.string.encrypt, R.mipmap.ic_tools_lock),
-        ToolItem(ToolAction.UNLOCK, R.string.decrypt, R.mipmap.ic_tools_unlock),
+        ToolItem(ToolAction.LOCK, R.string.tools_label_lock, R.mipmap.ic_tools_lock),
+        ToolItem(ToolAction.UNLOCK, R.string.tools_label_unlock, R.mipmap.ic_tools_unlock),
         ToolItem(ToolAction.PRINT, R.string.print, R.mipmap.ic_tools_print_pdf),
-        ToolItem(ToolAction.ZIP, R.string.tools_zip_file, R.mipmap.ic_tools_compress),
+        ToolItem(ToolAction.ZIP, R.string.tools_label_zip, R.mipmap.ic_tools_compress),
     )
 }

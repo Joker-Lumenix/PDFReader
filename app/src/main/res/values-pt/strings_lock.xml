@@ -12,31 +12,32 @@
 
     <!-- page titles -->
     <string name="lock_page_encrypt">Cifrar PDF</string>
-    <string name="lock_page_decrypt">Decifrar PDF</string>
+    <string name="lock_page_select">Selecionar ficheiro</string>
 
     <!-- password sheet -->
     <string name="lock_set_password">Definir palavra-passe</string>
     <string name="lock_set_password_hint">Será pedida uma palavra-passe para abrir este ficheiro</string>
     <string name="lock_remove_password">Remover palavra-passe</string>
     <string name="lock_remove_password_hint">O ficheiro deixará de estar protegido por palavra-passe</string>
+    <string name="lock_enter_password">Introduzir palavra-passe</string>
+    <string name="lock_enter_password_hint">É necessária uma palavra-passe para abrir este ficheiro</string>
     <string name="lock_password_hint">Introduza a palavra-passe</string>
     <string name="lock_password_too_short">A palavra-passe deve ter pelo menos 4 caracteres</string>
-    <string name="lock_clear_password">Limpar palavra-passe</string>
     <string name="lock_toggle_password">Mostrar palavra-passe</string>
 
     <!-- states -->
     <string name="lock_wrong_password">Palavra-passe incorreta</string>
     <string name="lock_not_encrypted">Este ficheiro não está cifrado</string>
     <string name="lock_operation_failed">Falhou a operação, tente novamente</string>
-    <string name="lock_working">A processar…</string>
-    <string name="lock_badge_encrypted">Cifrado</string>
 
     <!-- file list -->
-    <string name="lock_empty_hint">Ainda não há ficheiros PDF na sandbox</string>
     <string name="lock_import">Importar PDF</string>
+    <string name="lock_no_document">Selecione primeiro um ficheiro</string>
 
     <!-- result -->
     <string name="lock_result_path">Caminho: %1$s</string>
+    <string name="lock_result_locked">PDF cifrado</string>
+    <string name="lock_result_unlocked">PDF decifrado</string>
     <string name="lock_open_failed">Nenhuma app encontrada que abra este ficheiro</string>
 
 </resources>

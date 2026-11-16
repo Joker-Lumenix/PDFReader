@@ -1,18 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  Copy of the document preview and of the annotation editors.
-  The strings live in their own file so the shared table stays untouched.
--->
 <resources>
-
-    <!-- bottom toolbar of the reader -->
     <string name="preview_favorite">Избранное</string>
     <string name="preview_annotate">Аннотации</string>
     <string name="preview_open_with">Открыть с помощью</string>
     <string name="preview_share">Поделиться</string>
     <string name="preview_more">Ещё</string>
-
-    <!-- reader -->
     <string name="preview_page_indicator">%1$d / %2$d</string>
     <string name="preview_outline">Оглавление</string>
     <string name="preview_add_bookmark">Добавить закладку на эту страницу</string>
@@ -22,8 +14,6 @@
     <string name="preview_mode_night">Ночной</string>
     <string name="preview_mode_black">Чёрный</string>
     <string name="preview_bookmark_added">Закладка добавлена</string>
-
-    <!-- annotation tools -->
     <string name="preview_tool_highlight">Выделение</string>
     <string name="preview_tool_underline">Подчёркивание</string>
     <string name="preview_tool_strikethrough">Зачёркивание</string>
@@ -33,21 +23,19 @@
     <string name="preview_select_area">Проведите по странице, чтобы выделить область</string>
     <string name="preview_note_hint">Введите текст аннотации</string>
     <string name="preview_note_save">Сохранить аннотацию</string>
-
-    <!-- editors -->
     <string name="preview_color">Цвет</string>
+    <string name="preview_add_signature">Добавить</string>
     <string name="preview_save_to_document">Сохранить в документ</string>
     <string name="preview_signature_saved">Подпись сохранена</string>
+    <string name="preview_signature_failed">Страница ещё не готова, попробуйте снова</string>
     <string name="preview_draw_saved">Разметка сохранена, создана копия с аннотациями</string>
-
-    <!-- states -->
+    <string name="preview_print">Печать</string>
+    <string name="preview_feature_unavailable">Эта функция пока недоступна</string>
     <string name="preview_loading">Разбор документа…</string>
     <string name="preview_load_failed">Не удалось открыть этот документ</string>
     <string name="preview_load_failed_hint">Файл повреждён или его формат пока не поддерживается</string>
     <string name="preview_retry">Повторить</string>
     <string name="preview_rename_hint">Введите новое имя файла</string>
-
-    <!-- content descriptions -->
     <string name="preview_cd_back">Назад</string>
     <string name="preview_cd_more">Другие действия</string>
     <string name="preview_cd_rename">Переименовать</string>
@@ -57,10 +45,11 @@
     <string name="preview_cd_color">Выбор цвета</string>
     <string name="preview_cd_size">Выбор толщины</string>
     <string name="preview_cd_favorite">Избранное</string>
+    <string name="preview_cd_bookmark">Добавить закладку</string>
     <string name="preview_cd_share">Поделиться</string>
     <string name="preview_cd_open_with">Открыть с помощью</string>
     <string name="preview_cd_annotate">Аннотации</string>
+    <string name="preview_cd_add_signature">Добавить подпись в документ</string>
     <string name="preview_cd_page">Страница %1$d</string>
     <string name="preview_cd_slide">Слайд %1$d</string>
-
 </resources>

@@ -29,7 +29,7 @@
     <string name="clear_all">Alles löschen</string>
     <string name="clear_cache">Clear now</string>
     <string name="color_mode">Colour mode</string>
-    <string name="compress">PDF Compress</string>
+    <string name="compress">Komprimieren</string>
     <string name="confirm">Bestätigen</string>
     <string name="confirm_delete_message">Möchten Sie die ausgewählten Dateien wirklich löschen?</string>
     <string name="confirm_delete_title">Löschen bestätigen</string>
@@ -74,12 +74,12 @@
     <string name="just_once">Nur einmal</string>
     <string name="keep_screen_on">Keep screen on</string>
     <string name="lan_transfer">LAN-Übertragung</string>
-    <string name="language">Sprachen</string>
+    <string name="language">Sprache</string>
     <string name="language_selection">Sprachauswahl</string>
     <string name="list_view">Listenansicht</string>
     <string name="long_image">Langes Bild</string>
     <string name="md5">MD5 checksum</string>
-    <string name="merge">PDF Merge</string>
+    <string name="merge">PDFs zusammenführen</string>
     <string name="merge_count">Zusammenführen(%1$d)</string>
     <string name="merge_to_pdf">Als PDF zusammenführen</string>
     <string name="merged_document">Zusammengeführtes Dokument</string>
@@ -115,7 +115,7 @@
     <string name="permission_rationale">Um Dokumente auf Ihrem Gerät zu lesen und zu bearbeiten, erlauben Sie Let\'s PDF den Zugriff auf alle Ihre Dateien.</string>
     <string name="permission_required">Berechtigung erforderlich</string>
     <string name="plain_text">Klartext</string>
-    <string name="print">PDF Print</string>
+    <string name="print">Drucken</string>
     <string name="print_now">Print now</string>
     <string name="privacy_note">Alle Dateien bleiben in der Geräte-Sandbox, nichts wird hochgeladen</string>
     <string name="properties">Details</string>
@@ -160,7 +160,7 @@
     <string name="sort_modified">Nach Änderungsdatum</string>
     <string name="sort_name">Nach Name</string>
     <string name="sort_size">Nach Größe</string>
-    <string name="split">PDF Split</string>
+    <string name="split">PDF teilen</string>
     <string name="split_document">Dokument teilen</string>
     <string name="start_page">Default start page</string>
     <string name="start_reading">Start reading</string>

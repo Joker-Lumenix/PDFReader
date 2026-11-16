@@ -29,7 +29,7 @@
     <string name="clear_all">Очистить всё</string>
     <string name="clear_cache">Clear now</string>
     <string name="color_mode">Colour mode</string>
-    <string name="compress">PDF Compress</string>
+    <string name="compress">Сжать</string>
     <string name="confirm">Подтвердить</string>
     <string name="confirm_delete_message">Удалить выбранные файлы?</string>
     <string name="confirm_delete_title">Подтвердить удаление</string>
@@ -74,12 +74,12 @@
     <string name="just_once">Только один раз</string>
     <string name="keep_screen_on">Keep screen on</string>
     <string name="lan_transfer">Передача по LAN</string>
-    <string name="language">Языки</string>
+    <string name="language">Язык</string>
     <string name="language_selection">Выбор языка</string>
     <string name="list_view">Список</string>
     <string name="long_image">Длинное изображение</string>
     <string name="md5">MD5 checksum</string>
-    <string name="merge">PDF Merge</string>
+    <string name="merge">Объединить PDF</string>
     <string name="merge_count">Объединить(%1$d)</string>
     <string name="merge_to_pdf">Объединить в PDF</string>
     <string name="merged_document">Объединённый документ</string>
@@ -115,7 +115,7 @@
     <string name="permission_rationale">Чтобы читать и редактировать документы на устройстве, разрешите Let\'s PDF доступ ко всем файлам.</string>
     <string name="permission_required">Требуется разрешение</string>
     <string name="plain_text">Обычный текст</string>
-    <string name="print">PDF Print</string>
+    <string name="print">Печать</string>
     <string name="print_now">Print now</string>
     <string name="privacy_note">Все файлы остаются в песочнице устройства, ничего не отправляется</string>
     <string name="properties">Details</string>
@@ -160,7 +160,7 @@
     <string name="sort_modified">По дате изменения</string>
     <string name="sort_name">По имени</string>
     <string name="sort_size">По размеру</string>
-    <string name="split">PDF Split</string>
+    <string name="split">Разделить PDF</string>
     <string name="split_document">Разделить документ</string>
     <string name="start_page">Default start page</string>
     <string name="start_reading">Start reading</string>

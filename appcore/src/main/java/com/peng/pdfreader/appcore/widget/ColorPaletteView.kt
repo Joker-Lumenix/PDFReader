@@ -62,6 +62,20 @@ class ColorPaletteView @JvmOverloads constructor(
             invalidate()
         }
 
+    /** Whether the swatches get a hair line around them. */
+    var showSwatchBorder: Boolean = false
+        set(value) {
+            field = value
+            invalidate()
+        }
+
+    /** Colour of the ring around the selected swatch. */
+    var ringColor: Int = Color.parseColor("#333333")
+        set(value) {
+            field = value
+            invalidate()
+        }
+
     /** The swatches, in the order they are painted. */
     var colors: List<Int> = DEFAULT_COLORS
         set(value) {
@@ -110,16 +124,21 @@ class ColorPaletteView @JvmOverloads constructor(
         val radius = swatchDiameter / 2f
         val centreY = height / 2f
         val startX = paddingLeft + radius
+        val step = swatchDiameter + spacing()
         colors.forEachIndexed { index, colour ->
-            val centreX = startX + index * (swatchDiameter + itemSpacing)
+            val centreX = startX + index * step
             if (showSelectionRing && index == selectedIndex) {
+                ringPaint.color = ringColor
                 ringPaint.strokeWidth = ringWidth
-                canvas.drawCircle(centreX, centreY, radius + dp(2f), ringPaint)
+                // The ring of the design is 24dp around a 20dp swatch.
+                canvas.drawCircle(centreX, centreY, radius + dp(2f) - ringWidth / 2f, ringPaint)
             }
             fillPaint.color = colour
             canvas.drawCircle(centreX, centreY, radius, fillPaint)
-            borderPaint.strokeWidth = dp(1f)
-            canvas.drawCircle(centreX, centreY, radius, borderPaint)
+            if (showSwatchBorder) {
+                borderPaint.strokeWidth = dp(1f)
+                canvas.drawCircle(centreX, centreY, radius, borderPaint)
+            }
         }
     }
 
@@ -147,12 +166,15 @@ class ColorPaletteView @JvmOverloads constructor(
         if (colors.isEmpty()) return -1
         val radius = swatchDiameter / 2f
         val startX = paddingLeft + radius
-        val step = swatchDiameter + itemSpacing
+        val step = swatchDiameter + spacing()
         val raw = Math.round((x - startX) / step).toInt()
         if (raw !in colors.indices) return -1
         val centre = startX + raw * step
         return if (Math.abs(x - centre) <= radius + itemSpacing / 2f) raw else -1
     }
+
+    /** The gap between two swatches. */
+    private fun spacing(): Float = itemSpacing
 
     private fun dp(value: Float): Float = value * density
 

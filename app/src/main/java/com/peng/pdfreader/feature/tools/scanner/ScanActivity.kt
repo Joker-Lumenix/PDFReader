@@ -14,6 +14,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.lifecycleScope
 import com.peng.pdfreader.R
+import com.peng.pdfreader.appcore.util.Logger
 import com.peng.pdfreader.base.BaseActivity
 import com.peng.pdfreader.data.model.DocType
 import com.peng.pdfreader.data.repository.DocumentRepository
@@ -26,10 +27,11 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 /**
- * Turns a photo of the camera into a PDF.
+ * Turns a scan into a PDF.
  *
- * The camera is the system one: no document scanner is bundled, the photo is
- * simply placed into a new document.
+ * The Google document scanner is used first, it returns a ready made PDF. When
+ * it is not installed the system camera takes the photo and the photo is
+ * turned into a document.
  */
 class ScanActivity : BaseActivity() {
 
@@ -37,6 +39,34 @@ class ScanActivity : BaseActivity() {
     private val engine get() = ToolEngines.current
 
     private var pendingUri: Uri? = null
+
+    /**
+     * The Google document scanner, it hands over a finished PDF.
+     */
+    private val googleScan = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+    ) { result ->
+        val uri = result.data?.data
+        if (result.resultCode != RESULT_OK || uri == null) {
+            finish()
+            return@registerForActivityResult
+        }
+        lifecycleScope.launch {
+            val document = withContext(Dispatchers.IO) {
+                repository.importFromUri(this@ScanActivity, uri)
+            }
+            if (document == null) {
+                Toast.makeText(this@ScanActivity, R.string.tools_scan_failed, Toast.LENGTH_SHORT)
+                    .show()
+                finish()
+            } else {
+                Toast.makeText(this@ScanActivity, R.string.tools_scan_done, Toast.LENGTH_SHORT)
+                    .show()
+                PreviewActivity.start(this@ScanActivity, document.id)
+                finish()
+            }
+        }
+    }
 
     /**
      * Full resolution capture, the photo is written into the media store and
@@ -92,6 +122,16 @@ class ScanActivity : BaseActivity() {
     }
 
     private fun launchCamera() {
+        // The Google document scanner is preferred, it delivers a finished PDF.
+        val google = Intent(ACTION_GOOGLE_SCAN)
+        if (google.resolveActivity(packageManager) != null) {
+            try {
+                googleScan.launch(google)
+                return
+            } catch (error: ActivityNotFoundException) {
+                Logger.w(TAG, "the google scanner could not be started")
+            }
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val uri = createMediaEntry()
             if (uri != null) {
@@ -183,5 +223,12 @@ class ScanActivity : BaseActivity() {
                 },
             )
         }
+    }
+
+    companion object {
+        private const val TAG = "ScanActivity"
+
+        /** The intent of the Google document scanner. */
+        private const val ACTION_GOOGLE_SCAN = "com.google.android.gms.apps.docs.action.SCAN"
     }
 }

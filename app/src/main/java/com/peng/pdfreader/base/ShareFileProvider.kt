@@ -36,12 +36,12 @@ class ShareFileProvider : ContentProvider() {
         val values = columns.map { column ->
             when (column) {
                 OpenableColumns.DISPLAY_NAME -> file.name
-                OpenableColumns.SIZE -> file.length()
+                OpenableColumns.SIZE -> file.length().toString()
                 else -> null
             }
-        }
+        }.toTypedArray()
         val cursor = android.database.MatrixCursor(columns)
-        cursor.addRow(values.toTypedArray())
+        cursor.addRow(values)
         return cursor
     }
 

@@ -8,11 +8,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.FragmentManager
 import com.peng.pdfreader.appcore.widget.BaseBottomSheetDialog
 import com.peng.pdfreader.databinding.ToolsDialogTextInputBinding
+import com.peng.pdfreader.feature.tools.util.ToolShapes
 
 /**
  * Bottom sheet with a single text field.
  *
- * It is used by the tools that need a name (rename) or a secret (lock and
+ * It is used by the tools that need a name (rename, save) or a secret (lock and
  * unlock). The confirmed text is delivered through the fragment result API.
  */
 class ToolTextInputDialog : BaseBottomSheetDialog() {
@@ -30,12 +31,22 @@ class ToolTextInputDialog : BaseBottomSheetDialog() {
         view.tvTitle.text = title
         view.etInput.setText(initial)
         view.etInput.setSelection(initial.length)
+        // the input of the design is #f4f4f4 with a radius of 12
+        view.etInput.background = ToolShapes.roundRect(
+            requireContext(),
+            ToolShapes.INPUT_FIELD,
+            12f,
+        )
         if (secret) {
             view.etInput.inputType =
                 InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
         }
 
-        view.btnCancel.setOnClickListener { dismiss() }
+        view.ivClear.setOnClickListener { view.etInput.setText("") }
+        view.btnCancel.setOnClickListener {
+            parentFragmentManager.setFragmentResult(REQUEST_KEY_CANCEL, Bundle())
+            dismiss()
+        }
         view.btnConfirm.setOnClickListener {
             val text = view.etInput.text.toString().trim()
             if (text.isEmpty()) return@setOnClickListener
@@ -55,6 +66,7 @@ class ToolTextInputDialog : BaseBottomSheetDialog() {
     companion object {
         private const val TAG = "ToolTextInput"
         private const val REQUEST_KEY = "tools.text.input"
+        private const val REQUEST_KEY_CANCEL = "tools.text.input.cancel"
         private const val RESULT_VALUE = "value"
         private const val ARG_TITLE = "title"
         private const val ARG_VALUE = "value"
@@ -62,12 +74,15 @@ class ToolTextInputDialog : BaseBottomSheetDialog() {
 
         /**
          * Shows the sheet and reports the confirmed text.
+         *
+         * @param onCancelled called when the user closes the sheet without a value
          */
         fun show(
             manager: FragmentManager,
             title: String,
             initial: String = "",
             secret: Boolean = false,
+            onCancelled: (() -> Unit)? = null,
             onConfirmed: (String) -> Unit,
         ) {
             val dialog = ToolTextInputDialog().apply {
@@ -80,6 +95,11 @@ class ToolTextInputDialog : BaseBottomSheetDialog() {
             manager.setFragmentResultListener(REQUEST_KEY, dialog) { _, bundle ->
                 val value = bundle.getString(RESULT_VALUE) ?: return@setFragmentResultListener
                 onConfirmed(value)
+            }
+            if (onCancelled != null) {
+                manager.setFragmentResultListener(REQUEST_KEY_CANCEL, dialog) { _, _ ->
+                    onCancelled()
+                }
             }
             dialog.show(manager, TAG)
         }

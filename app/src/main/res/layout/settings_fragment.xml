@@ -2,15 +2,16 @@
 <!--
   Settings tab: page title bar plus the settings card.
 
-  The card is 569dp tall, exactly like the design, so the version line sits
-  on the lower edge of the card with a large empty area in between.
+  The card is 336x569dp (12dp from both screen edges, 12dp below the title
+  bar) exactly like the design, so the version line sits on the lower edge of
+  the card with the large empty area in between.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/surface_subtle"
+    android:background="@color/surface_muted"
     android:orientation="vertical">
 
     <com.peng.pdfreader.appcore.widget.PageTitleBar
@@ -31,7 +32,7 @@
             android:paddingStart="@dimen/space_m"
             android:paddingTop="@dimen/space_m"
             android:paddingEnd="@dimen/space_m"
-            android:paddingBottom="@dimen/space_xl">
+            android:paddingBottom="@dimen/space_xxl">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/cardSettings"

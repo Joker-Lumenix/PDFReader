@@ -29,7 +29,7 @@
     <string name="clear_all">전체 삭제</string>
     <string name="clear_cache">Clear now</string>
     <string name="color_mode">Colour mode</string>
-    <string name="compress">PDF Compress</string>
+    <string name="compress">압축</string>
     <string name="confirm">확인</string>
     <string name="confirm_delete_message">선택한 파일을 삭제할까요?</string>
     <string name="confirm_delete_title">삭제 확인</string>
@@ -79,7 +79,7 @@
     <string name="list_view">목록 보기</string>
     <string name="long_image">긴 이미지</string>
     <string name="md5">MD5 checksum</string>
-    <string name="merge">PDF Merge</string>
+    <string name="merge">PDF 병합</string>
     <string name="merge_count">병합(%1$d)</string>
     <string name="merge_to_pdf">PDF로 병합</string>
     <string name="merged_document">병합된 문서</string>
@@ -115,7 +115,7 @@
     <string name="permission_rationale">기기에서 문서를 읽고 편집하려면 Let\'s PDF가 모든 파일에 접근하도록 허용하세요.</string>
     <string name="permission_required">권한 필요</string>
     <string name="plain_text">일반 텍스트</string>
-    <string name="print">PDF Print</string>
+    <string name="print">인쇄</string>
     <string name="print_now">Print now</string>
     <string name="privacy_note">모든 파일은 기기 샌드박스에 저장되며 업로드되지 않습니다</string>
     <string name="properties">Details</string>
@@ -160,7 +160,7 @@
     <string name="sort_modified">수정 시간순</string>
     <string name="sort_name">이름순</string>
     <string name="sort_size">크기순</string>
-    <string name="split">PDF Split</string>
+    <string name="split">PDF 분할</string>
     <string name="split_document">문서 분할</string>
     <string name="start_page">Default start page</string>
     <string name="start_reading">Start reading</string>

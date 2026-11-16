@@ -6,21 +6,19 @@ import android.graphics.Color
 import android.graphics.RectF
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
-import android.view.Gravity
+import android.text.format.Formatter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.peng.pdfreader.R
 import com.peng.pdfreader.appcore.pdf.PdfEngine
 import com.peng.pdfreader.appcore.pdf.PdfVault
-import com.peng.pdfreader.appcore.widget.InkStroke
 import com.peng.pdfreader.appcore.widget.PdfPageView
 import com.peng.pdfreader.appcore.widget.ReadingMode
 import com.peng.pdfreader.base.BaseBackHandler
@@ -43,10 +41,14 @@ import com.peng.pdfreader.feature.preview.dialog.NoteDialog
 import com.peng.pdfreader.feature.preview.dialog.OutlineSheet
 import com.peng.pdfreader.feature.preview.dialog.RenameDialog
 import com.peng.pdfreader.feature.preview.util.FileSharing
+import com.peng.pdfreader.feature.preview.util.PreviewTitleActions
+import com.peng.pdfreader.feature.tools.activity.CompressActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Locale
 import java.util.UUID
 
 /**
@@ -102,22 +104,33 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
         document = doc
 
         binding.titleBar.title = doc.name
+        // The viewer shows the name of the file with 15sp / medium.
+        binding.titleBar.setTitleTypography(TITLE_SIZE_SP, true)
         binding.titleBar.showBack = true
         binding.titleBar.onBackClick = {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
-        binding.titleBar.addAction(buildRenameAction())
-        binding.titleBar.addAction(buildMoreAction())
+        binding.titleBar.addAction(buildTitleActions())
 
         binding.ivFavorite.setImageResource(
             if (doc.isFavorite) R.mipmap.ic_star_select else R.mipmap.ic_star_unselect,
         )
-        binding.actionFavorite.setOnClickListener { toggleFavorite() }
-        binding.actionAnnotate.setOnClickListener { toggleAnnotationBar() }
-        binding.actionOpenWith.setOnClickListener { openWith() }
-        binding.actionShare.setOnClickListener { share() }
+        binding.ivFavorite.setOnClickListener { toggleFavorite() }
+        binding.tvFavorite.setOnClickListener { toggleFavorite() }
+        binding.ivAnnotate.setOnClickListener { toggleAnnotationBar() }
+        binding.ivOpenWith.setOnClickListener { openWith() }
+        binding.tvOpenWith.setOnClickListener { openWith() }
+        binding.ivShare.setOnClickListener { share() }
+        binding.tvShare.setOnClickListener { share() }
 
-        binding.annotationBar.llTools.visibility = View.GONE
+        // The confirmation bar of the design carries the signature over.
+        binding.addBar.background = GradientDrawable().apply {
+            setColor(ADD_BAR_BACKGROUND)
+        }
+        binding.ivAdd.setImageResource(R.mipmap.ic_sign)
+        binding.addBar.setOnClickListener { commitPlacedSignature() }
+
+        binding.annotationBar.root.visibility = View.GONE
         binding.annotationBar.toolHighlight.setOnClickListener { selectTool(AnnotationType.HIGHLIGHT) }
         binding.annotationBar.toolUnderline.setOnClickListener { selectTool(AnnotationType.UNDERLINE) }
         binding.annotationBar.toolStrikethrough.setOnClickListener {
@@ -152,8 +165,13 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
     }
 
     override fun handleBackPressed(): Boolean {
-        val tools = _binding?.annotationBar?.llTools ?: return false
-        if (tools.visibility == View.VISIBLE) {
+        val page = currentPageView()
+        if (page != null && page.hasPendingPlacement) {
+            page.cancelSignaturePlacement()
+            return true
+        }
+        val bar = _binding?.annotationBar?.root ?: return false
+        if (bar.visibility == View.VISIBLE) {
             closeAnnotationBar()
             return true
         }
@@ -290,37 +308,55 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
         }
     }
 
-    private fun buildRenameAction(): View {
-        val tile = FrameLayout(requireContext())
-        tile.background = GradientDrawable().apply {
-            setColor(requireContext().getColor(R.color.brand_primary_container))
-            cornerRadius = dp(6.4f)
-        }
-        val icon = ImageView(requireContext()).apply {
-            setImageResource(R.mipmap.ic_edit_black)
-            contentDescription = getString(R.string.preview_cd_rename)
-        }
-        tile.addView(icon, FrameLayout.LayoutParams(dp(12), dp(14), Gravity.CENTER))
-        tile.contentDescription = getString(R.string.preview_cd_rename)
-        tile.setOnClickListener { showRenameDialog() }
-        return tile
-    }
-
-    private fun buildMoreAction(): View = ImageView(requireContext()).apply {
-        setImageResource(R.mipmap.ic_more)
-        contentDescription = getString(R.string.preview_cd_more)
-        setOnClickListener { showMoreActions() }
-        layoutParams = FrameLayout.LayoutParams(dp(24f).toInt(), dp(24f).toInt())
-    }
+    /**
+     * The three actions of the app bar: rename, share and the overflow.
+     *
+     * The design puts the rename tile at x=174, the share at x=276 and the
+     * overflow at x=316.
+     */
+    private fun buildTitleActions(): View = PreviewTitleActions.build(
+        requireContext(),
+        onRename = { showRenameDialog() },
+        onShare = { share() },
+        onMore = { showMoreActions() },
+    )
 
     private fun showMoreActions() {
+        val doc = document
         val sheet = MoreActionsSheet.create(
-            listOf(
-                MoreActionsSheet.Action(ACTION_OUTLINE, getString(R.string.preview_outline)),
-                MoreActionsSheet.Action(ACTION_BOOKMARK, getString(R.string.preview_add_bookmark)),
-                MoreActionsSheet.Action(ACTION_READING_MODE, getString(R.string.preview_reading_mode)),
-                MoreActionsSheet.Action(ACTION_RENAME, getString(R.string.rename)),
+            actions = listOf(
+                MoreActionsSheet.Action(
+                    ACTION_OUTLINE,
+                    getString(R.string.preview_outline),
+                    R.mipmap.ic_menu,
+                ),
+                MoreActionsSheet.Action(
+                    ACTION_BOOKMARK,
+                    getString(R.string.preview_add_bookmark),
+                    R.mipmap.ic_collect_unselect,
+                ),
+                MoreActionsSheet.Action(
+                    ACTION_READING_MODE,
+                    getString(R.string.preview_reading_mode),
+                    R.mipmap.ic_eye_open,
+                ),
+                MoreActionsSheet.Action(
+                    ACTION_RENAME,
+                    getString(R.string.rename),
+                    R.mipmap.ic_rename_black,
+                ),
             ),
+            wideAction = MoreActionsSheet.Action(
+                ACTION_COMPRESS,
+                getString(R.string.compress),
+                R.mipmap.ic_compress,
+            ),
+            documentName = doc?.name.orEmpty(),
+            documentType = doc?.let { getString(it.type.labelRes) }.orEmpty(),
+            documentMeta = documentMeta(),
+            documentLogo = doc?.let {
+                ContextCompat.getDrawable(requireContext(), it.type.logoRes)
+            },
         )
         sheet.onActionSelected = { id ->
             when (id) {
@@ -328,9 +364,25 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
                 ACTION_BOOKMARK -> addBookmark()
                 ACTION_READING_MODE -> showReadingModeDialog()
                 ACTION_RENAME -> showRenameDialog()
+                ACTION_SHARE -> share()
+                ACTION_COMPRESS -> compress()
             }
         }
         sheet.show(parentFragmentManager, "preview_more")
+    }
+
+    /** Opens the compressor of the app for the current document. */
+    private fun compress() {
+        val doc = document ?: return
+        CompressActivity.start(requireContext(), doc.id)
+    }
+
+    /** The meta line of the more sheet: the date and the size of the file. */
+    private fun documentMeta(): String {
+        val doc = document ?: return ""
+        val date = SimpleDateFormat("MM-dd HH:mm", Locale.getDefault()).format(doc.modifiedAt)
+        val size = Formatter.formatShortFileSize(requireContext(), doc.sizeBytes)
+        return "$date · $size"
     }
 
     private fun showRenameDialog() {
@@ -407,16 +459,16 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
     // ------------------------------------------------------------------ annotations
 
     private fun toggleAnnotationBar() {
-        val tools = binding.annotationBar.llTools
-        if (tools.visibility == View.VISIBLE) {
+        val bar = binding.annotationBar.root
+        if (bar.visibility == View.VISIBLE) {
             closeAnnotationBar()
         } else {
-            tools.visibility = View.VISIBLE
+            bar.visibility = View.VISIBLE
         }
     }
 
     private fun closeAnnotationBar() {
-        binding.annotationBar.llTools.visibility = View.GONE
+        binding.annotationBar.root.visibility = View.GONE
         activeTool = null
         pagerAdapter?.applySelection(false, null)
         updateToolSelection()
@@ -515,69 +567,66 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
         )
     }
 
+    /**
+     * Puts the signature of the editor on the page.
+     *
+     * The signature waits inside the selection box of the design until the
+     * user drags it into place and confirms it with the green button; the
+     * "Add" bar of the design then writes it into the document.
+     */
     private fun handleSignatureResult(resultCode: Int, data: Intent?) {
         if (resultCode != Activity.RESULT_OK) return
-        val payload = data?.getStringExtra(SignatureActivity.EXTRA_INK) ?: return
-        val canvasSize = data.getFloatArrayExtra(SignatureActivity.EXTRA_CANVAS) ?: return
-        val bounds = data.getFloatArrayExtra(SignatureActivity.EXTRA_BOUNDS) ?: return
+        val intent = data ?: return
+        val payload = intent.getStringExtra(SignatureActivity.EXTRA_INK) ?: return
+        val aspect = intent.getFloatExtra(SignatureActivity.EXTRA_ASPECT, 1f)
+        val strokes = AnnotationPayload.decodeInk(payload)
+        if (strokes.isEmpty()) return
         val view = currentPageView()
-        val aspect = if (view != null && view.pageHeightPt > 0) {
-            view.pageWidthPt.toFloat() / view.pageHeightPt
-        } else {
-            595f / 842f
+        if (view == null) {
+            Toast.makeText(requireContext(), R.string.preview_signature_failed, Toast.LENGTH_SHORT).show()
+            return
         }
-        val placed = placeInk(AnnotationPayload.decodeInk(payload), canvasSize, bounds, aspect)
-        if (placed.isEmpty()) return
+        view.onPlacementAccepted = { showAddBar(true) }
+        view.onPlacementCancelled = {
+            showAddBar(false)
+            activeTool = null
+            updateToolSelection()
+        }
+        view.beginSignaturePlacement(strokes, aspect)
+    }
+
+    /**
+     * Shows or hides the confirmation bar of the design.
+     *
+     * The bar appears once the signature rests on the page; it writes the
+     * signature into the document.
+     */
+    private fun showAddBar(visible: Boolean) {
+        binding.addBar.visibility = if (visible) View.VISIBLE else View.GONE
+    }
+
+    /** Writes the placed signature into the document. */
+    private fun commitPlacedSignature() {
+        val placed = currentPageView()?.commitSignaturePlacement()
+        if (placed == null) {
+            showAddBar(false)
+            return
+        }
         addAnnotation(AnnotationType.SIGNATURE, AnnotationPayload.encodeInk(placed))
+        showAddBar(false)
+        activeTool = null
+        updateToolSelection()
         Toast.makeText(requireContext(), R.string.preview_signature_saved, Toast.LENGTH_SHORT).show()
     }
 
     private fun handleDrawResult(resultCode: Int, data: Intent?) {
         if (resultCode != Activity.RESULT_OK) return
-        val payload = data?.getStringExtra(DrawActivity.EXTRA_INK) ?: return
+        val intent = data ?: return
+        val payload = intent.getStringExtra(DrawActivity.EXTRA_INK) ?: return
         addAnnotation(AnnotationType.DRAW, payload)
-        val output = data.getStringExtra(DrawActivity.EXTRA_OUTPUT)
+        val output = intent.getStringExtra(DrawActivity.EXTRA_OUTPUT)
         if (!output.isNullOrEmpty()) registerAnnotatedDocument(output)
         Toast.makeText(requireContext(), R.string.preview_draw_saved, Toast.LENGTH_SHORT).show()
-    }
-
-    /**
-     * Moves the signature of the editor onto the page.
-     *
-     * The signature is scaled to a quarter of the page width and placed at the
-     * lower left of the page, the way the design shows it.
-     */
-    private fun placeInk(
-        strokes: List<InkStroke>,
-        canvasSize: FloatArray,
-        bounds: FloatArray,
-        aspect: Float,
-    ): List<InkStroke> {
-        if (strokes.isEmpty()) return emptyList()
-        val canvasWidth = canvasSize.getOrElse(0) { 1f }.coerceAtLeast(1f)
-        val canvasHeight = canvasSize.getOrElse(1) { 1f }.coerceAtLeast(1f)
-        val left = bounds.getOrElse(0) { 0f } * canvasWidth
-        val top = bounds.getOrElse(1) { 0f } * canvasHeight
-        val right = bounds.getOrElse(2) { 1f } * canvasWidth
-        val bottom = bounds.getOrElse(3) { 1f } * canvasHeight
-        val inkWidth = (right - left).coerceAtLeast(1f)
-        val inkHeight = (bottom - top).coerceAtLeast(1f)
-        val targetWidth = 0.32f
-        val targetHeight = targetWidth * aspect * (inkHeight / inkWidth)
-        val targetLeft = 0.08f
-        val targetTop = 0.66f
-        return strokes.map { stroke ->
-            val points = FloatArray(stroke.points.size)
-            var index = 0
-            while (index + 1 < stroke.points.size) {
-                val x = stroke.points[index] * canvasWidth
-                val y = stroke.points[index + 1] * canvasHeight
-                points[index] = targetLeft + ((x - left) / inkWidth) * targetWidth
-                points[index + 1] = targetTop + ((y - top) / inkHeight) * targetHeight
-                index += 2
-            }
-            InkStroke(stroke.color, stroke.width * targetWidth * canvasWidth / inkWidth, points)
-        }
     }
 
     private fun registerAnnotatedDocument(path: String) {
@@ -603,6 +652,15 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
         private const val ACTION_BOOKMARK = "bookmark"
         private const val ACTION_READING_MODE = "reading_mode"
         private const val ACTION_RENAME = "rename"
+        private const val ACTION_SHARE = "share"
+        private const val ACTION_COMPRESS = "compress"
+
+        /** The name of the file is smaller than a page title. */
+        private const val TITLE_SIZE_SP = 15f
+
+        /** The confirmation bar of the design: 80 % black. */
+        private const val ADD_BAR_BACKGROUND = 0xCC313131.toInt()
+
 
         /** Creates the reader for the given document. */
         fun newInstance(docId: String): PdfPreviewFragment = PdfPreviewFragment().apply {

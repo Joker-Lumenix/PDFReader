@@ -14,7 +14,7 @@ class UnlockActivity : BaseLockActivity() {
 
     override val mode: PasswordSheet.Mode = PasswordSheet.Mode.UNLOCK
 
-    override val titleRes: Int = R.string.lock_page_decrypt
+    override val titleRes: Int = R.string.lock_page_select
 
     override fun accepts(document: Document): Boolean = isVaultFile(document)
 

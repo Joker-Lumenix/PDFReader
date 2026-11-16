@@ -50,15 +50,19 @@ class ImageTileAdapter(
 
         fun bindAdd() {
             val context = binding.root.context
-            binding.ivImage.setBackground(ToolShapes.roundRect(context, CAMERA_TILE, 4f))
-            binding.ivImage.setImageResource(R.mipmap.ic_camera)
-            binding.ivImage.setColorFilter(Color.WHITE)
+            binding.ivImage.setBackground(ToolShapes.roundRect(context, ToolShapes.CAMERA_TILE, 4f))
+            binding.ivImage.setImageDrawable(null)
+            // the camera tile of the design carries a 34x34 glyph in its centre
+            binding.ivCamera.visibility = View.VISIBLE
+            binding.ivCamera.setImageResource(R.mipmap.ic_camera)
+            binding.ivCamera.setColorFilter(Color.WHITE)
             binding.tvIndex.visibility = View.GONE
             binding.root.setOnClickListener { onAddClick() }
         }
 
         fun bindImage(index: Int) {
             val context = binding.root.context
+            binding.ivCamera.visibility = View.GONE
             binding.ivImage.setBackgroundResource(R.drawable.bg_card_r4)
             binding.ivImage.clearColorFilter()
             binding.ivImage.setImageBitmap(images[index])
@@ -67,10 +71,5 @@ class ImageTileAdapter(
             binding.tvIndex.background = ToolShapes.badge(context, true)
             binding.root.setOnClickListener { onImageClick(index) }
         }
-    }
-
-    companion object {
-        /** Colour of the camera tile of the design. */
-        private const val CAMERA_TILE = 0xFFEC7878.toInt()
     }
 }

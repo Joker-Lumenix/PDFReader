@@ -2,20 +2,22 @@
 <!--
   Sort sheet (design: files-选择).
 
-  Three sections, every option lives in a card and carries a radio on the right.
+  Title, three sections with two options each (every option carries a radio)
+  and the cancel / apply pair at the bottom.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:paddingTop="24dp"
-    android:paddingBottom="24dp">
+    android:paddingBottom="32dp">
 
     <TextView
         style="@style/TextAppearance.AppCore.SheetTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
+        android:includeFontPadding="false"
         android:text="@string/files_sort_title" />
 
     <!-- ======================= last modified ======================= -->
@@ -24,27 +26,30 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="19dp"
         android:layout_marginEnd="20dp"
+        android:includeFontPadding="false"
         android:text="@string/files_sort_section_time" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="92dp"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="15dp"
         android:layout_marginEnd="20dp"
         android:background="@drawable/bg_card_r8"
-        android:orientation="vertical">
+        android:backgroundTint="@color/surface_disabled"
+        android:orientation="vertical"
+        android:paddingTop="12dp">
 
         <LinearLayout
-            android:id="@+id/rowModified"
+            android:id="@+id/rowModifiedDesc"
             android:layout_width="match_parent"
             android:layout_height="44dp"
             android:background="?android:attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
-            android:gravity="center_vertical"
+            android:gravity="top"
             android:orientation="horizontal"
             android:paddingStart="12dp"
             android:paddingEnd="12dp">
@@ -53,38 +58,44 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:background="@drawable/bg_card_r4"
+                android:backgroundTint="@color/white"
                 android:contentDescription="@null"
                 android:padding="3dp"
                 android:scaleType="fitCenter"
                 android:src="@mipmap/ic_new_to_old" />
 
             <TextView
-                android:id="@+id/tvModified"
+                android:id="@+id/tvModifiedDesc"
                 style="@style/TextAppearance.AppCore.Body"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
+                android:layout_marginTop="3dp"
                 android:layout_weight="1"
-                android:text="@string/sort_modified"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/files_sort_new_to_old"
                 android:textSize="14sp" />
 
             <ImageView
-                android:id="@+id/radioModified"
+                android:id="@+id/radioModifiedDesc"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
+                android:background="@drawable/bg_card_r4"
+                android:backgroundTint="@color/white"
                 android:contentDescription="@null"
+                android:padding="3dp"
                 android:scaleType="fitCenter"
                 android:src="@mipmap/ic_checkbox_circle_unselect" />
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/rowCreated"
+            android:id="@+id/rowModifiedAsc"
             android:layout_width="match_parent"
             android:layout_height="44dp"
             android:background="?android:attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
-            android:gravity="center_vertical"
+            android:gravity="top"
             android:orientation="horizontal"
             android:paddingStart="12dp"
             android:paddingEnd="12dp">
@@ -93,26 +104,32 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:background="@drawable/bg_card_r4"
+                android:backgroundTint="@color/white"
                 android:contentDescription="@null"
                 android:padding="3dp"
                 android:scaleType="fitCenter"
-                android:src="@mipmap/ic_new_to_old" />
+                android:src="@mipmap/ic_old_to_new" />
 
             <TextView
-                android:id="@+id/tvCreated"
+                android:id="@+id/tvModifiedAsc"
                 style="@style/TextAppearance.AppCore.Body"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
+                android:layout_marginTop="3dp"
                 android:layout_weight="1"
-                android:text="@string/sort_created"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/files_sort_old_to_new"
                 android:textSize="14sp" />
 
             <ImageView
-                android:id="@+id/radioCreated"
+                android:id="@+id/radioModifiedAsc"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
+                android:background="@drawable/bg_card_r4"
+                android:backgroundTint="@color/white"
                 android:contentDescription="@null"
+                android:padding="3dp"
                 android:scaleType="fitCenter"
                 android:src="@mipmap/ic_checkbox_circle_unselect" />
         </LinearLayout>
@@ -124,27 +141,30 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
+        android:includeFontPadding="false"
         android:text="@string/files_sort_section_name" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="92dp"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="15dp"
         android:layout_marginEnd="20dp"
         android:background="@drawable/bg_card_r8"
-        android:orientation="vertical">
+        android:backgroundTint="@color/surface_disabled"
+        android:orientation="vertical"
+        android:paddingTop="12dp">
 
         <LinearLayout
-            android:id="@+id/rowName"
+            android:id="@+id/rowNameAsc"
             android:layout_width="match_parent"
             android:layout_height="44dp"
             android:background="?android:attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
-            android:gravity="center_vertical"
+            android:gravity="top"
             android:orientation="horizontal"
             android:paddingStart="12dp"
             android:paddingEnd="12dp">
@@ -153,26 +173,78 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:background="@drawable/bg_card_r4"
+                android:backgroundTint="@color/white"
                 android:contentDescription="@null"
                 android:padding="3dp"
                 android:scaleType="fitCenter"
                 android:src="@mipmap/ic_az" />
 
             <TextView
-                android:id="@+id/tvName"
+                android:id="@+id/tvNameAsc"
                 style="@style/TextAppearance.AppCore.Body"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
+                android:layout_marginTop="3dp"
                 android:layout_weight="1"
-                android:text="@string/sort_name"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/files_sort_a_to_z"
                 android:textSize="14sp" />
 
             <ImageView
-                android:id="@+id/radioName"
+                android:id="@+id/radioNameAsc"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
+                android:background="@drawable/bg_card_r4"
+                android:backgroundTint="@color/white"
                 android:contentDescription="@null"
+                android:padding="3dp"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/ic_checkbox_circle_unselect" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/rowNameDesc"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="top"
+            android:orientation="horizontal"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:background="@drawable/bg_card_r4"
+                android:backgroundTint="@color/white"
+                android:contentDescription="@null"
+                android:padding="3dp"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/ic_za" />
+
+            <TextView
+                android:id="@+id/tvNameDesc"
+                style="@style/TextAppearance.AppCore.Body"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="3dp"
+                android:layout_weight="1"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/files_sort_z_to_a"
+                android:textSize="14sp" />
+
+            <ImageView
+                android:id="@+id/radioNameDesc"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:background="@drawable/bg_card_r4"
+                android:backgroundTint="@color/white"
+                android:contentDescription="@null"
+                android:padding="3dp"
                 android:scaleType="fitCenter"
                 android:src="@mipmap/ic_checkbox_circle_unselect" />
         </LinearLayout>
@@ -184,27 +256,30 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
+        android:includeFontPadding="false"
         android:text="@string/files_sort_section_size" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="92dp"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="15dp"
         android:layout_marginEnd="20dp"
         android:background="@drawable/bg_card_r8"
-        android:orientation="vertical">
+        android:backgroundTint="@color/surface_disabled"
+        android:orientation="vertical"
+        android:paddingTop="12dp">
 
         <LinearLayout
-            android:id="@+id/rowSize"
+            android:id="@+id/rowSizeDesc"
             android:layout_width="match_parent"
             android:layout_height="44dp"
             android:background="?android:attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
-            android:gravity="center_vertical"
+            android:gravity="top"
             android:orientation="horizontal"
             android:paddingStart="12dp"
             android:paddingEnd="12dp">
@@ -213,29 +288,117 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:background="@drawable/bg_card_r4"
+                android:backgroundTint="@color/white"
                 android:contentDescription="@null"
                 android:padding="3dp"
                 android:scaleType="fitCenter"
-                android:src="@mipmap/ic_size" />
+                android:src="@mipmap/ic_large_to_small" />
 
             <TextView
-                android:id="@+id/tvSize"
+                android:id="@+id/tvSizeDesc"
                 style="@style/TextAppearance.AppCore.Body"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
+                android:layout_marginTop="3dp"
                 android:layout_weight="1"
-                android:text="@string/sort_size"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/files_sort_large_to_small"
                 android:textSize="14sp" />
 
             <ImageView
-                android:id="@+id/radioSize"
+                android:id="@+id/radioSizeDesc"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
+                android:background="@drawable/bg_card_r4"
+                android:backgroundTint="@color/white"
                 android:contentDescription="@null"
+                android:padding="3dp"
                 android:scaleType="fitCenter"
                 android:src="@mipmap/ic_checkbox_circle_unselect" />
         </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/rowSizeAsc"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="top"
+            android:orientation="horizontal"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp">
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:background="@drawable/bg_card_r4"
+                android:backgroundTint="@color/white"
+                android:contentDescription="@null"
+                android:padding="3dp"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/ic_small_to_large" />
+
+            <TextView
+                android:id="@+id/tvSizeAsc"
+                style="@style/TextAppearance.AppCore.Body"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="3dp"
+                android:layout_weight="1"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/files_sort_small_to_large"
+                android:textSize="14sp" />
+
+            <ImageView
+                android:id="@+id/radioSizeAsc"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:background="@drawable/bg_card_r4"
+                android:backgroundTint="@color/white"
+                android:contentDescription="@null"
+                android:padding="3dp"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/ic_checkbox_circle_unselect" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- ========================== buttons ========================== -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="24dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/btnCancel"
+            style="@style/TextAppearance.AppCore.Button"
+            android:layout_width="141dp"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_btn_unable_r16"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:text="@string/cancel" />
+
+        <Space
+            android:layout_width="34dp"
+            android:layout_height="1dp" />
+
+        <TextView
+            android:id="@+id/btnApply"
+            style="@style/TextAppearance.AppCore.Button"
+            android:layout_width="141dp"
+            android:layout_height="48dp"
+            android:background="@drawable/gradient_red"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:text="@string/files_apply" />
     </LinearLayout>
 
 </LinearLayout>

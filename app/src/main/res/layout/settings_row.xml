@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  One row of the settings list: 44dp tall, 24dp icon on a white circle,
-  title (15/600), optional subtitle (12/400) and a chevron on the right.
+  One row of the settings list: 44dp tall, 24dp icon, title (15/600), an
+  optional subtitle (12/400) and a 24dp chevron on the right.
+
+  Geometry of the design: the icon sits 12dp from the left edge of the row,
+  the title 6dp behind the icon, the chevron 12dp from the right edge.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -9,20 +12,13 @@
     android:layout_width="match_parent"
     android:layout_height="44dp">
 
-    <FrameLayout
+    <ImageView
+        android:id="@+id/ivRowIcon"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:background="@drawable/bg_white_r36">
-
-        <ImageView
-            android:id="@+id/ivRowIcon"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:contentDescription="@null"
-            android:padding="3dp"
-            android:scaleType="fitCenter"
-            tools:src="@mipmap/ic_share_app" />
-    </FrameLayout>
+        android:contentDescription="@null"
+        android:scaleType="fitCenter"
+        tools:src="@mipmap/ic_share_app" />
 
     <LinearLayout
         android:layout_width="0dp"

@@ -14,8 +14,18 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/bg_card_r4"
+        android:clipToOutline="true"
         android:contentDescription="@string/tools_image_select"
         android:scaleType="centerCrop" />
+
+    <!-- the camera tile of the design carries a 34x34 glyph in its centre -->
+    <ImageView
+        android:id="@+id/ivCamera"
+        android:layout_width="34dp"
+        android:layout_height="34dp"
+        android:layout_gravity="center"
+        android:contentDescription="@string/tools_image_add"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/tvIndex"

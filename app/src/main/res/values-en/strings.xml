@@ -29,7 +29,7 @@
     <string name="clear_all">Clear all</string>
     <string name="clear_cache">Clear now</string>
     <string name="color_mode">Colour mode</string>
-    <string name="compress">PDF Compress</string>
+    <string name="compress">Compress</string>
     <string name="confirm">Confirm</string>
     <string name="confirm_delete_message">Are you sure you want to delete the selected files?</string>
     <string name="confirm_delete_title">Confirm delete</string>
@@ -74,12 +74,12 @@
     <string name="just_once">Just once</string>
     <string name="keep_screen_on">Keep screen on</string>
     <string name="lan_transfer">LAN transfer</string>
-    <string name="language">Languages</string>
+    <string name="language">Language</string>
     <string name="language_selection">Language selection</string>
     <string name="list_view">List view</string>
     <string name="long_image">Long image</string>
     <string name="md5">MD5 checksum</string>
-    <string name="merge">PDF Merge</string>
+    <string name="merge">Merge PDF</string>
     <string name="merge_count">Merge(%1$d)</string>
     <string name="merge_to_pdf">Merge to PDF</string>
     <string name="merged_document">Merged document</string>
@@ -115,7 +115,7 @@
     <string name="permission_rationale">To read and edit documents on your device, please allow Let\'s PDF to access all your files.</string>
     <string name="permission_required">Permission Required</string>
     <string name="plain_text">Plain text</string>
-    <string name="print">PDF Print</string>
+    <string name="print">Print</string>
     <string name="print_now">Print now</string>
     <string name="privacy_note">All files stay in the on-device sandbox, nothing is uploaded</string>
     <string name="properties">Details</string>
@@ -160,7 +160,7 @@
     <string name="sort_modified">By modified time</string>
     <string name="sort_name">By name</string>
     <string name="sort_size">By size</string>
-    <string name="split">PDF Split</string>
+    <string name="split">Split PDF</string>
     <string name="split_document">Split document</string>
     <string name="start_page">Default start page</string>
     <string name="start_reading">Start reading</string>

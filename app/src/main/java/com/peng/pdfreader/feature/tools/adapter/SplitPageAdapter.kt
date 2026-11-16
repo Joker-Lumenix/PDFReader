@@ -43,8 +43,20 @@ class SplitPageAdapter(
         notifyDataSetChanged()
     }
 
-    /** The selected page numbers, ascending. */
-    fun selectedPages(): List<Int> = selected.sorted()
+    /** The selected page numbers, in the order the tiles are shown in. */
+    fun selectedPages(): List<Int> = pages.filter { it.number in selected }.map { it.number }
+
+    /**
+     * Moves a tile to another position.
+     *
+     * The design lets the user drag the tiles to change the order of the
+     * pages, the split follows the new order.
+     */
+    fun move(from: Int, to: Int) {
+        if (from !in pages.indices || to !in pages.indices) return
+        pages.add(to, pages.removeAt(from))
+        notifyItemMoved(from, to)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
         val binding = ToolsItemSplitPageBinding.inflate(

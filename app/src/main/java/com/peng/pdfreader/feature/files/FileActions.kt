@@ -28,6 +28,9 @@ object FileActions {
     const val LOCK = "lock"
     const val DELETE = "delete"
 
+    /** Opens the sort sheet of the list (design: files-选择). */
+    const val SORT = "sort"
+
     /** The favourite state of a document changed. */
     const val CHANGED = "changed"
 }

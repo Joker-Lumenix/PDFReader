@@ -1,5 +1,6 @@
 package com.peng.pdfreader.feature.files.sheet
 
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +15,7 @@ import com.peng.pdfreader.data.repository.DocumentRepository
 import com.peng.pdfreader.databinding.FilesSheetFileActionBinding
 import com.peng.pdfreader.feature.files.FileActions
 import com.peng.pdfreader.feature.files.util.FileUi
+import com.peng.pdfreader.feature.files.util.PageCountDrawable
 
 /**
  * The file action sheet (design: home-more).
@@ -53,12 +55,10 @@ class FileActionSheet : BaseBottomSheetDialog() {
     }
 
     private fun bindHeader(doc: Document) {
-        binding.ivThumbnail.setImageDrawable(
-            ContextCompat.getDrawable(requireContext(), doc.type.logoRes),
-        )
+        binding.ivThumbnail.setImageDrawable(thumbnail(doc))
         binding.tvName.text = doc.name
-        binding.tvType.text = getString(doc.type.labelRes)
-        binding.tvType.setTextColor(
+        binding.tvTypeChip.text = getString(doc.type.labelRes)
+        binding.tvTypeChip.setTextColor(
             ContextCompat.getColor(requireContext(), FileUi.typeColor(doc.type)),
         )
         binding.tvMeta.text = FileUi.meta(doc)
@@ -67,6 +67,13 @@ class FileActionSheet : BaseBottomSheetDialog() {
             if (doc.isFavorite) R.mipmap.ic_collect_select else R.mipmap.ic_collect_unselect,
         )
         binding.ivCollect.setOnClickListener { toggleCollect(doc) }
+    }
+
+    /** The type logo with the page count chip of the design drawn on top. */
+    private fun thumbnail(doc: Document): Drawable? {
+        val logo = ContextCompat.getDrawable(requireContext(), doc.type.logoRes) ?: return null
+        if (doc.pageCount <= 0) return logo
+        return PageCountDrawable(logo, doc.pageCount, requireContext())
     }
 
     private fun toggleCollect(doc: Document) {
@@ -95,6 +102,7 @@ class FileActionSheet : BaseBottomSheetDialog() {
         binding.rowMerge.setOnClickListener { send(doc, FileActions.MERGE) }
         binding.rowLock.setOnClickListener { send(doc, FileActions.LOCK) }
         binding.rowDelete.setOnClickListener { send(doc, FileActions.DELETE) }
+        binding.rowSort.setOnClickListener { send(doc, FileActions.SORT) }
     }
 
     private fun send(doc: Document, action: String) {

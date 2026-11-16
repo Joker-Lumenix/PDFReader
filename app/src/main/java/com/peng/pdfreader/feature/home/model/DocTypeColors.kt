@@ -7,15 +7,15 @@ import com.peng.pdfreader.data.model.DocType
 /**
  * Colour of the file type chip of a document row.
  *
- * The design uses a dedicated colour per format. Word is the only one without
- * a token in the palette, so it falls back to the dark brand red.
+ * The design uses a dedicated colour per format: PDF is the light brand red,
+ * Word the link blue, Excel the success green and PPT the warning amber.
  */
 @ColorRes
 fun DocType.chipColorRes(): Int = when (this) {
     DocType.PDF -> R.color.brand_primary_light
-    DocType.WORD -> R.color.brand_primary_dark
+    DocType.WORD -> R.color.text_link
     DocType.EXCEL -> R.color.text_success
-    DocType.PPT -> R.color.status_warning
+    DocType.PPT -> R.color.text_warning
     DocType.IMAGE -> R.color.brand_primary_light
     DocType.TXT -> R.color.text_secondary
     DocType.OTHER -> R.color.text_secondary

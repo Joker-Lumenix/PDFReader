@@ -117,7 +117,7 @@ class SignatureCanvasView @JvmOverloads constructor(
     var showBaseline: Boolean = true
 
     /** Vertical position of the baseline, as a ratio of the view height. */
-    var baselineRatio: Float = 0.47f
+    var baselineRatio: Float = 0.473f
 
     /** Raised whenever the ink changes. */
     var onStrokesChanged: (() -> Unit)? = null
@@ -281,7 +281,7 @@ class SignatureCanvasView @JvmOverloads constructor(
             canvas.drawLine(dp(25f), baseline, width - dp(24f), baseline, baselinePaint)
         }
         placeholderPaint.textSize = placeholderTextSize
-        canvas.drawText(text.toString(), width / 2f, baseline - dp(8f), placeholderPaint)
+        canvas.drawText(text.toString(), width / 2f, baseline - dp(19f), placeholderPaint)
     }
 
     private fun drawStrokes(canvas: Canvas, source: List<Stroke>) {

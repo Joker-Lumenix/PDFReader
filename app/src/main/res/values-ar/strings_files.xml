@@ -8,12 +8,26 @@
 -->
 <resources>
 
-    <!-- filter / sort sheets -->
+    <!-- scope tabs of the file list -->
+    <string name="files_tab_all">الكل</string>
+    <string name="files_tab_recent">الأخيرة</string>
+    <string name="files_tab_favorites">المفضلة</string>
+
+    <!-- search -->
+    <string name="files_search_hint">ابحث في أسماء الملفات</string>
+
+    <!-- sort sheet -->
     <string name="files_sort_title">الترتيب حسب</string>
-    <string name="files_filter_title">نوع الملف</string>
     <string name="files_sort_section_time">آخر تعديل</string>
     <string name="files_sort_section_name">الاسم</string>
     <string name="files_sort_section_size">حجم الملف</string>
+    <string name="files_sort_new_to_old">من الأحدث إلى الأقدم</string>
+    <string name="files_sort_old_to_new">من الأقدم إلى الأحدث</string>
+    <string name="files_sort_a_to_z">من A إلى Z</string>
+    <string name="files_sort_z_to_a">من Z إلى A</string>
+    <string name="files_sort_large_to_small">من الأكبر إلى الأصغر</string>
+    <string name="files_sort_small_to_large">من الأصغر إلى الأكبر</string>
+    <string name="files_apply">تطبيق</string>
 
     <!-- file action sheet -->
     <string name="files_open_with">فتح بتطبيق آخر</string>
@@ -21,9 +35,19 @@
     <string name="files_print">طباعة</string>
     <string name="files_feature_unavailable">هذه الميزة قيد التطوير</string>
 
+    <!-- multi select action bar -->
+    <string name="files_action_edit">تعديل</string>
+    <string name="files_action_merge">دمج</string>
+
     <!-- dialogs -->
-    <string name="files_rename_hint">أدخل اسم الملف الجديد</string>
     <string name="files_delete_message">هل تريد حذف هذا الملف؟ لا يمكن التراجع عن ذلك.</string>
     <string name="files_save_message">هل تريد حفظ التغييرات على هذا الملف؟ لا يمكن التراجع عن ذلك.</string>
+
+    <!-- empty states -->
+    <string name="files_empty_title">لا توجد ملفات</string>
+    <string name="files_empty_hint">وصول سريع إلى ملفاتك الشائعة</string>
+    <string name="files_search_empty_title">لا توجد ملفات مطابقة</string>
+    <string name="files_search_empty_hint">جرّب كلمة مفتاحية أخرى</string>
+    <string name="files_selected_count">تم تحديد %1$d</string>
 
 </resources>

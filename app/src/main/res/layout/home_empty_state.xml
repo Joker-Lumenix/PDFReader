@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Empty state of the home list (design: home-emp).
+
+  The block is left aligned (title and hint start at x=20), only the action
+  pill is centred.  The block starts 28dp below the top of the list area, so
+  the title sits at y=257, the hint at y=288 and the pill at y=326.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="20dp"
+    android:paddingEnd="20dp">
+
+    <TextView
+        android:id="@+id/tvTitle"
+        style="@style/TextAppearance.AppCore.EmptyTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="start"
+        android:includeFontPadding="false"
+        android:textColor="@color/text_secondary" />
+
+    <TextView
+        android:id="@+id/tvHint"
+        style="@style/TextAppearance.AppCore.Body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="start"
+        android:includeFontPadding="false"
+        android:textColor="@color/text_tertiary" />
+
+    <!-- "Go to set": 137x43, 16dp radius, brand gradient -->
+    <TextView
+        android:id="@+id/tvAction"
+        style="@style/TextAppearance.AppCore.Button"
+        android:layout_width="137dp"
+        android:layout_height="43dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/gradient_red"
+        android:clickable="true"
+        android:focusable="true"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center"
+        android:textColor="@color/white" />
+
+</LinearLayout>

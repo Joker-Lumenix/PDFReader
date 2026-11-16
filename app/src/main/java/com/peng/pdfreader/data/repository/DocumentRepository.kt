@@ -3,6 +3,7 @@ package com.peng.pdfreader.data.repository
 import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
+import com.peng.pdfreader.data.SampleDocuments
 import com.peng.pdfreader.data.model.DocType
 import com.peng.pdfreader.data.model.Document
 import com.peng.pdfreader.data.prefs.FileSort
@@ -40,6 +41,33 @@ class DocumentRepository private constructor(private val appContext: Context) {
         cacheDir = File(context.cacheDir, "thumbs").apply { mkdirs() }
         stateFile = File(context.filesDir, "library.json")
         loadState()
+        installSamples(context)
+    }
+
+    /**
+     * Puts the bundled samples into the sandbox on the first start so that every
+     * preview has something to show.
+     */
+    private fun installSamples(context: Context) {
+        val added = SampleDocuments.install(context, sandboxDir).toMutableList()
+        SampleDocuments.createDemoPdf(sandboxDir)?.let { added += it }
+        if (added.isEmpty()) return
+        added.forEach { file ->
+            if (documents.any { it.name == file.name }) return@forEach
+            val now = System.currentTimeMillis()
+            documents.add(
+                Document(
+                    id = UUID.randomUUID().toString(),
+                    name = file.name,
+                    type = SampleDocuments.typeOf(file.name),
+                    path = file.absolutePath,
+                    sizeBytes = file.length(),
+                    createdAt = now,
+                    modifiedAt = now,
+                ),
+            )
+        }
+        persist()
     }
 
     // ---------------------------------------------------------------- documents
@@ -112,10 +140,22 @@ class DocumentRepository private constructor(private val appContext: Context) {
     fun rename(doc: Document, newName: String) {
         val source = File(doc.path)
         val target = File(sandboxDir, "${doc.id}_$newName")
-        if (source.exists()) {
-            source.renameTo(target)
+        if (source.exists() && source.absolutePath != target.absolutePath) {
+            // The record has to follow the file, otherwise the document would
+            // point at a path that no longer exists.
+            if (!source.renameTo(target)) {
+                source.copyTo(target, overwrite = true)
+                source.delete()
+            }
         }
-        update(doc.copy(name = newName, modifiedAt = System.currentTimeMillis()))
+        update(
+            doc.copy(
+                name = newName,
+                path = target.absolutePath,
+                sizeBytes = target.length().takeIf { it > 0L } ?: doc.sizeBytes,
+                modifiedAt = System.currentTimeMillis(),
+            ),
+        )
     }
 
     fun delete(doc: Document) {

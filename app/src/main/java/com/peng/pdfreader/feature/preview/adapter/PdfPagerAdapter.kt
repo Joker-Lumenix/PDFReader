@@ -30,8 +30,15 @@ class PdfPagerAdapter(
     private var selectionEnabled = false
     private var selectionListener: ((Int, RectF) -> Unit)? = null
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder =
-        Holder(PdfPageView(parent.context))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
+        val view = PdfPageView(parent.context)
+        // ViewPager2 only accepts pages that fill it completely.
+        view.layoutParams = ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.MATCH_PARENT,
+        )
+        return Holder(view)
+    }
 
     override fun onBindViewHolder(holder: Holder, position: Int) {
         val view = holder.view

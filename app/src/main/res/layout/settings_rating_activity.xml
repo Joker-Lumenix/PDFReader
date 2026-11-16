@@ -1,177 +1,183 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Rating page: the "how do you like the app" screen with the three emoji
-  options (negative / neutral / positive).
+  Rating sheet of the design: the illustration peeks over the top edge of a
+  332dp white sheet, the question, the "top rating" bubble, five stars and the
+  action button.
+
+  The sheet is anchored to the bottom of the screen, the illustration 319dp
+  above the bottom edge so that it ends 13dp behind the top of the sheet.
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/surface_subtle"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <com.peng.pdfreader.appcore.widget.PageTitleBar
-        android:id="@+id/titleBar"
+    <View
+        android:id="@+id/scrim"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="match_parent"
+        android:background="@color/scrim_75"
+        android:clickable="true"
+        android:focusable="true" />
 
     <ImageView
         android:id="@+id/ivIllustration"
-        android:layout_width="match_parent"
+        android:layout_width="360dp"
         android:layout_height="196dp"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="319dp"
         android:contentDescription="@null"
-        android:scaleType="centerCrop"
-        android:src="@mipmap/bg_rate" />
+        android:scaleType="fitCenter"
+        tools:src="@mipmap/bg_rate" />
 
-    <TextView
-        android:id="@+id/tvQuestion"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/sheet"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/screen_margin"
-        android:layout_marginTop="@dimen/space_m"
-        android:layout_marginEnd="@dimen/screen_margin"
-        android:textColor="@color/text_secondary"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        tools:text="Do you like Let\'s PDF?" />
+        android:layout_height="332dp"
+        android:layout_gravity="bottom"
+        android:background="@drawable/bg_sheet_top_r16">
 
-    <TextView
-        android:id="@+id/tvHint"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/screen_margin"
-        android:layout_marginTop="@dimen/space_s"
-        android:layout_marginEnd="@dimen/screen_margin"
-        android:text="@string/rating_hint"
-        android:textColor="@color/text_tertiary"
-        android:textSize="14sp" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/space_xl"
-        android:orientation="horizontal"
-        android:paddingStart="@dimen/space_l"
-        android:paddingEnd="@dimen/space_l">
-
-        <LinearLayout
-            android:id="@+id/llBad"
+        <TextView
+            android:id="@+id/tvTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="?attr/selectableItemBackground"
-            android:gravity="center_horizontal"
-            android:orientation="vertical"
-            android:paddingTop="@dimen/space_s"
-            android:paddingBottom="@dimen/space_s">
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="41dp"
+            android:layout_marginEnd="32dp"
+            android:gravity="center"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="@color/text_on_night_accent_alt"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Do you like Let's PDF?" />
 
-            <ImageView
-                android:id="@+id/ivBad"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:contentDescription="@null"
-                android:scaleType="fitCenter"
-                android:src="@mipmap/emoji_cry" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/space_s"
-                android:text="@string/not_really"
-                android:textColor="@color/text_secondary"
-                android:textSize="13sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/llNeutral"
+        <TextView
+            android:id="@+id/tvSubtitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="?attr/selectableItemBackground"
-            android:gravity="center_horizontal"
-            android:orientation="vertical"
-            android:paddingTop="@dimen/space_s"
-            android:paddingBottom="@dimen/space_s">
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="32dp"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:text="@string/rating_hint"
+            android:textColor="@color/text_placeholder"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvTitle" />
 
-            <ImageView
-                android:id="@+id/ivNeutral"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:contentDescription="@null"
-                android:scaleType="fitCenter"
-                android:src="@mipmap/emoji_normal" />
+        <TextView
+            android:id="@+id/tvBubble"
+            android:layout_width="143dp"
+            android:layout_height="43dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="24dp"
+            android:background="@mipmap/ic_chat_bg"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center"
+            android:text="@string/rating_top_rating"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvSubtitle" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/space_s"
-                android:text="@string/rating_neutral"
-                android:textColor="@color/text_secondary"
-                android:textSize="13sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/llGood"
+        <FrameLayout
+            android:id="@+id/llStars"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="?attr/selectableItemBackground"
-            android:gravity="center_horizontal"
-            android:orientation="vertical"
-            android:paddingTop="@dimen/space_s"
-            android:paddingBottom="@dimen/space_s">
+            android:layout_height="70dp"
+            android:layout_marginTop="1dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvBubble">
 
-            <ImageView
-                android:id="@+id/ivGood"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:contentDescription="@null"
-                android:scaleType="fitCenter"
-                android:src="@mipmap/emoji_laugh" />
+            <!-- The two halos behind the fifth star are drawn in code. -->
+            <View
+                android:id="@+id/vStarHalo"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_gravity="end|center_vertical"
+                android:layout_marginEnd="29dp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/space_s"
-                android:text="@string/good"
-                android:textColor="@color/text_secondary"
-                android:textSize="13sp" />
-        </LinearLayout>
-    </LinearLayout>
+            <View
+                android:id="@+id/vStarCore"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:layout_gravity="end|center_vertical"
+                android:layout_marginEnd="41dp" />
 
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+            <LinearLayout
+                android:id="@+id/llStarRow"
+                android:layout_width="match_parent"
+                android:layout_height="36dp"
+                android:layout_gravity="center_vertical"
+                android:gravity="center"
+                android:orientation="horizontal">
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btnRate"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="@dimen/space_m"
-        android:background="@drawable/gradient_red"
-        android:backgroundTint="@null"
-        android:letterSpacing="0"
-        android:stateListAnimator="@null"
-        android:text="@string/rate_on_play"
-        android:textColor="@color/text_on_tint"
-        android:textSize="16sp" />
+                <ImageView
+                    android:id="@+id/ivStar1"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginEnd="22dp"
+                    android:contentDescription="@null"
+                    android:src="@mipmap/ic_star_unselect" />
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btnLater"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="@dimen/space_xl"
-        android:background="@drawable/bg_btn_unable_r16"
-        android:backgroundTint="@null"
-        android:letterSpacing="0"
-        android:stateListAnimator="@null"
-        android:text="@string/rating_later"
-        android:textColor="@color/text_on_tint"
-        android:textSize="16sp" />
+                <ImageView
+                    android:id="@+id/ivStar2"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginEnd="22dp"
+                    android:contentDescription="@null"
+                    android:src="@mipmap/ic_star_unselect" />
 
-</LinearLayout>
+                <ImageView
+                    android:id="@+id/ivStar3"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginEnd="22dp"
+                    android:contentDescription="@null"
+                    android:src="@mipmap/ic_star_unselect" />
+
+                <ImageView
+                    android:id="@+id/ivStar4"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginEnd="22dp"
+                    android:contentDescription="@null"
+                    android:src="@mipmap/ic_star_unselect" />
+
+                <ImageView
+                    android:id="@+id/ivStar5"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:contentDescription="@null"
+                    android:src="@mipmap/ic_star_unselect" />
+            </LinearLayout>
+        </FrameLayout>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnAction"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginBottom="32dp"
+            android:background="@drawable/bg_btn_unable_r16"
+            android:backgroundTint="@null"
+            android:enabled="false"
+            android:fontFamily="sans-serif-medium"
+            android:letterSpacing="0"
+            android:stateListAnimator="@null"
+            android:text="@string/rate"
+            android:textColor="@color/text_on_tint"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>

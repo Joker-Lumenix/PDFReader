@@ -1,34 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  Copy of the tool screens (Tools tab + the PDF tool flows).
-
-  The tool tab reuses the terminology of the main string table wherever it
-  exists (R.string.merge / split / image_to_pdf / encrypt / decrypt / print),
-  only the copy that the tool screens need on their own lives here.
--->
 <resources>
-
-    <!-- ==================== tools tab ==================== -->
-
     <string name="tools_scan_to_pdf">مسح إلى PDF</string>
     <string name="tools_zip_file">ملف ZIP</string>
+    <string name="tools_label_lock">قفل ملف PDF</string>
+    <string name="tools_label_unlock">إلغاء قفل ملف PDF</string>
+    <string name="tools_label_zip">ملف Zip</string>
     <string name="tools_not_available">هذه الميزة غير متاحة بعد</string>
     <string name="tools_failed">فشلت العملية: %1$s</string>
     <string name="tools_working">جارٍ المعالجة…</string>
     <string name="tools_pick_document">اختر مستند PDF</string>
     <string name="tools_empty_documents">لا توجد مستندات PDF في البيئة المعزولة</string>
-
-    <!-- ==================== merge ==================== -->
-
     <string name="tools_merge_title">دمج PDF</string>
     <string name="tools_merge_running">جارٍ الدمج…</string>
     <string name="tools_merge_empty">لا توجد مستندات للدمج</string>
     <string name="tools_merge_add">إضافة مستند</string>
     <string name="tools_merge_remove">إزالة</string>
     <string name="tools_merge_success_hint">تم الدمج بنجاح وحُفظ الملف في البيئة المعزولة</string>
-
-    <!-- ==================== split ==================== -->
-
     <string name="tools_split_title">تقسيم PDF</string>
     <string name="tools_split_action">تقسيم</string>
     <string name="tools_split_running">جارٍ التقسيم…</string>
@@ -37,46 +24,34 @@
     <string name="tools_split_range_hint">نطاق الصفحات، مثل 1-3,5</string>
     <string name="tools_split_range_invalid">نطاق الصفحات غير صالح</string>
     <string name="tools_split_done">تم التقسيم إلى %1$d مستندات</string>
-
-    <!-- ==================== image to pdf ==================== -->
-
+    <string name="tools_split_banner_drag">اسحب المصغّرة لتغيير الترتيب.</string>
+    <string name="tools_split_selected">تم تحديد %1$d صفحة</string>
+    <string name="tools_split_reorder">إعادة الترتيب</string>
     <string name="tools_image_to_pdf_title">صورة إلى PDF</string>
     <string name="tools_image_select">اختر الصور</string>
     <string name="tools_image_running">جارٍ إنشاء PDF…</string>
     <string name="tools_image_failed">فشل تحويل الصورة</string>
     <string name="tools_image_go_to_set">الانتقال إلى الإعدادات</string>
     <string name="tools_image_added">تمت إضافة %1$d صور</string>
-
-    <!-- ==================== compress ==================== -->
-
+    <string name="tools_image_add">إضافة صور</string>
+    <string name="tools_image_strip">الصور المحدّدة</string>
+    <string name="tools_input_clear">مسح الإدخال</string>
     <string name="tools_compress_title">ضغط PDF</string>
     <string name="tools_compress_result_title">النتيجة</string>
     <string name="tools_compress_running">جارٍ الضغط…</string>
     <string name="tools_compress_empty">اختر مستند PDF أولًا</string>
-
-    <!-- ==================== scan ==================== -->
-
     <string name="tools_scan_title">مسح إلى PDF</string>
     <string name="tools_scan_no_camera">لم يتم العثور على تطبيق كاميرا</string>
     <string name="tools_scan_failed">فشل التقاط الصورة</string>
     <string name="tools_scan_done">تم إنشاء المستند الممسوح</string>
-
-    <!-- ==================== print ==================== -->
-
     <string name="tools_print_title">طباعة PDF</string>
     <string name="tools_print_no_printer">لم يتم العثور على طابعة</string>
     <string name="tools_print_failed">تعذّر بدء خدمة الطباعة</string>
-
-    <!-- ==================== lock / unlock ==================== -->
-
     <string name="tools_lock_title">تعيين كلمة المرور</string>
     <string name="tools_unlock_title">إدخال كلمة المرور</string>
     <string name="tools_lock_done">تم تشفير المستند</string>
     <string name="tools_unlock_done">تم فك تشفير المستند</string>
     <string name="tools_unlock_failed">فشل فك التشفير، تحقق من كلمة المرور</string>
-
-    <!-- ==================== result page ==================== -->
-
     <string name="tools_result_more">المزيد</string>
     <string name="tools_result_open_with">فتح بتطبيق آخر</string>
     <string name="tools_result_compress">ضغط</string>
@@ -94,5 +69,4 @@
     <string name="tools_result_pages">%1$d صفحة</string>
     <string name="tools_result_share_unavailable">ميزة المشاركة غير متاحة بعد</string>
     <string name="tools_zip_done">تم إنشاء ملف ZIP: %1$s</string>
-
 </resources>

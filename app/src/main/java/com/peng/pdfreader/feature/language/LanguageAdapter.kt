@@ -1,10 +1,7 @@
 package com.peng.pdfreader.feature.language
 
-import android.content.Context
-import android.graphics.Color
-import android.graphics.drawable.Drawable
-import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -14,8 +11,9 @@ import com.peng.pdfreader.databinding.LanguageRowBinding
 /**
  * The single choice list of the language page.
  *
- * The radio button is drawn in code: the design shows an 18dp circle that is
- * an empty ring when unselected and a filled brand circle when selected.
+ * The selected row of the design is the red gradient pill with white text and
+ * a white radio with a red check mark, every other row is the plain endonym
+ * with an empty ring.
  */
 class LanguageAdapter(
     private val onSelected: (LanguageOption) -> Unit,
@@ -31,8 +29,18 @@ class LanguageAdapter(
     override fun onBindViewHolder(holder: OptionHolder, position: Int) {
         val option = LanguageCatalog.options[position]
         val context = holder.itemView.context
+        val selected = position == selectedIndex
+
         holder.binding.tvLanguage.text = context.getString(option.labelRes)
-        holder.binding.vRadio.background = radioDrawable(context, position == selectedIndex)
+        holder.binding.tvLanguage.setTextColor(
+            ContextCompat.getColor(
+                context,
+                if (selected) R.color.white else R.color.text_secondary,
+            ),
+        )
+        holder.binding.vRadio.background = LanguageRadioDrawable.of(context, selected)
+        // The design marks the selected row with a red gradient pill.
+        holder.binding.vSelectedPill.visibility = if (selected) View.VISIBLE else View.GONE
         holder.itemView.setOnClickListener { onSelected(option) }
     }
 
@@ -45,27 +53,6 @@ class LanguageAdapter(
         selectedIndex = if (index >= 0) index else RecyclerView.NO_POSITION
         if (previous != RecyclerView.NO_POSITION) notifyItemChanged(previous)
         if (selectedIndex != RecyclerView.NO_POSITION) notifyItemChanged(selectedIndex)
-    }
-
-    companion object {
-        private const val RADIO_SIZE_DP = 18
-
-        fun radioDrawable(context: Context, selected: Boolean): Drawable {
-            val density = context.resources.displayMetrics.density
-            val size = (RADIO_SIZE_DP * density).toInt()
-            return GradientDrawable().apply {
-                shape = GradientDrawable.OVAL
-                if (selected) {
-                    setColor(ContextCompat.getColor(context, R.color.brand_primary))
-                } else {
-                    setColor(Color.TRANSPARENT)
-                    setStroke(
-                        (density).toInt().coerceAtLeast(1),
-                        ContextCompat.getColor(context, R.color.surface_border_strong),
-                    )
-                }
-            }.apply { setSize(size, size) }
-        }
     }
 
     class OptionHolder(val binding: LanguageRowBinding) : RecyclerView.ViewHolder(binding.root)

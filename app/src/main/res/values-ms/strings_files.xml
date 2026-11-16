@@ -8,12 +8,26 @@
 -->
 <resources>
 
-    <!-- filter / sort sheets -->
+    <!-- scope tabs of the file list -->
+    <string name="files_tab_all">Semua</string>
+    <string name="files_tab_recent">Terkini</string>
+    <string name="files_tab_favorites">Kegemaran</string>
+
+    <!-- search -->
+    <string name="files_search_hint">Cari nama fail</string>
+
+    <!-- sort sheet -->
     <string name="files_sort_title">Isih mengikut</string>
-    <string name="files_filter_title">Jenis fail</string>
     <string name="files_sort_section_time">Baru diubah</string>
     <string name="files_sort_section_name">Nama</string>
     <string name="files_sort_section_size">Saiz fail</string>
+    <string name="files_sort_new_to_old">Terbaru ke lama</string>
+    <string name="files_sort_old_to_new">Lama ke terbaru</string>
+    <string name="files_sort_a_to_z">A hingga Z</string>
+    <string name="files_sort_z_to_a">Z hingga A</string>
+    <string name="files_sort_large_to_small">Besar ke kecil</string>
+    <string name="files_sort_small_to_large">Kecil ke besar</string>
+    <string name="files_apply">Guna</string>
 
     <!-- file action sheet -->
     <string name="files_open_with">Buka dengan aplikasi lain</string>
@@ -21,9 +35,19 @@
     <string name="files_print">Cetak</string>
     <string name="files_feature_unavailable">Ciri ini sedang dibangunkan</string>
 
+    <!-- multi select action bar -->
+    <string name="files_action_edit">Sunting</string>
+    <string name="files_action_merge">Gabungkan</string>
+
     <!-- dialogs -->
-    <string name="files_rename_hint">Masukkan nama fail baharu</string>
     <string name="files_delete_message">Padam fail ini? Tindakan ini tidak boleh dibatalkan.</string>
     <string name="files_save_message">Simpan perubahan pada fail ini? Tindakan ini tidak boleh dibatalkan.</string>
+
+    <!-- empty states -->
+    <string name="files_empty_title">Tiada fail lagi</string>
+    <string name="files_empty_hint">Akses pantas ke fail yang kerap digunakan</string>
+    <string name="files_search_empty_title">Tiada fail yang sepadan</string>
+    <string name="files_search_empty_hint">Cuba kata kunci lain</string>
+    <string name="files_selected_count">%1$d dipilih</string>
 
 </resources>

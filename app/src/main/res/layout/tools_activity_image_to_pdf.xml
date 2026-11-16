@@ -3,139 +3,201 @@
   "Image to PDF" flow (designs "Image to PDF", "Image to PDF-loading",
   "Image to PDF空状态", "Image to PDF下拉").
 
-  The grid of the picked images fills the screen, the bottom sheet carries the
-  "select image" title, the import button and the strip of the chosen images.
+  Geometry of the design (360x760):
+  - app bar with the title at x=52 and the picture action at x=181
+  - image tiles 104x104 at x = 12 / 128 / 244, rows at y = 92 / 208 / 324
+  - bottom sheet 360x164 at y=596, #fffdfd, radius 16 on the top corners
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/surface_subtle"
-    android:orientation="vertical">
+    android:background="@color/surface_subtle">
 
-    <com.peng.pdfreader.appcore.widget.PageTitleBar
-        android:id="@+id/titleBar"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <FrameLayout
-        android:id="@+id/content"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rvImages"
+        <!-- the header of the design carries the picture action next to the title -->
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:overScrollMode="never"
-            android:paddingStart="12dp"
-            android:paddingTop="5dp"
-            android:paddingEnd="12dp"
-            android:scrollbars="none" />
+            android:layout_height="wrap_content">
 
-        <LinearLayout
-            android:id="@+id/emptyState"
+            <com.peng.pdfreader.appcore.widget.PageTitleBar
+                android:id="@+id/titleBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <ImageView
+                android:id="@+id/ivHeaderIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="start|top"
+                android:layout_marginStart="181dp"
+                android:layout_marginTop="44dp"
+                android:clickable="true"
+                android:contentDescription="@string/tools_image_add"
+                android:focusable="true" />
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/content"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top"
-            android:layout_marginTop="208dp"
-            android:gravity="center_horizontal"
-            android:orientation="vertical"
-            android:visibility="gone">
+            android:layout_height="0dp"
+            android:layout_weight="1">
 
-            <TextView
-                android:id="@+id/tvEmptyTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif-medium"
-                android:text="@string/no_permissions"
-                android:textColor="@color/text_secondary"
-                android:textSize="20sp" />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvImages"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:overScrollMode="never"
+                android:paddingTop="3dp"
+                android:scrollbars="none" />
 
-            <TextView
-                android:id="@+id/tvEmptyHint"
+            <!-- the empty state of the design "Image to PDF空状态" -->
+            <LinearLayout
+                android:id="@+id/emptyState"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:gravity="center"
-                android:text="@string/authorization_required"
-                android:textColor="@color/text_tertiary"
-                android:textSize="14sp" />
+                android:layout_gravity="top"
+                android:layout_marginTop="211dp"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <TextView
+                    android:id="@+id/tvEmptyTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:gravity="center"
+                    android:text="@string/no_permissions"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/tvEmptyHint"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
+                    android:text="@string/authorization_required"
+                    android:textColor="@color/text_tertiary"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/btnGoToSet"
+                    android:layout_width="137dp"
+                    android:layout_height="43dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/gradient_red"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:fontFamily="sans-serif-medium"
+                    android:gravity="center"
+                    android:text="@string/tools_image_go_to_set"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+        <!-- bottom sheet of the design, it is part of the screen and not a dialog -->
+        <LinearLayout
+            android:id="@+id/sheet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_sheet_top_r16"
+            android:orientation="vertical"
+            android:paddingStart="20dp"
+            android:paddingTop="20dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="20dp">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp">
+
+                <TextView
+                    android:id="@+id/tvSheetTitle"
+                    style="@style/TextAppearance.AppCore.SheetTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start|center_vertical"
+                    android:text="@string/tools_image_select" />
+
+                <TextView
+                    android:id="@+id/btnImport"
+                    android:layout_width="100dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="end|center_vertical"
+                    android:background="@drawable/gradient_red"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:fontFamily="sans-serif-medium"
+                    android:gravity="center"
+                    android:textColor="@color/text_on_tint"
+                    android:textSize="14sp" />
+
+            </FrameLayout>
+
+            <HorizontalScrollView
+                android:id="@+id/stripScroll"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginTop="24dp"
+                android:contentDescription="@string/tools_image_strip"
+                android:overScrollMode="never"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:id="@+id/strip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="60dp"
+                    android:orientation="horizontal" />
+
+            </HorizontalScrollView>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <!-- the running job of the design "Image to PDF-loading", it dims the whole
+         screen and carries the running card in its centre -->
+    <FrameLayout
+        android:id="@+id/loadingState"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/scrim_75"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:id="@+id/loadingCard"
+            android:layout_width="152dp"
+            android:layout_height="122dp"
+            android:layout_gravity="top|center_horizontal"
+            android:layout_marginTop="268dp"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingTop="24dp">
+
+            <ProgressBar
+                android:layout_width="36dp"
+                android:layout_height="36dp" />
 
             <TextView
-                android:id="@+id/btnGoToSet"
-                android:layout_width="137dp"
-                android:layout_height="43dp"
+                android:id="@+id/tvLoading"
+                style="@style/TextAppearance.AppCore.ItemTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:background="@drawable/gradient_red"
-                android:clickable="true"
-                android:focusable="true"
-                android:fontFamily="sans-serif-medium"
-                android:gravity="center"
-                android:text="@string/tools_image_go_to_set"
-                android:textColor="@color/white"
-                android:textSize="16sp" />
+                android:text="@string/tools_working" />
 
         </LinearLayout>
 
     </FrameLayout>
 
-    <!-- bottom sheet of the design, it is part of the screen and not a dialog -->
-    <LinearLayout
-        android:id="@+id/sheet"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/bg_sheet_top_r16"
-        android:orientation="vertical"
-        android:paddingStart="20dp"
-        android:paddingTop="20dp"
-        android:paddingEnd="20dp"
-        android:paddingBottom="24dp">
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="40dp">
-
-            <TextView
-                android:id="@+id/tvSheetTitle"
-                style="@style/TextAppearance.AppCore.SheetTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start|center_vertical"
-                android:text="@string/tools_image_select" />
-
-            <TextView
-                android:id="@+id/btnImport"
-                android:layout_width="100dp"
-                android:layout_height="40dp"
-                android:layout_gravity="end|center_vertical"
-                android:background="@drawable/gradient_red"
-                android:clickable="true"
-                android:focusable="true"
-                android:fontFamily="sans-serif-medium"
-                android:gravity="center"
-                android:textColor="@color/text_on_tint"
-                android:textSize="14sp" />
-
-        </FrameLayout>
-
-        <HorizontalScrollView
-            android:id="@+id/stripScroll"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginTop="24dp"
-            android:overScrollMode="never"
-            android:scrollbars="none">
-
-            <LinearLayout
-                android:id="@+id/strip"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:orientation="horizontal" />
-
-        </HorizontalScrollView>
-
-    </LinearLayout>
-
-</LinearLayout>
+</FrameLayout>

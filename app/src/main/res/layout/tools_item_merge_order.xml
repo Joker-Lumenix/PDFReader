@@ -1,26 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   A document of the ordered merge list (design "merge-2").
-  The card is 306x72 at x=42, the red minus button sits 12dp in front of it.
+  The card is 306x72 at x=42, the red minus of the design sits at x=12.
 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="84dp">
 
-    <ImageView
+    <!-- the remove button of the design, a red minus in a 24x24 slot -->
+    <FrameLayout
         android:id="@+id/btnRemove"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:layout_gravity="start|center_vertical"
-        android:layout_marginStart="12dp"
+        android:layout_gravity="top|start"
+        android:layout_marginTop="24dp"
+        android:clickable="true"
         android:contentDescription="@string/tools_merge_remove"
-        android:src="@mipmap/ic_minus" />
+        android:focusable="true">
+
+        <View
+            android:layout_width="14dp"
+            android:layout_height="2dp"
+            android:layout_gravity="center"
+            android:background="@color/status_error_red2" />
+
+    </FrameLayout>
 
     <com.peng.pdfreader.appcore.widget.FileListItemView
         android:id="@+id/item"
         android:layout_width="306dp"
         android:layout_height="72dp"
-        android:layout_gravity="end|center_vertical"
+        android:layout_gravity="top|end"
         android:layout_marginEnd="12dp" />
 
 </FrameLayout>

@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.View
 import com.peng.pdfreader.R
 import com.peng.pdfreader.appcore.widget.ColorPaletteView
+import com.peng.pdfreader.appcore.widget.InkStroke
 import com.peng.pdfreader.base.BaseActivity
 import com.peng.pdfreader.databinding.ActivitySignatureBinding
 import com.peng.pdfreader.feature.preview.annotation.AnnotationPayload
@@ -28,7 +29,7 @@ class SignatureActivity : BaseActivity() {
         setContentView(binding.root)
 
         binding.ivBack.setOnClickListener { finish() }
-        binding.tvDone.setOnClickListener { confirm() }
+        binding.flDone.setOnClickListener { confirm() }
         binding.ivUndo.setOnClickListener {
             binding.canvas.undo()
             updateHistoryButtons()
@@ -44,22 +45,22 @@ class SignatureActivity : BaseActivity() {
         binding.canvas.onStrokesChanged = { updateHistoryButtons() }
 
         binding.llPalette.background = GradientDrawable().apply {
-            cornerRadius = dp(16f)
             setColor(PALETTE_BACKGROUND)
         }
         binding.palette.colors = ColorPaletteView.DEFAULT_COLORS
         binding.palette.swatchDiameter = dp(20f)
-        binding.palette.itemSpacing = dp(15f)
+        binding.palette.itemSpacing = dp(16f)
+        binding.palette.ringColor = Color.WHITE
         binding.palette.selectedColor = DEFAULT_COLOUR
         binding.palette.onColorSelected = { colour ->
             binding.canvas.strokeColor = colour
-            binding.tvColorSwatch.setTextColor(colour)
+            showSwatch(colour)
         }
-        binding.tvColorSwatch.setTextColor(DEFAULT_COLOUR)
+        showSwatch(DEFAULT_COLOUR)
 
         val toggle = View.OnClickListener { togglePalette() }
         binding.tvColorLabel.setOnClickListener(toggle)
-        binding.tvColorSwatch.setOnClickListener(toggle)
+        binding.swatch.setOnClickListener(toggle)
 
         updateHistoryButtons()
     }
@@ -69,32 +70,81 @@ class SignatureActivity : BaseActivity() {
         palette.visibility = if (palette.visibility == View.VISIBLE) View.GONE else View.VISIBLE
     }
 
+    /** The back button closes the colour palette before it leaves the editor. */
+    override fun handleBackPressed(): Boolean {
+        if (binding.llPalette.visibility == View.VISIBLE) {
+            binding.llPalette.visibility = View.GONE
+            return true
+        }
+        return false
+    }
+
+    /** Paints the colour of the next stroke into the colour bar. */
+    private fun showSwatch(colour: Int) {
+        binding.swatch.colors = listOf(colour)
+        binding.swatch.selectedIndex = 0
+        binding.swatch.swatchDiameter = dp(10f)
+        binding.swatch.showSelectionRing = false
+    }
+
     private fun updateHistoryButtons() {
         binding.ivUndo.setImageResource(
             if (binding.canvas.canUndo) R.mipmap.ic_undo_enable else R.mipmap.ic_undo_unable,
         )
-        binding.ivRedo.alpha = if (binding.canvas.canRedo) 1f else 0.4f
+        binding.ivRedo.setImageResource(
+            if (binding.canvas.canRedo) R.mipmap.ic_restore_enable else R.mipmap.ic_restore_unable,
+        )
     }
 
+    /**
+     * Hands the signature back to the caller.
+     *
+     * The strokes are normalised against the box of the signature (the ink
+     * without its empty margins) so the host can place them on a page without
+     * knowing the size of the canvas.
+     */
     private fun confirm() {
         val strokes = binding.canvas.inkStrokes()
         if (strokes.isEmpty()) {
             finish()
             return
         }
+        val canvasWidth = binding.canvas.width.toFloat().coerceAtLeast(1f)
+        val canvasHeight = binding.canvas.height.toFloat().coerceAtLeast(1f)
         val bounds = binding.canvas.inkBounds()
+        val left = bounds.left * canvasWidth
+        val top = bounds.top * canvasHeight
+        val boxWidth = ((bounds.right - bounds.left) * canvasWidth).coerceAtLeast(1f)
+        val boxHeight = ((bounds.bottom - bounds.top) * canvasHeight).coerceAtLeast(1f)
+
+        val unit = strokes.map { stroke ->
+            normalise(stroke, left, top, boxWidth, boxHeight, canvasWidth, canvasHeight)
+        }
         val data = Intent()
-            .putExtra(EXTRA_INK, AnnotationPayload.encodeInk(strokes))
-            .putExtra(
-                EXTRA_CANVAS,
-                floatArrayOf(binding.canvas.width.toFloat(), binding.canvas.height.toFloat()),
-            )
-            .putExtra(
-                EXTRA_BOUNDS,
-                floatArrayOf(bounds.left, bounds.top, bounds.right, bounds.bottom),
-            )
+            .putExtra(EXTRA_INK, AnnotationPayload.encodeInk(unit))
+            .putExtra(EXTRA_ASPECT, boxWidth / boxHeight)
         setResult(RESULT_OK, data)
         finish()
+    }
+
+    private fun normalise(
+        stroke: InkStroke,
+        left: Float,
+        top: Float,
+        boxWidth: Float,
+        boxHeight: Float,
+        canvasWidth: Float,
+        canvasHeight: Float,
+    ): InkStroke {
+        val points = FloatArray(stroke.points.size)
+        var index = 0
+        while (index + 1 < stroke.points.size) {
+            points[index] = (stroke.points[index] * canvasWidth - left) / boxWidth
+            points[index + 1] = (stroke.points[index + 1] * canvasHeight - top) / boxHeight
+            index += 2
+        }
+        // The width of a stroke is a fraction of the box of the signature.
+        return InkStroke(stroke.color, stroke.width * canvasWidth / boxWidth, points)
     }
 
     private fun dp(value: Float): Float = value * resources.displayMetrics.density
@@ -103,11 +153,8 @@ class SignatureActivity : BaseActivity() {
         /** The payload of the signature. */
         const val EXTRA_INK = "com.peng.pdfreader.extra.SIGNATURE_INK"
 
-        /** The size of the signing canvas. */
-        const val EXTRA_CANVAS = "com.peng.pdfreader.extra.SIGNATURE_CANVAS"
-
-        /** The bounding box of the signature inside the canvas. */
-        const val EXTRA_BOUNDS = "com.peng.pdfreader.extra.SIGNATURE_BOUNDS"
+        /** The width / height ratio of the signature. */
+        const val EXTRA_ASPECT = "com.peng.pdfreader.extra.SIGNATURE_ASPECT"
 
         private val DEFAULT_COLOUR = Color.parseColor("#333333")
         private const val PALETTE_BACKGROUND = 0xCC313131.toInt()

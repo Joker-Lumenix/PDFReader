@@ -8,12 +8,26 @@
 -->
 <resources>
 
-    <!-- filter / sort sheets -->
+    <!-- scope tabs of the file list -->
+    <string name="files_tab_all">すべて</string>
+    <string name="files_tab_recent">最近</string>
+    <string name="files_tab_favorites">お気に入り</string>
+
+    <!-- search -->
+    <string name="files_search_hint">ファイル名を検索</string>
+
+    <!-- sort sheet -->
     <string name="files_sort_title">並べ替え</string>
-    <string name="files_filter_title">ファイル形式</string>
     <string name="files_sort_section_time">更新日時</string>
     <string name="files_sort_section_name">名前</string>
     <string name="files_sort_section_size">ファイルサイズ</string>
+    <string name="files_sort_new_to_old">新しい順</string>
+    <string name="files_sort_old_to_new">古い順</string>
+    <string name="files_sort_a_to_z">A から Z</string>
+    <string name="files_sort_z_to_a">Z から A</string>
+    <string name="files_sort_large_to_small">大きい順</string>
+    <string name="files_sort_small_to_large">小さい順</string>
+    <string name="files_apply">適用</string>
 
     <!-- file action sheet -->
     <string name="files_open_with">別のアプリで開く</string>
@@ -21,9 +35,19 @@
     <string name="files_print">印刷</string>
     <string name="files_feature_unavailable">この機能は開発中です</string>
 
+    <!-- multi select action bar -->
+    <string name="files_action_edit">編集</string>
+    <string name="files_action_merge">結合</string>
+
     <!-- dialogs -->
-    <string name="files_rename_hint">新しいファイル名を入力</string>
     <string name="files_delete_message">このファイルを削除しますか？元に戻せません。</string>
     <string name="files_save_message">このファイルへの変更を保存しますか？元に戻せません。</string>
+
+    <!-- empty states -->
+    <string name="files_empty_title">ファイルがありません</string>
+    <string name="files_empty_hint">よく使うファイルにすぐアクセス</string>
+    <string name="files_search_empty_title">該当するファイルがありません</string>
+    <string name="files_search_empty_hint">別のキーワードを試してください</string>
+    <string name="files_selected_count">選択済み %1$d 件</string>
 
 </resources>

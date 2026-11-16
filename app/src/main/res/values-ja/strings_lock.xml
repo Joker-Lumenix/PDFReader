@@ -12,31 +12,32 @@
 
     <!-- page titles -->
     <string name="lock_page_encrypt">PDF の暗号化</string>
-    <string name="lock_page_decrypt">PDF の復号</string>
+    <string name="lock_page_select">ファイルを選択</string>
 
     <!-- password sheet -->
     <string name="lock_set_password">パスワードを設定</string>
     <string name="lock_set_password_hint">設定後、このファイルを開くにはパスワードが必要です</string>
     <string name="lock_remove_password">パスワードを削除</string>
     <string name="lock_remove_password_hint">削除後はパスワードで保護されません</string>
+    <string name="lock_enter_password">パスワードを入力</string>
+    <string name="lock_enter_password_hint">このファイルを開くにはパスワードが必要です</string>
     <string name="lock_password_hint">パスワードを入力</string>
     <string name="lock_password_too_short">パスワードは 4 文字以上で入力してください</string>
-    <string name="lock_clear_password">パスワードを消去</string>
     <string name="lock_toggle_password">パスワードを表示</string>
 
     <!-- states -->
     <string name="lock_wrong_password">パスワードが違います</string>
     <string name="lock_not_encrypted">このファイルは暗号化されていません</string>
     <string name="lock_operation_failed">操作に失敗しました。もう一度お試しください</string>
-    <string name="lock_working">処理中…</string>
-    <string name="lock_badge_encrypted">暗号化済み</string>
 
     <!-- file list -->
-    <string name="lock_empty_hint">サンドボックスに処理できる PDF ファイルはまだありません</string>
     <string name="lock_import">PDF を読み込む</string>
+    <string name="lock_no_document">先にファイルを選択してください</string>
 
     <!-- result -->
     <string name="lock_result_path">パス: %1$s</string>
+    <string name="lock_result_locked">PDF を暗号化しました</string>
+    <string name="lock_result_unlocked">PDF の暗号化を解除しました</string>
     <string name="lock_open_failed">このファイルを開けるアプリが見つかりません</string>
 
 </resources>

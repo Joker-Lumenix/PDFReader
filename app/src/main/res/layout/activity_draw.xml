@@ -8,7 +8,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/surface_blue_tint"
+    android:background="@color/surface_muted"
     android:orientation="vertical">
 
     <LinearLayout
@@ -18,7 +18,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="87dp"
+            android:layout_height="@dimen/top_bar_height"
             android:background="@color/surface_card"
             android:gravity="center_vertical"
             android:orientation="horizontal"
@@ -51,20 +51,23 @@
                 android:layout_height="24dp"
                 android:layout_marginEnd="16dp"
                 android:contentDescription="@string/preview_cd_redo"
-                android:src="@mipmap/ic_clockwise" />
+                android:src="@mipmap/ic_restore_unable" />
 
-            <TextView
-                android:id="@+id/tvDone"
+            <FrameLayout
+                android:id="@+id/flDone"
                 android:layout_width="55dp"
                 android:layout_height="24dp"
                 android:background="@drawable/gradient_red"
                 android:clickable="true"
                 android:contentDescription="@string/preview_save_to_document"
-                android:focusable="true"
-                android:gravity="center"
-                android:text="✓"
-                android:textColor="@color/text_on_tint"
-                android:textSize="14sp" />
+                android:focusable="true">
+
+                <com.peng.pdfreader.appcore.widget.CheckMarkView
+                    android:id="@+id/ivDone"
+                    android:layout_width="15dp"
+                    android:layout_height="10dp"
+                    android:layout_gravity="center" />
+            </FrameLayout>
         </LinearLayout>
 
         <View
@@ -84,6 +87,10 @@
             android:layout_height="match_parent" />
     </FrameLayout>
 
+    <!--
+      The dark tool bar of the design: 117dp tall, 16dp rounded on top.
+      The first row carries the stroke sizes, the second one the colours.
+    -->
     <LinearLayout
         android:id="@+id/toolBar"
         android:layout_width="match_parent"
@@ -103,7 +110,8 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:contentDescription="@string/preview_cd_size"
-                android:src="@mipmap/ic_size" />
+                android:src="@mipmap/ic_size"
+                android:tint="@color/white" />
 
             <View
                 android:layout_width="1dp"
@@ -115,7 +123,7 @@
                 android:id="@+id/llSizes"
                 android:layout_width="wrap_content"
                 android:layout_height="24dp"
-                android:layout_marginStart="57dp"
+                android:layout_marginStart="56dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal" />
         </LinearLayout>
@@ -123,8 +131,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="32dp"
-            android:layout_marginTop="32dp"
-            android:gravity="center_vertical"
+            android:layout_marginTop="30dp"
+            android:gravity="top"
             android:orientation="horizontal"
             android:paddingStart="20dp">
 
@@ -132,20 +140,23 @@
                 android:id="@+id/ivDraw"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
+                android:layout_marginTop="2dp"
                 android:contentDescription="@string/preview_tool_draw"
-                android:src="@mipmap/ic_draw" />
+                android:src="@mipmap/ic_draw"
+                android:tint="@color/white" />
 
             <View
                 android:layout_width="1dp"
                 android:layout_height="24dp"
                 android:layout_marginStart="13dp"
+                android:layout_marginTop="2dp"
                 android:background="@color/surface_neutral_strong" />
 
             <com.peng.pdfreader.appcore.widget.ColorPaletteView
                 android:id="@+id/palette"
                 android:layout_width="wrap_content"
-                android:layout_height="32dp"
-                android:layout_marginStart="14dp" />
+                android:layout_height="28dp"
+                android:layout_marginStart="13dp" />
         </LinearLayout>
 
     </LinearLayout>

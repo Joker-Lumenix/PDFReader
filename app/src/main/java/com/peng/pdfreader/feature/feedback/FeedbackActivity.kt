@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Bundle
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import com.peng.pdfreader.R
@@ -21,6 +22,9 @@ class FeedbackActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // The keyboard shrinks the card of the design, so the input and the
+        // submit button move up with it.
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
         binding = FeedbackActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -41,8 +45,6 @@ class FeedbackActivity : BaseActivity() {
             cornerRadius = 6.4f * density
             setColor(ContextCompat.getColor(this@FeedbackActivity, R.color.surface_disabled))
         }
-        val padding = (20 * density).toInt()
-        binding.etFeedback.setPadding(padding, padding, padding, padding)
     }
 
     private fun submit() {

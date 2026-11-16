@@ -25,6 +25,9 @@ class NotificationPermissionSheet : BaseBottomSheetDialog() {
     private var _binding: SettingsNotificationSheetBinding? = null
     private val binding get() = _binding!!
 
+    /** Raised once the sheet is gone, used by the start up flow to continue. */
+    var onDismissed: (() -> Unit)? = null
+
     private val permissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
             Logger.i(TAG, "notification permission granted: $granted")
@@ -37,6 +40,11 @@ class NotificationPermissionSheet : BaseBottomSheetDialog() {
         binding.ivClose.setOnClickListener { dismiss() }
         binding.btnTurnOn.setOnClickListener { requestNotificationPermission() }
         return binding.root
+    }
+
+    override fun onDismiss(dialog: android.content.DialogInterface) {
+        super.onDismiss(dialog)
+        onDismissed?.invoke()
     }
 
     private fun requestNotificationPermission() {

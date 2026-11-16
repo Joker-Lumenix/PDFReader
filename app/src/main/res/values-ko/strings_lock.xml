@@ -12,31 +12,32 @@
 
     <!-- page titles -->
     <string name="lock_page_encrypt">PDF 암호화</string>
-    <string name="lock_page_decrypt">PDF 복호화</string>
+    <string name="lock_page_select">파일 선택</string>
 
     <!-- password sheet -->
     <string name="lock_set_password">비밀번호 설정</string>
     <string name="lock_set_password_hint">설정 후 이 파일을 열려면 비밀번호가 필요합니다</string>
     <string name="lock_remove_password">비밀번호 제거</string>
     <string name="lock_remove_password_hint">제거하면 더 이상 비밀번호로 보호되지 않습니다</string>
+    <string name="lock_enter_password">비밀번호 입력</string>
+    <string name="lock_enter_password_hint">이 파일을 열려면 비밀번호가 필요합니다</string>
     <string name="lock_password_hint">비밀번호를 입력하세요</string>
     <string name="lock_password_too_short">비밀번호는 4자 이상이어야 합니다</string>
-    <string name="lock_clear_password">비밀번호 지우기</string>
     <string name="lock_toggle_password">비밀번호 표시</string>
 
     <!-- states -->
     <string name="lock_wrong_password">비밀번호가 틀립니다</string>
     <string name="lock_not_encrypted">이 파일은 암호화되지 않았습니다</string>
     <string name="lock_operation_failed">작업에 실패했습니다. 다시 시도해 주세요</string>
-    <string name="lock_working">처리 중…</string>
-    <string name="lock_badge_encrypted">암호화됨</string>
 
     <!-- file list -->
-    <string name="lock_empty_hint">샌드박스에 처리할 PDF 파일이 아직 없습니다</string>
     <string name="lock_import">PDF 가져오기</string>
+    <string name="lock_no_document">먼저 파일을 선택하세요</string>
 
     <!-- result -->
     <string name="lock_result_path">경로: %1$s</string>
+    <string name="lock_result_locked">PDF를 암호화했습니다</string>
+    <string name="lock_result_unlocked">PDF를 복호화했습니다</string>
     <string name="lock_open_failed">이 파일을 열 수 있는 앱을 찾지 못했습니다</string>
 
 </resources>

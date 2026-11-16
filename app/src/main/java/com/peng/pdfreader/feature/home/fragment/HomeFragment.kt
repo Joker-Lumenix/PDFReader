@@ -1,7 +1,6 @@
 package com.peng.pdfreader.feature.home.fragment
 
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
@@ -12,15 +11,14 @@ import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
-import androidx.core.widget.ImageViewCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.ViewPager2
 import com.peng.pdfreader.R
 import com.peng.pdfreader.appcore.util.Logger
-import com.peng.pdfreader.appcore.widget.FileListItemDecoration
 import com.peng.pdfreader.base.BaseFragment
 import com.peng.pdfreader.data.model.DocType
 import com.peng.pdfreader.data.model.Document
@@ -28,9 +26,15 @@ import com.peng.pdfreader.data.prefs.AppPrefs
 import com.peng.pdfreader.data.repository.DocumentRepository
 import com.peng.pdfreader.databinding.FragmentHomeBinding
 import com.peng.pdfreader.databinding.HomeItemFilterBinding
+import com.peng.pdfreader.feature.files.FileActions
+import com.peng.pdfreader.feature.files.dialog.DeleteConfirmDialog
+import com.peng.pdfreader.feature.files.dialog.RenameDialog
+import com.peng.pdfreader.feature.files.sheet.FileActionSheet
 import com.peng.pdfreader.feature.home.adapter.HomeDocumentAdapter
+import com.peng.pdfreader.feature.home.adapter.HomePagerAdapter
 import com.peng.pdfreader.feature.home.adapter.HomeQuickActionAdapter
 import com.peng.pdfreader.feature.home.model.QuickAction
+import com.peng.pdfreader.feature.home.util.HomeDocumentActions
 
 /**
  * Home tab.
@@ -39,8 +43,9 @@ import com.peng.pdfreader.feature.home.model.QuickAction
  * list and the scan button. The list itself lives in a dedicated adapter, see
  * [HomeDocumentAdapter].
  *
- * The page never navigates on its own: every action is reported through the
- * listener properties below so that the shell can route it.
+ * The page does not navigate on its own: every action is reported through the
+ * listener properties below so that the shell can route it. The only piece of
+ * UI the page owns is the document sheet of the row menu (design: home-more).
  */
 class HomeFragment : BaseFragment() {
 
@@ -50,11 +55,22 @@ class HomeFragment : BaseFragment() {
     /** Raised when a document row is tapped. */
     var onOpenDocument: ((Document) -> Unit)? = null
 
-    /** Raised when the "more" affordance of a document row is tapped. */
-    var onDocumentMenu: ((Document) -> Unit)? = null
+    /**
+     * Raised when the "more" affordance of a document row is tapped.
+     *
+     * The page opens the document sheet (design: home-more) itself, the
+     * callback is kept so that the shell can take over the row menu.
+     */
 
     /** Raised when the scan button is tapped. */
     var onScanClick: (() -> Unit)? = null
+
+    /**
+     * The round button opens the quick entry panel of the design.
+     *
+     * The anchor is the button itself, the panel positions itself above it.
+     */
+    var onQuickEntry: ((View) -> Unit)? = null
 
     /** Raised when the share action of the title bar is tapped. */
     var onShareClick: (() -> Unit)? = null
@@ -73,11 +89,12 @@ class HomeFragment : BaseFragment() {
 
     private lateinit var prefs: AppPrefs
     private lateinit var quickActionAdapter: HomeQuickActionAdapter
-    private lateinit var documentAdapter: HomeDocumentAdapter
+    private lateinit var pagerAdapter: HomePagerAdapter
 
     private val filterSegments = mutableListOf<Pair<HomeItemFilterBinding, DocType?>>()
     private var filter: DocType? = null
-    private var titleActionCount = 0
+    /** Guards the two way sync between the strip and the pager. */
+    private var syncingPager = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -99,9 +116,12 @@ class HomeFragment : BaseFragment() {
         setupTitleBar()
         setupQuickActions()
         setupFilterStrip()
-        setupDocumentList()
-        setupEmptyState()
-        binding.fabScan.setOnClickListener { onScanClick?.invoke() }
+        setupDocumentPager()
+        registerResults()
+        // The round button opens the quick entry panel of the design.
+        binding.fabScan.setOnClickListener {
+            onQuickEntry?.invoke(binding.fabScan) ?: onScanClick?.invoke()
+        }
         refreshDocuments()
     }
 
@@ -125,11 +145,42 @@ class HomeFragment : BaseFragment() {
 
     private fun setupTitleBar() {
         binding.titleBar.title = buildTitle()
-        addTitleAction(R.mipmap.ic_share_red, R.string.home_share, null) { onShareClick?.invoke() }
-        addTitleAction(R.mipmap.ic_print, R.string.home_print, null) { onPrintClick?.invoke() }
-        addTitleAction(R.mipmap.ic_menu, R.string.home_more, R.color.brand_primary_dark) {
-            onMoreClick?.invoke()
+        // The slot of the shared bar is a frame, so the three icons of the
+        // design need a row of their own to sit in.
+        val actions = LinearLayout(requireContext()).apply {
+            orientation = LinearLayout.HORIZONTAL
+            addView(titleAction(R.mipmap.ic_search_red, R.string.home_share) {
+                onShareClick?.invoke()
+            })
+            addView(titleAction(R.mipmap.ic_file_choose, R.string.home_print) {
+                onPrintClick?.invoke()
+            })
+            addView(titleAction(R.mipmap.ic_sort, R.string.home_more) {
+                onMoreClick?.invoke()
+            })
         }
+        binding.titleBar.addAction(actions)
+    }
+
+    /**
+     * Adds one of the three icons on the right hand side of the title bar.
+     *
+     * The icons sit 40dp apart (24dp icon + 16dp gap), the design puts them at
+     * x=236, x=276 and x=316.
+     */
+    private fun titleAction(
+        iconRes: Int,
+        descriptionRes: Int,
+        onClick: () -> Unit,
+    ): View {
+        val icon = ImageView(requireContext())
+        icon.layoutParams = LinearLayout.LayoutParams(dp(ACTION_SIZE), dp(ACTION_SIZE)).apply {
+            marginStart = dp(ACTION_GAP)
+        }
+        icon.setImageResource(iconRes)
+        icon.contentDescription = getString(descriptionRes)
+        icon.setOnClickListener { onClick() }
+        return icon
     }
 
     /**
@@ -149,36 +200,6 @@ class HomeFragment : BaseFragment() {
                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
             )
         }
-    }
-
-    /**
-     * Adds one of the three icons on the right hand side of the title bar.
-     *
-     * The icons sit 40dp apart, so every icon but the first one gets a 16dp
-     * gap in front of it.
-     */
-    private fun addTitleAction(
-        iconRes: Int,
-        descriptionRes: Int,
-        tintRes: Int?,
-        onClick: () -> Unit,
-    ) {
-        val context = requireContext()
-        val icon = ImageView(context)
-        icon.layoutParams = FrameLayout.LayoutParams(dp(ACTION_SIZE), dp(ACTION_SIZE)).apply {
-            marginStart = dp(if (titleActionCount == 0) 0 else ACTION_GAP)
-        }
-        icon.setImageResource(iconRes)
-        icon.contentDescription = getString(descriptionRes)
-        tintRes?.let {
-            ImageViewCompat.setImageTintList(
-                icon,
-                ColorStateList.valueOf(ContextCompat.getColor(context, it)),
-            )
-        }
-        icon.setOnClickListener { onClick() }
-        titleActionCount++
-        binding.titleBar.addAction(icon)
     }
 
     // ---------------------------------------------------------------- quick actions
@@ -202,9 +223,10 @@ class HomeFragment : BaseFragment() {
             binding.filterExcel to DocType.EXCEL,
             binding.filterPpt to DocType.PPT,
         )
-        filterSegments.forEach { (segment, type) ->
+        filterSegments.forEachIndexed { index, (segment, type) ->
             segment.filterLabel.setText(type?.labelRes ?: R.string.all)
             segment.root.setOnClickListener { selectFilter(type) }
+            segment.root.tag = index
         }
         applyFilterState()
     }
@@ -215,7 +237,13 @@ class HomeFragment : BaseFragment() {
         prefs.fileFilter = type
         Logger.d(TAG, "file type filter changed to ${type?.name ?: "ALL"}")
         applyFilterState()
-        refreshDocuments()
+        // The strip and the pager show the same state, so the pager follows.
+        val index = pagerAdapter.filters.indexOf(type)
+        if (index >= 0 && index != binding.documentPager.currentItem) {
+            syncingPager = true
+            binding.documentPager.setCurrentItem(index, true)
+            syncingPager = false
+        }
     }
 
     private fun applyFilterState() {
@@ -232,40 +260,79 @@ class HomeFragment : BaseFragment() {
         }
     }
 
-    // ---------------------------------------------------------------- document list
+    // ---------------------------------------------------------------- document pager
 
-    private fun setupDocumentList() {
-        documentAdapter = HomeDocumentAdapter(
+    private fun setupDocumentPager() {
+        pagerAdapter = HomePagerAdapter(
             onOpen = { document -> onOpenDocument?.invoke(document) },
-            onMenu = { document -> onDocumentMenu?.invoke(document) },
+            onMenu = { document -> openDocumentSheet(document) },
+            onEmptyAction = { openSettings() },
         )
-        binding.documentList.layoutManager = LinearLayoutManager(requireContext())
-        binding.documentList.adapter = documentAdapter
-        binding.documentList.setHasFixedSize(true)
-        binding.documentList.addItemDecoration(FileListItemDecoration(dp(ROW_GAP)))
+        binding.documentPager.adapter = pagerAdapter
+        binding.documentPager.offscreenPageLimit = 1
+        binding.documentPager.registerOnPageChangeCallback(pageChangeCallback)
+        // Start on the page of the stored filter.
+        val index = pagerAdapter.filters.indexOf(filter)
+        if (index >= 0) binding.documentPager.setCurrentItem(index, false)
+    }
+
+    // ---------------------------------------------------------------- document sheet
+
+    /**
+     * The row menu of the design (home-more).
+     *
+     * The sheet of the files feature carries the header, the four quick
+     * actions and the options card of the design, so it is reused here.
+     */
+    private fun openDocumentSheet(document: Document) {
+        FileActionSheet.show(childFragmentManager, document.id)
+    }
+
+    /**
+     * Listens to the operations of the document sheet.
+     *
+     * The sheet reports the picked operation, the page runs it and refreshes
+     * the list when the document changed.
+     */
+    private fun registerResults() {
+        childFragmentManager.setFragmentResultListener(
+            FileActions.REQUEST_KEY,
+            viewLifecycleOwner,
+        ) { _, bundle ->
+            val action = bundle.getString(FileActions.KEY_ACTION) ?: return@setFragmentResultListener
+            val docId = bundle.getString(FileActions.KEY_DOC_ID) ?: return@setFragmentResultListener
+            HomeDocumentActions(this@HomeFragment).run(action, docId)
+            refreshDocuments()
+        }
+        childFragmentManager.setFragmentResultListener(
+            RenameDialog.REQUEST_KEY,
+            viewLifecycleOwner,
+        ) { _, _ -> refreshDocuments() }
+        childFragmentManager.setFragmentResultListener(
+            DeleteConfirmDialog.REQUEST_KEY,
+            viewLifecycleOwner,
+        ) { _, _ -> refreshDocuments() }
+    }
+
+    private val pageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
+        override fun onPageSelected(position: Int) {
+            if (syncingPager) return
+            val type = pagerAdapter.filters.getOrNull(position)
+            if (type != filter) {
+                filter = type
+                prefs.fileFilter = type
+                Logger.d(TAG, "swiped to ${type?.name ?: "ALL"}")
+                applyFilterState()
+            }
+        }
     }
 
     private fun refreshDocuments() {
-        if (_binding == null || !::documentAdapter.isInitialized) return
-        val documents = DocumentRepository.get(requireContext())
-            .all()
-            .filter { filter == null || it.type == filter }
-        documentAdapter.submitList(documents)
-        val empty = documents.isEmpty()
-        binding.emptyState.visibility = if (empty) View.VISIBLE else View.GONE
-        binding.documentList.visibility = if (empty) View.GONE else View.VISIBLE
+        if (_binding == null || !::pagerAdapter.isInitialized) return
+        pagerAdapter.submit(DocumentRepository.get(requireContext()).all())
     }
 
     // ---------------------------------------------------------------- empty state
-
-    private fun setupEmptyState() {
-        binding.emptyState.title = getString(R.string.home_empty_title)
-        binding.emptyState.hint = getString(R.string.home_empty_hint)
-        binding.emptyState.actionText = getString(R.string.home_empty_action)
-        binding.emptyState.illustrationDrawable =
-            ContextCompat.getDrawable(requireContext(), R.mipmap.bg_file_access)
-        binding.emptyState.onActionClick = { openSettings() }
-    }
 
     /**
      * "Go to set" opens the system page of this app; when the shell wants to
@@ -306,7 +373,6 @@ class HomeFragment : BaseFragment() {
         private const val ACTION_SIZE = 24
         private const val ACTION_GAP = 16
         private const val QUICK_ACTION_GAP = 12
-        private const val ROW_GAP = 12
 
         /** The file types the filter strip can show. */
         private val FILTER_TYPES = listOf(

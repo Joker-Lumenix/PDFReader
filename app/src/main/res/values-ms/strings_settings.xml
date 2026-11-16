@@ -1,14 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  Copy of the settings / language / feedback / onboarding feature.
-
-  Every key is prefixed with the feature it belongs to so it can never
-  collide with the base string table; base keys that already carry the same
-  wording are reused instead of being duplicated here.
--->
 <resources>
-
-    <!-- ==================== settings ==================== -->
     <string name="settings_share_app">Kongsi aplikasi</string>
     <string name="settings_share_message">Ini alat PDF yang mudah digunakan: %1$s</string>
     <string name="settings_follow_system">Ikut sistem</string>
@@ -18,57 +9,41 @@
     <string name="settings_action_more">Lagi</string>
     <string name="settings_close">Tutup</string>
     <string name="settings_screen_missing">Skrin ini tidak tersedia buat masa ini</string>
-
-    <!-- ==================== language ==================== -->
-    <!-- Endonyms: they are written the way the language itself writes it. -->
-    <string name="language_en" translatable="false">English</string>
-    <string name="language_fr" translatable="false">Français</string>
-    <string name="language_ms" translatable="false">Bahasa Melayu</string>
-    <string name="language_es" translatable="false">Español</string>
-    <string name="language_pt" translatable="false">Português</string>
-    <string name="language_de" translatable="false">Deutsch</string>
-    <string name="language_ja" translatable="false">日本語</string>
-    <string name="language_ko" translatable="false">한국인</string>
-    <string name="language_ru" translatable="false">Русский</string>
-    <string name="language_ar" translatable="false">اللغة العربية</string>
-    <string name="language_zh_cn" translatable="false">简体中文</string>
-    <string name="language_zh_tw" translatable="false">繁體中文</string>
-
-    <!-- ==================== feedback ==================== -->
+    <string name="language_en">English</string>
+    <string name="language_fr">Français</string>
+    <string name="language_ms">Bahasa Melayu</string>
+    <string name="language_es">Español</string>
+    <string name="language_pt">Português</string>
+    <string name="language_de">Deutsch</string>
+    <string name="language_ja">日本語</string>
+    <string name="language_ko">한국인</string>
+    <string name="language_ru">Русский</string>
+    <string name="language_ar">اللغة العربية</string>
+    <string name="language_zh_cn">简体中文</string>
+    <string name="language_zh_tw">繁體中文</string>
     <string name="feedback_heading">Apakah masalah yang anda hadapi?</string>
     <string name="feedback_input_hint">Taip di sini…</string>
     <string name="feedback_mail_subject">Maklum balas Let\'s PDF</string>
     <string name="feedback_mail_opened">Aplikasi e-mel dibuka</string>
     <string name="feedback_no_mail_app">Tiada aplikasi e-mel dikesan, sila pasang dahulu</string>
-
-    <!-- ==================== rating ==================== -->
     <string name="rating_question">Adakah anda suka Let\'s PDF?</string>
     <string name="rating_hint">Beri kami penarafan!</string>
+    <string name="rating_top_rating">Beri kami lima bintang</string>
     <string name="rating_neutral">Boleh tahan</string>
     <string name="rating_later">Nanti</string>
     <string name="rating_store_missing">Tiada gedung aplikasi ditemui</string>
-
-    <!-- ==================== onboarding ==================== -->
     <string name="onboarding_skip">Langkau</string>
     <string name="onboarding_start">Mula</string>
-
-    <!-- ==================== permission ==================== -->
     <string name="permission_allow_all_files">Benarkan akses kepada semua fail</string>
-
-    <!-- ==================== default reader sheet ==================== -->
     <string name="set_default_title">Tetapkan sebagai pembaca PDF lalai</string>
     <string name="set_default_subtitle">Pilih &quot;Let\'s PDF: View &amp; Sign&quot;, kemudian ketik &quot;Sentiasa&quot;</string>
     <string name="set_default_mock_once">Sekali sahaja</string>
     <string name="set_default_mock_always">Sentiasa</string>
-
-    <!-- ==================== quick entry popup ==================== -->
     <string name="quick_entry_scan">Imbas PDF</string>
     <string name="quick_entry_merge">Gabungkan PDF</string>
     <string name="quick_entry_print">Cetak PDF</string>
-
-    <!-- ==================== notices ==================== -->
-    <!-- Placeholder copy: the final legal text has to be supplied by the app owner. -->
+    <string name="quick_entry_header_alert">Amaran</string>
+    <string name="quick_entry_header_edit">Sunting</string>
     <string name="notice_privacy_body">Kami mengambil privasi anda dengan serius. Semua fail dalam aplikasi ini kekal dalam kotak pasir peranti, tiada dimuat naik ke mana-mana pelayan dan tiada data peribadi dikumpulkan. Teks dasar privasi yang muktamad akan ditambah selepas disahkan oleh pihak guaman.</string>
     <string name="notice_terms_body">Dengan menggunakan aplikasi ini, anda bersetuju dengan terma penggunaan di bawah. Teks terma perkhidmatan yang muktamad akan ditambah selepas disahkan oleh pihak guaman.</string>
-
 </resources>

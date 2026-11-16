@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   Bottom sheet that explains how to make the app the default PDF reader.
+
+  Geometry of the design: 28dp above the title, 12dp to the subtitle, 20dp to
+  the 312x206dp illustration and 20dp to the 312x48dp button, which leaves a
+  32dp margin at the bottom (407dp sheet in total).
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -16,6 +20,8 @@
         android:id="@+id/tvTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="start"
+        android:includeFontPadding="false"
         android:textAppearance="@style/TextAppearance.AppCore.SheetTitle"
         tools:text="Set as default reader of PDF files" />
 
@@ -23,89 +29,31 @@
         android:id="@+id/tvSubtitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/space_m"
-        android:lineSpacingExtra="4dp"
+        android:layout_marginTop="12dp"
+        android:gravity="start"
+        android:includeFontPadding="false"
+        android:lineSpacingExtra="5dp"
         android:textAppearance="@style/TextAppearance.AppCore.SheetSubtitle"
         tools:text="Choose Let's PDF and press Always" />
 
-    <FrameLayout
-        android:id="@+id/illustrationCard"
-        android:layout_width="match_parent"
+    <ImageView
+        android:id="@+id/ivIllustration"
+        android:layout_width="312dp"
         android:layout_height="206dp"
-        android:layout_marginTop="20dp">
-
-        <LinearLayout
-            android:id="@+id/mockCard"
-            android:layout_width="252dp"
-            android:layout_height="143dp"
-            android:layout_gravity="center"
-            android:orientation="vertical">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="96dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingStart="@dimen/space_m"
-                android:paddingEnd="@dimen/space_m">
-
-                <ImageView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:contentDescription="@null"
-                    android:scaleType="fitCenter"
-                    android:src="@mipmap/logo_pdf" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/space_m"
-                    android:layout_weight="1"
-                    android:ellipsize="end"
-                    android:maxLines="1"
-                    android:text="@string/app_name"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="14sp" />
-            </LinearLayout>
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="@color/surface_border_subtle" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="47dp"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="@string/set_default_mock_once"
-                    android:textColor="@color/text_muted_blue"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="@string/set_default_mock_always"
-                    android:textColor="@color/text_muted_blue"
-                    android:textSize="14sp" />
-            </LinearLayout>
-        </LinearLayout>
-    </FrameLayout>
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:contentDescription="@null"
+        android:scaleType="fitCenter"
+        android:src="@mipmap/bg_set_default" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnOk"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="20dp"
         android:background="@drawable/gradient_red"
         android:backgroundTint="@null"
+        android:fontFamily="sans-serif-medium"
         android:letterSpacing="0"
         android:stateListAnimator="@null"
         android:text="@string/ok"

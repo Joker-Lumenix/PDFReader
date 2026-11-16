@@ -12,17 +12,23 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PdfReader">
 
+        <!-- The start up screen is the entry point of the app. -->
+        <activity
+            android:name=".ui.splash.SplashActivity"
+            android:exported="true"
+            android:theme="@style/Theme.PdfReader">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:launchMode="singleTask"
             android:theme="@style/Theme.PdfReader"
             android:windowSoftInputMode="adjustResize">
-
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
 
             <!-- Open documents from other apps / file managers. -->
             <intent-filter>
@@ -107,8 +113,9 @@
             android:name=".feature.settings.rating.RatingActivity"
             android:exported="false" />
 
+        <!-- The file permission step of the start up flow. -->
         <activity
-            android:name=".feature.settings.permission.StoragePermissionActivity"
+            android:name=".ui.permission.PermissionActivity"
             android:exported="false" />
 
         <activity

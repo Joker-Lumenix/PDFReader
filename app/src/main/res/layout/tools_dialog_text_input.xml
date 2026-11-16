@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Bottom sheet with a single text field (rename, password).
-  The layout follows the design of the rename sheet: title, input and the two
-  actions at the bottom.
+  Bottom sheet with a single text field (rename, save).
+
+  Layout follows the design of the rename sheet:
+  - the title is centred, 18sp / 600 / #333333
+  - the input is 316x48, #f4f4f4, radius 12, with a clear glyph on the right
+  - the two actions are 141 wide, 48 high, radius 16, with a 34 gap
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -18,34 +21,54 @@
         style="@style/TextAppearance.AppCore.SheetTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center" />
+        android:gravity="center"
+        android:includeFontPadding="false" />
 
-    <EditText
-        android:id="@+id/etInput"
-        style="@style/Widget.AppCore.InputField"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:layout_marginTop="24dp"
-        android:importantForAutofill="no"
-        android:inputType="text"
-        android:maxLines="1"
-        android:paddingStart="12dp"
-        android:paddingEnd="12dp"
-        android:textColor="@color/text_primary"
-        android:textColorHint="@color/text_placeholder"
-        android:textSize="14sp" />
+        android:layout_marginTop="24dp">
+
+        <EditText
+            android:id="@+id/etInput"
+            style="@style/Widget.AppCore.InputField"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:importantForAutofill="no"
+            android:inputType="text"
+            android:maxLines="1"
+            android:paddingStart="12dp"
+            android:paddingEnd="40dp"
+            android:textColor="@color/text_secondary"
+            android:textColorHint="@color/text_placeholder"
+            android:textSize="14sp" />
+
+        <!-- the clear glyph of the design, 20x20 in the top right of the field -->
+        <ImageView
+            android:id="@+id/ivClear"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="top|end"
+            android:layout_marginTop="14dp"
+            android:layout_marginEnd="12dp"
+            android:clickable="true"
+            android:contentDescription="@string/tools_input_clear"
+            android:focusable="true"
+            android:src="@mipmap/ic_close" />
+
+    </FrameLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
+        android:gravity="start"
         android:orientation="horizontal">
 
         <TextView
             android:id="@+id/btnCancel"
-            android:layout_width="0dp"
+            android:layout_width="141dp"
             android:layout_height="48dp"
-            android:layout_weight="1"
             android:background="@drawable/bg_btn_unable_r16"
             android:clickable="true"
             android:focusable="true"
@@ -57,10 +80,9 @@
 
         <TextView
             android:id="@+id/btnConfirm"
-            android:layout_width="0dp"
+            android:layout_width="141dp"
             android:layout_height="48dp"
-            android:layout_marginStart="12dp"
-            android:layout_weight="1"
+            android:layout_marginStart="34dp"
             android:background="@drawable/gradient_red"
             android:clickable="true"
             android:focusable="true"

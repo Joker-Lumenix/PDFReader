@@ -45,8 +45,7 @@ object PdfMeta {
         return result
     }
 
-    fun textByPage(file: File): List<String> {
-        val parsed = parse(file) ?: return emptyList()
+    fun textByPage(file: File): List<String> {        val parsed = parse(file) ?: return emptyList()
         val result = ArrayList<String>()
         parsed.pageOrder.forEach { pageId ->
             val body = parsed.body(pageId) ?: return@forEach
@@ -151,8 +150,10 @@ object PdfMeta {
         var start = marker + "stream".length
         if (body.getOrNull(start) == '\r') start++
         if (body.getOrNull(start) == '\n') start++
-        val end = body.indexOf("endstream", start)
-        if (end < 0) return null
+        // The parser cuts the object off in front of "endstream", so the
+        // terminator is not part of the body any more - the rest of the body
+        // is the payload.
+        val end = body.indexOf("endstream", start).let { if (it < 0) body.length else it }
         val payload = body.substring(start, end)
         return if (body.contains("/FlateDecode")) inflate(payload) else payload
     }

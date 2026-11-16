@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  A picked image as a row (design "Image to PDF下拉").
+
+  The row is 64 high, the picture is 64x64 at the start of the row and the
+  name and the size of the file sit next to it.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="64dp"
+    android:clickable="true"
+    android:focusable="true">
+
+    <ImageView
+        android:id="@+id/ivThumb"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_gravity="top|start"
+        android:background="@drawable/bg_card_r4"
+        android:clipToOutline="true"
+        android:contentDescription="@string/tools_image_select"
+        android:scaleType="centerCrop" />
+
+    <TextView
+        android:id="@+id/tvName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|start"
+        android:layout_marginStart="76dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginEnd="12dp"
+        android:ellipsize="middle"
+        android:maxLines="1"
+        android:textColor="@color/text_secondary"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvMeta"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|start"
+        android:layout_marginStart="76dp"
+        android:layout_marginTop="42dp"
+        android:layout_marginEnd="12dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/text_placeholder"
+        android:textSize="12sp" />
+
+</FrameLayout>

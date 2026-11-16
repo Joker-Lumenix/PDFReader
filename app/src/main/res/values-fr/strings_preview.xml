@@ -1,18 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  Copy of the document preview and of the annotation editors.
-  The strings live in their own file so the shared table stays untouched.
--->
 <resources>
-
-    <!-- bottom toolbar of the reader -->
     <string name="preview_favorite">Favori</string>
     <string name="preview_annotate">Annoter</string>
     <string name="preview_open_with">Ouvrir avec</string>
     <string name="preview_share">Partager</string>
     <string name="preview_more">Plus</string>
-
-    <!-- reader -->
     <string name="preview_page_indicator">%1$d / %2$d</string>
     <string name="preview_outline">Table des matières</string>
     <string name="preview_add_bookmark">Ajouter un signet à cette page</string>
@@ -22,8 +14,6 @@
     <string name="preview_mode_night">Nuit</string>
     <string name="preview_mode_black">Noir</string>
     <string name="preview_bookmark_added">Signet ajouté</string>
-
-    <!-- annotation tools -->
     <string name="preview_tool_highlight">Surligner</string>
     <string name="preview_tool_underline">Souligner</string>
     <string name="preview_tool_strikethrough">Barrer</string>
@@ -33,21 +23,19 @@
     <string name="preview_select_area">Faites glisser sur la page pour sélectionner une zone</string>
     <string name="preview_note_hint">Saisissez le contenu de l\'annotation</string>
     <string name="preview_note_save">Enregistrer l\'annotation</string>
-
-    <!-- editors -->
     <string name="preview_color">Couleur</string>
+    <string name="preview_add_signature">Ajouter</string>
     <string name="preview_save_to_document">Enregistrer dans le document</string>
     <string name="preview_signature_saved">Signature enregistrée</string>
+    <string name="preview_signature_failed">La page n\'est pas encore prête, réessayez</string>
     <string name="preview_draw_saved">Annotations enregistrées et copie annotée créée</string>
-
-    <!-- states -->
+    <string name="preview_print">Imprimer</string>
+    <string name="preview_feature_unavailable">Cette fonctionnalité n\'est pas disponible pour le moment</string>
     <string name="preview_loading">Analyse du document…</string>
     <string name="preview_load_failed">Impossible d\'afficher ce document</string>
     <string name="preview_load_failed_hint">Le fichier est peut-être endommagé ou son format n\'est pas encore pris en charge</string>
     <string name="preview_retry">Réessayer</string>
     <string name="preview_rename_hint">Saisissez un nouveau nom de fichier</string>
-
-    <!-- content descriptions -->
     <string name="preview_cd_back">Retour</string>
     <string name="preview_cd_more">Plus d\'actions</string>
     <string name="preview_cd_rename">Renommer</string>
@@ -57,10 +45,11 @@
     <string name="preview_cd_color">Choisir une couleur</string>
     <string name="preview_cd_size">Choisir l\'épaisseur</string>
     <string name="preview_cd_favorite">Favori</string>
+    <string name="preview_cd_bookmark">Ajouter un signet</string>
     <string name="preview_cd_share">Partager</string>
     <string name="preview_cd_open_with">Ouvrir avec</string>
     <string name="preview_cd_annotate">Annoter</string>
+    <string name="preview_cd_add_signature">Ajouter une signature au document</string>
     <string name="preview_cd_page">Page %1$d</string>
     <string name="preview_cd_slide">Diapositive %1$d</string>
-
 </resources>

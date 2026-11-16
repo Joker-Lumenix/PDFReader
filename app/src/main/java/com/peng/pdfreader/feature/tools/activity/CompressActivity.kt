@@ -14,6 +14,7 @@ import com.peng.pdfreader.feature.preview.activity.DrawActivity
 import com.peng.pdfreader.feature.preview.activity.SignatureActivity
 import com.peng.pdfreader.R
 import com.peng.pdfreader.appcore.pdf.PdfEngine
+import com.peng.pdfreader.appcore.widget.FileListItemDecoration
 import com.peng.pdfreader.base.BaseActivity
 import com.peng.pdfreader.data.model.DocType
 import com.peng.pdfreader.data.model.Document
@@ -33,7 +34,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 /**
- * Compress flow (design "压缩结果页").
+ * Compress flow (design "compress result page").
  *
  * The first step lists the documents of the sandbox, the second one shows the
  * produced document together with the size comparison.
@@ -55,11 +56,12 @@ class CompressActivity : BaseActivity() {
         setContentView(binding.root)
 
         binding.titleBar.showBack = true
-        binding.titleBar.title = getString(R.string.tools_compress_title)
+        binding.titleBar.title = getString(R.string.compress)
         binding.titleBar.onBackClick = { onBackPressedDispatcher.onBackPressed() }
 
         binding.rvDocuments.layoutManager = LinearLayoutManager(this)
         binding.rvDocuments.adapter = adapter
+        binding.rvDocuments.addItemDecoration(FileListItemDecoration(dp(12)))
 
         val docId = intent.getStringExtra(EXTRA_DOC_ID)
         val document = docId?.let { repository.byId(it) }
@@ -73,7 +75,7 @@ class CompressActivity : BaseActivity() {
     private fun showPicker() {
         binding.rvDocuments.visibility = View.VISIBLE
         binding.resultPage.root.visibility = View.GONE
-        binding.titleBar.title = getString(R.string.tools_compress_title)
+        binding.titleBar.title = getString(R.string.compress)
         val documents = repository.all().filter { it.type == DocType.PDF }
         adapter.submit(documents)
         if (documents.isEmpty()) {
@@ -84,7 +86,7 @@ class CompressActivity : BaseActivity() {
     private fun compress(document: Document) {
         binding.rvDocuments.visibility = View.GONE
         binding.resultPage.root.visibility = View.VISIBLE
-        binding.titleBar.title = getString(R.string.tools_compress_result_title)
+        binding.titleBar.title = getString(R.string.result)
         binding.titleBar.subtitle = getString(R.string.tools_compress_running)
 
         val out = ToolOutput.file(this, "compressed.pdf")
@@ -119,6 +121,7 @@ class CompressActivity : BaseActivity() {
         ToolsResultBinder.bindDocument(this, binding.resultPage, document)
         ToolsResultBinder.bindSizes(this, binding.resultPage, before, after)
         ToolsResultBinder.bindActions(
+            this,
             binding.resultPage,
             ToolsResultActions(
                 onOpenWith = { openWith(document) },
@@ -177,6 +180,8 @@ class CompressActivity : BaseActivity() {
     private fun toastNotAvailable() {
         Toast.makeText(this, R.string.tools_not_available, Toast.LENGTH_SHORT).show()
     }
+
+    private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
 
     companion object {
         private const val EXTRA_DOC_ID = "doc_id"

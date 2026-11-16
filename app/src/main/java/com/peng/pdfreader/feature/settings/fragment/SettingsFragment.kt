@@ -1,33 +1,35 @@
 package com.peng.pdfreader.feature.settings.fragment
 
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import com.peng.pdfreader.BuildConfig
 import com.peng.pdfreader.R
 import com.peng.pdfreader.base.BaseFragment
-import com.peng.pdfreader.data.prefs.AppPrefs
-import com.peng.pdfreader.databinding.FragmentSettingsBinding
+import com.peng.pdfreader.databinding.SettingsFragmentBinding
 import com.peng.pdfreader.databinding.SettingsRowBinding
 import com.peng.pdfreader.feature.feedback.FeedbackActivity
 import com.peng.pdfreader.feature.language.LanguageActivity
 import com.peng.pdfreader.feature.language.LanguageCatalog
 import com.peng.pdfreader.feature.settings.notice.NoticeActivity
-import com.peng.pdfreader.feature.settings.permission.SetDefaultReaderSheet
+import com.peng.pdfreader.feature.settings.rating.RatingActivity
 import com.peng.pdfreader.feature.settings.util.SettingsScreen
 
 /**
  * Settings tab: sharing, language, feedback, privacy policy and terms of use.
+ *
+ * The app bar carries the red thumbs up of the design, it opens the rating
+ * sheet.
  */
 class SettingsFragment : BaseFragment() {
 
-    private var _binding: FragmentSettingsBinding? = null
+    private var _binding: SettingsFragmentBinding? = null
     private val binding get() = _binding!!
 
     override fun onCreateView(
@@ -35,7 +37,7 @@ class SettingsFragment : BaseFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        _binding = FragmentSettingsBinding.inflate(inflater, container, false)
+        _binding = SettingsFragmentBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -43,7 +45,7 @@ class SettingsFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.titleBar.title = getString(R.string.nav_settings)
-        binding.titleBar.addAction(buildTitleAction())
+        binding.titleBar.addAction(buildRateAction())
 
         bindRows()
 
@@ -53,6 +55,11 @@ class SettingsFragment : BaseFragment() {
     override fun onResume() {
         super.onResume()
         updateLanguageSubtitle()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun bindRows() {
@@ -100,29 +107,25 @@ class SettingsFragment : BaseFragment() {
 
     /** The language row carries the current selection as its subtitle. */
     private fun updateLanguageSubtitle() {
-        val option = LanguageCatalog.find(AppPrefs.get(requireContext()).language)
+        val applied = AppCompatDelegate.getApplicationLocales()[0]?.toLanguageTag()
+        val option = LanguageCatalog.find(applied)
         val subtitle = binding.rowLanguage.tvRowSubtitle
         subtitle.visibility = View.VISIBLE
-        if (option == null) {
-            subtitle.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_error_pink))
-            subtitle.text = getString(R.string.settings_follow_system)
+        subtitle.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_error_pink))
+        subtitle.text = if (option == null) {
+            getString(R.string.settings_follow_system)
         } else {
-            subtitle.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_placeholder))
-            subtitle.text = getString(option.labelRes)
+            getString(option.labelRes)
         }
     }
 
-    private fun buildTitleAction(): View {
+    /** The red thumbs up of the design opens the rating sheet. */
+    private fun buildRateAction(): View {
         val action = ImageView(requireContext()).apply {
             layoutParams = FrameLayout.LayoutParams(dp(24), dp(24))
-            setImageResource(R.mipmap.ic_more)
-            imageTintList = ColorStateList.valueOf(
-                ContextCompat.getColor(requireContext(), R.color.brand_primary_dark),
-            )
-            contentDescription = getString(R.string.settings_action_more)
-            setOnClickListener {
-                SetDefaultReaderSheet().show(parentFragmentManager, SetDefaultReaderSheet.TAG)
-            }
+            setImageResource(R.mipmap.ic_zan)
+            contentDescription = getString(R.string.rate)
+            setOnClickListener { openRating() }
         }
         return action
     }
@@ -144,6 +147,10 @@ class SettingsFragment : BaseFragment() {
 
     private fun openFeedback() {
         SettingsScreen.start(requireContext(), Intent(requireContext(), FeedbackActivity::class.java))
+    }
+
+    private fun openRating() {
+        SettingsScreen.start(requireContext(), Intent(requireContext(), RatingActivity::class.java))
     }
 
     private fun openNotice(type: String) {

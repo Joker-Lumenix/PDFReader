@@ -12,31 +12,32 @@
 
     <!-- page titles -->
     <string name="lock_page_encrypt">Chiffrer un PDF</string>
-    <string name="lock_page_decrypt">Déchiffrer un PDF</string>
+    <string name="lock_page_select">Sélectionner un fichier</string>
 
     <!-- password sheet -->
     <string name="lock_set_password">Définir un mot de passe</string>
     <string name="lock_set_password_hint">Un mot de passe sera demandé à l\'ouverture de ce fichier</string>
     <string name="lock_remove_password">Supprimer le mot de passe</string>
     <string name="lock_remove_password_hint">Le fichier ne sera plus protégé par un mot de passe</string>
+    <string name="lock_enter_password">Saisir le mot de passe</string>
+    <string name="lock_enter_password_hint">Un mot de passe est nécessaire pour ouvrir ce fichier</string>
     <string name="lock_password_hint">Saisissez le mot de passe</string>
     <string name="lock_password_too_short">Le mot de passe doit contenir au moins 4 caractères</string>
-    <string name="lock_clear_password">Effacer le mot de passe</string>
     <string name="lock_toggle_password">Afficher le mot de passe</string>
 
     <!-- states -->
     <string name="lock_wrong_password">Mot de passe incorrect</string>
     <string name="lock_not_encrypted">Ce fichier n\'est pas chiffré</string>
     <string name="lock_operation_failed">Échec de l\'opération, veuillez réessayer</string>
-    <string name="lock_working">Traitement…</string>
-    <string name="lock_badge_encrypted">Chiffré</string>
 
     <!-- file list -->
-    <string name="lock_empty_hint">Aucun fichier PDF à traiter dans le bac à sable</string>
     <string name="lock_import">Importer un PDF</string>
+    <string name="lock_no_document">Sélectionnez d\'abord un fichier</string>
 
     <!-- result -->
     <string name="lock_result_path">Chemin : %1$s</string>
+    <string name="lock_result_locked">PDF chiffré</string>
+    <string name="lock_result_unlocked">PDF déchiffré</string>
     <string name="lock_open_failed">Aucune app trouvée pour ouvrir ce fichier</string>
 
 </resources>

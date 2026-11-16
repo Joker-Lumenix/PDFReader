@@ -1,34 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  Copy of the tool screens (Tools tab + the PDF tool flows).
-
-  The tool tab reuses the terminology of the main string table wherever it
-  exists (R.string.merge / split / image_to_pdf / encrypt / decrypt / print),
-  only the copy that the tool screens need on their own lives here.
--->
 <resources>
-
-    <!-- ==================== tools tab ==================== -->
-
     <string name="tools_scan_to_pdf">スキャンして PDF を作成</string>
     <string name="tools_zip_file">ZIP 圧縮ファイル</string>
+    <string name="tools_label_lock">PDF をロック</string>
+    <string name="tools_label_unlock">PDF のロックを解除</string>
+    <string name="tools_label_zip">Zip ファイル</string>
     <string name="tools_not_available">この機能はまだ利用できません</string>
     <string name="tools_failed">操作に失敗しました: %1$s</string>
     <string name="tools_working">処理中…</string>
     <string name="tools_pick_document">PDF ドキュメントを選択</string>
     <string name="tools_empty_documents">サンドボックスに PDF ドキュメントはまだありません</string>
-
-    <!-- ==================== merge ==================== -->
-
     <string name="tools_merge_title">PDF 結合</string>
     <string name="tools_merge_running">結合中…</string>
     <string name="tools_merge_empty">結合できるドキュメントがありません</string>
     <string name="tools_merge_add">ドキュメントを追加</string>
     <string name="tools_merge_remove">削除</string>
     <string name="tools_merge_success_hint">結合が完了しました。ファイルはサンドボックスに保存されました</string>
-
-    <!-- ==================== split ==================== -->
-
     <string name="tools_split_title">PDF 分割</string>
     <string name="tools_split_action">分割</string>
     <string name="tools_split_running">分割中…</string>
@@ -37,46 +24,34 @@
     <string name="tools_split_range_hint">ページ範囲（例: 1-3,5）</string>
     <string name="tools_split_range_invalid">ページ範囲の形式が正しくありません</string>
     <string name="tools_split_done">%1$d 個のドキュメントに分割しました</string>
-
-    <!-- ==================== image to pdf ==================== -->
-
+    <string name="tools_split_banner_drag">サムネイルをドラッグすると順序を変更できます。</string>
+    <string name="tools_split_selected">%1$d ページを選択中</string>
+    <string name="tools_split_reorder">並べ替え</string>
     <string name="tools_image_to_pdf_title">画像から PDF</string>
     <string name="tools_image_select">画像を選択</string>
     <string name="tools_image_running">PDF を作成中…</string>
     <string name="tools_image_failed">画像の変換に失敗しました</string>
     <string name="tools_image_go_to_set">設定へ</string>
     <string name="tools_image_added">%1$d 枚の画像を追加しました</string>
-
-    <!-- ==================== compress ==================== -->
-
+    <string name="tools_image_add">画像を追加</string>
+    <string name="tools_image_strip">選択した画像</string>
+    <string name="tools_input_clear">入力を消去</string>
     <string name="tools_compress_title">PDF 圧縮</string>
     <string name="tools_compress_result_title">結果</string>
     <string name="tools_compress_running">圧縮中…</string>
     <string name="tools_compress_empty">先に PDF ドキュメントを選択してください</string>
-
-    <!-- ==================== scan ==================== -->
-
     <string name="tools_scan_title">スキャンして PDF を作成</string>
     <string name="tools_scan_no_camera">利用できるカメラアプリが見つかりません</string>
     <string name="tools_scan_failed">撮影に失敗しました</string>
     <string name="tools_scan_done">スキャンドキュメントを作成しました</string>
-
-    <!-- ==================== print ==================== -->
-
     <string name="tools_print_title">PDF 印刷</string>
     <string name="tools_print_no_printer">利用できるプリンターが見つかりません</string>
     <string name="tools_print_failed">印刷サービスを開始できませんでした</string>
-
-    <!-- ==================== lock / unlock ==================== -->
-
     <string name="tools_lock_title">パスワードを設定</string>
     <string name="tools_unlock_title">パスワードを入力</string>
     <string name="tools_lock_done">ドキュメントを暗号化しました</string>
     <string name="tools_unlock_done">ドキュメントの暗号化を解除しました</string>
     <string name="tools_unlock_failed">復号に失敗しました。パスワードを確認してください</string>
-
-    <!-- ==================== result page ==================== -->
-
     <string name="tools_result_more">その他</string>
     <string name="tools_result_open_with">別のアプリで開く</string>
     <string name="tools_result_compress">圧縮</string>
@@ -94,5 +69,4 @@
     <string name="tools_result_pages">%1$d ページ</string>
     <string name="tools_result_share_unavailable">共有機能はまだ利用できません</string>
     <string name="tools_zip_done">ZIP ファイルを作成しました: %1$s</string>
-
 </resources>

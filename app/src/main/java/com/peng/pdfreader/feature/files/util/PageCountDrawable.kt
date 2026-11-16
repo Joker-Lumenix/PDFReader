@@ -50,7 +50,7 @@ class PageCountDrawable(
         val metrics = textPaint.fontMetrics
         val textWidth = textPaint.measureText(label)
         val textHeight = metrics.descent - metrics.ascent
-        val paddingH = dp(3f)
+        val paddingH = dp(8f)
         val paddingV = dp(1f)
         val chipWidth = textWidth + paddingH * 2
         val chipHeight = textHeight + paddingV * 2

@@ -10,6 +10,7 @@ import com.peng.pdfreader.R
 import com.peng.pdfreader.appcore.widget.FileItemUiState
 import com.peng.pdfreader.data.model.Document
 import com.peng.pdfreader.databinding.LockItemFileBinding
+import com.peng.pdfreader.feature.lock.widget.LockThumbnailDrawable
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -68,14 +69,14 @@ class LockFileAdapter(
                     meta = metaOf(context, item),
                     typeLabel = context.getString(item.type.labelRes),
                     typeColor = ContextCompat.getColor(context, R.color.brand_primary_light),
-                    thumbnail = ContextCompat.getDrawable(context, item.type.logoRes),
+                    thumbnail = LockThumbnailDrawable(
+                        context = context,
+                        base = ContextCompat.getDrawable(context, item.type.logoRes)!!,
+                        pageCount = item.pageCount,
+                        locked = item.isEncrypted,
+                    ),
                     showType = true,
                     showMore = true,
-                    badge = if (item.isEncrypted) {
-                        context.getString(R.string.lock_badge_encrypted)
-                    } else {
-                        null
-                    },
                 ),
             )
         }

@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.WindowInsets
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -31,6 +32,22 @@ class BottomNavBar @JvmOverloads constructor(
         orientation = VERTICAL
         LayoutInflater.from(context).inflate(R.layout.widget_bottom_nav, this, true)
         tabsHolder = findViewById(R.id.llTabs)
+        applySystemBarInset()
+    }
+
+    /**
+     * Keeps the bar above the system navigation.
+     *
+     * The app draws edge to edge, so the window reaches behind the navigation
+     * bar; the bar takes its inset as padding and grows by it.
+     */
+    private fun applySystemBarInset() {
+        setOnApplyWindowInsetsListener { view, insets ->
+            val bottom = insets.getInsets(WindowInsets.Type.navigationBars()).bottom
+            view.setPadding(0, 0, 0, bottom)
+            insets
+        }
+        requestApplyInsets()
     }
 
     /**

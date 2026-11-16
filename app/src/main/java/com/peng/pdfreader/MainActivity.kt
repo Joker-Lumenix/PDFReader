@@ -3,42 +3,43 @@ package com.peng.pdfreader
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.result.contract.ActivityResultContracts
+import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.peng.pdfreader.appcore.util.Logger
 import com.peng.pdfreader.appcore.widget.BottomNavItem
 import com.peng.pdfreader.base.BaseActivity
 import com.peng.pdfreader.base.BaseBackHandler
 import com.peng.pdfreader.data.model.Document
+import com.peng.pdfreader.data.repository.DocumentRepository
 import com.peng.pdfreader.databinding.ActivityMainBinding
 import com.peng.pdfreader.feature.files.fragment.FilesFragment
 import com.peng.pdfreader.feature.home.fragment.HomeFragment
 import com.peng.pdfreader.feature.home.model.QuickAction
-import com.peng.pdfreader.feature.onboarding.OnboardingLauncher
+import com.peng.pdfreader.feature.lock.activity.LockActivity
 import com.peng.pdfreader.feature.preview.activity.PreviewActivity
 import com.peng.pdfreader.feature.settings.fragment.SettingsFragment
-import com.peng.pdfreader.feature.settings.notification.NotificationPermissionSheet
-import com.peng.pdfreader.feature.settings.permission.StoragePermissionActivity
+import com.peng.pdfreader.feature.settings.notification.PersistentNotificationHelper
+import com.peng.pdfreader.feature.settings.widget.QuickEntryPopupView
+import com.peng.pdfreader.feature.tools.activity.CompressActivity
+import com.peng.pdfreader.feature.tools.activity.MergeActivity
 import com.peng.pdfreader.feature.tools.fragment.ToolsFragment
 import com.peng.pdfreader.feature.tools.scanner.ScanActivity
+import com.peng.pdfreader.ui.permission.PermissionActivity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
- * Application shell.
+ * The home of the app.
  *
- * Hosts the four top level tabs and routes the actions the tabs report. Every
- * tab is an independent fragment under `feature/<domain>/fragment`; the shell
- * only decides where a reported action leads.
+ * It only hosts the four tabs and routes the actions the tabs report; the
+ * steps of the start up flow (splash, onboarding, permission) live in their own
+ * activities.
  */
 class MainActivity : BaseActivity() {
 
     private lateinit var binding: ActivityMainBinding
-
-    private val onboardingLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult(),
-    ) {
-        // The notification permission sheet is the next step of the first run.
-        showNotificationPermissionSheet()
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,7 +49,47 @@ class MainActivity : BaseActivity() {
         binding.bottomNav.setItems(navItems(), TAB_HOME) { tab -> showTab(tab) }
         if (savedInstanceState == null) {
             showTab(TAB_HOME)
-            startOnboardingIfNeeded()
+        }
+        handleIntent(intent)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleIntent(intent)
+    }
+
+    /**
+     * Routes the intent of the shell and of the quick actions of the ongoing
+     * notification.
+     */
+    private fun handleIntent(intent: Intent?) {
+        val action = intent?.action ?: return
+        when (action) {
+            PersistentNotificationHelper.ACTION_SCAN -> startActivity(Intent(this, ScanActivity::class.java))
+            PersistentNotificationHelper.ACTION_LOCK -> LockActivity.start(this)
+            PersistentNotificationHelper.ACTION_COMPRESS -> CompressActivity.start(this)
+            PersistentNotificationHelper.ACTION_PRINT -> showTab(TAB_FILES)
+            Intent.ACTION_VIEW, Intent.ACTION_SEND -> handleIncomingDocument(intent)
+        }
+    }
+
+    /**
+     * Opens a document that was handed over by another app.
+     *
+     * The file is copied into the private sandbox first, then previewed.
+     */
+    private fun handleIncomingDocument(intent: Intent?) {
+        val uri = when (intent?.action) {
+            Intent.ACTION_VIEW -> intent.data
+            Intent.ACTION_SEND -> intent.getParcelableExtraCompat(Intent.EXTRA_STREAM)
+            else -> null
+        } ?: return
+        lifecycleScope.launch {
+            val document = withContext(Dispatchers.IO) {
+                DocumentRepository.get(this@MainActivity).importFromUri(this@MainActivity, uri)
+            }
+            if (document != null) openDocument(document)
         }
     }
 
@@ -78,9 +119,9 @@ class MainActivity : BaseActivity() {
         TAB_SETTINGS -> SettingsFragment()
         else -> HomeFragment().apply {
             onOpenDocument = { document -> openDocument(document) }
-            onDocumentMenu = { document -> openDocumentMenu(document) }
             onQuickAction = { action -> onQuickAction(action) }
             onScanClick = { openScanner() }
+            onQuickEntry = { anchor -> showQuickEntry(anchor) }
             onShareClick = { shareApp() }
             onPrintClick = { openPrinter() }
             onMoreClick = { showTab(TAB_FILES) }
@@ -94,11 +135,6 @@ class MainActivity : BaseActivity() {
         PreviewActivity.start(this, document.id)
     }
 
-    private fun openDocumentMenu(document: Document) {
-        // The file action sheet lives in the files feature; the home row menu
-        // reuses the same entry point.
-        showTab(TAB_FILES)
-    }
 
     private fun onQuickAction(action: QuickAction) {
         when (action) {
@@ -115,6 +151,23 @@ class MainActivity : BaseActivity() {
         }
     }
 
+    /**
+     * The quick entry panel of the design: it opens above the round button of
+     * the home tab and offers Scan PDF, Merge PDF and Print PDF.
+     */
+    private fun showQuickEntry(anchor: View) {
+        val popup = QuickEntryPopupView(this)
+        popup.onEntryClick = { entry ->
+            popup.dismiss()
+            when (entry.id) {
+                "scan" -> openScanner()
+                "merge" -> MergeActivity.start(this)
+                "print" -> showTab(TAB_FILES)
+            }
+        }
+        popup.show(anchor)
+    }
+
     private fun shareApp() {
         val intent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
@@ -129,18 +182,7 @@ class MainActivity : BaseActivity() {
     }
 
     private fun openStoragePermission() {
-        startActivity(Intent(this, StoragePermissionActivity::class.java))
-    }
-
-    // ---------------------------------------------------------------- first run
-
-    private fun startOnboardingIfNeeded() {
-        OnboardingLauncher.showIfNeeded(this) { intent -> onboardingLauncher.launch(intent) }
-    }
-
-    private fun showNotificationPermissionSheet() {
-        if (supportFragmentManager.findFragmentByTag(NotificationPermissionSheet.TAG) != null) return
-        NotificationPermissionSheet().show(supportFragmentManager, NotificationPermissionSheet.TAG)
+        startActivity(Intent(this, PermissionActivity::class.java))
     }
 
     private fun tagOf(tab: Int): String = "tab_$tab"
@@ -179,5 +221,14 @@ class MainActivity : BaseActivity() {
         const val TAB_FILES = 1
         const val TAB_TOOLS = 2
         const val TAB_SETTINGS = 3
+
+        /** Reads a stream uri from an intent, whatever the platform version. */
+        private fun Intent.getParcelableExtraCompat(name: String): android.net.Uri? =
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                getParcelableExtra(name, android.net.Uri::class.java)
+            } else {
+                @Suppress("DEPRECATION")
+                getParcelableExtra(name) as? android.net.Uri
+            }
     }
 }

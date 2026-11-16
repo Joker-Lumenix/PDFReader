@@ -16,6 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/bg_card_r4"
+        android:clipToOutline="true"
         android:contentDescription="@string/tools_split_title"
         android:scaleType="centerCrop" />
 

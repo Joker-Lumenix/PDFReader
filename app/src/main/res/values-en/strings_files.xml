@@ -8,12 +8,26 @@
 -->
 <resources>
 
-    <!-- filter / sort sheets -->
+    <!-- scope tabs of the file list -->
+    <string name="files_tab_all">All</string>
+    <string name="files_tab_recent">Recent</string>
+    <string name="files_tab_favorites">Favorites</string>
+
+    <!-- search -->
+    <string name="files_search_hint">Search file names</string>
+
+    <!-- sort sheet -->
     <string name="files_sort_title">Sort by</string>
-    <string name="files_filter_title">File type</string>
     <string name="files_sort_section_time">Recently modified</string>
     <string name="files_sort_section_name">Name</string>
     <string name="files_sort_section_size">File size</string>
+    <string name="files_sort_new_to_old">Newest to oldest</string>
+    <string name="files_sort_old_to_new">Oldest to newest</string>
+    <string name="files_sort_a_to_z">A to Z</string>
+    <string name="files_sort_z_to_a">Z to A</string>
+    <string name="files_sort_large_to_small">Largest to smallest</string>
+    <string name="files_sort_small_to_large">Smallest to largest</string>
+    <string name="files_apply">Apply</string>
 
     <!-- file action sheet -->
     <string name="files_open_with">Open with another app</string>
@@ -21,9 +35,19 @@
     <string name="files_print">Print</string>
     <string name="files_feature_unavailable">This feature is under development</string>
 
+    <!-- multi select action bar -->
+    <string name="files_action_edit">Edit</string>
+    <string name="files_action_merge">Merge</string>
+
     <!-- dialogs -->
-    <string name="files_rename_hint">Enter a new file name</string>
     <string name="files_delete_message">Delete this file? This cannot be undone.</string>
     <string name="files_save_message">Save the changes to this file? This cannot be undone.</string>
+
+    <!-- empty states -->
+    <string name="files_empty_title">No files yet</string>
+    <string name="files_empty_hint">Quick access to frequent files</string>
+    <string name="files_search_empty_title">No matching files</string>
+    <string name="files_search_empty_hint">Try another keyword</string>
+    <string name="files_selected_count">%1$d selected</string>
 
 </resources>

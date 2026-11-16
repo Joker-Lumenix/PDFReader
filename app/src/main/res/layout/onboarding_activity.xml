@@ -1,58 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Onboarding: three pages, a page indicator, a skip link and the next button.
+  Onboarding: three pages, the page indicator on the left and the next button.
+
+  Geometry of the design: the indicator starts 24dp from the left edge and
+  sits 20dp above the 312x48dp next button, which keeps a 32dp margin to the
+  bottom of the screen. The design carries no skip link, the next button of the
+  last page leaves the flow.
 -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/surface_card">
+    android:background="@color/surface_card"
+    android:orientation="vertical">
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/pager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/pager"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
-        <LinearLayout
-            android:id="@+id/llDots"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="26dp"
-            android:orientation="horizontal" />
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnNext"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_marginStart="24dp"
-            android:layout_marginEnd="24dp"
-            android:layout_marginBottom="@dimen/space_xxl"
-            android:background="@drawable/gradient_red"
-            android:backgroundTint="@null"
-            android:letterSpacing="0"
-            android:stateListAnimator="@null"
-            android:text="@string/next"
-            android:textColor="@color/text_on_tint"
-            android:textSize="16sp" />
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/tvSkip"
+        android:id="@+id/llDots"
         android:layout_width="wrap_content"
-        android:layout_height="48dp"
-        android:layout_gravity="end|top"
-        android:layout_marginEnd="@dimen/space_ml"
-        android:gravity="center"
-        android:paddingStart="@dimen/space_m"
-        android:paddingEnd="@dimen/space_m"
-        android:text="@string/onboarding_skip"
-        android:textColor="@color/text_placeholder"
-        android:textSize="14sp" />
+        android:layout_height="6dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginBottom="20dp"
+        android:orientation="horizontal" />
 
-</FrameLayout>
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnNext"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="@dimen/space_xxl"
+        android:background="@drawable/gradient_red"
+        android:backgroundTint="@null"
+        android:fontFamily="sans-serif-medium"
+        android:letterSpacing="0"
+        android:stateListAnimator="@null"
+        android:text="@string/next"
+        android:textColor="@color/text_on_tint"
+        android:textSize="16sp" />
+
+</LinearLayout>

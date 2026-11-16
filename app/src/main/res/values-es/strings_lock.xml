@@ -12,31 +12,32 @@
 
     <!-- page titles -->
     <string name="lock_page_encrypt">Cifrar PDF</string>
-    <string name="lock_page_decrypt">Descifrar PDF</string>
+    <string name="lock_page_select">Seleccionar archivo</string>
 
     <!-- password sheet -->
     <string name="lock_set_password">Establecer contraseña</string>
     <string name="lock_set_password_hint">Al abrir el archivo se pedirá la contraseña</string>
     <string name="lock_remove_password">Quitar contraseña</string>
     <string name="lock_remove_password_hint">El archivo dejará de estar protegido con contraseña</string>
+    <string name="lock_enter_password">Introducir contraseña</string>
+    <string name="lock_enter_password_hint">Se necesita una contraseña para abrir este archivo</string>
     <string name="lock_password_hint">Introduce la contraseña</string>
     <string name="lock_password_too_short">La contraseña debe tener al menos 4 caracteres</string>
-    <string name="lock_clear_password">Borrar contraseña</string>
     <string name="lock_toggle_password">Mostrar contraseña</string>
 
     <!-- states -->
     <string name="lock_wrong_password">Contraseña incorrecta</string>
     <string name="lock_not_encrypted">Este archivo no está cifrado</string>
     <string name="lock_operation_failed">Error en la operación, inténtalo de nuevo</string>
-    <string name="lock_working">Procesando…</string>
-    <string name="lock_badge_encrypted">Cifrado</string>
 
     <!-- file list -->
-    <string name="lock_empty_hint">Aún no hay archivos PDF en el sandbox</string>
     <string name="lock_import">Importar PDF</string>
+    <string name="lock_no_document">Primero elige un archivo</string>
 
     <!-- result -->
     <string name="lock_result_path">Ruta: %1$s</string>
+    <string name="lock_result_locked">PDF cifrado</string>
+    <string name="lock_result_unlocked">PDF descifrado</string>
     <string name="lock_open_failed">No se encontró ninguna app que pueda abrir este archivo</string>
 
 </resources>

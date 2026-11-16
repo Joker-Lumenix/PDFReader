@@ -12,31 +12,32 @@
 
     <!-- page titles -->
     <string name="lock_page_encrypt">تشفير PDF</string>
-    <string name="lock_page_decrypt">فك تشفير PDF</string>
+    <string name="lock_page_select">اختيار ملف</string>
 
     <!-- password sheet -->
     <string name="lock_set_password">تعيين كلمة المرور</string>
     <string name="lock_set_password_hint">ستُطلب كلمة المرور عند فتح هذا الملف</string>
     <string name="lock_remove_password">إزالة كلمة المرور</string>
     <string name="lock_remove_password_hint">لن يكون الملف محميًا بكلمة المرور بعد الإزالة</string>
+    <string name="lock_enter_password">إدخال كلمة المرور</string>
+    <string name="lock_enter_password_hint">كلمة المرور مطلوبة لفتح هذا الملف</string>
     <string name="lock_password_hint">أدخل كلمة المرور</string>
     <string name="lock_password_too_short">يجب ألا تقل كلمة المرور عن 4 أحرف</string>
-    <string name="lock_clear_password">مسح كلمة المرور</string>
     <string name="lock_toggle_password">إظهار كلمة المرور</string>
 
     <!-- states -->
     <string name="lock_wrong_password">كلمة المرور غير صحيحة</string>
     <string name="lock_not_encrypted">هذا الملف غير مشفّر</string>
     <string name="lock_operation_failed">فشلت العملية، يرجى المحاولة مرة أخرى</string>
-    <string name="lock_working">جارٍ المعالجة…</string>
-    <string name="lock_badge_encrypted">مشفّر</string>
 
     <!-- file list -->
-    <string name="lock_empty_hint">لا توجد ملفات PDF في البيئة المعزولة بعد</string>
     <string name="lock_import">استيراد PDF</string>
+    <string name="lock_no_document">الرجاء اختيار ملف أولاً</string>
 
     <!-- result -->
     <string name="lock_result_path">المسار: %1$s</string>
+    <string name="lock_result_locked">تم تشفير ملف PDF</string>
+    <string name="lock_result_unlocked">تم فك تشفير ملف PDF</string>
     <string name="lock_open_failed">لم يتم العثور على تطبيق يمكنه فتح هذا الملف</string>
 
 </resources>

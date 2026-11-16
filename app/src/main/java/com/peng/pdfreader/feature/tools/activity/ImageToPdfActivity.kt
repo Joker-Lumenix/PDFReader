@@ -2,13 +2,12 @@ package com.peng.pdfreader.feature.tools.activity
 
 import android.content.Context
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import android.view.LayoutInflater
+import android.view.Gravity
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -16,22 +15,24 @@ import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.peng.pdfreader.R
 import com.peng.pdfreader.base.BaseActivity
 import com.peng.pdfreader.data.model.DocType
 import com.peng.pdfreader.data.repository.DocumentRepository
 import com.peng.pdfreader.databinding.ToolsActivityImageToPdfBinding
-import com.peng.pdfreader.databinding.ToolsDialogProgressBinding
 import com.peng.pdfreader.feature.preview.activity.PreviewActivity
+import com.peng.pdfreader.feature.tools.adapter.EdgeGapDecoration
+import com.peng.pdfreader.feature.tools.adapter.ImageRowAdapter
 import com.peng.pdfreader.feature.tools.adapter.ImageTileAdapter
-import com.peng.pdfreader.feature.tools.adapter.ToolGridDecoration
+import com.peng.pdfreader.feature.tools.adapter.PitchGridDecoration
 import com.peng.pdfreader.feature.tools.engine.ToolEngines
+import com.peng.pdfreader.feature.tools.util.ToolFormatters
 import com.peng.pdfreader.feature.tools.util.ToolOutput
 import com.peng.pdfreader.feature.tools.util.ToolShapes
+import com.peng.pdfreader.feature.tools.view.ImageGlyphDrawable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -54,12 +55,34 @@ class ImageToPdfActivity : BaseActivity() {
     private val images = mutableListOf<File>()
     private val thumbnails = mutableListOf<Bitmap>()
 
+    /** The design shows the pictures as a grid, the list is the second view. */
+    private var listMode = false
+
     private val adapter by lazy {
         ImageTileAdapter(
             onAddClick = { pickImages() },
             onImageClick = { index -> removeImage(index) },
         )
     }
+
+    private val rowAdapter by lazy {
+        ImageRowAdapter { index ->
+            // the first row is the camera, it opens the picker
+            if (index == 0) pickImages() else removeImage(index - 1)
+        }
+    }
+
+    private val gridDecoration by lazy {
+        // the tiles of the design sit at x = 12 / 128 / 244, 12 apart
+        PitchGridDecoration(
+            cellWidthPx = dp(104),
+            pitchPx = dp(116),
+            startMarginPx = dp(12),
+            rowSpacingPx = dp(12),
+        )
+    }
+
+    private val listDecoration by lazy { EdgeGapDecoration(dp(12), dp(12)) }
 
     private val picker = registerForActivityResult(
         ActivityResultContracts.PickMultipleVisualMedia(MAX_IMAGES),
@@ -73,20 +96,20 @@ class ImageToPdfActivity : BaseActivity() {
         setContentView(binding.root)
 
         binding.titleBar.showBack = true
-        binding.titleBar.title = getString(R.string.tools_image_to_pdf_title)
+        binding.titleBar.title = getString(R.string.image_to_pdf)
         binding.titleBar.onBackClick = { onBackPressedDispatcher.onBackPressed() }
-        binding.titleBar.addAction(buildPickAction())
-
-        binding.rvImages.layoutManager = GridLayoutManager(this, 3)
-        binding.rvImages.adapter = adapter
-        binding.rvImages.addItemDecoration(
-            ToolGridDecoration(
-                spanCount = 3,
-                cellWidthPx = dp(104),
-                rowSpacingPx = dp(12),
-                itemCount = { adapter.itemCount },
-            ),
+        // the design puts the picture action next to the title, it switches
+        // between the grid and the list of the picked pictures
+        binding.ivHeaderIcon.setImageDrawable(
+            ImageGlyphDrawable(resources.displayMetrics.density),
         )
+        binding.ivHeaderIcon.setOnClickListener { toggleViewMode() }
+
+        // the running card of the design is a white surface with a radius of 20
+        binding.loadingCard.background =
+            ToolShapes.roundRect(this, ToolShapes.SURFACE_SHEET, 20f)
+
+        applyViewMode()
 
         binding.btnImport.setOnClickListener { importToPdf() }
         binding.btnGoToSet.setOnClickListener { openAppSettings() }
@@ -101,13 +124,28 @@ class ImageToPdfActivity : BaseActivity() {
 
     // ------------------------------------------------------------------ picking
 
-    private fun buildPickAction(): ImageView = ImageView(this).apply {
-        layoutParams = FrameLayout.LayoutParams(dp(24), dp(24)).apply {
-            marginStart = dp(8)
+    /**
+     * Switches between the grid of the design "Image to PDF" and the list of
+     * the design "Image to PDF下拉".
+     */
+    private fun toggleViewMode() {
+        listMode = !listMode
+        applyViewMode()
+    }
+
+    private fun applyViewMode() {
+        binding.rvImages.removeItemDecoration(gridDecoration)
+        binding.rvImages.removeItemDecoration(listDecoration)
+        if (listMode) {
+            binding.rvImages.layoutManager = LinearLayoutManager(this)
+            binding.rvImages.adapter = rowAdapter
+            binding.rvImages.addItemDecoration(listDecoration)
+        } else {
+            binding.rvImages.layoutManager = GridLayoutManager(this, 3)
+            binding.rvImages.adapter = adapter
+            binding.rvImages.addItemDecoration(gridDecoration)
         }
-        setImageResource(R.mipmap.ic_file_choose)
-        imageTintList = ColorStateList.valueOf(getColor(R.color.text_placeholder))
-        setOnClickListener { pickImages() }
+        refresh()
     }
 
     private fun pickImages() {
@@ -166,11 +204,11 @@ class ImageToPdfActivity : BaseActivity() {
             Toast.makeText(this, R.string.tools_image_failed, Toast.LENGTH_SHORT).show()
             return
         }
-        val dialog = showProgress()
+        showLoading(true)
         val out = ToolOutput.file(this, "images.pdf")
         lifecycleScope.launch {
             val outcome = engine.imagesToPdf(images.toList(), out)
-            dialog.dismiss()
+            showLoading(false)
             outcome.fold(
                 onSuccess = {
                     val document = repository.addExisting(
@@ -197,39 +235,82 @@ class ImageToPdfActivity : BaseActivity() {
         }
     }
 
-    private fun showProgress(): AlertDialog {
-        val view = ToolsDialogProgressBinding.inflate(LayoutInflater.from(this))
-        view.tvMessage.setText(R.string.tools_image_running)
-        return MaterialAlertDialogBuilder(this)
-            .setView(view.root)
-            .setCancelable(false)
-            .show()
+    /** The running state of the design "Image to PDF-loading". */
+    private fun showLoading(visible: Boolean) {
+        binding.loadingState.visibility = if (visible) View.VISIBLE else View.GONE
+        binding.btnImport.isEnabled = !visible && images.isNotEmpty()
     }
 
     // ------------------------------------------------------------------ state
 
     private fun refresh() {
         adapter.submit(thumbnails.toList())
+        rowAdapter.submit(buildRows())
         binding.btnImport.text = getString(R.string.import_count, images.size)
         binding.btnImport.isEnabled = images.isNotEmpty()
         binding.emptyState.visibility = if (images.isEmpty()) View.VISIBLE else View.GONE
+        // the empty state of the design carries the import button only
+        binding.stripScroll.visibility = if (images.isEmpty()) View.GONE else View.VISIBLE
         rebuildStrip()
     }
 
+    /** The rows of the list view, the camera comes first. */
+    private fun buildRows(): List<ImageRowAdapter.Row> {
+        val rows = mutableListOf(
+            ImageRowAdapter.Row(
+                name = getString(R.string.tools_image_add),
+                meta = "",
+                thumbnail = null,
+                isCamera = true,
+            ),
+        )
+        images.forEachIndexed { index, file ->
+            rows += ImageRowAdapter.Row(
+                name = file.name,
+                meta = ToolFormatters.size(file.length()),
+                thumbnail = thumbnails.getOrNull(index),
+            )
+        }
+        return rows
+    }
+
     /**
-     * The strip of the design shows the picked images as small thumbnails.
+     * The strip of the design shows the picked images as small thumbnails,
+     * every one of them carries the mark of the design in its top right corner.
      */
     private fun rebuildStrip() {
         binding.strip.removeAllViews()
         val size = dp(56)
         thumbnails.forEach { bitmap ->
-            val image = ImageView(this)
-            image.layoutParams = LinearLayout.LayoutParams(size, size).apply {
-                marginEnd = dp(10)
+            val holder = FrameLayout(this).apply {
+                layoutParams = LinearLayout.LayoutParams(size, size).apply {
+                    // the stub of the SDK has no setMarginTop, the fields are public
+                    topMargin = dp(4)
+                    marginEnd = dp(10)
+                }
+                // the mark of the design hangs over the top right corner
+                clipChildren = false
             }
+            val image = ImageView(this)
+            image.layoutParams = FrameLayout.LayoutParams(size, size)
             image.scaleType = ImageView.ScaleType.CENTER_CROP
             image.setImageBitmap(bitmap)
-            binding.strip.addView(image)
+            // the thumbnails of the design have rounded corners
+            image.background = ToolShapes.roundRect(this, ToolShapes.BACKDROP, 4f)
+            image.clipToOutline = true
+            holder.addView(image)
+
+            val mark = ImageView(this)
+            mark.layoutParams = FrameLayout.LayoutParams(dp(20), dp(20)).apply {
+                gravity = Gravity.TOP or Gravity.END
+                topMargin = -dp(4)
+                marginEnd = -dp(4)
+            }
+            mark.setImageResource(R.mipmap.ic_ok)
+            mark.contentDescription = getString(R.string.tools_image_strip)
+            holder.addView(mark)
+
+            binding.strip.addView(holder)
         }
     }
 

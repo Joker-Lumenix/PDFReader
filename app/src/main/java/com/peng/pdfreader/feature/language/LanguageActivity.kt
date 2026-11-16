@@ -15,6 +15,10 @@ import com.peng.pdfreader.databinding.LanguageActivityBinding
  * The choice is written to [AppPrefs.language] and applied right away through
  * [AppCompatDelegate.setApplicationLocales]; the activity is recreated by the
  * framework afterwards, so the whole app switches to the new language.
+ *
+ * The design starts with nothing selected - the "Next" button stays disabled
+ * until the user picks a language - and it marks the selected row with the red
+ * gradient pill.
  */
 class LanguageActivity : BaseActivity() {
 
@@ -41,8 +45,10 @@ class LanguageActivity : BaseActivity() {
         restoreSelection()
     }
 
+    /** Pre-selects the language the app currently runs in. */
     private fun restoreSelection() {
-        val option = LanguageCatalog.find(AppPrefs.get(this).language)
+        val applied = AppCompatDelegate.getApplicationLocales()[0]?.toLanguageTag()
+        val option = LanguageCatalog.find(applied)
         selected = option
         adapter.select(option)
         updateNextState()

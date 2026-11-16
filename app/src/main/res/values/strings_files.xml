@@ -8,12 +8,26 @@
 -->
 <resources>
 
-    <!-- filter / sort sheets -->
+    <!-- scope tabs of the file list -->
+    <string name="files_tab_all">全部</string>
+    <string name="files_tab_recent">最近</string>
+    <string name="files_tab_favorites">收藏</string>
+
+    <!-- search -->
+    <string name="files_search_hint">搜索文件名</string>
+
+    <!-- sort sheet -->
     <string name="files_sort_title">排序方式</string>
-    <string name="files_filter_title">文件类型</string>
     <string name="files_sort_section_time">最近修改</string>
     <string name="files_sort_section_name">名称</string>
     <string name="files_sort_section_size">文件大小</string>
+    <string name="files_sort_new_to_old">由新到旧</string>
+    <string name="files_sort_old_to_new">由旧到新</string>
+    <string name="files_sort_a_to_z">由 A 到 Z</string>
+    <string name="files_sort_z_to_a">由 Z 到 A</string>
+    <string name="files_sort_large_to_small">由大到小</string>
+    <string name="files_sort_small_to_large">由小到大</string>
+    <string name="files_apply">应用</string>
 
     <!-- file action sheet -->
     <string name="files_open_with">其他应用打开</string>
@@ -21,9 +35,19 @@
     <string name="files_print">打印</string>
     <string name="files_feature_unavailable">该功能正在开发中</string>
 
+    <!-- multi select action bar -->
+    <string name="files_action_edit">编辑</string>
+    <string name="files_action_merge">合并</string>
+
     <!-- dialogs -->
-    <string name="files_rename_hint">请输入新的文件名</string>
     <string name="files_delete_message">确定要删除该文件吗？删除后无法恢复。</string>
     <string name="files_save_message">确定要保存对该文件的修改吗？保存后无法撤销。</string>
+
+    <!-- empty states -->
+    <string name="files_empty_title">暂无文件</string>
+    <string name="files_empty_hint">快速访问常用文件</string>
+    <string name="files_search_empty_title">未找到相关文件</string>
+    <string name="files_search_empty_hint">换个关键词试试</string>
+    <string name="files_selected_count">已选 %1$d 项</string>
 
 </resources>

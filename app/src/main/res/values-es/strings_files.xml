@@ -8,12 +8,26 @@
 -->
 <resources>
 
-    <!-- filter / sort sheets -->
+    <!-- scope tabs of the file list -->
+    <string name="files_tab_all">Todos</string>
+    <string name="files_tab_recent">Recientes</string>
+    <string name="files_tab_favorites">Favoritos</string>
+
+    <!-- search -->
+    <string name="files_search_hint">Buscar por nombre de archivo</string>
+
+    <!-- sort sheet -->
     <string name="files_sort_title">Ordenar por</string>
-    <string name="files_filter_title">Tipo de archivo</string>
     <string name="files_sort_section_time">Modificados recientemente</string>
     <string name="files_sort_section_name">Nombre</string>
     <string name="files_sort_section_size">Tamaño de archivo</string>
+    <string name="files_sort_new_to_old">Más recientes primero</string>
+    <string name="files_sort_old_to_new">Más antiguos primero</string>
+    <string name="files_sort_a_to_z">De A a Z</string>
+    <string name="files_sort_z_to_a">De Z a A</string>
+    <string name="files_sort_large_to_small">Más grande primero</string>
+    <string name="files_sort_small_to_large">Más pequeño primero</string>
+    <string name="files_apply">Aplicar</string>
 
     <!-- file action sheet -->
     <string name="files_open_with">Abrir con otra aplicación</string>
@@ -21,9 +35,19 @@
     <string name="files_print">Imprimir</string>
     <string name="files_feature_unavailable">Esta función está en desarrollo</string>
 
+    <!-- multi select action bar -->
+    <string name="files_action_edit">Editar</string>
+    <string name="files_action_merge">Fusionar</string>
+
     <!-- dialogs -->
-    <string name="files_rename_hint">Escribe un nuevo nombre de archivo</string>
     <string name="files_delete_message">¿Eliminar este archivo? No se puede deshacer.</string>
     <string name="files_save_message">¿Guardar los cambios en este archivo? No se puede deshacer.</string>
+
+    <!-- empty states -->
+    <string name="files_empty_title">Aún no hay archivos</string>
+    <string name="files_empty_hint">Acceso rápido a tus archivos frecuentes</string>
+    <string name="files_search_empty_title">No se encontraron archivos</string>
+    <string name="files_search_empty_hint">Prueba con otra palabra clave</string>
+    <string name="files_selected_count">%1$d seleccionados</string>
 
 </resources>

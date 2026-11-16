@@ -30,7 +30,7 @@
     <string name="clear_all">清空</string>
     <string name="clear_cache">一键清理</string>
     <string name="color_mode">色彩模式</string>
-    <string name="compress">PDF 压缩</string>
+    <string name="compress">压缩</string>
     <string name="confirm">确认</string>
     <string name="confirm_delete_message">确定要删除所选文件吗？</string>
     <string name="confirm_delete_title">删除确认</string>
@@ -76,12 +76,12 @@
     <string name="just_once">仅一次</string>
     <string name="keep_screen_on">屏幕常亮保护</string>
     <string name="lan_transfer">局域网传输</string>
-    <string name="language">多语言</string>
+    <string name="language">语言</string>
     <string name="language_selection">语言选择</string>
     <string name="list_view">列表视图</string>
     <string name="long_image">长图</string>
     <string name="md5">MD5 完整性哈希校验码</string>
-    <string name="merge">PDF 合并</string>
+    <string name="merge">合并 PDF</string>
     <string name="merge_count">合并(%1$d)</string>
     <string name="merge_to_pdf">合并为PDF</string>
     <string name="merged_document">合并文档</string>
@@ -119,7 +119,7 @@
     <string name="permission_required">需要权限</string>
     <string name="plain_text">纯文本</string>
     <string name="file_type_ppt" translatable="false">PPT</string>
-    <string name="print">PDF 打印</string>
+    <string name="print">打印</string>
     <string name="print_now">立即打印</string>
     <string name="privacy_note">所有文件仅保存在本机沙盒，零云端上传</string>
     <string name="properties">详细属性</string>
@@ -164,7 +164,7 @@
     <string name="sort_modified">按修改时间</string>
     <string name="sort_name">按名称</string>
     <string name="sort_size">按大小</string>
-    <string name="split">PDF 拆分</string>
+    <string name="split">拆分 PDF</string>
     <string name="split_document">拆分文档</string>
     <string name="start_page">默认启动页面</string>
     <string name="start_reading">开始阅读</string>
