@@ -24,7 +24,15 @@ object PdfMeta {
      * The search needs the text of every page, that does not fit into the memory
      * of a phone for a huge document.
      */
-    private const val MAX_TEXT_BYTES = 24L * 1024 * 1024
+    private const val MAX_TEXT_BYTES = 256L * 1024 * 1024
+
+    /**
+     * The most characters the text of all pages may have.
+     *
+     * The text of a huge document does not fit into the heap of a phone, so
+     * the search stops there and reports the pages it has read.
+     */
+    private const val MAX_TEXT_CHARS = 6_000_000
 
     /** The most objects the fallback scan reads, it looks at every object. */
     private const val MAX_FALLBACK_OBJECTS = 5_000
@@ -67,7 +75,9 @@ object PdfMeta {
         if (file.length() > MAX_TEXT_BYTES) return emptyList()
         val parsed = parse(file) ?: return emptyList()
         val result = ArrayList<String>()
+        var chars = 0
         parsed.pageOrder.forEach { pageId ->
+            if (chars >= MAX_TEXT_CHARS) return result
             val body = parsed.body(pageId) ?: return@forEach
             val contentRefs = contentReferences(body)
             val builder = StringBuilder()
@@ -76,7 +86,9 @@ object PdfMeta {
                     builder.append(extractText(raw))
                 }
             }
-            result += builder.toString().replace(Regex("\\s+"), " ").trim()
+            val text = builder.toString().replace(Regex("\\s+"), " ").trim()
+            chars += text.length
+            result += text
         }
         return result
     }
@@ -318,7 +330,10 @@ private fun depthOf(parsed: PdfObjects, itemId: Int): Int {
         private val lengths = LinkedHashMap<Int, Int>()
 
         /** The bodies that were read already. */
-        private val cache = HashMap<Int, String>()
+        private val cache = LinkedHashMap<Int, String>(16, 0.75f, true)
+
+        /** How many characters the cache holds. */
+        private var cachedChars = 0
 
         fun ids(): List<Int> = offsets.keys.toList()
 
@@ -355,8 +370,27 @@ private fun depthOf(parsed: PdfObjects, itemId: Int): Int {
             cache[id]?.let { return it }
             val offset = offsets[id] ?: return null
             val text = readBody(offset) ?: return null
-            if (cache.size < MAX_CACHED_BODIES) cache[id] = text
+            remember(id, text)
             return text
+        }
+
+        /**
+         * Keeps a body in the cache.
+         *
+         * The cache is bounded by its size, so the search of a big document
+         * does not fill the heap: the body that was read the longest time ago
+         * is dropped when the cache grows too big.
+         */
+        private fun remember(id: Int, text: String) {
+            if (text.length > MAX_CACHED_CHARS) return
+            cache.remove(id)?.let { cachedChars -= it.length }
+            cache[id] = text
+            cachedChars += text.length
+            while (cachedChars > MAX_CACHED_CHARS && cache.isNotEmpty()) {
+                val oldest = cache.entries.first()
+                cachedChars -= oldest.value.length
+                cache.remove(oldest.key)
+            }
         }
 
         /** Reads the body of an object, it ends at "endobj" or "endstream". */
@@ -451,7 +485,7 @@ private fun depthOf(parsed: PdfObjects, itemId: Int): Int {
             /** The most bytes one object body may have. */
             private const val MAX_BODY_BYTES = 8 shl 20
 
-            /** The most bodies that are kept in the memory. */
-            private const val MAX_CACHED_BODIES = 64
+            /** The most characters the cache of the bodies holds. */
+            private const val MAX_CACHED_CHARS = 4 shl 20
         }
 }

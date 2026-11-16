@@ -78,11 +78,17 @@ abstract class BaseBottomSheetDialog(
             val behavior = BottomSheetBehavior.from(this)
             behavior.isFitToContents = true
             behavior.skipCollapsed = true
-            if (behavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
+            // A sheet that is taller than the screen stops at the height of
+            // the screen, its body scrolls inside of it.
+            behavior.maxHeight = screenHeight()
+            if (behavior.state != BottomSheetBehavior.STATE_EXPANDED) {
                 behavior.state = BottomSheetBehavior.STATE_EXPANDED
             }
         }
     }
+
+    /** The height of the screen, a sheet never grows beyond it. */
+    protected fun screenHeight(): Int = resources.displayMetrics.heightPixels
 
     /** Builds the sheet body. */
     abstract fun createContentView(inflater: LayoutInflater, container: ViewGroup?): View

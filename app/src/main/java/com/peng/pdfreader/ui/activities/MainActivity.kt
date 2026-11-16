@@ -6,6 +6,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -69,7 +70,7 @@ class MainActivity : BaseActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // todo 只有home、Files页面这个按钮需要显示，Tools、Settings按钮不可见，也不可以点击
+        // The scan button belongs to the home and the files tab.
         binding.fabScan.setOnClickListener {
             openScanner()
         }
@@ -177,6 +178,18 @@ class MainActivity : BaseActivity() {
         transaction.commitAllowingStateLoss()
         binding.bottomNav.selectTab(tab)
         currentTab = tab
+        applyScanButton(tab)
+    }
+
+    /**
+     * The scan button belongs to the home and to the files tab.
+     *
+     * On the tools and on the settings tab the button is gone, so it cannot
+     * be tapped there either.
+     */
+    private fun applyScanButton(tab: Int) {
+        val visible = tab == TAB_HOME || tab == TAB_FILES
+        binding.fabScan.visibility = if (visible) View.VISIBLE else View.GONE
     }
 
     private fun createFragment(tab: Int): Fragment = when (tab) {
@@ -201,7 +214,10 @@ class MainActivity : BaseActivity() {
 
     private fun onQuickAction(action: QuickAction) {
         when (action) {
-            QuickAction.IMAGE_TO_PDF, QuickAction.MERGE_PDF -> showTab(TAB_TOOLS)
+            // The two cards of the home tab open their own flow.
+            QuickAction.IMAGE_TO_PDF -> ImageToPdfActivity.start(this)
+            QuickAction.MERGE_PDF -> MergeActivity.start(this)
+            // The narrow chevron opens the full tool list.
             QuickAction.MORE -> showTab(TAB_TOOLS)
         }
     }

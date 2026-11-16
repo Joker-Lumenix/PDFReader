@@ -88,46 +88,40 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
         }
         document = doc
 
-        binding.titleBar.title = doc.name
-        // The viewer shows the name of the file with 15sp / medium.
-        binding.titleBar.setTitleTypography(15f, true)
-        binding.titleBar.showBack = true
-        binding.titleBar.onBackClick = {
+        binding.tvTitle.text = doc.name
+        binding.ivBack.setOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
-        binding.titleBar.addAction(
-            PreviewTitleActions.build(
-                requireContext(),
-                onRename = { showRenameDialog() },
-                onShare = { share() },
-                onMore = { showMoreActions() },
-            ),
-        )
+        binding.ivRename.setOnClickListener {
+            showRenameDialog()
+        }
 
-        binding.ivFavorite.setImageResource(
-            if (doc.isFavorite) R.mipmap.ic_star_select else R.mipmap.ic_star_unselect,
-        )
-        binding.ivFavorite.setOnClickListener { toggleFavorite() }
-        binding.tvFavorite.setOnClickListener { toggleFavorite() }
-        binding.ivBookmark.setOnClickListener { addBookmark() }
-        binding.ivOpenWith.setOnClickListener { openWith() }
-        binding.tvOpenWith.setOnClickListener { openWith() }
-        binding.ivShare.setOnClickListener { share() }
-        binding.tvShare.setOnClickListener { share() }
+        binding.llShare.setOnClickListener {
+            share()
+        }
+
+        binding.ivMore.setOnClickListener {
+            showMoreActions()
+        }
+
+        binding.llOpenWith.setOnClickListener {
+            openWith()
+        }
+        binding.llCollect.setOnClickListener {
+            toggleFavorite()
+        }
 
         showLoading()
         loadDocument()
     }
-
-    // ------------------------------------------------------------------ actions
 
     private fun toggleFavorite() {
         val doc = document ?: return
         repository.toggleFavorite(doc)
         val updated = repository.byId(doc.id) ?: return
         document = updated
-        binding.ivFavorite.setImageResource(
-            if (updated.isFavorite) R.mipmap.ic_star_select else R.mipmap.ic_star_unselect,
+        binding.ivCollect.setImageResource(
+            if (updated.isFavorite) R.mipmap.ic_collect_select else R.mipmap.ic_collect_unselect,
         )
     }
 
@@ -148,6 +142,9 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
         }
     }
 
+    /**
+     * 添加书签
+     */
     private fun addBookmark() {
         val doc = document ?: return
         repository.addBookmark(
@@ -169,7 +166,7 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
                 val updated = repository.byId(doc.id)
                 if (updated != null) {
                     document = updated
-                    binding.titleBar.title = updated.name
+                    binding.tvTitle.text = updated.name
                 }
             }
         }
@@ -351,7 +348,6 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
         scroll.setOnScrollChangeListener { _, _, scrollY, _, _ -> preview.updateScrollOffset(scrollY) }
         preview.onPageChanged = { page ->
             currentIndex = page
-            binding.titleBar.subtitle = getString(R.string.preview_cd_page, page + 1)
         }
         showContent(scroll)
     }
@@ -361,7 +357,6 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
         preview.deck = deck
         preview.onSlideChanged = { slide ->
             currentIndex = slide
-            binding.titleBar.subtitle = getString(R.string.preview_cd_slide, slide + 1)
         }
         showContent(preview)
     }
@@ -371,7 +366,6 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
         preview.workbook = workbook
         preview.onSheetChanged = { sheet ->
             currentIndex = sheet
-            binding.titleBar.subtitle = workbook.sheets.getOrNull(sheet)?.name.orEmpty()
         }
         showContent(preview)
     }

@@ -9,13 +9,95 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/surface_blue_tint"
     android:orientation="vertical">
 
-    <com.peng.pdfreader.appcore.widget.PageTitleBar
-        android:id="@+id/titleBar"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="63dp"
+        android:background="@color/surface_card"
+        >
+
+        <ImageView
+            android:id="@+id/ivBack"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginLeft="20dp"
+            android:layout_alignParentLeft="true"
+            android:contentDescription="@string/appcore_back"
+            android:src="@drawable/ic_arrow_back"
+            android:layout_centerVertical="true"
+            />
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:textSize="15sp"
+            android:textColor="#ff060606"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:maxWidth="150dp"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/ivBack"
+            android:ellipsize="end"
+            android:layout_centerVertical="true"
+            android:maxLines="1"
+            android:layout_marginStart="7dp"
+            tools:text="标题"
+            />
+
+        <TextView
+            android:id="@+id/tvL"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="("
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/tvTitle"
+            android:textColor="#ff060606"
+            android:layout_marginLeft="7dp"
+            />
+
+        <TextView
+            android:id="@+id/tvPageIndicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/tvL"
+            android:textColor="#ff060606"
+            tools:text="2/90"
+            />
+
+        <TextView
+            android:id="@+id/tvR"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=")"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/tvPageIndicator"
+            android:textColor="#ff060606"
+            />
+
+        <ImageView
+            android:id="@+id/ivRename"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@mipmap/ic_rename_black"
+            android:layout_toEndOf="@+id/tvPageIndicator"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="7dp"
+            />
+
+        <ImageView
+            android:id="@+id/ivMore"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@mipmap/ic_more"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="20dp"
+            />
+
+    </RelativeLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -27,35 +109,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:orientation="vertical">
 
-            <include
-                android:id="@+id/annotationBar"
-                layout="@layout/preview_annotation_toolbar" />
-
-            <TextView
-                android:id="@+id/tvPageIndicator"
-                style="@style/TextAppearance.AppCore.Meta"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="12dp"
-                android:background="@drawable/bg_white_r36"
-                android:paddingStart="12dp"
-                android:paddingTop="4dp"
-                android:paddingEnd="12dp"
-                android:paddingBottom="4dp"
-                android:textColor="@color/text_tertiary" />
-        </LinearLayout>
-
-        <!--
-          The confirmation bar of the design: it shows up when a signature
-          waits on the page and adds it to the document.
-        -->
         <LinearLayout
             android:id="@+id/addBar"
             android:layout_width="match_parent"
@@ -88,115 +142,93 @@
     </FrameLayout>
 
     <!-- The bottom bar of the design: 74dp tall, four icons on fixed spots. -->
-    <FrameLayout
+
+    <LinearLayout
         android:id="@+id/bottomToolbar"
         android:layout_width="match_parent"
         android:layout_height="74dp"
-        android:background="@color/white">
+        android:orientation="horizontal"
+        android:background="@color/white"
+        >
 
-        <ImageView
-            android:id="@+id/ivFavorite"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_gravity="top|start"
-            android:layout_marginStart="46dp"
-            android:layout_marginTop="15dp"
-            android:background="?android:attr/selectableItemBackground"
-            android:clickable="true"
-            android:contentDescription="@string/preview_cd_favorite"
-            android:focusable="true"
-            android:src="@mipmap/ic_star_unselect" />
-
-        <ImageView
-            android:id="@+id/ivAnnotate"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_gravity="top|start"
-            android:layout_marginStart="90dp"
-            android:layout_marginTop="15dp"
-            android:background="?android:attr/selectableItemBackground"
-            android:clickable="true"
-            android:contentDescription="@string/preview_cd_annotate"
-            android:focusable="true"
-            android:src="@mipmap/ic_draw" />
-
-        <ImageView
-            android:id="@+id/ivOpenWith"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_gravity="top|start"
-            android:layout_marginStart="166dp"
-            android:layout_marginTop="15dp"
-            android:background="?android:attr/selectableItemBackground"
-            android:clickable="true"
-            android:contentDescription="@string/preview_cd_open_with"
-            android:focusable="true"
-            android:src="@mipmap/ic_open_with" />
-
-        <ImageView
-            android:id="@+id/ivShare"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_gravity="top|start"
-            android:layout_marginStart="286dp"
-            android:layout_marginTop="15dp"
-            android:background="?android:attr/selectableItemBackground"
-            android:clickable="true"
-            android:contentDescription="@string/preview_cd_share"
-            android:focusable="true"
-            android:src="@mipmap/ic_share_square_black" />
-
-        <!-- The annotate action carries no label, the design shows a bare icon -->
-        <TextView
-            android:id="@+id/tvFavorite"
-            style="@style/TextAppearance.AppCore.Meta"
-            android:layout_width="80dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top|start"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="47dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:fontFamily="sans-serif-medium"
+        <LinearLayout
+            android:id="@+id/llShare"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
             android:gravity="center_horizontal"
-            android:text="@string/preview_favorite"
-            android:textColor="@color/text_secondary"
-            android:textSize="12sp" />
+            >
 
-        <!-- The annotate action carries no label, the design shows a bare icon -->
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginTop="15dp"
+                android:src="@mipmap/ic_share_square_black" />
 
-        <TextView
-            android:id="@+id/tvOpenWith"
-            style="@style/TextAppearance.AppCore.Meta"
-            android:layout_width="80dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top|start"
-            android:layout_marginStart="140dp"
-            android:layout_marginTop="47dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:fontFamily="sans-serif-medium"
+            <TextView
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center_horizontal"
+                android:text="@string/files_share"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llDraw"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
             android:gravity="center_horizontal"
-            android:text="@string/preview_open_with"
-            android:textColor="@color/text_secondary"
-            android:textSize="12sp" />
+            >
 
-        <TextView
-            android:id="@+id/tvShare"
-            style="@style/TextAppearance.AppCore.Meta"
-            android:layout_width="80dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top|start"
-            android:layout_marginStart="260dp"
-            android:layout_marginTop="47dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:fontFamily="sans-serif-medium"
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginTop="15dp"
+                android:src="@mipmap/ic_draw" />
+
+            <TextView
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center_horizontal"
+                android:text="@string/tools_result_draw"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llSign"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
             android:gravity="center_horizontal"
-            android:text="@string/preview_share"
-            android:textColor="@color/text_secondary"
-            android:textSize="12sp" />
+            >
 
-    </FrameLayout>
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginTop="15dp"
+                android:src="@mipmap/ic_sign" />
+
+            <TextView
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center_horizontal"
+                android:text="@string/preview_tool_signature"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
 
 </LinearLayout>

@@ -7,13 +7,64 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/surface_muted"
     android:orientation="vertical">
 
-    <com.peng.pdfreader.appcore.widget.PageTitleBar
-        android:id="@+id/titleBar"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="63dp"
+        android:background="@color/surface_card"
+        >
+
+        <ImageView
+            android:id="@+id/ivBack"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginLeft="20dp"
+            android:layout_alignParentLeft="true"
+            android:contentDescription="@string/appcore_back"
+            android:src="@drawable/ic_arrow_back"
+            android:layout_centerVertical="true"
+            />
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:textSize="15sp"
+            android:textColor="#ff060606"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:maxWidth="150dp"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/ivBack"
+            android:ellipsize="end"
+            android:layout_centerVertical="true"
+            android:maxLines="1"
+            android:layout_marginStart="7dp"
+            tools:text="标题"
+            />
+        
+        <ImageView
+            android:id="@+id/ivRename"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@mipmap/ic_rename_black"
+            android:layout_toEndOf="@+id/tvTitle"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="7dp"
+            />
+
+        <ImageView
+            android:id="@+id/ivMore"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@mipmap/ic_more"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="20dp"
+            />
+
+    </RelativeLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -61,119 +112,94 @@
 
     </FrameLayout>
 
-    <!--
-      The bottom bar of the design: 74dp tall, four icons on fixed spots.
-      Favourite, bookmark, open with and share - the design only labels the
-      first, the third and the fourth one.
-    -->
-    <FrameLayout
+    <LinearLayout
         android:id="@+id/bottomToolbar"
         android:layout_width="match_parent"
         android:layout_height="74dp"
-        android:background="@color/white">
-
-        <ImageView
-            android:id="@+id/ivFavorite"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_gravity="top|start"
-            android:layout_marginStart="46dp"
-            android:layout_marginTop="15dp"
-            android:background="?android:attr/selectableItemBackground"
-            android:clickable="true"
-            android:contentDescription="@string/preview_cd_favorite"
-            android:focusable="true"
-            android:src="@mipmap/ic_star_unselect" />
-
-        <ImageView
-            android:id="@+id/ivBookmark"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_gravity="top|start"
-            android:layout_marginStart="90dp"
-            android:layout_marginTop="15dp"
-            android:background="?android:attr/selectableItemBackground"
-            android:clickable="true"
-            android:contentDescription="@string/preview_cd_bookmark"
-            android:focusable="true"
-            android:src="@mipmap/ic_collect_unselect" />
-
-        <ImageView
-            android:id="@+id/ivOpenWith"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_gravity="top|start"
-            android:layout_marginStart="166dp"
-            android:layout_marginTop="15dp"
-            android:background="?android:attr/selectableItemBackground"
-            android:clickable="true"
-            android:contentDescription="@string/preview_cd_open_with"
-            android:focusable="true"
-            android:src="@mipmap/ic_open_with" />
-
-        <ImageView
-            android:id="@+id/ivShare"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_gravity="top|start"
-            android:layout_marginStart="286dp"
-            android:layout_marginTop="15dp"
-            android:background="?android:attr/selectableItemBackground"
-            android:clickable="true"
-            android:contentDescription="@string/preview_cd_share"
-            android:focusable="true"
-            android:src="@mipmap/ic_share_square_black" />
-
-        <TextView
-            android:id="@+id/tvFavorite"
-            style="@style/TextAppearance.AppCore.Meta"
-            android:layout_width="80dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top|start"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="47dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:fontFamily="sans-serif-medium"
+        android:orientation="horizontal"
+        android:background="@color/white"
+        >
+        <LinearLayout
+            android:id="@+id/llCollect"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
             android:gravity="center_horizontal"
-            android:text="@string/preview_favorite"
-            android:textColor="@color/text_secondary"
-            android:textSize="12sp" />
+            >
 
-        <!-- The second action carries no label, the design shows a bare icon. -->
+            <ImageView
+                android:id="@+id/ivCollect"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginTop="15dp"
+                android:src="@mipmap/ic_collect_unselect" />
 
-        <TextView
-            android:id="@+id/tvOpenWith"
-            style="@style/TextAppearance.AppCore.Meta"
-            android:layout_width="80dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top|start"
-            android:layout_marginStart="140dp"
-            android:layout_marginTop="47dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:fontFamily="sans-serif-medium"
+            <TextView
+                android:id="@+id/tvCollect"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center_horizontal"
+                android:text="@string/preview_favorite"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llOpenWith"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
             android:gravity="center_horizontal"
-            android:text="@string/preview_open_with"
-            android:textColor="@color/text_secondary"
-            android:textSize="12sp" />
+            >
 
-        <TextView
-            android:id="@+id/tvShare"
-            style="@style/TextAppearance.AppCore.Meta"
-            android:layout_width="80dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top|start"
-            android:layout_marginStart="260dp"
-            android:layout_marginTop="47dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:fontFamily="sans-serif-medium"
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginTop="15dp"
+                android:src="@mipmap/ic_open_with_black" />
+
+            <TextView
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center_horizontal"
+                android:text="@string/files_open_with"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/llShare"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
             android:gravity="center_horizontal"
-            android:text="@string/preview_share"
-            android:textColor="@color/text_secondary"
-            android:textSize="12sp" />
+            >
 
-    </FrameLayout>
+            <ImageView
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginTop="15dp"
+                android:src="@mipmap/ic_share_square_black" />
+
+            <TextView
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center_horizontal"
+                android:text="@string/files_share"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
 
 </LinearLayout>

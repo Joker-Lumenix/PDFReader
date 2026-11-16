@@ -164,19 +164,19 @@ class HomeFragment : BaseFragment() {
     // ---------------------------------------------------------------- quick actions
 
     private fun setupQuickActions() {
-
+        // The page does not navigate on its own, it reports the card that was
+        // tapped and the shell routes it.
         binding.toolsImageToPdf.setOnClickListener {
-            // todo 进入图片转pdf的流程
+            onQuickAction?.invoke(QuickAction.IMAGE_TO_PDF)
         }
 
         binding.toolsMergePdf.setOnClickListener {
-            // todo 进入合并pdf的流程
+            onQuickAction?.invoke(QuickAction.MERGE_PDF)
         }
 
         binding.toTools.setOnClickListener {
-            // todo 进入合并pdf的流程
+            onQuickAction?.invoke(QuickAction.MORE)
         }
-
     }
 
     // ---------------------------------------------------------------- filter strip

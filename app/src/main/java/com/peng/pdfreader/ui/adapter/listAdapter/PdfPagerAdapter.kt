@@ -3,6 +3,7 @@ package com.peng.pdfreader.ui.adapter.listAdapter
 import android.graphics.RectF
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.peng.pdfreader.appcore.pdf.PdfEngine
 import com.peng.pdfreader.appcore.widget.PdfMark
 import com.peng.pdfreader.appcore.widget.PdfPageView
 import com.peng.pdfreader.appcore.widget.ReadingMode
@@ -27,6 +28,9 @@ class PdfPagerAdapter(
     /** Supplies the marks of a page. */
     var marksProvider: ((Int) -> List<PdfMark>)? = null
 
+    /** Raised when a page could not be rendered. */
+    var onRenderFailed: (() -> Unit)? = null
+
     private var selectionEnabled = false
     private var selectionListener: ((Int, RectF) -> Unit)? = null
 
@@ -45,6 +49,7 @@ class PdfPagerAdapter(
         views[position] = view
         view.setReadingMode(readingMode)
         view.setMarks(marksProvider?.invoke(position).orEmpty())
+        view.onRenderFailed = { onRenderFailed?.invoke() }
         applySelectionTo(view, position)
         if (image) {
             view.setImage(file)
@@ -56,6 +61,9 @@ class PdfPagerAdapter(
     override fun onViewRecycled(holder: Holder) {
         val position = holder.bindingAdapterPosition
         if (position != RecyclerView.NO_POSITION) views.remove(position)
+        // The bitmap of the page is the biggest object of the reader, it is
+        // given back as soon as the view leaves the screen.
+        holder.view.release()
         super.onViewRecycled(holder)
     }
 
@@ -97,6 +105,18 @@ class PdfPagerAdapter(
     /** Switches the reading mode of every page that is alive. */
     fun applyReadingMode(mode: ReadingMode) {
         views.values.forEach { it.setReadingMode(mode) }
+    }
+
+    /**
+     * Gives the memory of the document back.
+     *
+     * The engine keeps the parsed document open while the reader works on it,
+     * this closes it again.
+     */
+    fun release() {
+        views.values.forEach { it.release() }
+        views.clear()
+        PdfEngine.release(file)
     }
 
     class Holder(val view: PdfPageView) : RecyclerView.ViewHolder(view)

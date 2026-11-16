@@ -19,9 +19,9 @@ import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
 import com.peng.pdfreader.appcore.pdf.PdfEngine
+import com.peng.pdfreader.appcore.util.Logger
 import java.io.File
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
+import java.util.concurrent.RejectedExecutionException
 import kotlin.math.max
 import kotlin.math.sqrt
 import kotlin.math.min
@@ -69,7 +69,9 @@ data class PdfMark(
  * A single PDF page with pinch zoom, pan and the annotation overlay.
  *
  * The page bitmap is rendered by the framework renderer of `:appcore` on a
- * background thread, the view only ever paints what it already owns.
+ * background thread, the view only ever paints what it already owns. The pool
+ * of the engine is shared by every page of the app, so a view that is
+ * recycled and bound again keeps working.
  */
 class PdfPageView @JvmOverloads constructor(
     context: Context,
@@ -134,7 +136,6 @@ class PdfPageView @JvmOverloads constructor(
         strokeWidth = 1.5f * density
     }
 
-    private val executor: ExecutorService = Executors.newSingleThreadExecutor()
     private val mainHandler = Handler(Looper.getMainLooper())
 
     private var source: File? = null
@@ -215,6 +216,12 @@ class PdfPageView @JvmOverloads constructor(
                 applyScale(detector.scaleFactor, detector.focusX, detector.focusY)
                 return true
             }
+
+            override fun onScaleEnd(detector: ScaleGestureDetector) {
+                // The gesture is over: the page can be rendered again with the
+                // detail the new zoom asks for.
+                requestSharperPage()
+            }
         },
     )
 
@@ -254,7 +261,7 @@ class PdfPageView @JvmOverloads constructor(
         source = file
         pageIndex = index
         imageDocument = false
-        requestRender()
+        requestRender(resetViewport = true)
     }
 
     /** Renders a raster image as a single page. */
@@ -262,7 +269,20 @@ class PdfPageView @JvmOverloads constructor(
         source = file
         pageIndex = 0
         imageDocument = true
-        requestRender()
+        requestRender(resetViewport = true)
+    }
+
+    /**
+     * Gives the bitmap of the page back.
+     *
+     * The bitmap is the largest object the reader owns, so it is freed as
+     * soon as the view is not painted any more.
+     */
+    fun release() {
+        // A render that is still on its way belongs to the old page.
+        renderToken++
+        releaseBitmap()
+        invalidate()
     }
 
     /** Switches the visual reading mode. */
@@ -375,46 +395,106 @@ class PdfPageView @JvmOverloads constructor(
 
     // ------------------------------------------------------------------ rendering
 
-    private fun requestRender() {
+    /**
+     * Renders the page on a worker thread.
+     *
+     * @param resetViewport whether the zoom and the pan of the page start
+     * over. A new page always starts over, a page that is only rendered again
+     * to get more detail keeps the place of the reader.
+     */
+    private fun requestRender(resetViewport: Boolean) {
         val file = source ?: return
         val index = pageIndex
         val isImage = imageDocument
         val token = ++renderToken
-        bitmap = null
+        if (resetViewport) releaseBitmap()
         invalidate()
-        val targetWidth = if (width > 0) {
-            (width * density * 1.6f).toInt().coerceAtLeast(480)
-        } else {
-            1240
-        }
-        executor.execute {
-            val rendered = if (isImage) {
-                PdfEngine.renderImage(file, targetWidth)
-            } else {
-                PdfEngine.renderPage(file, index, targetWidth)
-            }
-            mainHandler.post {
-                if (token != renderToken) return@post
-                if (rendered == null) {
-                    onRenderFailed?.invoke()
-                    invalidate()
-                    return@post
-                }
-                bitmap = rendered.bitmap
-                pageWidthPt = rendered.pageWidthPt
-                pageHeightPt = rendered.pageHeightPt
-                baseScale = if (width > 0 && height > 0) {
-                    min(width.toFloat() / rendered.bitmap.width, height.toFloat() / rendered.bitmap.height)
+        val targetWidth = renderWidth()
+        try {
+            PdfEngine.workers.execute {
+                val rendered = if (isImage) {
+                    PdfEngine.renderImage(file, targetWidth)
                 } else {
-                    0f
+                    PdfEngine.renderPage(file, index, targetWidth)
                 }
-                zoom = 1f
-                offsetX = 0f
-                offsetY = 0f
-                invalidate()
-                onRendered?.invoke()
+                mainHandler.post {
+                    if (token != renderToken) {
+                        // The page was replaced while the render was running.
+                        recycle(rendered?.bitmap)
+                        return@post
+                    }
+                    if (rendered == null) {
+                        onRenderFailed?.invoke()
+                        invalidate()
+                        return@post
+                    }
+                    val previous = bitmap
+                    bitmap = rendered.bitmap
+                    if (previous != null && previous !== rendered.bitmap) recycle(previous)
+                    pageWidthPt = rendered.pageWidthPt
+                    pageHeightPt = rendered.pageHeightPt
+                    baseScale = if (width > 0 && height > 0) {
+                        min(width.toFloat() / rendered.bitmap.width, height.toFloat() / rendered.bitmap.height)
+                    } else {
+                        0f
+                    }
+                    if (resetViewport) {
+                        zoom = 1f
+                        offsetX = 0f
+                        offsetY = 0f
+                    } else {
+                        clampOffset()
+                    }
+                    invalidate()
+                    onRendered?.invoke()
+                }
             }
+        } catch (error: RejectedExecutionException) {
+            Logger.w(TAG, "the render pool does not accept the page any more")
         }
+    }
+
+    /**
+     * The width of the bitmap the page is rendered into.
+     *
+     * The view measures its pages in pixels, so the width of the bitmap is
+     * derived from the width of the view and never from its density: a
+     * density of three would ask for a bitmap that is three times as wide as
+     * the screen and would not fit into the heap of a phone.
+     */
+    private fun renderWidth(): Int {
+        val viewWidth = if (width > 0) width else resources.displayMetrics.widthPixels
+        val wanted = (viewWidth * zoom * RENDER_SCALE).toInt()
+        return wanted.coerceIn(MIN_RENDER_WIDTH, MAX_RENDER_WIDTH)
+    }
+
+    /**
+     * Renders the page again when the reader zoomed in far enough.
+     *
+     * The page is drawn from a bitmap, so a zoom that needs more pixels than
+     * the bitmap holds would only blur it. The page is therefore rendered
+     * again as soon as the zoom asks for more detail than the current bitmap
+     * offers.
+     */
+    private fun requestSharperPage() {
+        val page = bitmap ?: return
+        if (zoom <= 1f) return
+        if (renderWidth() <= page.width) return
+        requestRender(resetViewport = false)
+    }
+
+    /** Drops the bitmap of the page. */
+    private fun releaseBitmap() {
+        val old = bitmap
+        bitmap = null
+        recycle(old)
+    }
+
+    /** Frees a bitmap that is not painted any more. */
+    private fun recycle(target: Bitmap?) {
+        if (target == null) return
+        if (target.isRecycled) return
+        target.recycle()
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
@@ -788,13 +868,24 @@ class PdfPageView @JvmOverloads constructor(
         ReadingMode.BLACK -> null
     }
 
-    override fun onDetachedFromWindow() {
-        super.onDetachedFromWindow()
-        executor.shutdownNow()
-    }
-
     companion object {
+        private const val TAG = "PdfPageView"
+
         private const val MAX_ZOOM = 5f
+
+        /**
+         * How much detail a page is rendered with.
+         *
+         * The page is rendered a bit wider than the view, so the reader can
+         * zoom in without the page turning blurry right away.
+         */
+        private const val RENDER_SCALE = 1.5f
+
+        /** The narrowest bitmap a page is rendered into. */
+        private const val MIN_RENDER_WIDTH = 480
+
+        /** The widest bitmap a page is rendered into. */
+        private const val MAX_RENDER_WIDTH = 2048
 
         /** The width of a placed signature, as a fraction of the page width. */
         private const val PLACEMENT_WIDTH = 0.414f

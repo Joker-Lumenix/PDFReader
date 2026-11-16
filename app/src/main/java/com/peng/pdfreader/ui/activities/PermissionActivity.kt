@@ -9,7 +9,6 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.provider.Settings
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
@@ -17,6 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import com.peng.pdfreader.appcore.util.Logger
 import com.peng.pdfreader.base.BaseActivity
 import com.peng.pdfreader.data.DocumentRepository
+import com.peng.pdfreader.data.SharedStorage
 import com.peng.pdfreader.databinding.ActivityPermissionBinding
 import com.peng.pdfreader.notification.PersistentNotificationHelper
 import com.peng.pdfreader.permission.SetDefaultReaderSheet
@@ -40,6 +40,12 @@ class PermissionActivity : BaseActivity() {
     /** Whether the "set as default reader" hint has been shown already. */
     private var defaultReaderAsked = false
 
+    /** Whether the flow was continued already, the page leaves only once. */
+    private var flowContinued = false
+
+    /** Whether the home screen was started already. */
+    private var homeStarted = false
+
     /**
      * The runtime permission of the versions below Android 11.
      *
@@ -49,7 +55,11 @@ class PermissionActivity : BaseActivity() {
     private val readStoragePermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
             Logger.i(TAG, "read external storage granted: $granted")
-            // todo 获取到权限之后，关闭当前页面进入主页
+            if (granted && exitToHomeAfterGrant()) {
+                // The permission is there: the page closes and the home
+                // screen takes over.
+                continueFlow()
+            }
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,11 +79,10 @@ class PermissionActivity : BaseActivity() {
     /**
      * Asks for the runtime permission of the versions below Android 11.
      *
-     * From Android 11 on the "access all files" permission replaces it, the
-     * system screen of the design asks for that one.
+     * From Android 11 on the "access all files" permission replaces it: the
+     * button of the page opens the system screen of that permission and the
+     * page leaves the app once the permission was given.
      */
-
-    // TODO: 这里的文件访问权限不太对，我要的是MANAGE_EXTERNAL_STORAGE，页面内点击btnAllow后，跳转系统文件访问权限开启页面，应用权限获取之后，关闭当前页面进入主页
     private fun askForReadPermissionIfNeeded() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) return
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -86,14 +95,31 @@ class PermissionActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
-        if (hasStoragePermission()) {
-            // The documents of the device are collected right away, so the
-            // list is complete when the home screen is opened.
-            syncSharedDocuments()
-            if (exitToHomeAfterGrant()) {
-                goHome()
-                finish()
-            }
+        if (!hasStoragePermission()) return
+        // The documents of the device are collected right away, so the list is
+        // complete when the home screen is opened.
+        syncSharedDocuments()
+        if (exitToHomeAfterGrant()) {
+            // The permission was given in the system screen, the flow goes on.
+            continueFlow()
+        }
+    }
+
+    /**
+     * Continues the start up flow.
+     *
+     * The page is left only once, no matter how often the permission is
+     * reported.
+     */
+    private fun continueFlow() {
+        if (flowContinued) return
+        flowContinued = true
+        syncSharedDocuments()
+        if (exitToHomeAfterGrant()) {
+            // The page is a step of the flow: the home screen takes over.
+            goHome()
+        } else {
+            finish()
         }
     }
 
@@ -108,16 +134,7 @@ class PermissionActivity : BaseActivity() {
     }
 
     /** Whether the app may read the shared storage. */
-    private fun hasStoragePermission(): Boolean =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            Environment.isExternalStorageManager()
-        } else {
-            // Below Android 11 the access to the files is a runtime permission.
-            ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-            ) == PackageManager.PERMISSION_GRANTED
-        }
+    private fun hasStoragePermission(): Boolean = SharedStorage.canRead(this)
 
     private fun openAllFilesSettings() {
         val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -154,6 +171,7 @@ class PermissionActivity : BaseActivity() {
      * after the app is opened there.
      */
     private fun goHome() {
+        if (homeStarted) return
         if (defaultReaderAsked) {
             openHome()
             return
@@ -161,11 +179,17 @@ class PermissionActivity : BaseActivity() {
         defaultReaderAsked = true
         val sheet = SetDefaultReaderSheet()
         sheet.onAction = { Logger.d(TAG, "the default app settings are opened") }
-        sheet.onDismissed = { Logger.d(TAG, "the default reader hint was closed") }
+        sheet.onDismissed = {
+            Logger.d(TAG, "the default reader hint was closed")
+            // The hint is gone, the home screen takes over.
+            openHome()
+        }
         sheet.show(supportFragmentManager, SetDefaultReaderSheet.TAG)
     }
 
     private fun openHome() {
+        if (homeStarted) return
+        homeStarted = true
         // The ongoing notification of the design only makes sense once the user
         // allowed the notifications.
         if (hasNotificationPermission()) {

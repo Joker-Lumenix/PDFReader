@@ -18,6 +18,8 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.peng.pdfreader.R
 import com.peng.pdfreader.appcore.pdf.PdfEngine
+import com.peng.pdfreader.appcore.pdf.PdfError
+import com.peng.pdfreader.appcore.pdf.PdfOpen
 import com.peng.pdfreader.appcore.pdf.PdfVault
 import com.peng.pdfreader.appcore.widget.PdfPageView
 import com.peng.pdfreader.appcore.widget.ReadingMode
@@ -53,11 +55,7 @@ import java.util.Locale
 import java.util.UUID
 
 /**
- * The PDF reader.
- *
- * The pages are rendered by `:appcore` on a background thread, the reading
- * position is persisted and the annotations are written through the
- * repository.
+ * todo 签名以及涂鸦功能目前按照UI设计的样式做。之后再增加功能是在添加下划线这些功能
  */
 class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
 
@@ -73,6 +71,7 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
     private var currentPage = 0
     private var activeTool: AnnotationType? = null
     private var bottomSheetPassword: BottomSheetPassword? = null
+    private var renderFailureReported = false
     private val annotationColour = Color.parseColor("#fb4141")
 
     private val signatureLauncher = registerForActivityResult(
@@ -104,25 +103,23 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
         }
         document = doc
 
-        binding.titleBar.title = doc.name
-        // The viewer shows the name of the file with 15sp / medium.
-        binding.titleBar.setTitleTypography(TITLE_SIZE_SP, true)
-        binding.titleBar.showBack = true
-        binding.titleBar.onBackClick = {
+        binding.tvTitle.text = doc.name
+        binding.ivBack.setOnClickListener {
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
-        binding.titleBar.addAction(buildTitleActions())
 
-        binding.ivFavorite.setImageResource(
-            if (doc.isFavorite) R.mipmap.ic_star_select else R.mipmap.ic_star_unselect,
-        )
-        binding.ivFavorite.setOnClickListener { toggleFavorite() }
-        binding.tvFavorite.setOnClickListener { toggleFavorite() }
-        binding.ivAnnotate.setOnClickListener { toggleAnnotationBar() }
-        binding.ivOpenWith.setOnClickListener { openWith() }
-        binding.tvOpenWith.setOnClickListener { openWith() }
-        binding.ivShare.setOnClickListener { share() }
-        binding.tvShare.setOnClickListener { share() }
+        binding.ivRename.setOnClickListener {
+            showRenameDialog()
+        }
+        binding.ivMore.setOnClickListener {
+            showMoreActions()
+        }
+
+        binding.llShare.setOnClickListener {
+            share()
+        }
+
+        binding.llShare.setOnClickListener { share() }
 
         // The confirmation bar of the design carries the signature over.
         binding.addBar.background = GradientDrawable().apply {
@@ -131,15 +128,13 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
         binding.ivAdd.setImageResource(R.mipmap.ic_sign)
         binding.addBar.setOnClickListener { commitPlacedSignature() }
 
-        binding.annotationBar.root.visibility = View.GONE
-        binding.annotationBar.toolHighlight.setOnClickListener { selectTool(AnnotationType.HIGHLIGHT) }
-        binding.annotationBar.toolUnderline.setOnClickListener { selectTool(AnnotationType.UNDERLINE) }
-        binding.annotationBar.toolStrikethrough.setOnClickListener {
-            selectTool(AnnotationType.STRIKETHROUGH)
+        binding.llSign.setOnClickListener {
+            selectTool(AnnotationType.SIGNATURE)
         }
-        binding.annotationBar.toolDraw.setOnClickListener { selectTool(AnnotationType.DRAW) }
-        binding.annotationBar.toolNote.setOnClickListener { selectTool(AnnotationType.NOTE) }
-        binding.annotationBar.toolSignature.setOnClickListener { selectTool(AnnotationType.SIGNATURE) }
+
+        binding.llDraw.setOnClickListener {
+            selectTool(AnnotationType.DRAW)
+        }
 
         binding.pager.registerOnPageChangeCallback(
             object : ViewPager2.OnPageChangeCallback() {
@@ -149,9 +144,7 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
                 }
             },
         )
-
         loadDocument()
-        updateToolSelection()
     }
 
     override fun onPause() {
@@ -161,6 +154,9 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        // The engine keeps the parsed document open while it is read, this
+        // gives the memory of a big document back.
+        pagerAdapter?.release()
         pagerAdapter = null
         _binding = null
     }
@@ -169,11 +165,6 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
         val page = currentPageView()
         if (page != null && page.hasPendingPlacement) {
             page.cancelSignaturePlacement()
-            return true
-        }
-        val bar = _binding?.annotationBar?.root ?: return false
-        if (bar.visibility == View.VISIBLE) {
-            closeAnnotationBar()
             return true
         }
         return false
@@ -195,16 +186,16 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
 
     private fun openDocument(doc: Document, file: File) {
         viewLifecycleOwner.lifecycleScope.launch {
-            val count = withContext(Dispatchers.IO) {
-                if (doc.type == DocType.IMAGE) 1 else PdfEngine.pageCount(file)
+            val outcome = withContext(Dispatchers.IO) {
+                if (doc.type == DocType.IMAGE) PdfOpen.Opened(1) else PdfEngine.open(file)
             }
             if (_binding == null) return@launch
-            if (count <= 0 && doc.type != DocType.IMAGE) {
-                // The file is broken or it is not a PDF at all - the failure
-                // dialog of the design explains it.
-                showOpenFailure(doc)
+            if (outcome is PdfOpen.Failed) {
+                // The engine reports what went wrong, the design explains it.
+                showOpenFailure(doc, outcome.code)
                 return@launch
             }
+            val count = (outcome as PdfOpen.Opened).pageCount
             pageCount = count.coerceAtLeast(1)
             val adapter = PdfPagerAdapter(
                 file,
@@ -215,6 +206,7 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
             adapter.marksProvider = { page ->
                 AnnotationMarks.marksOf(repository.annotationsOf(doc.id), page)
             }
+            adapter.onRenderFailed = { reportRenderFailure() }
             pagerAdapter = adapter
             binding.pager.adapter = adapter
             val start = (doc.lastPage - 1).coerceIn(0, pageCount - 1)
@@ -222,6 +214,18 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
             currentPage = start
             updateIndicator()
         }
+    }
+
+    /**
+     * A page could not be shown.
+     *
+     * The reader stays open, the other pages are still there.
+     */
+    private fun reportRenderFailure() {
+        if (_binding == null) return
+        if (renderFailureReported) return
+        renderFailureReported = true
+        Toast.makeText(requireContext(), R.string.preview_load_failed, Toast.LENGTH_SHORT).show()
     }
 
     // ------------------------------------------------------------------ locked documents
@@ -232,11 +236,15 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
      * The dialog of the design explains it, the page stays open so the user
      * can go back to the list.
      */
-    private fun showOpenFailure(doc: Document) {
-        val message = if (doc.type == DocType.PDF) {
-            getString(R.string.preview_open_invalid)
-        } else {
-            getString(R.string.preview_open_failed)
+    private fun showOpenFailure(doc: Document, code: String) {
+        val message = when (code) {
+            PdfError.CODE_ENCRYPTED -> getString(R.string.error_pdf_encrypted)
+            PdfError.CODE_UNREADABLE -> getString(R.string.preview_open_failed)
+            else -> if (doc.type == DocType.PDF) {
+                getString(R.string.preview_open_invalid)
+            } else {
+                getString(R.string.preview_open_failed)
+            }
         }
         DialogFailure.show(childFragmentManager, message)
     }
@@ -310,9 +318,6 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
         repository.toggleFavorite(doc)
         val updated = repository.byId(doc.id) ?: return
         document = updated
-        binding.ivFavorite.setImageResource(
-            if (updated.isFavorite) R.mipmap.ic_star_select else R.mipmap.ic_star_unselect,
-        )
     }
 
     private fun share() {
@@ -418,7 +423,7 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
                 val updated = repository.byId(doc.id)
                 if (updated != null) {
                     document = updated
-                    binding.titleBar.title = updated.name
+                    binding.tvTitle.text = updated.name
                 }
             }
         }
@@ -478,27 +483,14 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
             .show()
     }
 
-    // ------------------------------------------------------------------ annotations
-
-    private fun toggleAnnotationBar() {
-        val bar = binding.annotationBar.root
-        if (bar.visibility == View.VISIBLE) {
-            closeAnnotationBar()
-        } else {
-            bar.visibility = View.VISIBLE
-        }
-    }
-
     private fun closeAnnotationBar() {
-        binding.annotationBar.root.visibility = View.GONE
         activeTool = null
         pagerAdapter?.applySelection(false, null)
-        updateToolSelection()
+
     }
 
     private fun selectTool(type: AnnotationType) {
         activeTool = type
-        updateToolSelection()
         when (type) {
             AnnotationType.HIGHLIGHT,
             AnnotationType.UNDERLINE,
@@ -518,33 +510,10 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
         }
     }
 
-    private fun updateToolSelection() {
-        val tools = listOf(
-            binding.annotationBar.toolHighlight to AnnotationType.HIGHLIGHT,
-            binding.annotationBar.toolUnderline to AnnotationType.UNDERLINE,
-            binding.annotationBar.toolStrikethrough to AnnotationType.STRIKETHROUGH,
-            binding.annotationBar.toolDraw to AnnotationType.DRAW,
-            binding.annotationBar.toolNote to AnnotationType.NOTE,
-            binding.annotationBar.toolSignature to AnnotationType.SIGNATURE,
-        )
-        tools.forEach { (view, type) ->
-            val selected = type == activeTool
-            view.setBackgroundResource(
-                if (selected) R.drawable.bg_icon_tile else R.drawable.bg_type_chip,
-            )
-            view.setTextColor(
-                requireContext().getColor(
-                    if (selected) R.color.brand_primary else R.color.text_secondary,
-                ),
-            )
-        }
-    }
-
     private fun onAreaSelected(type: AnnotationType, rect: RectF) {
         addAnnotation(type, AnnotationPayload.encodeRect(rect))
         activeTool = null
         pagerAdapter?.applySelection(false, null)
-        updateToolSelection()
     }
 
     private fun showNoteDialog() {
@@ -612,7 +581,6 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
         view.onPlacementCancelled = {
             showAddBar(false)
             activeTool = null
-            updateToolSelection()
         }
         view.beginSignaturePlacement(strokes, aspect)
     }
@@ -637,7 +605,6 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
         addAnnotation(AnnotationType.SIGNATURE, AnnotationPayload.encodeInk(placed))
         showAddBar(false)
         activeTool = null
-        updateToolSelection()
         Toast.makeText(requireContext(), R.string.preview_signature_saved, Toast.LENGTH_SHORT).show()
     }
 

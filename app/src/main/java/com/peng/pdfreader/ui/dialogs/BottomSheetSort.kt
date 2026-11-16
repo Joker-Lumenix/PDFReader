@@ -5,23 +5,26 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.ScrollView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentManager
 import com.peng.pdfreader.R
 import com.peng.pdfreader.appcore.widget.BaseBottomSheetDialog
-import com.peng.pdfreader.databinding.FilesSheetSortBinding
+import com.peng.pdfreader.databinding.DialogSortBinding
 import com.peng.pdfreader.utils.FileSortOption
 import com.peng.pdfreader.utils.FilesPrefs
 
 /**
  * 排序弹窗
- * todo 该弹窗没有全部弹出，弹了一些，需要拖动才能全部弹出
+ *
+ * 弹窗的内容比屏幕还高，所以它放在一个可以滚动的容器里：整个弹窗一直铺到
+ * 屏幕的底部，超出的部分在弹窗内部滚动。
  */
 class BottomSheetSort : BaseBottomSheetDialog() {
 
-    private var _binding: FilesSheetSortBinding? = null
+    private var _binding: DialogSortBinding? = null
     private val binding get() = _binding!!
 
     /** The option that is currently marked. */
@@ -37,8 +40,15 @@ class BottomSheetSort : BaseBottomSheetDialog() {
     )
 
     override fun createContentView(inflater: LayoutInflater, container: ViewGroup?): View {
-        _binding = FilesSheetSortBinding.inflate(inflater, container, false)
-        return binding.root
+        _binding = DialogSortBinding.inflate(inflater, container, false)
+        // The body of the sheet is taller than a phone screen, so it scrolls
+        // inside of the sheet instead of growing beyond it.
+        val scroll = ScrollView(requireContext()).apply {
+            isFillViewport = true
+            isVerticalScrollBarEnabled = false
+            addView(binding.root)
+        }
+        return scroll
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

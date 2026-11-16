@@ -98,6 +98,22 @@ sealed class PdfError(code: String, cause: Throwable? = null) : Exception(code, 
 }
 
 /**
+ * Outcome of opening a document.
+ *
+ * The engine never hands a raw exception to the UI: it either opens the
+ * document or reports one of the stable codes of [PdfError], which the app
+ * maps onto a localised message.
+ */
+sealed class PdfOpen {
+
+    /** The document was opened and holds this many pages. */
+    data class Opened(val pageCount: Int) : PdfOpen()
+
+    /** The document could not be opened. */
+    data class Failed(val code: String, val cause: Throwable? = null) : PdfOpen()
+}
+
+/**
  * Outcome of a compression run.
  *
  * @param originalSize size of the source document

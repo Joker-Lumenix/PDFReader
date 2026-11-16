@@ -2,10 +2,10 @@ package com.peng.pdfreader.appcore.pdf
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
-import android.graphics.pdf.PdfDocument
 import com.peng.pdfreader.appcore.util.Logger
 import java.io.File
 import java.io.FileOutputStream
@@ -27,9 +27,10 @@ import kotlin.math.roundToInt
  * PdfProcessor.merge(sources, out, onProgress = { progress -> }) { result -> }
  * ```
  *
- * The work itself is ported from the first version of the app. It renders the
- * pages through the framework renderer and writes them into a fresh document,
- * which is the only way to rebuild a PDF with the platform APIs.
+ * The pages are rendered through the framework renderer and written into a
+ * fresh document. The document is written page by page, so only one page is
+ * held in the memory at a time - a document of any size can be produced that
+ * way.
  */
 object PdfProcessor {
 
@@ -74,45 +75,22 @@ object PdfProcessor {
         report: (PdfProgress) -> Unit,
     ): Long {
         if (sources.isEmpty()) throw PdfError.Unsupported(PdfError.CODE_NO_FILES)
-        val document = PdfDocument()
-        var written = 0
-        try {
-            sources.forEachIndexed { index, source ->
-                if (!source.isFile) throw PdfError.UnreadableSource(source.absolutePath)
-                val pages = PdfEngine.pageCount(source)
-                if (pages <= 0) throw PdfError.UnreadableSource(source.absolutePath)
-                for (pageNo in 1..pages) {
-                    val rendered = PdfEngine.renderPage(source, pageNo - 1) ?: continue
-                    val info = PdfDocument.PageInfo
-                        .Builder(rendered.pageWidthPt, rendered.pageHeightPt, written + 1)
-                        .create()
-                    val page = document.startPage(info)
-                    page.canvas.drawBitmap(
-                        rendered.bitmap,
-                        null,
-                        RectF(0f, 0f, rendered.pageWidthPt.toFloat(), rendered.pageHeightPt.toFloat()),
-                        Paint(Paint.FILTER_BITMAP_FLAG),
-                    )
-                    document.finishPage(page)
-                    rendered.bitmap.recycle()
-                    written++
-                }
-                if (insertBlankOnOdd && written % 2 == 1) {
-                    val info = PdfDocument.PageInfo.Builder(A4_WIDTH_PT, A4_HEIGHT_PT, written + 1).create()
-                    val page = document.startPage(info)
-                    page.canvas.drawColor(Color.WHITE)
-                    document.finishPage(page)
-                    written++
-                }
-                report(PdfProgress(PdfStage.MERGE, index + 1, sources.size))
+        val pages = ArrayList<PdfPictureWriter.Source>()
+        sources.forEachIndexed { index, source ->
+            if (!source.isFile) throw PdfError.UnreadableSource(source.absolutePath)
+            val count = PdfEngine.pageCount(source)
+            if (count <= 0) throw PdfError.UnreadableSource(source.absolutePath)
+            for (pageNo in 1..count) {
+                pages += PdfPictureWriter.Source.ofPage(source, pageNo - 1)
             }
-            if (written == 0) throw PdfError.Unsupported(PdfError.CODE_NO_PAGES)
-            out.parentFile?.let { if (!it.exists()) it.mkdirs() }
-            FileOutputStream(out).use { document.writeTo(it) }
-        } finally {
-            document.close()
+            // A blank page keeps the pairs of the documents together.
+            if (insertBlankOnOdd && pages.size % 2 == 1) {
+                pages += PdfPictureWriter.Source.blank()
+            }
+            report(PdfProgress(PdfStage.MERGE, index + 1, sources.size))
         }
-        return out.length()
+        if (pages.isEmpty()) throw PdfError.Unsupported(PdfError.CODE_NO_PAGES)
+        return writeDocument(out, pages, report, PdfStage.MERGE)
     }
 
     // ------------------------------------------------------------------ split
@@ -176,38 +154,16 @@ object PdfProcessor {
             val end = min(total, range.last)
             if (end < start) return@forEachIndexed
             val target = File(outDir, "%s_p%03d-%03d.pdf".format(baseName(source), start, end))
-            writePages(source, start..end, target)
+            val pages = ArrayList<PdfPictureWriter.Source>()
+            for (pageNo in start..end) {
+                pages += PdfPictureWriter.Source.ofPage(source, pageNo - 1)
+            }
+            writeDocument(target, pages, report, PdfStage.SPLIT)
             outputs += target
             report(PdfProgress(PdfStage.SPLIT, index + 1, ranges.size))
         }
         if (outputs.isEmpty()) throw PdfError.Unsupported(PdfError.CODE_NO_PAGES)
         return outputs
-    }
-
-    private fun writePages(source: File, pages: IntRange, target: File): Long {
-        val document = PdfDocument()
-        try {
-            var index = 0
-            for (pageNo in pages) {
-                val rendered = PdfEngine.renderPage(source, pageNo - 1) ?: continue
-                val info = PdfDocument.PageInfo
-                    .Builder(rendered.pageWidthPt, rendered.pageHeightPt, ++index)
-                    .create()
-                val page = document.startPage(info)
-                page.canvas.drawBitmap(
-                    rendered.bitmap,
-                    null,
-                    RectF(0f, 0f, rendered.pageWidthPt.toFloat(), rendered.pageHeightPt.toFloat()),
-                    Paint(Paint.FILTER_BITMAP_FLAG),
-                )
-                document.finishPage(page)
-                rendered.bitmap.recycle()
-            }
-            FileOutputStream(target).use { document.writeTo(it) }
-        } finally {
-            document.close()
-        }
-        return target.length()
     }
 
     // ------------------------------------------------------------------ compress
@@ -263,48 +219,49 @@ object PdfProcessor {
         report: (PdfProgress) -> Unit,
     ): Long {
         if (images.isEmpty()) throw PdfError.Unsupported(PdfError.CODE_NO_IMAGES)
-        val document = PdfDocument()
-        try {
-            val margin = marginMm / 25.4f * 72f
-            val pageWidth = if (landscape) A4_HEIGHT_PT else A4_WIDTH_PT
-            val pageHeight = if (landscape) A4_WIDTH_PT else A4_HEIGHT_PT
-            val contentWidth = pageWidth - margin * 2
-            val contentHeight = pageHeight - margin * 2
-            val cellWidth = contentWidth / layout.columns
-            val cellHeight = contentHeight / layout.rows
+        val margin = marginMm / 25.4f * 72f
+        val pageWidth = if (landscape) A4_HEIGHT_PT else A4_WIDTH_PT
+        val pageHeight = if (landscape) A4_WIDTH_PT else A4_HEIGHT_PT
+        val contentWidth = pageWidth - margin * 2
+        val contentHeight = pageHeight - margin * 2
+        val cellWidth = contentWidth / layout.columns
+        val cellHeight = contentHeight / layout.rows
 
-            images.chunked(layout.perPage).forEachIndexed { pageIndex, chunk ->
-                val info = PdfDocument.PageInfo.Builder(pageWidth, pageHeight, pageIndex + 1).create()
-                val page = document.startPage(info)
-                page.canvas.drawColor(Color.WHITE)
-                chunk.forEachIndexed { slot, item ->
-                    val bitmap = decodeImage(item) ?: return@forEachIndexed
-                    val column = slot % layout.columns
-                    val row = slot / layout.columns
-                    val left = margin + column * cellWidth
-                    val top = margin + row * cellHeight
-                    val scale = min(cellWidth / bitmap.width, cellHeight / bitmap.height)
-                    val drawWidth = bitmap.width * scale
-                    val drawHeight = bitmap.height * scale
-                    val dest = RectF(
-                        left + (cellWidth - drawWidth) / 2,
-                        top + (cellHeight - drawHeight) / 2,
-                        left + (cellWidth + drawWidth) / 2,
-                        top + (cellHeight + drawHeight) / 2,
-                    )
-                    page.canvas.drawBitmap(bitmap, null, dest, Paint(Paint.FILTER_BITMAP_FLAG))
-                    bitmap.recycle()
-                }
-                document.finishPage(page)
-                report(PdfProgress(PdfStage.IMAGES, pageIndex + 1, images.size))
+        val pages = ArrayList<PdfPictureWriter.Source>()
+        images.chunked(layout.perPage).forEachIndexed { pageIndex, chunk ->
+            // The page is drawn as a picture, so only this one page is held in
+            // the memory while it is written.
+            val picture = Bitmap.createBitmap(PAGE_PIXEL_WIDTH, pagePixelHeight(pageHeight, pageWidth), Bitmap.Config.ARGB_8888)
+            picture.eraseColor(Color.WHITE)
+            val canvas = Canvas(picture)
+            val scale = PAGE_PIXEL_WIDTH.toFloat() / pageWidth.toFloat()
+            chunk.forEachIndexed { slot, item ->
+                val bitmap = decodeImage(item) ?: return@forEachIndexed
+                val column = slot % layout.columns
+                val row = slot / layout.columns
+                val left = margin + column * cellWidth
+                val top = margin + row * cellHeight
+                val fit = min(cellWidth / bitmap.width, cellHeight / bitmap.height)
+                val drawWidth = bitmap.width * fit
+                val drawHeight = bitmap.height * fit
+                val dest = RectF(
+                    (left + (cellWidth - drawWidth) / 2) * scale,
+                    (top + (cellHeight - drawHeight) / 2) * scale,
+                    (left + (cellWidth + drawWidth) / 2) * scale,
+                    (top + (cellHeight + drawHeight) / 2) * scale,
+                )
+                canvas.drawBitmap(bitmap, null, dest, Paint(Paint.FILTER_BITMAP_FLAG))
+                bitmap.recycle()
             }
-            out.parentFile?.let { if (!it.exists()) it.mkdirs() }
-            FileOutputStream(out).use { document.writeTo(it) }
-        } finally {
-            document.close()
+            pages += PdfPictureWriter.Source.ofPicture(picture, pageWidth, pageHeight)
+            report(PdfProgress(PdfStage.IMAGES, pageIndex + 1, images.size))
         }
-        return out.length()
+        return writeDocument(out, pages, report, PdfStage.IMAGES)
     }
+
+    /** The height of the picture of a page, in pixels. */
+    private fun pagePixelHeight(pageHeightPt: Int, pageWidthPt: Int): Int =
+        (PAGE_PIXEL_WIDTH.toFloat() * pageHeightPt / pageWidthPt).roundToInt().coerceAtLeast(1)
 
     private fun decodeImage(item: File): Bitmap? = BitmapFactory.decodeFile(item.absolutePath)
 
@@ -350,9 +307,36 @@ object PdfProcessor {
         return pages.toList()
     }
 
+    // ------------------------------------------------------------------ writing
+
+    /**
+     * Writes the pages into a document.
+     *
+     * The pages are put into the file one after the other, so the memory of
+     * the job does not grow with the number of pages.
+     */
+    private fun writeDocument(
+        out: File,
+        pages: List<PdfPictureWriter.Source>,
+        report: (PdfProgress) -> Unit,
+        stage: PdfStage,
+    ): Long {
+        out.parentFile?.let { if (!it.exists()) it.mkdirs() }
+        FileOutputStream(out).use { stream ->
+            PdfPictureWriter(stream).write(pages) { written ->
+                report(PdfProgress(stage, written, pages.size))
+            }
+        }
+        Logger.d(TAG, "wrote ${pages.size} pages into ${out.absolutePath}")
+        return out.length()
+    }
+
     // ------------------------------------------------------------------ plumbing
 
     private fun baseName(file: File): String = file.nameWithoutExtension
+
+    /** The width of the picture of a page, in pixels. */
+    private const val PAGE_PIXEL_WIDTH = 1240
 
     /**
      * Runs [work] on a worker thread and hands the result to [onResult].

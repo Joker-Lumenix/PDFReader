@@ -12,6 +12,7 @@ import com.peng.pdfreader.ui.activities.LockActivity
 import com.peng.pdfreader.ui.activities.UnlockActivity
 import com.peng.pdfreader.ui.uiData.AdSamples
 import com.peng.pdfreader.ui.activities.ImageToPdfActivity
+import com.peng.pdfreader.ui.activities.MergeActivity
 import com.peng.pdfreader.ui.activities.SplitActivity
 import com.peng.pdfreader.ui.dialogs.BottomSheetToolDocumentPicker
 import com.peng.pdfreader.feature.tools.pack.ZipRunner
@@ -55,7 +56,7 @@ class ToolsFragment : BaseFragment() {
             SplitActivity.start(requireContext())
         }
         binding.llMergePDF.setOnClickListener {
-            ImageToPdfActivity.start(requireContext())
+            MergeActivity.start(requireContext())
         }
         binding.llScanPDF.setOnClickListener {
             ToolScanner.launch(this)

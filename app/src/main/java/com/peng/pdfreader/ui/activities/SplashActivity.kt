@@ -5,13 +5,12 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.view.animation.LinearInterpolator
 import androidx.activity.result.contract.ActivityResultContracts
 import com.peng.pdfreader.appcore.util.Logger
 import com.peng.pdfreader.base.BaseActivity
+import com.peng.pdfreader.data.SharedStorage
 import com.peng.pdfreader.databinding.ActivitySplashBinding
 import com.peng.pdfreader.notification.NotificationPermissionHelper
 import com.peng.pdfreader.ui.flow.AppFlow
@@ -113,7 +112,11 @@ class SplashActivity : BaseActivity() {
         )
         val intent = when (step) {
             AppFlow.Step.GUIDE -> Intent(this, GuideActivity::class.java)
-            AppFlow.Step.PERMISSION -> Intent(this, PermissionActivity::class.java)
+            // The permission page is a step of the flow: it closes itself and
+            // the home screen takes over once the permission was given.
+            AppFlow.Step.PERMISSION -> Intent(this, PermissionActivity::class.java).apply {
+                putExtra(PermissionActivity.EXTRA_EXIT_TO_HOME, true)
+            }
             AppFlow.Step.HOME -> Intent(this, MainActivity::class.java)
         }
         startActivity(
@@ -124,12 +127,13 @@ class SplashActivity : BaseActivity() {
         finish()
     }
 
-    private fun hasStoragePermission(): Boolean =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            Environment.isExternalStorageManager()
-        } else {
-            true
-        }
+    /**
+     * Whether the app may read the shared storage.
+     *
+     * On Android 11 and above that is the "access all files" permission, below
+     * that the runtime permission for reading the external storage.
+     */
+    private fun hasStoragePermission(): Boolean = SharedStorage.canRead(this)
 
     private companion object {
         const val TAG = "SplashActivity"
