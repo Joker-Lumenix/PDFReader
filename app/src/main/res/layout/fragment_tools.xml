@@ -32,6 +32,7 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:fillViewport="true"
+        android:layout_marginHorizontal="@dimen/dsg_radius_20"
         android:overScrollMode="never">
 
         <FrameLayout
@@ -41,10 +42,10 @@
             <!-- yellow panel, the surface of the tool grid -->
             <View
                 android:id="@+id/panel"
-                android:layout_width="320dp"
+                android:layout_width="match_parent"
                 android:layout_height="420dp"
                 android:layout_gravity="top|start"
-                android:layout_marginStart="20dp"
+                android:layout_marginHorizontal="20dp"
                 android:layout_marginTop="147dp" />
 
             <!-- the 2 x 4 grid of the tools -->
@@ -56,8 +57,6 @@
                 android:layout_marginTop="163dp"
                 android:clipToPadding="false"
                 android:overScrollMode="never"
-                android:paddingStart="37dp"
-                android:paddingEnd="37dp"
                 android:scrollbars="none" />
 
             <!-- hero illustration, drawn on top of the yellow panel -->
@@ -71,7 +70,22 @@
                 android:contentDescription="@string/tools"
                 android:src="@mipmap/bg_tools" />
 
+            <!--
+              banner ad of the design, it sits below the grid of the tools.
+              The app does not bundle an ad sdk, the slot only reserves the
+              space and renders the local sample.
+            -->
+            <com.peng.pdfreader.appcore.widget.AdSlotView
+                android:id="@+id/adBanner"
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:layout_gravity="top|start"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="563dp"
+                android:layout_marginEnd="12dp" />
+
         </FrameLayout>
+
 
     </androidx.core.widget.NestedScrollView>
 

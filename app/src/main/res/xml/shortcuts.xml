@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The quick access of the launcher (design: 快捷入口).
+
+  The entries show up when the app icon is pressed and held in the system
+  launcher. They are static, so they are available right after the install and
+  they do not need a running service.
+
+  Every entry opens the shell with an own action; the shell routes the action
+  to the tool it belongs to.
+-->
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <shortcut
+        android:shortcutId="scan"
+        android:enabled="true"
+        android:icon="@mipmap/ic_google_scan"
+        android:shortcutShortLabel="@string/scanner"
+        android:shortcutLongLabel="@string/scan_to_pdf">
+        <intent
+            android:action="com.peng.pdfreader.action.SCAN"
+            android:targetClass="com.peng.pdfreader.MainActivity"
+            android:targetPackage="com.peng.pdfreader" />
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="merge"
+        android:enabled="true"
+        android:icon="@mipmap/ic_merge_pdf"
+        android:shortcutShortLabel="@string/merge"
+        android:shortcutLongLabel="@string/merge">
+        <intent
+            android:action="com.peng.pdfreader.action.MERGE"
+            android:targetClass="com.peng.pdfreader.MainActivity"
+            android:targetPackage="com.peng.pdfreader" />
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="image_to_pdf"
+        android:enabled="true"
+        android:icon="@mipmap/ic_tools_image_to_pdf"
+        android:shortcutShortLabel="@string/image_to_pdf"
+        android:shortcutLongLabel="@string/image_to_pdf">
+        <intent
+            android:action="com.peng.pdfreader.action.IMAGE_TO_PDF"
+            android:targetClass="com.peng.pdfreader.MainActivity"
+            android:targetPackage="com.peng.pdfreader" />
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="print"
+        android:enabled="true"
+        android:icon="@mipmap/ic_print"
+        android:shortcutShortLabel="@string/print"
+        android:shortcutLongLabel="@string/print">
+        <intent
+            android:action="com.peng.pdfreader.action.OPEN_FILES"
+            android:targetClass="com.peng.pdfreader.MainActivity"
+            android:targetPackage="com.peng.pdfreader" />
+    </shortcut>
+
+</shortcuts>

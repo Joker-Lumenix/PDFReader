@@ -45,10 +45,15 @@ class AppPrefs private constructor(context: Context) {
             .getOrDefault(FileSort.MODIFIED)
         set(value) = prefs.edit { putString(KEY_FILE_SORT, value.name) }
 
-    /** Whether the onboarding has already been shown. */
-    var onboardingShown: Boolean
-        get() = prefs.getBoolean(KEY_ONBOARDING_SHOWN, false)
-        set(value) = prefs.edit { putBoolean(KEY_ONBOARDING_SHOWN, value) }
+    /** Whether the guide has already been shown. */
+    var guideShown: Boolean
+        get() = prefs.getBoolean(KEY_GUIDE_SHOWN, false)
+        set(value) = prefs.edit { putBoolean(KEY_GUIDE_SHOWN, value) }
+
+    /** Whether the notification permission was asked for already. */
+    var notificationPermissionAsked: Boolean
+        get() = prefs.getBoolean(KEY_NOTIFICATION_ASKED, false)
+        set(value) = prefs.edit { putBoolean(KEY_NOTIFICATION_ASKED, value) }
 
     companion object {
         private const val KEY_LANGUAGE = "language"
@@ -56,7 +61,8 @@ class AppPrefs private constructor(context: Context) {
         private const val KEY_READING_MODE = "reading_mode"
         private const val KEY_FILE_FILTER = "file_filter"
         private const val KEY_FILE_SORT = "file_sort"
-        private const val KEY_ONBOARDING_SHOWN = "onboarding_shown"
+        private const val KEY_GUIDE_SHOWN = "guide_shown"
+        private const val KEY_NOTIFICATION_ASKED = "notification_permission_asked"
 
         const val DEFAULT_LANGUAGE = "zh-CN"
 

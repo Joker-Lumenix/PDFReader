@@ -1,5 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!--
+      File access: on Android 11 and above the app asks for the "all files"
+      access, below that the plain read permission is enough.
+    -->
+    <uses-permission
+        android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
+
+    <!-- The notifications are a runtime permission on Android 13 and above. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- The scanner of the tools uses the camera. -->
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
 
     <application
         android:name=".PdfReaderApp"
@@ -21,6 +46,14 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <!--
+              The quick access of the launcher: the shortcuts show up when the
+              app icon is pressed and held in the system launcher.
+            -->
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
         </activity>
 
         <activity
@@ -118,8 +151,19 @@
             android:name=".ui.permission.PermissionActivity"
             android:exported="false" />
 
+        <!-- The guide of the first start. -->
         <activity
-            android:name=".feature.onboarding.OnboardingActivity"
+            android:name=".feature.guide.GuideActivity"
+            android:exported="false" />
+
+        <!-- The file search and the file picker of the home tab. -->
+        <activity
+            android:name=".feature.files.activity.FileSearchActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".feature.files.activity.FileSelectActivity"
             android:exported="false" />
 
         <!-- Keeps the chosen app locale across restarts on Android 12 and below. -->

@@ -30,6 +30,9 @@ import com.peng.pdfreader.feature.files.FileActions
 import com.peng.pdfreader.feature.files.dialog.DeleteConfirmDialog
 import com.peng.pdfreader.feature.files.dialog.RenameDialog
 import com.peng.pdfreader.feature.files.sheet.FileActionSheet
+import com.peng.pdfreader.feature.files.sheet.SortSheet
+import com.peng.pdfreader.feature.files.util.FileSortOption
+import com.peng.pdfreader.feature.files.util.FilesPrefs
 import com.peng.pdfreader.feature.home.adapter.HomeDocumentAdapter
 import com.peng.pdfreader.feature.home.adapter.HomePagerAdapter
 import com.peng.pdfreader.feature.home.adapter.HomeQuickActionAdapter
@@ -72,14 +75,11 @@ class HomeFragment : BaseFragment() {
      */
     var onQuickEntry: ((View) -> Unit)? = null
 
-    /** Raised when the share action of the title bar is tapped. */
-    var onShareClick: (() -> Unit)? = null
+    /** Raised when the search action of the title bar is tapped. */
+    var onSearchClick: (() -> Unit)? = null
 
-    /** Raised when the print action of the title bar is tapped. */
-    var onPrintClick: (() -> Unit)? = null
-
-    /** Raised when the overflow action of the title bar is tapped. */
-    var onMoreClick: (() -> Unit)? = null
+    /** Raised when the file selection action of the title bar is tapped. */
+    var onSelectClick: (() -> Unit)? = null
 
     /** Raised when the empty state asks the user to open the system settings. */
     var onOpenSettings: (() -> Unit)? = null
@@ -147,16 +147,17 @@ class HomeFragment : BaseFragment() {
         binding.titleBar.title = buildTitle()
         // The slot of the shared bar is a frame, so the three icons of the
         // design need a row of their own to sit in.
+        // The icons are the search, the file selection and the sort order.
         val actions = LinearLayout(requireContext()).apply {
             orientation = LinearLayout.HORIZONTAL
-            addView(titleAction(R.mipmap.ic_search_red, R.string.home_share) {
-                onShareClick?.invoke()
+            addView(titleAction(R.mipmap.ic_search_red, R.string.search) {
+                onSearchClick?.invoke()
             })
-            addView(titleAction(R.mipmap.ic_file_choose, R.string.home_print) {
-                onPrintClick?.invoke()
+            addView(titleAction(R.mipmap.ic_file_choose, R.string.select_file) {
+                onSelectClick?.invoke()
             })
-            addView(titleAction(R.mipmap.bg_permission, R.string.home_more) {
-                onMoreClick?.invoke()
+            addView(titleAction(R.mipmap.ic_sort, R.string.files_sort_title) {
+                openSortSheet()
             })
         }
         binding.titleBar.addAction(actions)
@@ -312,6 +313,21 @@ class HomeFragment : BaseFragment() {
             DeleteConfirmDialog.REQUEST_KEY,
             viewLifecycleOwner,
         ) { _, _ -> refreshDocuments() }
+        // The sort sheet writes the picked order back, the list follows it.
+        childFragmentManager.setFragmentResultListener(
+            SortSheet.REQUEST_KEY,
+            viewLifecycleOwner,
+        ) { _, bundle ->
+            val raw = bundle.getString(SortSheet.KEY_SORT)
+            val option = raw?.let { name ->
+                FileSortOption.entries.firstOrNull { it.name == name }
+            } ?: return@setFragmentResultListener
+            FilesPrefs.get(requireContext()).sortOption = option
+            // The base sort is shared with the rest of the app.
+            prefs.fileSort = option.sort
+            Logger.d(TAG, "file sort changed to ${option.name}")
+            refreshDocuments()
+        }
     }
 
     private val pageChangeCallback = object : ViewPager2.OnPageChangeCallback() {
@@ -329,7 +345,21 @@ class HomeFragment : BaseFragment() {
 
     private fun refreshDocuments() {
         if (_binding == null || !::pagerAdapter.isInitialized) return
-        pagerAdapter.submit(DocumentRepository.get(requireContext()).all())
+        // The list follows the sort order of the files feature.
+        val option = FilesPrefs.get(requireContext()).sortOption
+        val documents = DocumentRepository.get(requireContext()).query(null, option.sort, null)
+        pagerAdapter.submit(if (option.reverse) documents.reversed() else documents)
+    }
+
+    // ------------------------------------------------------------------ sort sheet
+
+    /**
+     * The sort sheet of the files feature.
+     *
+     * The sheet writes the picked order back, the list is rebuilt with it.
+     */
+    private fun openSortSheet() {
+        SortSheet.show(childFragmentManager)
     }
 
     // ---------------------------------------------------------------- empty state

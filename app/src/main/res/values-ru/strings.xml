@@ -52,6 +52,8 @@
     <string name="encrypted">Зашифрованные</string>
     <string name="eraser">Eraser</string>
     <string name="exit_retention_title">Хотите попробовать перед выходом?</string>
+    <string name="exit_retention_exit">Выход</string>
+    <string name="exit_retention_try">Попробовать</string>
     <string name="export_annotations">Export annotations</string>
     <string name="export_format">Формат экспорта</string>
     <string name="favourite">Избранное</string>

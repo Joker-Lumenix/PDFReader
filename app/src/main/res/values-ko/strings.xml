@@ -52,6 +52,8 @@
     <string name="encrypted">암호화됨</string>
     <string name="eraser">Eraser</string>
     <string name="exit_retention_title">나가기 전에 한 번 더 써볼까요?</string>
+    <string name="exit_retention_exit">종료</string>
+    <string name="exit_retention_try">사용해 보기</string>
     <string name="export_annotations">Export annotations</string>
     <string name="export_format">내보내기 형식</string>
     <string name="favourite">즐겨찾기</string>

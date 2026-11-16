@@ -7,19 +7,21 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
 import com.peng.pdfreader.R
+import com.peng.pdfreader.appcore.widget.AdSlotView
 import com.peng.pdfreader.base.BaseFragment
 import com.peng.pdfreader.data.model.Document
 import com.peng.pdfreader.databinding.FragmentToolsBinding
+import com.peng.pdfreader.feature.lock.activity.LockActivity
+import com.peng.pdfreader.feature.lock.activity.UnlockActivity
+import com.peng.pdfreader.feature.settings.widget.AdSamples
 import com.peng.pdfreader.feature.tools.activity.ImageToPdfActivity
 import com.peng.pdfreader.feature.tools.activity.MergeActivity
 import com.peng.pdfreader.feature.tools.activity.SplitActivity
 import com.peng.pdfreader.feature.tools.adapter.ToolGridAdapter
 import com.peng.pdfreader.feature.tools.adapter.ToolGridDecoration
 import com.peng.pdfreader.feature.tools.dialog.ToolDocumentPickerDialog
-import com.peng.pdfreader.feature.lock.activity.LockActivity
-import com.peng.pdfreader.feature.lock.activity.UnlockActivity
-import com.peng.pdfreader.feature.tools.pack.ZipRunner
 import com.peng.pdfreader.feature.tools.model.ToolAction
+import com.peng.pdfreader.feature.tools.pack.ZipRunner
 import com.peng.pdfreader.feature.tools.print.ToolPrintRunner
 import com.peng.pdfreader.feature.tools.scanner.ToolScanner
 import com.peng.pdfreader.feature.tools.util.ToolShapes
@@ -65,6 +67,10 @@ class ToolsFragment : BaseFragment() {
                 itemCount = { adapter.itemCount },
             ),
         )
+
+        // The banner ad of the design sits below the grid of the tools.
+        binding.adBanner.style = AdSlotView.Style.BANNER
+        binding.adBanner.content = AdSamples.banner(requireContext())
     }
 
     private fun onToolSelected(action: ToolAction) {

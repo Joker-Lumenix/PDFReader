@@ -7,6 +7,7 @@
   from the left edge and the handle 8dp from the right edge.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="36dp"
@@ -42,6 +43,6 @@
         android:layout_height="20dp"
         android:contentDescription="@null"
         android:src="@drawable/ic_drag_handle"
-        android:tint="@color/surface_neutral_warm" />
+        app:tint="@color/surface_neutral_warm" />
 
 </LinearLayout>

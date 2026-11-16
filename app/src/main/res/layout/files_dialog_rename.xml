@@ -67,7 +67,8 @@
         <TextView
             android:id="@+id/btnCancel"
             style="@style/TextAppearance.AppCore.Button"
-            android:layout_width="141dp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="48dp"
             android:background="@drawable/bg_btn_unable_r16"
             android:clickable="true"
@@ -83,7 +84,8 @@
         <TextView
             android:id="@+id/btnOk"
             style="@style/TextAppearance.AppCore.Button"
-            android:layout_width="141dp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="48dp"
             android:background="@drawable/gradient_red"
             android:clickable="true"

@@ -54,6 +54,8 @@
     <string name="eraser">橡皮擦</string>
     <string name="file_type_excel" translatable="false">Excel</string>
     <string name="exit_retention_title">离开前想先试试吗？</string>
+    <string name="exit_retention_exit">退出</string>
+    <string name="exit_retention_try">试一下</string>
     <string name="export_annotations">导出批注</string>
     <string name="export_format">导出格式</string>
     <string name="favourite">已收藏</string>

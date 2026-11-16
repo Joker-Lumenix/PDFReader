@@ -19,7 +19,6 @@ import com.peng.pdfreader.R
 import com.peng.pdfreader.appcore.util.Logger
 import com.peng.pdfreader.base.BaseActivity
 import com.peng.pdfreader.databinding.ActivityPermissionBinding
-import com.peng.pdfreader.feature.settings.notification.NotificationPermissionSheet
 import com.peng.pdfreader.feature.settings.notification.PersistentNotificationHelper
 import com.peng.pdfreader.feature.settings.permission.SetDefaultReaderSheet
 
@@ -35,9 +34,6 @@ import com.peng.pdfreader.feature.settings.permission.SetDefaultReaderSheet
 class PermissionActivity : BaseActivity() {
 
     private lateinit var binding: ActivityPermissionBinding
-
-    /** Whether the notification permission has been asked for already. */
-    private var notificationAsked = false
 
     /** Whether the "set as default reader" hint has been shown already. */
     private var defaultReaderAsked = false
@@ -141,29 +137,24 @@ class PermissionActivity : BaseActivity() {
     /**
      * Continues the start up flow.
      *
-     * The hint about the default reader comes first, the notification
-     * permission is the last step before the home screen.
+     * The hint about the default reader comes first. It is a hint only:
+     * closing it - by tapping outside or with the back button - keeps the user
+     * on this page, the flow continues with the button of the sheet (the
+     * system screen of the default apps) or with the close button of the page.
+     *
+     * The notification permission is asked for on the home screen - two seconds
+     * after the app is opened there.
      */
     private fun goHome() {
         if (defaultReaderAsked) {
-            askForNotificationPermission()
+            openHome()
             return
         }
         defaultReaderAsked = true
         val sheet = SetDefaultReaderSheet()
-        sheet.onDismissed = { askForNotificationPermission() }
+        sheet.onAction = { Logger.d(TAG, "the default app settings are opened") }
+        sheet.onDismissed = { Logger.d(TAG, "the default reader hint was closed") }
         sheet.show(supportFragmentManager, SetDefaultReaderSheet.TAG)
-    }
-
-    private fun askForNotificationPermission() {
-        if (notificationAsked) {
-            openHome()
-            return
-        }
-        notificationAsked = true
-        val sheet = NotificationPermissionSheet()
-        sheet.onDismissed = { openHome() }
-        sheet.show(supportFragmentManager, NotificationPermissionSheet.TAG)
     }
 
     private fun openHome() {

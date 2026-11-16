@@ -1,4 +1,4 @@
-﻿package com.peng.pdfreader.feature.files.fragment
+package com.peng.pdfreader.feature.files.fragment
 
 import android.content.Context
 import android.content.Intent
@@ -13,16 +13,17 @@ import android.print.PrintManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowInsets
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.peng.pdfreader.R
 import com.peng.pdfreader.appcore.util.Logger
+import com.peng.pdfreader.appcore.util.SystemBarInsets
 import com.peng.pdfreader.appcore.util.Thumbnails
 import com.peng.pdfreader.appcore.widget.FileItemUiState
 import com.peng.pdfreader.appcore.widget.FileListItemDecoration
@@ -34,6 +35,7 @@ import com.peng.pdfreader.data.prefs.AppPrefs
 import com.peng.pdfreader.data.repository.DocumentRepository
 import com.peng.pdfreader.databinding.FragmentFilesBinding
 import com.peng.pdfreader.feature.files.FileActions
+import com.peng.pdfreader.feature.files.adapter.AdBannerAdapter
 import com.peng.pdfreader.feature.files.adapter.FileListAdapter
 import com.peng.pdfreader.feature.files.dialog.DeleteConfirmDialog
 import com.peng.pdfreader.feature.files.dialog.RenameDialog
@@ -48,6 +50,7 @@ import com.peng.pdfreader.feature.files.util.FilesPrefs
 import com.peng.pdfreader.feature.files.util.PageCountDrawable
 import com.peng.pdfreader.feature.lock.activity.LockActivity
 import com.peng.pdfreader.feature.preview.activity.PreviewActivity
+import com.peng.pdfreader.feature.settings.widget.AdSamples
 import com.peng.pdfreader.feature.tools.activity.CompressActivity
 import com.peng.pdfreader.feature.tools.activity.MergeActivity
 import com.peng.pdfreader.feature.tools.activity.SplitActivity
@@ -212,7 +215,7 @@ class FilesFragment : BaseFragment() {
         // The search field replaces the title strip but has to stay below the
         // status bar, so the overlay is pushed down by the status bar inset.
         binding.searchBar.setOnApplyWindowInsetsListener { view, insets ->
-            val top = insets.getInsets(WindowInsets.Type.statusBars()).top
+            val top = SystemBarInsets.top(insets)
             val params = view.layoutParams as? ViewGroup.MarginLayoutParams
             if (params != null && params.topMargin != top) {
                 params.topMargin = top
@@ -255,7 +258,12 @@ class FilesFragment : BaseFragment() {
             },
         )
         binding.recycler.layoutManager = LinearLayoutManager(requireContext())
-        binding.recycler.adapter = adapter
+        // The ad banner of the design is the first entry of the list, it
+        // scrolls with the documents.
+        binding.recycler.adapter = ConcatAdapter(
+            AdBannerAdapter(AdSamples.banner(requireContext())),
+            adapter,
+        )
         binding.recycler.setHasFixedSize(true)
         binding.recycler.addItemDecoration(FileListItemDecoration(dp(ROW_GAP)))
     }

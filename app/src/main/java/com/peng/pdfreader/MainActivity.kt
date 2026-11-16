@@ -1,9 +1,11 @@
 package com.peng.pdfreader
 
+import android.Manifest
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.peng.pdfreader.appcore.util.Logger
@@ -13,20 +15,27 @@ import com.peng.pdfreader.base.BaseBackHandler
 import com.peng.pdfreader.data.model.Document
 import com.peng.pdfreader.data.repository.DocumentRepository
 import com.peng.pdfreader.databinding.ActivityMainBinding
+import com.peng.pdfreader.feature.files.activity.FileSearchActivity
+import com.peng.pdfreader.feature.files.activity.FileSelectActivity
 import com.peng.pdfreader.feature.files.fragment.FilesFragment
 import com.peng.pdfreader.feature.home.fragment.HomeFragment
 import com.peng.pdfreader.feature.home.model.QuickAction
+import com.peng.pdfreader.feature.home.sheet.ExitRetentionSheet
 import com.peng.pdfreader.feature.lock.activity.LockActivity
 import com.peng.pdfreader.feature.preview.activity.PreviewActivity
 import com.peng.pdfreader.feature.settings.fragment.SettingsFragment
+import com.peng.pdfreader.feature.settings.notification.NotificationPermissionHelper
+import com.peng.pdfreader.feature.settings.notification.NotificationPermissionSheet
 import com.peng.pdfreader.feature.settings.notification.PersistentNotificationHelper
 import com.peng.pdfreader.feature.settings.widget.QuickEntryPopupView
 import com.peng.pdfreader.feature.tools.activity.CompressActivity
+import com.peng.pdfreader.feature.tools.activity.ImageToPdfActivity
 import com.peng.pdfreader.feature.tools.activity.MergeActivity
 import com.peng.pdfreader.feature.tools.fragment.ToolsFragment
 import com.peng.pdfreader.feature.tools.scanner.ScanActivity
 import com.peng.pdfreader.ui.permission.PermissionActivity
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -41,6 +50,27 @@ class MainActivity : BaseActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
+    /** Whether the custom notification sheet was shown already. */
+    private var notificationSheetShown = false
+
+    /** Whether the exit retention sheet is on the screen. */
+    private var exitRetentionShown = false
+
+    /** The tab that is on the screen. */
+    private var currentTab = TAB_HOME
+
+    private val notificationPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            Logger.i(TAG, "notification permission granted: $granted")
+            if (granted) {
+                PersistentNotificationHelper.show(this)
+            } else {
+                // The system refuses to show its dialog again, the custom sheet
+                // of the design guides the user to the settings.
+                showNotificationPermissionSheet()
+            }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -51,6 +81,9 @@ class MainActivity : BaseActivity() {
             showTab(TAB_HOME)
         }
         handleIntent(intent)
+        // The notification permission is asked for a moment after the home
+        // screen was opened, see the notification permission handling.
+        scheduleNotificationPermission()
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -60,16 +93,19 @@ class MainActivity : BaseActivity() {
     }
 
     /**
-     * Routes the intent of the shell and of the quick actions of the ongoing
-     * notification.
+     * Routes the intent of the shell, of the quick actions of the ongoing
+     * notification and of the shortcuts of the launcher.
      */
     private fun handleIntent(intent: Intent?) {
         val action = intent?.action ?: return
         when (action) {
-            PersistentNotificationHelper.ACTION_SCAN -> startActivity(Intent(this, ScanActivity::class.java))
+            PersistentNotificationHelper.ACTION_SCAN -> openScanner()
             PersistentNotificationHelper.ACTION_LOCK -> LockActivity.start(this)
             PersistentNotificationHelper.ACTION_COMPRESS -> CompressActivity.start(this)
             PersistentNotificationHelper.ACTION_PRINT -> showTab(TAB_FILES)
+            ACTION_MERGE -> MergeActivity.start(this)
+            ACTION_IMAGE_TO_PDF -> ImageToPdfActivity.start(this)
+            ACTION_OPEN_FILES -> showTab(TAB_FILES)
             Intent.ACTION_VIEW, Intent.ACTION_SEND -> handleIncomingDocument(intent)
         }
     }
@@ -95,7 +131,25 @@ class MainActivity : BaseActivity() {
 
     override fun handleBackPressed(): Boolean {
         val current = supportFragmentManager.findFragmentById(R.id.fragmentContainer)
-        return (current as? BaseBackHandler)?.onBackHandled() ?: false
+        if ((current as? BaseBackHandler)?.onBackHandled() == true) return true
+        // Leaving the app from the home tab shows the retention sheet of the
+        // design, it offers one of the tools before the user goes.
+        if (currentTab == TAB_HOME) {
+            showExitRetention()
+            return true
+        }
+        return false
+    }
+
+    /** Shows the exit retention sheet of the design. */
+    private fun showExitRetention() {
+        if (exitRetentionShown || isFinishing || isDestroyed) return
+        exitRetentionShown = true
+        ExitRetentionSheet.show(
+            supportFragmentManager,
+            onExit = { finishAffinity() },
+            onDismissed = { exitRetentionShown = false },
+        )
     }
 
     private fun showTab(tab: Int) {
@@ -111,6 +165,7 @@ class MainActivity : BaseActivity() {
         }
         transaction.commitAllowingStateLoss()
         binding.bottomNav.selectTab(tab)
+        currentTab = tab
     }
 
     private fun createFragment(tab: Int): Fragment = when (tab) {
@@ -122,9 +177,8 @@ class MainActivity : BaseActivity() {
             onQuickAction = { action -> onQuickAction(action) }
             onScanClick = { openScanner() }
             onQuickEntry = { anchor -> showQuickEntry(anchor) }
-            onShareClick = { shareApp() }
-            onPrintClick = { openPrinter() }
-            onMoreClick = { showTab(TAB_FILES) }
+            onSearchClick = { FileSearchActivity.start(this@MainActivity) }
+            onSelectClick = { FileSelectActivity.start(this@MainActivity) }
             onOpenSettings = { openStoragePermission() }
         }
     }
@@ -168,17 +222,49 @@ class MainActivity : BaseActivity() {
         popup.show(anchor)
     }
 
-    private fun shareApp() {
-        val intent = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, getString(R.string.app_name))
+    // ------------------------------------------------------- notification permission
+
+    /**
+     * Asks for the notification permission two seconds after the home screen
+     * was opened.
+     *
+     * The start up screen already asked for it - when the user denied it there,
+     * the request is repeated here. As long as the system still shows its own
+     * dialog the system dialog is used, otherwise the custom sheet of the
+     * design takes over.
+     */
+    private fun scheduleNotificationPermission() {
+        lifecycleScope.launch {
+            delay(NOTIFICATION_PERMISSION_DELAY_MS)
+            requestNotificationPermission()
         }
-        startActivity(Intent.createChooser(intent, getString(R.string.share)))
     }
 
-    private fun openPrinter() {
-        // Printing a concrete document is handled by the preview and tool flows.
-        Logger.d(TAG, "print requested from the home tab")
+    private fun requestNotificationPermission() {
+        if (isFinishing || isDestroyed) return
+        if (NotificationPermissionHelper.hasPermission(this)) {
+            PersistentNotificationHelper.show(this)
+            return
+        }
+        if (NotificationPermissionHelper.requiresRuntimeRequest() &&
+            NotificationPermissionHelper.canAskSystem(
+                this,
+                NotificationPermissionHelper.wasAsked(this),
+            )
+        ) {
+            NotificationPermissionHelper.markAsked(this)
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            return
+        }
+        // The system does not show its dialog anymore - the custom sheet of the
+        // design guides the user to the settings of the system.
+        showNotificationPermissionSheet()
+    }
+
+    private fun showNotificationPermissionSheet() {
+        if (notificationSheetShown || isFinishing || isDestroyed) return
+        notificationSheetShown = true
+        NotificationPermissionSheet.show(supportFragmentManager)
     }
 
     private fun openStoragePermission() {
@@ -217,10 +303,22 @@ class MainActivity : BaseActivity() {
     companion object {
         private const val TAG = "MainActivity"
 
+        /** The notification permission is asked for two seconds after the start. */
+        private const val NOTIFICATION_PERMISSION_DELAY_MS = 2_000L
+
         const val TAB_HOME = 0
         const val TAB_FILES = 1
         const val TAB_TOOLS = 2
         const val TAB_SETTINGS = 3
+
+        /** The shortcut of the launcher that opens the merge tool. */
+        const val ACTION_MERGE = "com.peng.pdfreader.action.MERGE"
+
+        /** The shortcut of the launcher that opens the image to pdf tool. */
+        const val ACTION_IMAGE_TO_PDF = "com.peng.pdfreader.action.IMAGE_TO_PDF"
+
+        /** The shortcut of the launcher that opens the files tab. */
+        const val ACTION_OPEN_FILES = "com.peng.pdfreader.action.OPEN_FILES"
 
         /** Reads a stream uri from an intent, whatever the platform version. */
         private fun Intent.getParcelableExtraCompat(name: String): android.net.Uri? =

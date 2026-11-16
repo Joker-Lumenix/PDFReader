@@ -52,6 +52,8 @@
     <string name="encrypted">Verschlüsselt</string>
     <string name="eraser">Eraser</string>
     <string name="exit_retention_title">Möchten Sie es vor dem Verlassen ausprobieren?</string>
+    <string name="exit_retention_exit">Beenden</string>
+    <string name="exit_retention_try">Ausprobieren</string>
     <string name="export_annotations">Export annotations</string>
     <string name="export_format">Exportformat</string>
     <string name="favourite">Favoriten</string>

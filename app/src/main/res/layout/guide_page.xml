@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  One page of the guide (design: 引导1 / 引导2 / 引导3).
+
+  The illustration fills the whole width of the screen and takes the room
+  above the text, the title and the subtitle sit underneath it, both left
+  aligned with a 24dp margin.
+
+  The artwork is 1440x2320 (a very tall format), so the image is cropped
+  instead of being scaled down - the text below it stays visible on every
+  screen size.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/ivIllustration"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:contentDescription="@null"
+        android:scaleType="centerCrop"
+        tools:src="@mipmap/bg_guide_1" />
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="24dp"
+        android:gravity="start"
+        android:includeFontPadding="false"
+        android:textColor="@color/text_secondary"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        tools:text="Convert Image to PDF" />
+
+    <TextView
+        android:id="@+id/tvSubtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="12dp"
+        android:gravity="start"
+        android:includeFontPadding="false"
+        android:lineSpacingExtra="9dp"
+        android:textColor="@color/text_tertiary"
+        android:textSize="14sp"
+        tools:text="One-click fast conversion" />
+
+</LinearLayout>

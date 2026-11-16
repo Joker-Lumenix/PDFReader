@@ -52,6 +52,8 @@
     <string name="encrypted">Disulit</string>
     <string name="eraser">Pemadam</string>
     <string name="exit_retention_title">Mahu cuba dahulu sebelum keluar?</string>
+    <string name="exit_retention_exit">Keluar</string>
+    <string name="exit_retention_try">Cuba</string>
     <string name="export_annotations">Eksport anotasi</string>
     <string name="export_format">Format eksport</string>
     <string name="favourite">Kegemaran</string>

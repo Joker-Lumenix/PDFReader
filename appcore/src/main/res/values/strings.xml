@@ -11,4 +11,5 @@
     <string name="appcore_file_icon" translatable="false">File</string>
     <string name="appcore_tab_icon" translatable="false">Tab</string>
     <string name="appcore_empty_state" translatable="false">Empty</string>
+    <string name="appcore_ad_icon" translatable="false">Ad</string>
 </resources>

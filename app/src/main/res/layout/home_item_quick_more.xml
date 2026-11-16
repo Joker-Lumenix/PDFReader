@@ -4,6 +4,7 @@
   Two overlapping chevrons, exactly like the design.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="50dp"
     android:layout_height="82dp"
     android:background="@drawable/bg_card_r8"
@@ -18,7 +19,7 @@
         android:contentDescription="@null"
         android:scaleType="fitCenter"
         android:src="@drawable/ic_chevron_right"
-        android:tint="@color/surface_neutral_600" />
+        app:tint="@color/surface_neutral_600" />
 
     <!-- The design draws the two chevrons next to each other (7dp apart). -->
     <ImageView
@@ -28,6 +29,6 @@
         android:contentDescription="@null"
         android:scaleType="fitCenter"
         android:src="@drawable/ic_chevron_right"
-        android:tint="@color/surface_neutral_600" />
+        app:tint="@color/surface_neutral_600" />
 
 </LinearLayout>

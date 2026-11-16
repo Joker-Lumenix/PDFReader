@@ -52,6 +52,8 @@
     <string name="encrypted">Encrypted</string>
     <string name="eraser">Eraser</string>
     <string name="exit_retention_title">Want to try it before you go?</string>
+    <string name="exit_retention_exit">Exit</string>
+    <string name="exit_retention_try">Try it</string>
     <string name="export_annotations">Export annotations</string>
     <string name="export_format">Export format</string>
     <string name="favourite">Favourites</string>

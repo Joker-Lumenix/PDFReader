@@ -33,14 +33,13 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="92dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="15dp"
         android:layout_marginEnd="20dp"
         android:background="@drawable/bg_card_r8"
         android:backgroundTint="@color/surface_disabled"
-        android:orientation="vertical"
-        android:paddingTop="12dp">
+        android:orientation="vertical">
 
         <LinearLayout
             android:id="@+id/rowModifiedDesc"
@@ -49,7 +48,7 @@
             android:background="?android:attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
-            android:gravity="top"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingStart="12dp"
             android:paddingEnd="12dp">
@@ -60,7 +59,6 @@
                 android:background="@drawable/bg_card_r4"
                 android:backgroundTint="@color/white"
                 android:contentDescription="@null"
-                android:padding="3dp"
                 android:scaleType="fitCenter"
                 android:src="@mipmap/ic_new_to_old" />
 
@@ -70,7 +68,6 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="3dp"
                 android:layout_weight="1"
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/files_sort_new_to_old"
@@ -80,12 +77,10 @@
                 android:id="@+id/radioModifiedDesc"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:background="@drawable/bg_card_r4"
                 android:backgroundTint="@color/white"
                 android:contentDescription="@null"
-                android:padding="3dp"
-                android:scaleType="fitCenter"
-                android:src="@mipmap/ic_checkbox_circle_unselect" />
+                android:scaleType="fitXY"
+                android:src="@mipmap/ic_checkbox_circle_select" />
         </LinearLayout>
 
         <LinearLayout
@@ -95,7 +90,7 @@
             android:background="?android:attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
-            android:gravity="top"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingStart="12dp"
             android:paddingEnd="12dp">
@@ -106,7 +101,6 @@
                 android:background="@drawable/bg_card_r4"
                 android:backgroundTint="@color/white"
                 android:contentDescription="@null"
-                android:padding="3dp"
                 android:scaleType="fitCenter"
                 android:src="@mipmap/ic_old_to_new" />
 
@@ -116,7 +110,6 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="3dp"
                 android:layout_weight="1"
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/files_sort_old_to_new"
@@ -126,10 +119,9 @@
                 android:id="@+id/radioModifiedAsc"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:background="@drawable/bg_card_r4"
                 android:backgroundTint="@color/white"
                 android:contentDescription="@null"
-                android:padding="3dp"
+
                 android:scaleType="fitCenter"
                 android:src="@mipmap/ic_checkbox_circle_unselect" />
         </LinearLayout>
@@ -148,14 +140,13 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="92dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="15dp"
         android:layout_marginEnd="20dp"
         android:background="@drawable/bg_card_r8"
         android:backgroundTint="@color/surface_disabled"
-        android:orientation="vertical"
-        android:paddingTop="12dp">
+        android:orientation="vertical">
 
         <LinearLayout
             android:id="@+id/rowNameAsc"
@@ -164,7 +155,7 @@
             android:background="?android:attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
-            android:gravity="top"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingStart="12dp"
             android:paddingEnd="12dp">
@@ -175,7 +166,6 @@
                 android:background="@drawable/bg_card_r4"
                 android:backgroundTint="@color/white"
                 android:contentDescription="@null"
-                android:padding="3dp"
                 android:scaleType="fitCenter"
                 android:src="@mipmap/ic_az" />
 
@@ -185,7 +175,6 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="3dp"
                 android:layout_weight="1"
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/files_sort_a_to_z"
@@ -195,10 +184,9 @@
                 android:id="@+id/radioNameAsc"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:background="@drawable/bg_card_r4"
                 android:backgroundTint="@color/white"
                 android:contentDescription="@null"
-                android:padding="3dp"
+
                 android:scaleType="fitCenter"
                 android:src="@mipmap/ic_checkbox_circle_unselect" />
         </LinearLayout>
@@ -210,7 +198,7 @@
             android:background="?android:attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
-            android:gravity="top"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingStart="12dp"
             android:paddingEnd="12dp">
@@ -221,7 +209,6 @@
                 android:background="@drawable/bg_card_r4"
                 android:backgroundTint="@color/white"
                 android:contentDescription="@null"
-                android:padding="3dp"
                 android:scaleType="fitCenter"
                 android:src="@mipmap/ic_za" />
 
@@ -231,7 +218,6 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="3dp"
                 android:layout_weight="1"
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/files_sort_z_to_a"
@@ -241,10 +227,9 @@
                 android:id="@+id/radioNameDesc"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:background="@drawable/bg_card_r4"
                 android:backgroundTint="@color/white"
                 android:contentDescription="@null"
-                android:padding="3dp"
+
                 android:scaleType="fitCenter"
                 android:src="@mipmap/ic_checkbox_circle_unselect" />
         </LinearLayout>
@@ -269,8 +254,7 @@
         android:layout_marginEnd="20dp"
         android:background="@drawable/bg_card_r8"
         android:backgroundTint="@color/surface_disabled"
-        android:orientation="vertical"
-        android:paddingTop="12dp">
+        android:orientation="vertical">
 
         <LinearLayout
             android:id="@+id/rowSizeDesc"
@@ -279,7 +263,7 @@
             android:background="?android:attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
-            android:gravity="top"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingStart="12dp"
             android:paddingEnd="12dp">
@@ -290,7 +274,7 @@
                 android:background="@drawable/bg_card_r4"
                 android:backgroundTint="@color/white"
                 android:contentDescription="@null"
-                android:padding="3dp"
+
                 android:scaleType="fitCenter"
                 android:src="@mipmap/ic_large_to_small" />
 
@@ -300,7 +284,6 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="3dp"
                 android:layout_weight="1"
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/files_sort_large_to_small"
@@ -310,10 +293,8 @@
                 android:id="@+id/radioSizeDesc"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:background="@drawable/bg_card_r4"
                 android:backgroundTint="@color/white"
                 android:contentDescription="@null"
-                android:padding="3dp"
                 android:scaleType="fitCenter"
                 android:src="@mipmap/ic_checkbox_circle_unselect" />
         </LinearLayout>
@@ -325,7 +306,7 @@
             android:background="?android:attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
-            android:gravity="top"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
             android:paddingStart="12dp"
             android:paddingEnd="12dp">
@@ -336,7 +317,6 @@
                 android:background="@drawable/bg_card_r4"
                 android:backgroundTint="@color/white"
                 android:contentDescription="@null"
-                android:padding="3dp"
                 android:scaleType="fitCenter"
                 android:src="@mipmap/ic_small_to_large" />
 
@@ -346,9 +326,9 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="3dp"
                 android:layout_weight="1"
                 android:fontFamily="sans-serif-medium"
+                android:layout_gravity="center_vertical"
                 android:text="@string/files_sort_small_to_large"
                 android:textSize="14sp" />
 
@@ -356,10 +336,8 @@
                 android:id="@+id/radioSizeAsc"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:background="@drawable/bg_card_r4"
                 android:backgroundTint="@color/white"
                 android:contentDescription="@null"
-                android:padding="3dp"
                 android:scaleType="fitCenter"
                 android:src="@mipmap/ic_checkbox_circle_unselect" />
         </LinearLayout>
@@ -377,7 +355,8 @@
         <TextView
             android:id="@+id/btnCancel"
             style="@style/TextAppearance.AppCore.Button"
-            android:layout_width="141dp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="48dp"
             android:background="@drawable/bg_btn_unable_r16"
             android:clickable="true"
@@ -392,7 +371,8 @@
         <TextView
             android:id="@+id/btnApply"
             style="@style/TextAppearance.AppCore.Button"
-            android:layout_width="141dp"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="48dp"
             android:background="@drawable/gradient_red"
             android:clickable="true"

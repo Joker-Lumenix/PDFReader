@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Onboarding: three pages, the page indicator on the left and the next button.
+  The guide of the first start (design: 引导1 / 引导2 / 引导3).
 
-  Geometry of the design: the indicator starts 24dp from the left edge and
-  sits 20dp above the 312x48dp next button, which keeps a 32dp margin to the
-  bottom of the screen. The design carries no skip link, the next button of the
-  last page leaves the flow.
+  The pager carries the three pages, the page indicator sits on the left above
+  the next button. The design carries no skip link, the next button of the
+  last page closes the guide and hands over to the permission page.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"

@@ -1,4 +1,4 @@
-package com.peng.pdfreader.feature.onboarding
+package com.peng.pdfreader.feature.guide
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
@@ -11,35 +11,55 @@ import androidx.core.content.ContextCompat
 import androidx.viewpager2.widget.ViewPager2
 import com.peng.pdfreader.R
 import com.peng.pdfreader.appcore.util.Logger
+import com.peng.pdfreader.appcore.util.SystemBarInsets
 import com.peng.pdfreader.base.BaseActivity
-import com.peng.pdfreader.databinding.OnboardingActivityBinding
+import com.peng.pdfreader.databinding.GuideActivityBinding
 import com.peng.pdfreader.data.prefs.AppPrefs
-import com.peng.pdfreader.feature.settings.rating.RatingActivity
 import com.peng.pdfreader.ui.permission.PermissionActivity
 
 /**
- * The three page onboarding of the app.
+ * The guide of the first start.
  *
- * It is opened by [OnboardingLauncher] on the very first start and shows the
- * three illustrations of the design.
+ * It is a page of its own: the pager shows the three illustrations of the
+ * design, the image fills the whole width of the screen and the title and the
+ * subtitle sit underneath it.
+ *
+ * When the guide is finished it closes itself and the flow continues with the
+ * page that asks for the access to the files.
  */
-class OnboardingActivity : BaseActivity() {
+class GuideActivity : BaseActivity() {
 
-    private lateinit var binding: OnboardingActivityBinding
+    private lateinit var binding: GuideActivityBinding
 
-    private val pages = OnboardingPages.all
+    private val pages = GuidePages.all
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = OnboardingActivityBinding.inflate(layoutInflater)
+        binding = GuideActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.pager.adapter = OnboardingPageAdapter(pages)
+        applyNavigationBarInset()
+
+        binding.pager.adapter = GuidePageAdapter(pages)
         binding.pager.registerOnPageChangeCallback(pageChangeCallback)
 
         buildPageIndicator()
 
         binding.btnNext.setOnClickListener { onNextClicked() }
+    }
+
+    /**
+     * Keeps the next button above the navigation bar.
+     *
+     * The app draws edge to edge, so the window reaches behind the navigation
+     * bar; the button takes its inset as padding.
+     */
+    private fun applyNavigationBarInset() {
+        binding.root.setOnApplyWindowInsetsListener { view, insets ->
+            view.setPadding(0, 0, 0, SystemBarInsets.bottom(insets))
+            insets
+        }
+        binding.root.requestApplyInsets()
     }
 
     override fun onDestroy() {
@@ -58,20 +78,21 @@ class OnboardingActivity : BaseActivity() {
             binding.pager.currentItem = binding.pager.currentItem + 1
             return
         }
-        finishOnboarding()
+        finishGuide()
     }
 
-    private fun finishOnboarding() {
-        // The rating page follows the onboarding, as in the design.
-        AppPrefs.get(this).onboardingShown = true
+    /**
+     * Leaves the guide.
+     *
+     * The page closes itself and hands over to the permission page, which asks
+     * for the access to the files.
+     */
+    private fun finishGuide() {
+        AppPrefs.get(this).guideShown = true
         try {
-            startActivity(
-                Intent(this, RatingActivity::class.java)
-                    .putExtra(RatingActivity.EXTRA_CONTINUE_FLOW, true),
-            )
-        } catch (error: ActivityNotFoundException) {
-            Logger.w(TAG, "the rating page is not registered in the manifest")
             PermissionActivity.startAsFlowStep(this)
+        } catch (error: ActivityNotFoundException) {
+            Logger.w(TAG, "the permission page is not registered in the manifest")
         }
         finish()
     }
@@ -108,7 +129,7 @@ class OnboardingActivity : BaseActivity() {
         return GradientDrawable().apply {
             if (active) {
                 cornerRadius = (DOT_SIZE_DP * density) / 2f
-                setColor(ContextCompat.getColor(this@OnboardingActivity, R.color.accent_rose))
+                setColor(ContextCompat.getColor(this@GuideActivity, R.color.accent_rose))
                 setSize((DOT_ACTIVE_WIDTH_DP * density).toInt(), (DOT_SIZE_DP * density).toInt())
             } else {
                 shape = GradientDrawable.OVAL
@@ -121,13 +142,18 @@ class OnboardingActivity : BaseActivity() {
     private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
 
     companion object {
-        private const val TAG = "OnboardingActivity"
+        private const val TAG = "GuideActivity"
         private const val DOT_ACTIVE_WIDTH_DP = 24
         private const val DOT_SIZE_DP = 6
         private const val DOT_GAP_DP = 8
 
-        /** Whether the onboarding has already been seen. */
+        /** Whether the guide has already been seen. */
         fun hasBeenShown(context: android.content.Context): Boolean =
-            AppPrefs.get(context).onboardingShown
+            AppPrefs.get(context).guideShown
+
+        /** Opens the guide. */
+        fun start(context: android.content.Context) {
+            context.startActivity(Intent(context, GuideActivity::class.java))
+        }
     }
 }

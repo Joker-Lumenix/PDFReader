@@ -12,6 +12,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.peng.pdfreader.appcore.R
+import com.peng.pdfreader.appcore.util.SystemBarInsets
 
 /**
  * Page title bar.
@@ -63,7 +64,7 @@ class PageTitleBar @JvmOverloads constructor(
      */
     private fun applySystemBarInset() {
         setOnApplyWindowInsetsListener { view, insets ->
-            val top = insets.getInsets(WindowInsets.Type.statusBars()).top
+            val top = SystemBarInsets.top(insets)
             view.setPadding(0, top, 0, 0)
             insets
         }

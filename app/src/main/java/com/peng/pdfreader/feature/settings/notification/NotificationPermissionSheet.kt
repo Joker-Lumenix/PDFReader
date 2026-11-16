@@ -2,7 +2,6 @@ package com.peng.pdfreader.feature.settings.notification
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,10 +14,12 @@ import com.peng.pdfreader.appcore.widget.BaseBottomSheetDialog
 import com.peng.pdfreader.databinding.SettingsNotificationSheetBinding
 
 /**
- * Asks for the notification permission.
+ * The custom sheet that asks for the notification permission.
  *
- * The runtime permission only exists on Android 13 (API 33) and above; on
- * older versions the sheet simply closes again.
+ * It is the fallback of the start up flow: as soon as the system refuses to
+ * show its own dialog - or on the versions that do not know the runtime
+ * permission at all - this sheet takes over and guides the user to the
+ * notification settings of the system.
  */
 class NotificationPermissionSheet : BaseBottomSheetDialog() {
 
@@ -38,7 +39,7 @@ class NotificationPermissionSheet : BaseBottomSheetDialog() {
         _binding = SettingsNotificationSheetBinding.inflate(inflater, container, false)
 
         binding.ivClose.setOnClickListener { dismiss() }
-        binding.btnTurnOn.setOnClickListener { requestNotificationPermission() }
+        binding.btnTurnOn.setOnClickListener { onTurnOnClicked() }
         return binding.root
     }
 
@@ -47,21 +48,37 @@ class NotificationPermissionSheet : BaseBottomSheetDialog() {
         onDismissed?.invoke()
     }
 
-    private fun requestNotificationPermission() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-            dismiss()
-            return
-        }
-        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.POST_NOTIFICATIONS)
-            == PackageManager.PERMISSION_GRANTED
+    /**
+     * The button of the design.
+     *
+     * As long as the system still shows its own dialog the app asks for the
+     * permission there, otherwise the notification settings of the system are
+     * opened - that is the only way left to switch the notifications on.
+     */
+    private fun onTurnOnClicked() {
+        val context = requireContext()
+        if (NotificationPermissionHelper.requiresRuntimeRequest() &&
+            ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
+            != PackageManager.PERMISSION_GRANTED &&
+            NotificationPermissionHelper.canAskSystem(
+                requireActivity(),
+                NotificationPermissionHelper.wasAsked(context),
+            )
         ) {
-            dismiss()
+            NotificationPermissionHelper.markAsked(context)
+            permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             return
         }
-        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        NotificationPermissionHelper.openNotificationSettings(context)
+        dismiss()
     }
 
     companion object {
         const val TAG = "NotificationPermissionSheet"
+
+        /** Shows the sheet. */
+        fun show(manager: androidx.fragment.app.FragmentManager) {
+            NotificationPermissionSheet().show(manager, TAG)
+        }
     }
 }

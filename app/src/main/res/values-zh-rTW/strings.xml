@@ -52,6 +52,8 @@
     <string name="encrypted">已加密</string>
     <string name="eraser">橡皮擦</string>
     <string name="exit_retention_title">離開前想先試試嗎？</string>
+    <string name="exit_retention_exit">離開</string>
+    <string name="exit_retention_try">試試看</string>
     <string name="export_annotations">匯出批註</string>
     <string name="export_format">匯出格式</string>
     <string name="favourite">已收藏</string>

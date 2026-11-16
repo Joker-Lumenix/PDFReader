@@ -93,6 +93,28 @@
         <item name="android:includeFontPadding">false</item>
     </style>
 
+    <!-- Ad title: 14sp / 500 / #333333 -->
+    <style name="TextAppearance.AppCore.AdTitle" parent="TextAppearance.MaterialComponents.Subtitle2">
+        <item name="android:textSize">14sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/text_secondary</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
+    <!-- Ad action of the banner: 16sp / 500 / #f8fbff -->
+    <style name="TextAppearance.AppCore.AdAction" parent="TextAppearance.MaterialComponents.Button">
+        <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textColor">@color/text_on_tint</item>
+        <item name="android:letterSpacing">0</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
+    <!-- Ad action of the card: 16sp / 500 / #f8fbff -->
+    <style name="TextAppearance.AppCore.AdActionLarge" parent="TextAppearance.AppCore.AdAction">
+        <item name="android:textSize">16sp</item>
+    </style>
+
     <!-- ==================== widgets ==================== -->
 
     <!-- Primary CTA: brand gradient, 16dp radius, 48dp tall -->

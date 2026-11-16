@@ -52,6 +52,8 @@
     <string name="encrypted">暗号化済み</string>
     <string name="eraser">Eraser</string>
     <string name="exit_retention_title">閉じる前に試してみますか？</string>
+    <string name="exit_retention_exit">終了</string>
+    <string name="exit_retention_try">試してみる</string>
     <string name="export_annotations">Export annotations</string>
     <string name="export_format">エクスポート形式</string>
     <string name="favourite">お気に入り</string>

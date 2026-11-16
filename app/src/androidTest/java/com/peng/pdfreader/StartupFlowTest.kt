@@ -47,16 +47,34 @@ class StartupFlowTest {
     }
 
     @Test
-    fun theFlowContinuesWithTheOnboardingOnAFreshInstall() {
+    fun theFlowContinuesWithTheGuideOnAFreshInstall() {
         val prefs = InstrumentationRegistry.getInstrumentation().targetContext
             .getSharedPreferences("pdf_reader_prefs", android.content.Context.MODE_PRIVATE)
-        prefs.edit().putBoolean("onboarding_shown", false).apply()
+        prefs.edit().putBoolean("guide_shown", false).apply()
 
         val step = AppFlow.nextStep(
-            onboardingShown = false,
+            guideShown = false,
             storageGranted = true,
         )
-        assertEquals(AppFlow.Step.ONBOARDING, step)
+        assertEquals(AppFlow.Step.GUIDE, step)
+    }
+
+    @Test
+    fun theFlowContinuesWithThePermissionWhenTheFilesAreNotAccessible() {
+        val step = AppFlow.nextStep(
+            guideShown = true,
+            storageGranted = false,
+        )
+        assertEquals(AppFlow.Step.PERMISSION, step)
+    }
+
+    @Test
+    fun theFlowContinuesWithTheHomeWhenEverythingIsGranted() {
+        val step = AppFlow.nextStep(
+            guideShown = true,
+            storageGranted = true,
+        )
+        assertEquals(AppFlow.Step.HOME, step)
     }
 
     @Test

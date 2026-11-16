@@ -29,11 +29,17 @@ class SetDefaultReaderSheet : BaseBottomSheetDialog() {
     /** Raised once the sheet is gone, used by the start up flow to continue. */
     var onDismissed: (() -> Unit)? = null
 
+    /** Raised when the user asked for the default app settings of the system. */
+    var onAction: (() -> Unit)? = null
+
     override fun createContentView(inflater: LayoutInflater, container: ViewGroup?): View {
         _binding = SettingsSetDefaultSheetBinding.inflate(inflater, container, false)
         applyIllustrationSurface()
+        binding.tvTitle.setText(R.string.set_default_title)
+        binding.tvSubtitle.setText(R.string.set_default_subtitle)
         binding.btnOk.setOnClickListener {
             openDefaultAppSettings()
+            onAction?.invoke()
             dismiss()
         }
         return binding.root

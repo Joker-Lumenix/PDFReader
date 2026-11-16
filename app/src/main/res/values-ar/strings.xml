@@ -52,6 +52,8 @@
     <string name="encrypted">مشفّر</string>
     <string name="eraser">الممحاة</string>
     <string name="exit_retention_title">هل تريد تجربته قبل المغادرة؟</string>
+    <string name="exit_retention_exit">خروج</string>
+    <string name="exit_retention_try">جرّبها الآن</string>
     <string name="export_annotations">تصدير التعليقات</string>
     <string name="export_format">تنسيق التصدير</string>
     <string name="favourite">المفضلة</string>

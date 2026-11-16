@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The exit retention sheet (design: 退出挽留).
+
+  The sheet offers one of the tools of the app before the user leaves, the ad
+  card of the design sits below it. The two buttons close the app or open the
+  offered tool.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/surface_white_alt"
+    android:orientation="vertical"
+    android:paddingStart="24dp"
+    android:paddingTop="24dp"
+    android:paddingEnd="24dp"
+    android:paddingBottom="@dimen/space_xxl">
+
+    <ImageView
+        android:id="@+id/ivCharacter"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:layout_gravity="center_horizontal"
+        android:contentDescription="@null"
+        android:scaleType="fitCenter"
+        tools:src="@mipmap/emoji_normal" />
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center_horizontal"
+        android:includeFontPadding="false"
+        android:text="@string/exit_retention_title"
+        android:textColor="@color/text_on_night_accent_alt"
+        android:textSize="20sp" />
+
+    <!-- the tool that is offered before the user leaves -->
+    <LinearLayout
+        android:id="@+id/featureCard"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/bg_retention_feature"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp">
+
+        <ImageView
+            android:id="@+id/ivFeatureIcon"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:contentDescription="@null"
+            android:scaleType="fitCenter"
+            tools:src="@mipmap/ic_tools_image_to_pdf" />
+
+        <TextView
+            android:id="@+id/tvFeatureLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:fontFamily="sans-serif-medium"
+            android:includeFontPadding="false"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            tools:text="Image to PDF" />
+    </LinearLayout>
+
+    <!-- the ad slot of the design -->
+    <com.peng.pdfreader.appcore.widget.AdSlotView
+        android:id="@+id/adSlot"
+        android:layout_width="match_parent"
+        android:layout_height="118dp"
+        android:layout_marginTop="12dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_marginTop="14dp"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnExit"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/bg_retention_exit"
+            android:backgroundTint="@null"
+            android:fontFamily="sans-serif-medium"
+            android:letterSpacing="0"
+            android:stateListAnimator="@null"
+            android:text="@string/exit_retention_exit"
+            android:textColor="@color/white"
+            android:textSize="17sp" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnTry"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="34dp"
+            android:layout_weight="1"
+            android:background="@drawable/gradient_red"
+            android:backgroundTint="@null"
+            android:fontFamily="sans-serif-medium"
+            android:letterSpacing="0"
+            android:stateListAnimator="@null"
+            android:text="@string/exit_retention_try"
+            android:textColor="@color/white"
+            android:textSize="17sp" />
+    </LinearLayout>
+
+</LinearLayout>

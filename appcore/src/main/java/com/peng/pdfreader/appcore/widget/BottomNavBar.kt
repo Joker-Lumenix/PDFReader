@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.peng.pdfreader.appcore.R
+import com.peng.pdfreader.appcore.util.SystemBarInsets
 
 /**
  * Bottom navigation bar.
@@ -43,7 +44,7 @@ class BottomNavBar @JvmOverloads constructor(
      */
     private fun applySystemBarInset() {
         setOnApplyWindowInsetsListener { view, insets ->
-            val bottom = insets.getInsets(WindowInsets.Type.navigationBars()).bottom
+            val bottom = SystemBarInsets.bottom(insets)
             view.setPadding(0, 0, 0, bottom)
             insets
         }

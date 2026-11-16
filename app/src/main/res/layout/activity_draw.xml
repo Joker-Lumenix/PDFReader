@@ -6,6 +6,7 @@
   Bottom: the dark tool bar with the stroke sizes and the colours.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/surface_muted"
@@ -111,7 +112,7 @@
                 android:layout_height="24dp"
                 android:contentDescription="@string/preview_cd_size"
                 android:src="@mipmap/ic_size"
-                android:tint="@color/white" />
+                app:tint="@color/white" />
 
             <View
                 android:layout_width="1dp"
@@ -143,7 +144,7 @@
                 android:layout_marginTop="2dp"
                 android:contentDescription="@string/preview_tool_draw"
                 android:src="@mipmap/ic_draw"
-                android:tint="@color/white" />
+                app:tint="@color/white" />
 
             <View
                 android:layout_width="1dp"

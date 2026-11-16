@@ -10,22 +10,22 @@ import org.junit.Test
 class AppFlowTest {
 
     @Test
-    fun `the onboarding comes first`() {
+    fun `the guide comes first`() {
         assertEquals(
-            AppFlow.Step.ONBOARDING,
-            AppFlow.nextStep(onboardingShown = false, storageGranted = false),
+            AppFlow.Step.GUIDE,
+            AppFlow.nextStep(guideShown = false, storageGranted = false),
         )
         assertEquals(
-            AppFlow.Step.ONBOARDING,
-            AppFlow.nextStep(onboardingShown = false, storageGranted = true),
+            AppFlow.Step.GUIDE,
+            AppFlow.nextStep(guideShown = false, storageGranted = true),
         )
     }
 
     @Test
-    fun `the permission comes after the onboarding`() {
+    fun `the permission comes after the guide`() {
         assertEquals(
             AppFlow.Step.PERMISSION,
-            AppFlow.nextStep(onboardingShown = true, storageGranted = false),
+            AppFlow.nextStep(guideShown = true, storageGranted = false),
         )
     }
 
@@ -33,7 +33,7 @@ class AppFlowTest {
     fun `the home comes last`() {
         assertEquals(
             AppFlow.Step.HOME,
-            AppFlow.nextStep(onboardingShown = true, storageGranted = true),
+            AppFlow.nextStep(guideShown = true, storageGranted = true),
         )
     }
 }

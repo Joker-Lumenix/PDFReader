@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The ad banner at the top of the file list (design: files-筛选).
+
+  The banner scrolls with the list, it is the first entry of it.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="72dp">
+
+    <com.peng.pdfreader.appcore.widget.AdSlotView
+        android:id="@+id/adSlot"
+        android:layout_width="match_parent"
+        android:layout_height="72dp" />
+
+</FrameLayout>
