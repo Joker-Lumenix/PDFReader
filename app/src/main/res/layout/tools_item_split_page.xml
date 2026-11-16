@@ -6,7 +6,7 @@
   green when the page is selected, translucent black when it is not.
 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="104dp"
+    android:layout_width="match_parent"
     android:layout_height="124dp"
     android:clickable="true"
     android:focusable="true">

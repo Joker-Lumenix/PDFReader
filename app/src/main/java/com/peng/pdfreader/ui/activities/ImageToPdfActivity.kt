@@ -32,7 +32,6 @@ import com.peng.pdfreader.feature.tools.util.ToolFormatters
 import com.peng.pdfreader.feature.tools.util.ToolFlow
 import com.peng.pdfreader.feature.tools.util.ToolOutput
 import com.peng.pdfreader.feature.tools.util.ToolShapes
-import com.peng.pdfreader.feature.tools.view.ImageGlyphDrawable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -95,15 +94,11 @@ class ImageToPdfActivity : BaseActivity() {
         binding = ToolsActivityImageToPdfBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.titleBar.showBack = true
-        binding.titleBar.title = getString(R.string.image_to_pdf)
-        binding.titleBar.onBackClick = { onBackPressedDispatcher.onBackPressed() }
-        // the design puts the picture action next to the title, it switches
-        // between the grid and the list of the picked pictures
-        binding.ivHeaderIcon.setImageDrawable(
-            ImageGlyphDrawable(resources.displayMetrics.density),
-        )
-        binding.ivHeaderIcon.setOnClickListener { toggleViewMode() }
+        binding.tvTitle.text = getString(R.string.image_to_pdf)
+        binding.ivBack.setOnClickListener {
+            onBackPressedDispatcher.onBackPressed()
+        }
+        binding.ivChangeCameraGroup.setOnClickListener { toggleViewMode() }
 
         // the running card of the design is a white surface with a radius of 20
         binding.loadingCard.background =

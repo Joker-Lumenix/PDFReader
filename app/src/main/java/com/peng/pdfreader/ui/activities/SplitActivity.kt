@@ -24,7 +24,6 @@ import com.peng.pdfreader.feature.tools.engine.ToolEngines
 import com.peng.pdfreader.feature.tools.util.ToolFlow
 import com.peng.pdfreader.feature.tools.util.ToolOutput
 import com.peng.pdfreader.feature.tools.util.ToolShapes
-import com.peng.pdfreader.feature.tools.view.InfoGlyphDrawable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -61,7 +60,7 @@ class SplitActivity : BaseActivity() {
         binding.titleBar.onBackClick = { onBackPressedDispatcher.onBackPressed() }
 
         binding.banner.background = ToolShapes.roundRect(this, ToolShapes.BANNER_BLUE, 8f)
-        binding.bannerIcon.setImageDrawable(InfoGlyphDrawable(dp(2).toFloat()))
+
         binding.banner.setOnClickListener { openRangeDialog() }
 
         binding.rvPages.layoutManager = GridLayoutManager(this, 3)
