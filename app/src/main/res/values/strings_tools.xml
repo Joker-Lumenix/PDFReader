@@ -106,4 +106,7 @@
     <string name="tools_result_share_unavailable">分享功能尚未开放</string>
     <string name="tools_zip_done">已生成压缩包：%1$s</string>
 
+    <string name="tools_image_albums">相册</string>
+    <string name="tools_image_all_albums">所有照片</string>
+    <string name="tools_image_album_other">其他相册</string>
 </resources>

@@ -11,26 +11,35 @@ import com.peng.pdfreader.databinding.ToolsItemImageTileBinding
 import com.peng.pdfreader.feature.tools.util.ToolShapes
 
 /**
- * The grid of the picked images (design "Image to PDF").
+ * The grid of the images (design "Image to PDF").
  *
  * The first cell of the grid is always the camera tile, it opens the photo
- * picker. Every other cell shows one of the picked images with its index.
+ * picker. Every other cell shows one of the images of the device with its
+ * number in the selection.
  */
 class ImageTileAdapter(
     private val onAddClick: () -> Unit,
     private val onImageClick: (Int) -> Unit,
 ) : RecyclerView.Adapter<ImageTileAdapter.Holder>() {
 
-    private val images = mutableListOf<Bitmap>()
+    /** One image of the grid. */
+    data class Item(
+        /** 图片的缩略图。 */
+        val thumbnail: Bitmap?,
+        /** 选中的序号，0 表示没有选中。 */
+        val index: Int,
+    )
+
+    private val items = mutableListOf<Item>()
 
     /** Replaces the content of the grid. */
-    fun submit(newImages: List<Bitmap>) {
-        images.clear()
-        images.addAll(newImages)
+    fun submit(newItems: List<Item>) {
+        items.clear()
+        items.addAll(newItems)
         notifyDataSetChanged()
     }
 
-    override fun getItemCount(): Int = images.size + 1
+    override fun getItemCount(): Int = items.size + 1
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
         val binding = ToolsItemImageTileBinding.inflate(
@@ -42,7 +51,7 @@ class ImageTileAdapter(
     }
 
     override fun onBindViewHolder(holder: Holder, position: Int) {
-        if (position == 0) holder.bindAdd() else holder.bindImage(position - 1)
+        if (position == 0) holder.bindAdd() else holder.bindImage(items[position - 1], position - 1)
     }
 
     inner class Holder(private val binding: ToolsItemImageTileBinding) :
@@ -60,15 +69,16 @@ class ImageTileAdapter(
             binding.root.setOnClickListener { onAddClick() }
         }
 
-        fun bindImage(index: Int) {
+        fun bindImage(item: Item, index: Int) {
             val context = binding.root.context
             binding.ivCamera.visibility = View.GONE
             binding.ivImage.setBackgroundResource(R.drawable.bg_card_r4)
             binding.ivImage.clearColorFilter()
-            binding.ivImage.setImageBitmap(images[index])
-            binding.tvIndex.visibility = View.VISIBLE
-            binding.tvIndex.text = (index + 1).toString()
-            binding.tvIndex.background = ToolShapes.badge(context, true)
+            binding.ivImage.setImageBitmap(item.thumbnail)
+            // 只有选中的图片带编号
+            binding.tvIndex.visibility = if (item.index > 0) View.VISIBLE else View.GONE
+            binding.tvIndex.text = item.index.toString()
+            binding.tvIndex.background = ToolShapes.badge(context, item.index > 0)
             binding.root.setOnClickListener { onImageClick(index) }
         }
     }

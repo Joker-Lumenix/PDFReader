@@ -138,6 +138,10 @@
             android:exported="false" />
 
         <activity
+            android:name=".ui.activities.ImageAlbumActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".ui.activities.CompressActivity"
             android:exported="false" />
 

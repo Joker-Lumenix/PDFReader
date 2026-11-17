@@ -11,10 +11,11 @@ import com.peng.pdfreader.databinding.ToolsItemImageRowBinding
 import com.peng.pdfreader.feature.tools.util.ToolShapes
 
 /**
- * The picked images as a list (design "Image to PDF下拉").
+ * A list of pictures as rows (design "Image to PDF下拉").
  *
- * The grid of the design shows the same images as tiles, the list shows them
- * as rows with the name and the size of the file.
+ * The row shows a picture of 64x64 on the left, the name and the meta line of
+ * the picture next to it. The page of the albums uses the same rows: the
+ * cover of the album, its name and the number of the pictures in it.
  */
 class ImageRowAdapter(
     private val onClick: (Int) -> Unit,

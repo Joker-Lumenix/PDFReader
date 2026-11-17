@@ -70,4 +70,7 @@
     <string name="tools_result_pages">%1$d صفحة</string>
     <string name="tools_result_share_unavailable">ميزة المشاركة غير متاحة بعد</string>
     <string name="tools_zip_done">تم إنشاء ملف ZIP: %1$s</string>
+    <string name="tools_image_albums">الألبومات</string>
+    <string name="tools_image_all_albums">كل الصور</string>
+    <string name="tools_image_album_other">ألبومات أخرى</string>
 </resources>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 普通通知样式 -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    xmlns:tool="http://schemas.android.com/apk/res-auto"
+    android:background="@color/surface_card"
+    android:orientation="horizontal">
+
+    <ImageView
+        android:id="@+id/ivImage"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:src="@mipmap/nf_image_to_pdf"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="10dp"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:textColor="@color/text_secondary"
+        tools:ignore="HardcodedText"
+        tools:text="✨ Photos → PDF in seconds. Try it now! ✨"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/ivImage"
+        android:layout_toLeftOf="@+id/tvTryNow"
+        android:layout_marginLeft="6dp"
+        android:layout_marginRight="10dp"
+        />
+
+    <TextView
+        android:id="@+id/tvTryNow"
+        android:layout_width="80dp"
+        android:layout_height="28dp"
+        android:textSize="12sp"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="8dp"
+        android:background="@drawable/gradient_red"
+        android:text="Try Now"
+        />
+
+
+</RelativeLayout>

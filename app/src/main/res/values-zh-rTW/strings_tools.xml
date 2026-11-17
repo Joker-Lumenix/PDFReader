@@ -70,4 +70,7 @@
     <string name="tools_result_pages">%1$d 頁</string>
     <string name="tools_result_share_unavailable">分享功能尚未開放</string>
     <string name="tools_zip_done">已產生壓縮檔：%1$s</string>
+    <string name="tools_image_albums">相簿</string>
+    <string name="tools_image_all_albums">全部照片</string>
+    <string name="tools_image_album_other">其他相簿</string>
 </resources>

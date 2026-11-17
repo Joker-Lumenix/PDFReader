@@ -70,4 +70,7 @@
     <string name="tools_result_pages">%1$d pages</string>
     <string name="tools_result_share_unavailable">Le partage n\'est pas encore disponible</string>
     <string name="tools_zip_done">Archive ZIP créée : %1$s</string>
+    <string name="tools_image_albums">Albums</string>
+    <string name="tools_image_all_albums">Toutes les photos</string>
+    <string name="tools_image_album_other">Autres albums</string>
 </resources>

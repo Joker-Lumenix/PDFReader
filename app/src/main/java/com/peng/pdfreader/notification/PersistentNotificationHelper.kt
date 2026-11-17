@@ -64,7 +64,7 @@ object PersistentNotificationHelper {
             .setContentIntent(contentIntent(context, ACTION_OPEN, 0))
 
         // The row of the design: four entries with an icon and a label.
-        val views = RemoteViews(context.packageName, R.layout.notification_quick_actions)
+        val views = RemoteViews(context.packageName, R.layout.notification_always)
         views.setTextViewText(R.id.tvQuickPrint, context.getString(R.string.quick_entry_print))
         views.setTextViewText(R.id.tvQuickScan, context.getString(R.string.quick_entry_scan))
         views.setTextViewText(R.id.tvQuickLock, context.getString(R.string.app_lock))

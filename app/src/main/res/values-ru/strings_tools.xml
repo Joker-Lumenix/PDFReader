@@ -70,4 +70,7 @@
     <string name="tools_result_pages">стр. %1$d</string>
     <string name="tools_result_share_unavailable">Функция «Поделиться» пока недоступна</string>
     <string name="tools_zip_done">ZIP-архив создан: %1$s</string>
+    <string name="tools_image_albums">Альбомы</string>
+    <string name="tools_image_all_albums">Все фото</string>
+    <string name="tools_image_album_other">Другие альбомы</string>
 </resources>

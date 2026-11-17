@@ -70,4 +70,7 @@
     <string name="tools_result_pages">%1$d ページ</string>
     <string name="tools_result_share_unavailable">共有機能はまだ利用できません</string>
     <string name="tools_zip_done">ZIP ファイルを作成しました: %1$s</string>
+    <string name="tools_image_albums">アルバム</string>
+    <string name="tools_image_all_albums">すべての写真</string>
+    <string name="tools_image_album_other">その他のアルバム</string>
 </resources>

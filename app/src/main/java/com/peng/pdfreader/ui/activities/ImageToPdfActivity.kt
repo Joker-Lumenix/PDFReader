@@ -1,5 +1,6 @@
 package com.peng.pdfreader.ui.activities
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -18,19 +19,16 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.peng.pdfreader.R
 import com.peng.pdfreader.base.BaseActivity
 import com.peng.pdfreader.data.DocType
 import com.peng.pdfreader.data.DocumentRepository
+import com.peng.pdfreader.data.MediaImages
 import com.peng.pdfreader.data.SharedStorage
 import com.peng.pdfreader.databinding.ToolsActivityImageToPdfBinding
-import com.peng.pdfreader.ui.adapter.decoration.EdgeGapDecoration
-import com.peng.pdfreader.ui.adapter.listAdapter.ImageRowAdapter
-import com.peng.pdfreader.ui.adapter.listAdapter.ImageTileAdapter
 import com.peng.pdfreader.ui.adapter.decoration.PitchGridDecoration
+import com.peng.pdfreader.ui.adapter.listAdapter.ImageTileAdapter
 import com.peng.pdfreader.feature.tools.engine.ToolEngines
-import com.peng.pdfreader.feature.tools.util.ToolFormatters
 import com.peng.pdfreader.feature.tools.util.ToolFlow
 import com.peng.pdfreader.feature.tools.util.ToolOutput
 import com.peng.pdfreader.feature.tools.util.ToolShapes
@@ -43,8 +41,10 @@ import java.io.File
  * "Image to PDF" flow (designs "Image to PDF", "Image to PDF-loading",
  * "Image to PDF空状态", "Image to PDF下拉").
  *
- * The images are picked with the system photo picker, the grid shows them with
- * their index and the bottom sheet turns them into a document.
+ * With the access to the files the page shows the pictures of the device: the
+ * arrow next to the title opens the albums of the device (the groups of the
+ * design), a chosen album narrows the pictures down. The pictures of the
+ * picker are added to the selection the same way.
  */
 class ImageToPdfActivity : BaseActivity() {
 
@@ -53,24 +53,32 @@ class ImageToPdfActivity : BaseActivity() {
     private val repository by lazy { DocumentRepository.get(this) }
     private val engine get() = ToolEngines.current
 
-    private val images = mutableListOf<File>()
-    private val thumbnails = mutableListOf<Bitmap>()
+    /** 设备里的图片，页面显示的就是它们。 */
+    private val deviceImages = mutableListOf<MediaImages.Image>()
 
-    /** The design shows the pictures as a grid, the list is the second view. */
-    private var listMode = false
+    /** 设备里图片的缩略图。 */
+    private val thumbnails = mutableMapOf<Long, Bitmap>()
+
+    /** 选中的图片，已经复制到沙盒里。 */
+    private val selected = mutableListOf<Selected>()
+
+    /** 当前显示的相册，null 表示所有相册。 */
+    private var albumId: String? = null
+
+    /** 选中的图片。 */
+    private class Selected(
+        /** 来源图片的 id，照片选择器选的是 0。 */
+        val sourceId: Long,
+        /** 沙盒里的文件。 */
+        val file: File,
+        val thumbnail: Bitmap?,
+    )
 
     private val adapter by lazy {
         ImageTileAdapter(
             onAddClick = { pickImages() },
-            onImageClick = { index -> removeImage(index) },
+            onImageClick = { index -> toggleImage(index) },
         )
-    }
-
-    private val rowAdapter by lazy {
-        ImageRowAdapter { index ->
-            // the first row is the camera, it opens the picker
-            if (index == 0) pickImages() else removeImage(index - 1)
-        }
     }
 
     private val gridDecoration by lazy {
@@ -83,12 +91,21 @@ class ImageToPdfActivity : BaseActivity() {
         )
     }
 
-    private val listDecoration by lazy { EdgeGapDecoration(dp(12), dp(12)) }
-
     private val picker = registerForActivityResult(
         ActivityResultContracts.PickMultipleVisualMedia(MAX_IMAGES),
     ) { uris ->
         if (uris.isNotEmpty()) importImages(uris)
+    }
+
+    /** 标题旁边的箭头打开相册分组页面。 */
+    private val albums = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+    ) { result ->
+        val data = result.data ?: return@registerForActivityResult
+        if (result.resultCode != Activity.RESULT_OK) return@registerForActivityResult
+        // 选中的分组回到这一页，页面只显示这个分组的图片。
+        albumId = data.getStringExtra(ImageAlbumActivity.EXTRA_ALBUM_ID)
+        loadDeviceImages()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -100,13 +117,17 @@ class ImageToPdfActivity : BaseActivity() {
         binding.ivBack.setOnClickListener {
             onBackPressedDispatcher.onBackPressed()
         }
-        binding.ivChangeCameraGroup.setOnClickListener { toggleViewMode() }
+        binding.ivChangeCameraGroup.setOnClickListener {
+            albums.launch(Intent(this, ImageAlbumActivity::class.java))
+        }
 
         // the running card of the design is a white surface with a radius of 20
         binding.loadingCard.background =
             ToolShapes.roundRect(this, ToolShapes.SURFACE_SHEET, 20f)
 
-        applyViewMode()
+        binding.rvImages.layoutManager = GridLayoutManager(this, 3)
+        binding.rvImages.adapter = adapter
+        binding.rvImages.addItemDecoration(gridDecoration)
 
         binding.btnImport.setOnClickListener { importToPdf() }
         binding.btnGoToSet.setOnClickListener { openAppSettings() }
@@ -116,33 +137,62 @@ class ImageToPdfActivity : BaseActivity() {
         binding.btnImport.background =
             ToolShapes.gradientPill(this, R.drawable.gradient_red, 20f)
 
-        refresh()
+        loadDeviceImages()
     }
 
-    // ------------------------------------------------------------------ picking
+    // ------------------------------------------------------------------ images
 
     /**
-     * Switches between the grid of the design "Image to PDF" and the list of
-     * the design "Image to PDF下拉".
+     * Reads the pictures of the device.
+     *
+     * Without the access to the files the system does not let the app read the
+     * pictures, the page shows the hint of the permission then.
      */
-    private fun toggleViewMode() {
-        listMode = !listMode
-        applyViewMode()
+    private fun loadDeviceImages() {
+        if (!SharedStorage.canRead(this)) {
+            deviceImages.clear()
+            thumbnails.clear()
+            refresh()
+            return
+        }
+        lifecycleScope.launch {
+            val images = withContext(Dispatchers.IO) {
+                MediaImages.images(this@ImageToPdfActivity, albumId).take(MAX_IMAGES)
+            }
+            deviceImages.clear()
+            deviceImages.addAll(images)
+            thumbnails.clear()
+            withContext(Dispatchers.IO) {
+                images.forEach { image ->
+                    MediaImages.thumbnail(this@ImageToPdfActivity, image, THUMBNAIL_SIZE)
+                        ?.let { thumbnails[image.id] = it }
+                }
+            }
+            refresh()
+        }
     }
 
-    private fun applyViewMode() {
-        binding.rvImages.removeItemDecoration(gridDecoration)
-        binding.rvImages.removeItemDecoration(listDecoration)
-        if (listMode) {
-            binding.rvImages.layoutManager = LinearLayoutManager(this)
-            binding.rvImages.adapter = rowAdapter
-            binding.rvImages.addItemDecoration(listDecoration)
-        } else {
-            binding.rvImages.layoutManager = GridLayoutManager(this, 3)
-            binding.rvImages.adapter = adapter
-            binding.rvImages.addItemDecoration(gridDecoration)
+    /** Selects a picture of the device or removes it from the selection. */
+    private fun toggleImage(index: Int) {
+        val image = deviceImages.getOrNull(index) ?: return
+        val existing = selected.indexOfFirst { it.sourceId == image.id }
+        if (existing >= 0) {
+            selected.removeAt(existing).file.delete()
+            refresh()
+            return
         }
-        refresh()
+        lifecycleScope.launch {
+            // The picture is copied into the scratch directory, the PDF is made
+            // from the copies.
+            val file = withContext(Dispatchers.IO) { copyToSandbox(image.uri) }
+            if (file == null) {
+                Toast.makeText(this@ImageToPdfActivity, R.string.tools_image_failed, Toast.LENGTH_SHORT)
+                    .show()
+                return@launch
+            }
+            selected += Selected(image.id, file, thumbnails[image.id])
+            refresh()
+        }
     }
 
     private fun pickImages() {
@@ -156,10 +206,10 @@ class ImageToPdfActivity : BaseActivity() {
     private fun importImages(uris: List<Uri>) {
         lifecycleScope.launch {
             uris.forEach { uri ->
-                val loaded = withContext(Dispatchers.IO) { copyImage(uri) }
-                if (loaded != null) {
-                    images += loaded.first
-                    thumbnails += loaded.second
+                val file = withContext(Dispatchers.IO) { copyToSandbox(uri) }
+                if (file != null) {
+                    val bitmap = withContext(Dispatchers.IO) { decodeThumbnail(file) }
+                    selected += Selected(0L, file, bitmap)
                 }
             }
             refresh()
@@ -167,15 +217,14 @@ class ImageToPdfActivity : BaseActivity() {
     }
 
     /**
-     * Copies a picked image into the scratch directory and decodes a thumbnail.
+     * Copies a picture into the scratch directory.
      */
-    private fun copyImage(uri: Uri): Pair<File, Bitmap>? = runCatching {
-        val target = ToolOutput.file(this, "image_${System.currentTimeMillis()}_${images.size}.jpg")
+    private fun copyToSandbox(uri: Uri): File? = runCatching {
+        val target = ToolOutput.file(this, "image_${System.currentTimeMillis()}_${selected.size}.jpg")
         contentResolver.openInputStream(uri)?.use { input ->
             target.outputStream().use { output -> input.copyTo(output) }
         } ?: return null
-        val bitmap = decodeThumbnail(target) ?: return null
-        target to bitmap
+        target
     }.getOrNull()
 
     private fun decodeThumbnail(file: File): Bitmap? {
@@ -187,17 +236,10 @@ class ImageToPdfActivity : BaseActivity() {
         return BitmapFactory.decodeFile(file.absolutePath, options)
     }
 
-    private fun removeImage(index: Int) {
-        if (index !in images.indices) return
-        images.removeAt(index).delete()
-        thumbnails.removeAt(index).recycle()
-        refresh()
-    }
-
     // ------------------------------------------------------------------ pdf
 
     private fun importToPdf() {
-        if (images.isEmpty()) {
+        if (selected.isEmpty()) {
             Toast.makeText(this, R.string.tools_image_failed, Toast.LENGTH_SHORT).show()
             return
         }
@@ -206,7 +248,7 @@ class ImageToPdfActivity : BaseActivity() {
         lifecycleScope.launch {
             // The job runs behind the shared progress page.
             ToolFlow.run(this@ImageToPdfActivity, getString(R.string.tools_image_running)) { _ ->
-                val outcome = engine.imagesToPdf(images.toList(), out)
+                val outcome = engine.imagesToPdf(selected.map { it.file }, out)
                 outcome.getOrThrow()
                 val document = repository.addExisting(
                     ToolOutput.uniqueName("images", ".pdf"),
@@ -224,50 +266,36 @@ class ImageToPdfActivity : BaseActivity() {
     /** The running state of the design "Image to PDF-loading". */
     private fun showLoading(visible: Boolean) {
         binding.loadingState.visibility = if (visible) View.VISIBLE else View.GONE
-        binding.btnImport.isEnabled = !visible && images.isNotEmpty()
+        binding.btnImport.isEnabled = !visible && selected.isNotEmpty()
     }
 
     // ------------------------------------------------------------------ state
 
     private fun refresh() {
-        adapter.submit(thumbnails.toList())
-        rowAdapter.submit(buildRows())
-        binding.btnImport.text = getString(R.string.import_count, images.size)
-        binding.btnImport.isEnabled = images.isNotEmpty()
+        adapter.submit(
+            deviceImages.map { image ->
+                ImageTileAdapter.Item(
+                    thumbnail = thumbnails[image.id],
+                    index = selected.indexOfFirst { it.sourceId == image.id } + 1,
+                )
+            },
+        )
+        binding.btnImport.text = getString(R.string.import_count, selected.size)
+        binding.btnImport.isEnabled = selected.isNotEmpty()
         // The empty state of the design is the state without the permission.
         // When the app may read the files the grid with the camera tile is
         // shown instead of the hint of the permission.
         val permissionMissing = !SharedStorage.canRead(this)
         binding.emptyState.visibility = if (permissionMissing) View.VISIBLE else View.GONE
         // the empty state of the design carries the import button only
-        binding.stripScroll.visibility = if (images.isEmpty()) View.GONE else View.VISIBLE
+        binding.stripScroll.visibility = if (selected.isEmpty()) View.GONE else View.VISIBLE
         rebuildStrip()
     }
 
     override fun onResume() {
         super.onResume()
         // The permission may have been given in the system screen.
-        refresh()
-    }
-
-    /** The rows of the list view, the camera comes first. */
-    private fun buildRows(): List<ImageRowAdapter.Row> {
-        val rows = mutableListOf(
-            ImageRowAdapter.Row(
-                name = getString(R.string.tools_image_add),
-                meta = "",
-                thumbnail = null,
-                isCamera = true,
-            ),
-        )
-        images.forEachIndexed { index, file ->
-            rows += ImageRowAdapter.Row(
-                name = file.name,
-                meta = ToolFormatters.size(file.length()),
-                thumbnail = thumbnails.getOrNull(index),
-            )
-        }
-        return rows
+        if (SharedStorage.canRead(this)) loadDeviceImages() else refresh()
     }
 
     /**
@@ -277,7 +305,7 @@ class ImageToPdfActivity : BaseActivity() {
     private fun rebuildStrip() {
         binding.strip.removeAllViews()
         val size = dp(56)
-        thumbnails.forEach { bitmap ->
+        selected.forEach { item ->
             val holder = FrameLayout(this).apply {
                 layoutParams = LinearLayout.LayoutParams(size, size).apply {
                     // the stub of the SDK has no setMarginTop, the fields are public
@@ -290,7 +318,7 @@ class ImageToPdfActivity : BaseActivity() {
             val image = ImageView(this)
             image.layoutParams = FrameLayout.LayoutParams(size, size)
             image.scaleType = ImageView.ScaleType.CENTER_CROP
-            image.setImageBitmap(bitmap)
+            image.setImageBitmap(item.thumbnail)
             // the thumbnails of the design have rounded corners
             image.background = ToolShapes.roundRect(this, ToolShapes.BACKDROP, 4f)
             image.clipToOutline = true
