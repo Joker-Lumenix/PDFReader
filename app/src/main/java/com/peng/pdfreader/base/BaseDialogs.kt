@@ -1,6 +1,6 @@
-package com.peng.pdfreader.core.widget
+package com.peng.pdfreader.base
 
-import android.content.DialogInterface
+import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -57,13 +57,21 @@ abstract class BaseBottomSheetDialog(
     protected var sheetContainer: FrameLayout? = null
         private set
 
+    /**
+     * The body of the sheet.
+     *
+     * It must not paint a surface of its own: a surface of its own would
+     * cover the rounded corners of the container.
+     */
+    private var sheetContent: View? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.getBoolean(ARG_DISMISS_OUTSIDE)?.let { dismissOnClickOutside = it }
         arguments?.getBoolean(ARG_DISMISS_ON_BACK)?.let { dismissOnBackPress = it }
     }
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): android.app.Dialog {
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val dialog = BottomSheetDialog(requireContext(), theme)
         dialog.setCanceledOnTouchOutside(dismissOnClickOutside)
         // The window must not paint a surface of its own. Material gives the
@@ -94,6 +102,7 @@ abstract class BaseBottomSheetDialog(
         sheetContainer = sheet
         val content = createContentView(inflater, sheet)
         content.background = null
+        sheetContent = content
         sheet.addView(content)
         return sheet
     }
@@ -115,21 +124,30 @@ abstract class BaseBottomSheetDialog(
             if (behavior.state != BottomSheetBehavior.STATE_EXPANDED) {
                 behavior.state = BottomSheetBehavior.STATE_EXPANDED
             }
-            // The panel of the Material dialog paints a surface of its own.
-            // It is cleared here, so the only surface that is visible is the
-            // one of the container: the panel of the design, a white surface
-            // with a 16dp radius at the top and square corners at the bottom.
+            // The panel of the Material dialog paints a white surface of its
+            // own and that surface is square, so it shows through the rounded
+            // corners of the design. Material applies its background in the
+            // onStart of the dialog, which runs after this callback, so the
+            // panel is cleared once the dialog is on the screen.
             //
-            // The window is transparent as well, so nothing shows behind the
-            // rounded top corners.
-            background = null
-            dialog?.window?.decorView?.setBackgroundColor(Color.TRANSPARENT)
-            sheetContainer?.background = if (hasSurface) {
-                ContextCompat.getDrawable(requireContext(), R.drawable.bg_sheet_top_r16)
-            } else {
-                null
+            // After that the only surface that is visible is the one of the
+            // container: the panel of the design, a white surface with a 16dp
+            // radius at the top and square corners at the bottom. The body of
+            // the sheet stays transparent, a surface of its own would cover
+            // the rounded corners as well.
+            post {
+                background = null
+                dialog?.window?.decorView?.setBackgroundColor(Color.TRANSPARENT)
+                sheetContainer?.background = if (hasSurface) {
+                    ContextCompat.getDrawable(requireContext(), R.drawable.bg_sheet_top_r16)
+                } else {
+                    null
+                }
+                if (hasSurface) {
+                    sheetContent?.background = null
+                }
+                applyNavigationBarInset()
             }
-            applyNavigationBarInset()
         }
         // Tapping the page behind the sheet closes it.
         dialog?.findViewById<View>(com.google.android.material.R.id.touch_outside)
@@ -174,6 +192,7 @@ abstract class BaseBottomSheetDialog(
     override fun onDestroyView() {
         super.onDestroyView()
         sheetContainer = null
+        sheetContent = null
     }
 
     companion object {

@@ -12,7 +12,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import com.peng.pdfreader.R
 import com.peng.pdfreader.core.util.Logger
-import com.peng.pdfreader.core.widget.BaseBottomSheetDialog
+import com.peng.pdfreader.base.BaseBottomSheetDialog
 import com.peng.pdfreader.databinding.SettingsSetDefaultSheetBinding
 
 /**

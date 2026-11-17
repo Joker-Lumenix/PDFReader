@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.peng.pdfreader.R
-import com.peng.pdfreader.core.widget.BaseBottomSheetDialog
+import com.peng.pdfreader.base.BaseBottomSheetDialog
 
 /**
  * The outline (table of contents) of the document.

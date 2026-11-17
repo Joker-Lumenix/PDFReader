@@ -12,7 +12,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import com.peng.pdfreader.R
 import com.peng.pdfreader.core.pdf.PdfVault
-import com.peng.pdfreader.core.widget.BaseBottomSheetDialog
+import com.peng.pdfreader.base.BaseBottomSheetDialog
 import com.peng.pdfreader.databinding.LockSheetPasswordBinding
 import com.peng.pdfreader.feature.lock.sheet.LockErrorIconDrawable
 import com.peng.pdfreader.feature.lock.sheet.LockPasswordMask

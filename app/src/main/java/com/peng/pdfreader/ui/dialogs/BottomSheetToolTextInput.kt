@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentManager
-import com.peng.pdfreader.core.widget.BaseBottomSheetDialog
+import com.peng.pdfreader.base.BaseBottomSheetDialog
 import com.peng.pdfreader.databinding.ToolsDialogTextInputBinding
 import com.peng.pdfreader.feature.tools.util.ToolShapes
 

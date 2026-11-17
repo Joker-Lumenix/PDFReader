@@ -10,7 +10,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
 import com.peng.pdfreader.core.util.Logger
-import com.peng.pdfreader.core.widget.BaseBottomSheetDialog
+import com.peng.pdfreader.base.BaseBottomSheetDialog
 import com.peng.pdfreader.databinding.SettingsNotificationSheetBinding
 
 /**

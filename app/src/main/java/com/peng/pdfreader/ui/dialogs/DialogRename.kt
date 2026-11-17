@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
 import com.peng.pdfreader.R
-import com.peng.pdfreader.core.widget.BaseAlertDialog
+import com.peng.pdfreader.base.BaseAlertDialog
 
 /**
  * Asks for the new name of a document.
