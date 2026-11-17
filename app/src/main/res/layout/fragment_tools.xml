@@ -6,19 +6,27 @@
     android:background="@color/surface_subtle"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/title"
+    <!-- 顶部标题栏：标题（状态栏的 inset 加在标题栏上，所以状态栏和标题栏同色） -->
+    <LinearLayout
+        android:id="@+id/topBar"
         android:layout_width="match_parent"
         android:layout_height="63dp"
+        android:background="@color/surface_card"
+        android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:paddingLeft="20dp"
-        android:text="@string/tools"
-        android:textColor="#ff060606"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:background="#fffafafa"
         app:layout_constraintTop_toTopOf="parent"
-        />
+        android:paddingLeft="20dp">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/tools"
+            android:textColor="#ff060606"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            />
+    </LinearLayout>
 
     <ScrollView
         android:id="@+id/scroll"
@@ -26,8 +34,8 @@
         android:layout_height="0dp"
         android:layout_marginTop="8dp"
         android:overScrollMode="never"
-        app:layout_constraintTop_toBottomOf="@+id/title"
-        app:layout_constraintBottom_toTopOf="@+id/adBanner"
+        app:layout_constraintTop_toBottomOf="@id/topBar"
+        app:layout_constraintBottom_toTopOf="@id/adBanner"
         >
 
         <LinearLayout
