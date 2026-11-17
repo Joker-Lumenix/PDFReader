@@ -71,119 +71,154 @@
                     android:maxLines="1" />
             </LinearLayout>
         </LinearLayout>
+
+        <!-- 收藏按钮，设计稿里它在标题的右边 -->
+        <ImageView
+            android:id="@+id/ivCollect"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_gravity="top"
+            android:contentDescription="@string/favourite"
+            android:src="@mipmap/ic_collect_unselect" />
     </LinearLayout>
 
-    <!-- The four action tiles, on the spots of the design: 40 / 123 / 206 / 289. -->
-    <FrameLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="54dp"
-        android:layout_marginTop="32dp">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:orientation="horizontal">
 
-        <ImageView
-            android:id="@+id/ivTile0"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_gravity="top|start"
-            android:layout_marginStart="40dp"
-            android:background="@drawable/bg_icon_tile"
+        <LinearLayout
+            android:id="@+id/actionRename"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
-            android:padding="6dp" />
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
 
-        <ImageView
-            android:id="@+id/ivTile1"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_gravity="top|start"
-            android:layout_marginStart="123dp"
-            android:background="@drawable/bg_icon_tile"
+            <ImageView
+                android:id="@+id/ivActionRename"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/ic_rename_red" />
+
+            <TextView
+                android:id="@+id/tvActionRename"
+                style="@style/TextAppearance.AppCore.Body"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/rename"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/actionOpenWith"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
-            android:padding="6dp" />
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
 
-        <ImageView
-            android:id="@+id/ivTile2"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_gravity="top|start"
-            android:layout_marginStart="206dp"
-            android:background="@drawable/bg_icon_tile"
+            <ImageView
+                android:id="@+id/ivActionOpenWith"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/ic_open_with" />
+
+            <TextView
+                android:id="@+id/tvActionOpenWith"
+                style="@style/TextAppearance.AppCore.Body"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:ellipsize="end"
+                android:gravity="center"
+                android:maxLines="1"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/files_open_with"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/actionShare"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
-            android:padding="6dp" />
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
 
-        <ImageView
-            android:id="@+id/ivTile3"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_gravity="top|start"
-            android:layout_marginStart="289dp"
-            android:background="@drawable/bg_icon_tile"
+            <ImageView
+                android:id="@+id/ivActionShare"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/ic_share_red" />
+
+            <TextView
+                android:id="@+id/tvActionShare"
+                style="@style/TextAppearance.AppCore.Body"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/files_share"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/actionPrint"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
-            android:padding="6dp" />
-
-        <TextView
-            android:id="@+id/tvTile0"
-            style="@style/TextAppearance.AppCore.Meta"
-            android:layout_width="76dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top|start"
-            android:layout_marginStart="18dp"
-            android:layout_marginTop="40dp"
-            android:clickable="true"
-            android:fontFamily="sans-serif-medium"
             android:gravity="center_horizontal"
-            android:maxLines="1"
-            android:textColor="@color/text_secondary"
-            android:textSize="12sp" />
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tvTile1"
-            style="@style/TextAppearance.AppCore.Meta"
-            android:layout_width="76dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top|start"
-            android:layout_marginStart="101dp"
-            android:layout_marginTop="40dp"
-            android:clickable="true"
-            android:fontFamily="sans-serif-medium"
-            android:gravity="center_horizontal"
-            android:maxLines="1"
-            android:textColor="@color/text_secondary"
-            android:textSize="12sp" />
+            <ImageView
+                android:id="@+id/ivActionPrint"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:scaleType="fitCenter"
+                android:src="@mipmap/ic_print" />
 
-        <TextView
-            android:id="@+id/tvTile2"
-            style="@style/TextAppearance.AppCore.Meta"
-            android:layout_width="76dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top|start"
-            android:layout_marginStart="184dp"
-            android:layout_marginTop="40dp"
-            android:clickable="true"
-            android:fontFamily="sans-serif-medium"
-            android:gravity="center_horizontal"
-            android:maxLines="1"
-            android:textColor="@color/text_secondary"
-            android:textSize="12sp" />
-
-        <TextView
-            android:id="@+id/tvTile3"
-            style="@style/TextAppearance.AppCore.Meta"
-            android:layout_width="76dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top|start"
-            android:layout_marginStart="267dp"
-            android:layout_marginTop="40dp"
-            android:clickable="true"
-            android:fontFamily="sans-serif-medium"
-            android:gravity="center_horizontal"
-            android:maxLines="1"
-            android:textColor="@color/text_secondary"
-            android:textSize="12sp" />
-
-    </FrameLayout>
+            <TextView
+                android:id="@+id/tvActionPrint"
+                style="@style/TextAppearance.AppCore.Body"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:fontFamily="sans-serif-medium"
+                android:text="@string/files_print"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp" />
+        </LinearLayout>
+    </LinearLayout>
 
     <!-- The wide action of the design: 320 x 48, #f5f5f5, 6.4dp radius. -->
     <LinearLayout

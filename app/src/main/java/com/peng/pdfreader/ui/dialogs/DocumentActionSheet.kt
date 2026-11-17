@@ -34,11 +34,13 @@ object DocumentActionSheet {
             return
         }
         val sheet = BottomSheetMoreActionNoPdf.create(
+            // The four tiles of the design, in the order of the design: the
+            // shared operations (open with, print) always sit in the same tile.
             actions = listOf(
                 BottomSheetMoreActionNoPdf.Action(
                     FileActions.RENAME,
                     context.getString(R.string.rename),
-                    R.mipmap.ic_rename_black,
+                    R.mipmap.ic_rename_red,
                 ),
                 BottomSheetMoreActionNoPdf.Action(
                     FileActions.OPEN_WITH,
@@ -48,12 +50,12 @@ object DocumentActionSheet {
                 BottomSheetMoreActionNoPdf.Action(
                     FileActions.SHARE,
                     context.getString(R.string.files_share),
-                    R.mipmap.ic_share_square_black,
+                    R.mipmap.ic_share_red,
                 ),
                 BottomSheetMoreActionNoPdf.Action(
-                    FileActions.COMPRESS,
-                    context.getString(R.string.compress),
-                    R.mipmap.ic_compress,
+                    FileActions.PRINT,
+                    context.getString(R.string.files_print),
+                    R.mipmap.ic_print,
                 ),
             ),
             wideAction = BottomSheetMoreActionNoPdf.Action(

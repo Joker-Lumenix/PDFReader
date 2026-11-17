@@ -180,7 +180,7 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
                 BottomSheetMoreActionNoPdf.Action(
                     ACTION_RENAME,
                     getString(R.string.rename),
-                    R.mipmap.ic_rename_black,
+                    R.mipmap.ic_rename_red,
                 ),
                 BottomSheetMoreActionNoPdf.Action(
                     ACTION_OPEN_WITH,
@@ -190,7 +190,7 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
                 BottomSheetMoreActionNoPdf.Action(
                     ACTION_SHARE,
                     getString(R.string.preview_share),
-                    R.mipmap.ic_share_square_black,
+                    R.mipmap.ic_share_red,
                 ),
                 BottomSheetMoreActionNoPdf.Action(
                     ACTION_PRINT,
@@ -219,6 +219,8 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
                 ACTION_COMPRESS -> CompressActivity.start(requireContext(), doc?.id)
             }
         }
+        // The document id is needed by the favourite button of the sheet.
+        sheet.documentId = doc?.id.orEmpty()
         sheet.show(parentFragmentManager, "preview_more")
     }
 

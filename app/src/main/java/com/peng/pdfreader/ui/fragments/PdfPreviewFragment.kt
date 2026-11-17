@@ -437,23 +437,23 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
             actions = listOf(
                 BottomSheetMoreActionNoPdf.Action(
                     ACTION_OUTLINE,
-                    getString(R.string.preview_outline),
-                    R.mipmap.ic_menu,
+                    getString(R.string.rename),
+                    R.mipmap.ic_rename_red,
                 ),
                 BottomSheetMoreActionNoPdf.Action(
                     ACTION_BOOKMARK,
-                    getString(R.string.preview_add_bookmark),
-                    R.mipmap.ic_collect_unselect,
+                    getString(R.string.files_open_with),
+                    R.mipmap.ic_open_with,
                 ),
                 BottomSheetMoreActionNoPdf.Action(
                     ACTION_READING_MODE,
-                    getString(R.string.preview_reading_mode),
-                    R.mipmap.ic_eye_open,
+                    getString(R.string.share),
+                    R.mipmap.ic_share_red,
                 ),
                 BottomSheetMoreActionNoPdf.Action(
                     ACTION_RENAME,
-                    getString(R.string.rename),
-                    R.mipmap.ic_rename_black,
+                    getString(R.string.print),
+                    R.mipmap.ic_print,
                 ),
             ),
             wideAction = BottomSheetMoreActionNoPdf.Action(
@@ -467,6 +467,8 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
             documentLogo = ContextCompat.getDrawable(requireContext(), doc.type.logoRes),
         )
         sheet.onActionSelected = { id -> onPreviewAction(id) }
+        // The document id is needed by the favourite button of the sheet.
+        sheet.documentId = doc.id
         sheet.show(parentFragmentManager, "preview_more")
     }
 

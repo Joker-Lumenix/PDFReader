@@ -1,16 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  Feedback page: the card with the heading and the illustration on top, the
-  large multi line input below them and the submit button.
-
-  Geometry of the design: card 336x649dp at 12dp from the screen edges, the
-  heading row 84dp tall (15dp below the card top), the heading 156dp wide at
-  x=40, the illustration 116x84dp at x=212, the input 296x466dp at x=32 and
-  the submit button 312x48dp floating over the lower edge of the card.
-
-  The card grows and shrinks with the window, so the input and the button
-  follow the keyboard up like in the "Feedback-enter" state of the design.
--->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -20,7 +8,8 @@
     android:orientation="vertical">
 
     <!-- 顶部标题栏：返回按钮 + 标题 -->
-    <LinearLayout android:id="@+id/topBar"
+    <LinearLayout
+        android:id="@+id/topBar"
         android:layout_width="match_parent"
         android:layout_height="63dp"
         android:background="@color/surface_card"
@@ -66,12 +55,11 @@
             android:layout_marginTop="@dimen/space_m"
             android:layout_marginEnd="@dimen/space_m"
             android:background="@drawable/bg_card_r8"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHeight_max="649dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintVertical_bias="0">
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0">
 
             <LinearLayout
                 android:id="@+id/rowHeading"
@@ -124,7 +112,6 @@
                 android:textSize="15sp"
                 app:layout_constraintBottom_toTopOf="@id/btnSubmit"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHeight_max="466dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/rowHeading" />
 

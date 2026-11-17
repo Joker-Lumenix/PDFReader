@@ -13,6 +13,7 @@ import androidx.annotation.DrawableRes
 import androidx.core.os.bundleOf
 import com.peng.pdfreader.R
 import com.peng.pdfreader.core.widget.BaseBottomSheetDialog
+import com.peng.pdfreader.data.DocumentRepository
 import com.peng.pdfreader.ui.uiData.FileActions
 
 /**
@@ -73,25 +74,23 @@ class BottomSheetMoreActionNoPdf : BaseBottomSheetDialog() {
         view.findViewById<TextView>(R.id.tvMeta).text = documentMeta
         view.findViewById<ImageView>(R.id.ivLogo).setImageDrawable(documentLogo)
 
-        val tiles = listOf(
-            R.id.ivTile0 to R.id.tvTile0,
-            R.id.ivTile1 to R.id.tvTile1,
-            R.id.ivTile2 to R.id.tvTile2,
-            R.id.ivTile3 to R.id.tvTile3,
-        )
-        actions.take(tiles.size).forEachIndexed { index, action ->
-            val (iconId, labelId) = tiles[index]
-            val icon = view.findViewById<ImageView>(iconId)
-            icon.setImageResource(action.iconRes)
-            icon.setOnClickListener { pick(action) }
-            val label = view.findViewById<TextView>(labelId)
-            label.text = action.label
-            label.setOnClickListener { pick(action) }
-        }
-        // The tiles without an action are not shown at all.
-        tiles.drop(actions.size).forEach { (iconId, labelId) ->
-            view.findViewById<ImageView>(iconId).visibility = View.GONE
-            view.findViewById<TextView>(labelId).visibility = View.GONE
+        bindCollect(view)
+
+        // The four tiles of the design. Every tile shows the operation of the
+        // caller: the caption and the icon always belong to the operation, so
+        // the shared operations (open with, print) always sit in the same tile.
+        TILES.forEachIndexed { index, tile ->
+            val container = view.findViewById<LinearLayout>(tile.container)
+            val action = actions.getOrNull(index)
+            if (action == null) {
+                // The tiles without an operation are not shown at all.
+                container.visibility = View.GONE
+                return@forEachIndexed
+            }
+            container.visibility = View.VISIBLE
+            view.findViewById<ImageView>(tile.icon).setImageResource(action.iconRes)
+            view.findViewById<TextView>(tile.label).text = action.label
+            container.setOnClickListener { pick(action) }
         }
 
         val wide = view.findViewById<LinearLayout>(R.id.llWide)
@@ -111,11 +110,54 @@ class BottomSheetMoreActionNoPdf : BaseBottomSheetDialog() {
         return view
     }
 
+    /**
+     * The favourite button of the header.
+     *
+     * The state comes from the document library, the sheet writes it back and
+     * tells the page that the document changed.
+     */
+    private fun bindCollect(view: View) {
+        val button = view.findViewById<ImageView>(R.id.ivCollect)
+        val repository = DocumentRepository.get(requireContext())
+        val document = documentId.takeIf { it.isNotEmpty() }
+            ?.let { repository.byId(it) }
+        if (document == null) {
+            button.visibility = View.GONE
+            return
+        }
+        button.visibility = View.VISIBLE
+        button.setImageResource(
+            if (document.isFavorite) R.mipmap.ic_collect_select else R.mipmap.ic_collect_unselect,
+        )
+        button.setOnClickListener {
+            repository.toggleFavorite(document)
+            val updated = repository.byId(document.id) ?: document
+            button.setImageResource(
+                if (updated.isFavorite) {
+                    R.mipmap.ic_collect_select
+                } else {
+                    R.mipmap.ic_collect_unselect
+                },
+            )
+            // The document changed, the list behind the sheet has to know it.
+            parentFragmentManager.setFragmentResult(
+                FileActions.REQUEST_KEY,
+                bundleOf(
+                    FileActions.KEY_ACTION to FileActions.CHANGED,
+                    FileActions.KEY_DOC_ID to updated.id,
+                ),
+            )
+        }
+    }
+
     private fun pick(action: Action) {
-        onActionSelected?.invoke(action.id)
-        // The pages of the lists listen to the fragment result API, the sheet
-        // reports the operation the same way the sheet of the PDF files does.
-        if (documentId.isNotEmpty()) {
+        val callback = onActionSelected
+        if (callback != null) {
+            callback(action.id)
+        } else if (documentId.isNotEmpty()) {
+            // The pages of the lists listen to the fragment result API, the
+            // sheet reports the operation the same way the sheet of the PDF
+            // files does.
             parentFragmentManager.setFragmentResult(
                 FileActions.REQUEST_KEY,
                 bundleOf(
@@ -132,7 +174,27 @@ class BottomSheetMoreActionNoPdf : BaseBottomSheetDialog() {
     /** An action of the sheet. */
     data class Action(val id: String, val label: String, @DrawableRes val iconRes: Int)
 
+    /** One tile of the design: the container, the icon and the caption. */
+    private data class Tile(
+        val container: Int,
+        val icon: Int,
+        val label: Int,
+    )
+
     companion object {
+        /**
+         * The four tiles of the design, in the order of the design.
+         *
+         * The shared operations (open with, print) always sit in the same tile,
+         * so the business logic of the pages matches the UI.
+         */
+        private val TILES = listOf(
+            Tile(R.id.actionRename, R.id.ivActionRename, R.id.tvActionRename),
+            Tile(R.id.actionOpenWith, R.id.ivActionOpenWith, R.id.tvActionOpenWith),
+            Tile(R.id.actionShare, R.id.ivActionShare, R.id.tvActionShare),
+            Tile(R.id.actionPrint, R.id.ivActionPrint, R.id.tvActionPrint),
+        )
+
         /** The surface of the wide row of the design. */
         private const val WIDE_ROW_COLOR = 0xFFF5F5F5.toInt()
 
