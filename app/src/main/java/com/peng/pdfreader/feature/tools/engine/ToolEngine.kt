@@ -1,9 +1,9 @@
 package com.peng.pdfreader.feature.tools.engine
 
-import com.peng.pdfreader.appcore.pdf.CompressResult
-import com.peng.pdfreader.appcore.pdf.ImageLayout
-import com.peng.pdfreader.appcore.pdf.PdfJob
-import com.peng.pdfreader.appcore.pdf.PdfProcessor
+import com.peng.pdfreader.core.pdf.CompressResult
+import com.peng.pdfreader.core.pdf.ImageLayout
+import com.peng.pdfreader.core.pdf.PdfJob
+import com.peng.pdfreader.core.pdf.PdfProcessor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -11,7 +11,7 @@ import java.io.File
 import kotlin.coroutines.resume
 
 /**
- * The single seam between the tool screens and the PDF engine of `:appcore`.
+ * The single seam between the tool screens and the PDF engine of the core package.
  *
  * Every screen talks to this interface only, so the wiring with the engine
  * lives in exactly one place. The calls are suspending: they never run on the
@@ -78,9 +78,9 @@ interface ToolEngine {
 }
 
 /**
- * The production implementation, backed by the PDF engine of `:appcore`.
+ * The production implementation, backed by the PDF engine of the core package.
  *
- * The engine of `:appcore` reports through callbacks and runs the work on its
+ * The engine of the core package reports through callbacks and runs the work on its
  * own worker; this implementation turns that into a suspending call that can
  * be cancelled together with the coroutine of the screen.
  */

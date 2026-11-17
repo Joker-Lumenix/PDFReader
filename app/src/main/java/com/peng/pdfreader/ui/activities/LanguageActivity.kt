@@ -36,9 +36,8 @@ class LanguageActivity : BaseActivity() {
         binding = LanguageActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.titleBar.title = getString(R.string.language_selection)
-        binding.titleBar.showBack = true
-        binding.titleBar.onBackClick = { finish() }
+        binding.tvTitle.text = getString(R.string.language_selection)
+        binding.ivBack.setOnClickListener { finish() }
 
         binding.rvLanguages.layoutManager = LinearLayoutManager(this)
         binding.rvLanguages.adapter = adapter

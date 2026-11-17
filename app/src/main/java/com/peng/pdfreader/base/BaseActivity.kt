@@ -15,7 +15,7 @@ import com.peng.pdfreader.R
  * It only carries page level plumbing that every page needs - most notably the
  * back key interception. There is deliberately **no UI interaction logic** in
  * here: no title bar, no dialogs, no list handling. Those live in the pages
- * and in the shared widgets of `:appcore`.
+ * and in the shared widgets of the core package.
  */
 abstract class BaseActivity : AppCompatActivity() {
 

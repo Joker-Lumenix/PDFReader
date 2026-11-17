@@ -12,7 +12,7 @@ import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.core.os.bundleOf
 import com.peng.pdfreader.R
-import com.peng.pdfreader.appcore.widget.BaseBottomSheetDialog
+import com.peng.pdfreader.core.widget.BaseBottomSheetDialog
 import com.peng.pdfreader.ui.uiData.FileActions
 
 /**

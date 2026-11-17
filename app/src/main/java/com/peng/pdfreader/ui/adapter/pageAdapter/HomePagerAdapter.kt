@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.peng.pdfreader.R
-import com.peng.pdfreader.appcore.widget.FileListItemDecoration
+import com.peng.pdfreader.core.widget.FileListItemDecoration
 import com.peng.pdfreader.data.DocType
 import com.peng.pdfreader.data.Document
 import com.peng.pdfreader.databinding.HomeItemDocumentPageBinding

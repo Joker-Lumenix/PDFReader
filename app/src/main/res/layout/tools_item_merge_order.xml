@@ -26,7 +26,7 @@
 
     </FrameLayout>
 
-    <com.peng.pdfreader.appcore.widget.FileListItemView
+    <com.peng.pdfreader.core.widget.FileListItemView
         android:id="@+id/item"
         android:layout_width="306dp"
         android:layout_height="72dp"

@@ -3,7 +3,7 @@ package com.peng.pdfreader.utils
 import android.content.Context
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
-import com.peng.pdfreader.appcore.util.Thumbnails
+import com.peng.pdfreader.core.util.Thumbnails
 import com.peng.pdfreader.data.DocType
 import com.peng.pdfreader.data.Document
 import com.peng.pdfreader.data.DocumentRepository

@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentManager
 import com.peng.pdfreader.R
-import com.peng.pdfreader.appcore.widget.BaseAlertDialog
+import com.peng.pdfreader.core.widget.BaseAlertDialog
 import com.peng.pdfreader.databinding.FilesDialogConfirmBinding
 
 /**

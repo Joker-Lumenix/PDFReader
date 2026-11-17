@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="FileListItemView">
+        <!-- File name, 15sp / 600 -->
+        <attr name="itemTitle" format="string" />
+        <!-- Secondary line, 12sp / 400 / #999999 -->
+        <attr name="itemMeta" format="string" />
+        <!-- File type label shown inside the pill, 10sp / 700 -->
+        <attr name="itemTypeLabel" format="string" />
+        <!-- Colour of the type label -->
+        <attr name="itemTypeColor" format="color" />
+        <!-- Show the "more" affordance on the right -->
+        <attr name="itemShowMore" format="boolean" />
+        <!-- Show the selection checkbox (multi select mode) -->
+        <attr name="itemShowCheckbox" format="boolean" />
+        <!-- Checkbox state -->
+        <attr name="itemChecked" format="boolean" />
+        <!-- Show the type pill -->
+        <attr name="itemShowType" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="EmptyStateView">
+        <attr name="emptyTitle" format="string" />
+        <attr name="emptyHint" format="string" />
+        <attr name="emptyActionText" format="string" />
+    </declare-styleable>
+
+    <!--
+      The file type filter strip of the home page. The strip draws its own
+      segments, so the geometry of a segment can be changed without touching
+      the layout of the page.
+    -->
+    <declare-styleable name="FilterStripView">
+        <!-- 选中时文本的颜色 -->
+        <attr name="filterSelectedColor" format="color" />
+        <!-- 未选中时文本的颜色 -->
+        <attr name="filterUnselectedColor" format="color" />
+        <!-- 文本的字号，单位sp -->
+        <attr name="filterLabelTextSize" format="dimension" />
+        <!-- 指示器的宽度，单位dp -->
+        <attr name="filterIndicatorWidth" format="dimension" />
+        <!-- 指示器的高度，单位dp -->
+        <attr name="filterIndicatorHeight" format="dimension" />
+        <!-- 指示器的圆角，单位dp -->
+        <attr name="filterIndicatorRadius" format="dimension" />
+        <!-- 指示器与文本之间的距离，单位dp -->
+        <attr name="filterIndicatorGap" format="dimension" />
+        <!-- 每一个条目的宽度，单位dp，0表示按权重平分 -->
+        <attr name="filterItemWidth" format="dimension" />
+        <!-- 每一个条目的高度，单位dp -->
+        <attr name="filterItemHeight" format="dimension" />
+        <!-- 指示器的颜色 -->
+        <attr name="filterIndicatorColor" format="color" />
+    </declare-styleable>
+
+</resources>

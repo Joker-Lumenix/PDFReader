@@ -2,7 +2,7 @@ package com.peng.pdfreader.data
 
 import android.content.Context
 import androidx.core.content.edit
-import com.peng.pdfreader.appcore.widget.ReadingMode
+import com.peng.pdfreader.core.widget.ReadingMode
 
 /**
  * Persisted application preferences.

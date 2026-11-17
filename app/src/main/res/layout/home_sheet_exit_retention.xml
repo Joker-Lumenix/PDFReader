@@ -73,7 +73,7 @@
     </LinearLayout>
 
     <!-- the ad slot of the design -->
-    <com.peng.pdfreader.appcore.widget.AdSlotView
+    <com.peng.pdfreader.core.widget.AdSlotView
         android:id="@+id/adSlot"
         android:layout_width="match_parent"
         android:layout_height="118dp"

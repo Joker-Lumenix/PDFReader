@@ -5,9 +5,9 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.peng.pdfreader.R
-import com.peng.pdfreader.appcore.widget.FileItemUiState
-import com.peng.pdfreader.appcore.widget.FileListItemView
-import com.peng.pdfreader.appcore.widget.createForList
+import com.peng.pdfreader.core.widget.FileItemUiState
+import com.peng.pdfreader.core.widget.FileListItemView
+import com.peng.pdfreader.core.widget.createForList
 import com.peng.pdfreader.data.Document
 import com.peng.pdfreader.utils.PageCountDrawable
 import com.peng.pdfreader.feature.tools.util.ToolFormatters

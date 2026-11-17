@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.peng.pdfreader.R
-import com.peng.pdfreader.appcore.widget.FileItemUiState
+import com.peng.pdfreader.core.widget.FileItemUiState
 import com.peng.pdfreader.data.Document
 import com.peng.pdfreader.databinding.ToolsItemMergeOrderBinding
 import com.peng.pdfreader.utils.PageCountDrawable

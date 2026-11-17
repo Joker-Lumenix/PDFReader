@@ -23,7 +23,7 @@
             android:layout_height="24dp"
             android:layout_marginLeft="20dp"
             android:layout_alignParentLeft="true"
-            android:contentDescription="@string/appcore_back"
+            android:contentDescription="@string/label_back"
             android:src="@drawable/ic_arrow_back"
             android:layout_centerVertical="true"
             />
@@ -103,7 +103,7 @@
             android:background="@color/surface_muted"
             android:visibility="gone">
 
-            <com.peng.pdfreader.appcore.widget.EmptyStateView
+            <com.peng.pdfreader.core.widget.EmptyStateView
                 android:id="@+id/emptyState"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

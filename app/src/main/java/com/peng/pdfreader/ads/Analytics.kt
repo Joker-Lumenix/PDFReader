@@ -1,8 +1,10 @@
 package com.peng.pdfreader.ads
 
 import android.content.Context
+import com.google.firebase.FirebaseApp
 import com.google.firebase.analytics.FirebaseAnalytics
-import com.peng.pdfreader.appcore.util.Logger
+import com.peng.pdfreader.BuildConfig
+import com.peng.pdfreader.core.util.Logger
 
 /**
  * The analytics of the app.
@@ -15,9 +17,23 @@ object Analytics {
     /** The name of the app in the console. */
     private const val APP_NAME = "pdf_reader"
 
-    private fun analytics(context: Context): FirebaseAnalytics? = runCatching {
-        FirebaseAnalytics.getInstance(context.applicationContext)
-    }.getOrNull()
+    /**
+     * The analytics instance, or null when firebase is not available.
+     *
+     * The automatic initialisation of firebase is switched off in the manifest,
+     * so the app starts it itself. As long as the repository still carries the
+     * placeholder configuration the sdk is not started at all: it would
+     * reject the fake project and the app would not come up.
+     */
+    private fun analytics(context: Context): FirebaseAnalytics? {
+        if (!BuildConfig.FIREBASE_CONFIGURED) return null
+        return runCatching {
+            if (FirebaseApp.getApps(context).isEmpty()) {
+                FirebaseApp.initializeApp(context)
+            }
+            FirebaseAnalytics.getInstance(context.applicationContext)
+        }.getOrNull()
+    }
 
     /** The app was opened. */
     fun appOpen(context: Context) {

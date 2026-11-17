@@ -16,8 +16,8 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
 import com.peng.pdfreader.BuildConfig
 import com.peng.pdfreader.R
-import com.peng.pdfreader.appcore.util.Logger
-import com.peng.pdfreader.appcore.widget.BaseBottomSheetDialog
+import com.peng.pdfreader.core.util.Logger
+import com.peng.pdfreader.core.widget.BaseBottomSheetDialog
 import com.peng.pdfreader.databinding.SettingsRatingSheetBinding
 import com.peng.pdfreader.ui.activities.FeedbackActivity
 

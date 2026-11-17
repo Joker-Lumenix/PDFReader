@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.peng.pdfreader.R
-import com.peng.pdfreader.appcore.widget.FileItemUiState
+import com.peng.pdfreader.core.widget.FileItemUiState
 import com.peng.pdfreader.data.Document
 import com.peng.pdfreader.databinding.LockItemFileBinding
 import com.peng.pdfreader.ui.widget.LockThumbnailDrawable
@@ -18,8 +18,8 @@ import java.util.Locale
 /**
  * The file list of the lock and the unlock flow.
  *
- * The rows are the shared [com.peng.pdfreader.appcore.widget.FileListItemView]
- * of :appcore, the adapter only maps a document onto its state.
+ * The rows are the shared [com.peng.pdfreader.core.widget.FileListItemView]
+ * of the core package, the adapter only maps a document onto its state.
  */
 class LockFileAdapter(
     private val onFileClick: (Document) -> Unit,

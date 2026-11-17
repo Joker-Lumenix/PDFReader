@@ -14,7 +14,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.lifecycleScope
 import com.peng.pdfreader.R
-import com.peng.pdfreader.appcore.util.Logger
+import com.peng.pdfreader.core.util.Logger
 import com.peng.pdfreader.base.BaseActivity
 import com.peng.pdfreader.data.DocType
 import com.peng.pdfreader.data.DocumentRepository

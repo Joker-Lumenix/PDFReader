@@ -1,6 +1,6 @@
 package com.peng.pdfreader.data
 
-import com.peng.pdfreader.appcore.pdf.PdfEngine
+import com.peng.pdfreader.core.pdf.PdfEngine
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule

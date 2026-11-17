@@ -11,8 +11,8 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.peng.pdfreader.R
-import com.peng.pdfreader.appcore.widget.FileItemUiState
-import com.peng.pdfreader.appcore.widget.FileListItemDecoration
+import com.peng.pdfreader.core.widget.FileItemUiState
+import com.peng.pdfreader.core.widget.FileListItemDecoration
 import com.peng.pdfreader.base.BaseActivity
 import com.peng.pdfreader.base.ShareFileProvider
 import com.peng.pdfreader.data.DocType

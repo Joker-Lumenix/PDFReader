@@ -15,17 +15,17 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.peng.pdfreader.R
-import com.peng.pdfreader.appcore.office.OoxmlPackage
-import com.peng.pdfreader.appcore.office.docx.DocxDocument
-import com.peng.pdfreader.appcore.office.docx.DocxParser
-import com.peng.pdfreader.appcore.office.pptx.PptxDeck
-import com.peng.pdfreader.appcore.office.pptx.PptxParser
-import com.peng.pdfreader.appcore.office.xlsx.XlsxParser
-import com.peng.pdfreader.appcore.office.xlsx.XlsxWorkbook
-import com.peng.pdfreader.appcore.util.Logger
-import com.peng.pdfreader.appcore.widget.DocxPreviewView
-import com.peng.pdfreader.appcore.widget.PptxPreviewView
-import com.peng.pdfreader.appcore.widget.XlsxPreviewView
+import com.peng.pdfreader.core.office.OoxmlPackage
+import com.peng.pdfreader.core.office.docx.DocxDocument
+import com.peng.pdfreader.core.office.docx.DocxParser
+import com.peng.pdfreader.core.office.pptx.PptxDeck
+import com.peng.pdfreader.core.office.pptx.PptxParser
+import com.peng.pdfreader.core.office.xlsx.XlsxParser
+import com.peng.pdfreader.core.office.xlsx.XlsxWorkbook
+import com.peng.pdfreader.core.util.Logger
+import com.peng.pdfreader.core.widget.DocxPreviewView
+import com.peng.pdfreader.core.widget.PptxPreviewView
+import com.peng.pdfreader.core.widget.XlsxPreviewView
 import com.peng.pdfreader.base.BaseBackHandler
 import com.peng.pdfreader.base.BaseFragment
 import com.peng.pdfreader.data.DocType
@@ -47,7 +47,7 @@ import java.util.Locale
 /**
  * The offline Office preview.
  *
- * The document is parsed by the OOXML parsers of `:appcore` on a background
+ * The document is parsed by the OOXML parsers of the core package on a background
  * thread and rendered by the format specific preview view.
  */
 class OfficePreviewFragment : BaseFragment(), BaseBackHandler {

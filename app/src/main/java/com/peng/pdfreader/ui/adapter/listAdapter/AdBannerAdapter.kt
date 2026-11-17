@@ -4,8 +4,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.peng.pdfreader.ads.Ads
-import com.peng.pdfreader.appcore.widget.AdContent
-import com.peng.pdfreader.appcore.widget.AdSlotView
+import com.peng.pdfreader.core.widget.AdContent
+import com.peng.pdfreader.core.widget.AdSlotView
 import com.peng.pdfreader.databinding.FilesItemAdBannerBinding
 
 /**

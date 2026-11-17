@@ -11,8 +11,8 @@ import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
 import androidx.viewpager2.widget.ViewPager2
 import com.peng.pdfreader.R
-import com.peng.pdfreader.appcore.util.Logger
-import com.peng.pdfreader.appcore.util.SystemBarInsets
+import com.peng.pdfreader.core.util.Logger
+import com.peng.pdfreader.core.util.SystemBarInsets
 import com.peng.pdfreader.base.BaseActivity
 import com.peng.pdfreader.databinding.GuideActivityBinding
 import com.peng.pdfreader.data.AppPrefs

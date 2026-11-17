@@ -3,7 +3,7 @@ package com.peng.pdfreader.data
 import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
-import com.peng.pdfreader.appcore.util.Logger
+import com.peng.pdfreader.core.util.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.json.JSONArray

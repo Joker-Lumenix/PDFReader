@@ -8,7 +8,7 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import com.peng.pdfreader.R
-import com.peng.pdfreader.appcore.util.Logger
+import com.peng.pdfreader.core.util.Logger
 import com.peng.pdfreader.base.BaseActivity
 import com.peng.pdfreader.databinding.FeedbackActivityBinding
 
@@ -28,9 +28,8 @@ class FeedbackActivity : BaseActivity() {
         binding = FeedbackActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.titleBar.title = getString(R.string.feedback)
-        binding.titleBar.showBack = true
-        binding.titleBar.onBackClick = { finish() }
+        binding.tvTitle.text = getString(R.string.feedback)
+        binding.ivBack.setOnClickListener { finish() }
 
         binding.tvHeading.text = getString(R.string.feedback_heading)
         applyInputSurface()

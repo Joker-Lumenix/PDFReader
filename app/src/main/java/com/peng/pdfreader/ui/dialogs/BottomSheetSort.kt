@@ -11,7 +11,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentManager
 import com.peng.pdfreader.R
-import com.peng.pdfreader.appcore.widget.BaseBottomSheetDialog
+import com.peng.pdfreader.core.widget.BaseBottomSheetDialog
 import com.peng.pdfreader.databinding.DialogSortBinding
 import com.peng.pdfreader.utils.FileSortOption
 import com.peng.pdfreader.utils.FilesPrefs

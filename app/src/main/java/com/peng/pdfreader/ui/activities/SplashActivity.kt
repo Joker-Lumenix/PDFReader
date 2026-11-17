@@ -8,7 +8,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.animation.LinearInterpolator
 import androidx.activity.result.contract.ActivityResultContracts
-import com.peng.pdfreader.appcore.util.Logger
+import com.peng.pdfreader.core.util.Logger
 import com.peng.pdfreader.base.BaseActivity
 import com.peng.pdfreader.data.SharedStorage
 import com.peng.pdfreader.databinding.ActivitySplashBinding

@@ -8,7 +8,7 @@ import android.print.PrintManager
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.peng.pdfreader.R
-import com.peng.pdfreader.appcore.util.Logger
+import com.peng.pdfreader.core.util.Logger
 import com.peng.pdfreader.base.ShareFileProvider
 import com.peng.pdfreader.data.DocType
 import com.peng.pdfreader.data.Document

@@ -10,14 +10,14 @@ import android.print.PageRange
 import android.print.PrintAttributes
 import android.print.PrintDocumentAdapter
 import android.print.PrintDocumentInfo
-import com.peng.pdfreader.appcore.pdf.PdfEngine
+import com.peng.pdfreader.core.pdf.PdfEngine
 import java.io.ByteArrayOutputStream
 import java.io.File
 
 /**
  * Prints a PDF of the sandbox.
  *
- * The pages are rasterised with the offline renderer of `:appcore` and written
+ * The pages are rasterised with the offline renderer of the core package and written
  * back as a PDF, so the print job never needs a network connection and never
  * touches the original file.
  */

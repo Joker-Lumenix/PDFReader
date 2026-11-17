@@ -10,8 +10,8 @@ import android.print.PageRange
 import android.print.PrintAttributes
 import android.print.PrintDocumentAdapter
 import android.print.PrintDocumentInfo
-import com.peng.pdfreader.appcore.pdf.PdfEngine
-import com.peng.pdfreader.appcore.util.Logger
+import com.peng.pdfreader.core.pdf.PdfEngine
+import com.peng.pdfreader.core.util.Logger
 import java.io.File
 import java.io.FileOutputStream
 

@@ -3,6 +3,7 @@ package com.peng.pdfreader.ui.activities
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -33,9 +34,9 @@ class ToolProgressActivity : BaseActivity() {
         binding = ActivityToolsProgressBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.titleBar.showBack = false
         // the design of the running job shows an empty app bar
-        binding.titleBar.title = ""
+        binding.tvTitle.text = ""
+        binding.ivBack.visibility = View.GONE
 
         // the progress track of the design: a 240x6 track with a handle
         binding.progressView.progressTrack.background =

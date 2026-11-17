@@ -2,8 +2,8 @@ package com.peng.pdfreader.base
 
 import android.content.Context
 import com.peng.pdfreader.R
-import com.peng.pdfreader.appcore.pdf.PdfError
-import com.peng.pdfreader.appcore.pdf.PdfVault
+import com.peng.pdfreader.core.pdf.PdfError
+import com.peng.pdfreader.core.pdf.PdfVault
 
 /**
  * Maps the error codes of the PDF engine onto localised messages.

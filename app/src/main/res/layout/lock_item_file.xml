@@ -2,10 +2,10 @@
 <!--
   One row of the lock / unlock file list.
 
-  The row itself is the shared FileListItemView of :appcore, so the design of
+  The row itself is the shared FileListItemView of the core package, so the design of
   the file card stays in one place.
 -->
-<com.peng.pdfreader.appcore.widget.FileListItemView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.peng.pdfreader.core.widget.FileListItemView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/fileItem"
     android:layout_width="match_parent"
     android:layout_height="72dp"

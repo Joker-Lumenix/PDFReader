@@ -62,7 +62,7 @@
                 android:contentDescription="@string/preview_cd_done"
                 android:focusable="true">
 
-                <com.peng.pdfreader.appcore.widget.CheckMarkView
+                <com.peng.pdfreader.core.widget.CheckMarkView
                     android:id="@+id/ivDone"
                     android:layout_width="15dp"
                     android:layout_height="10dp"
@@ -81,7 +81,7 @@
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <com.peng.pdfreader.appcore.widget.SignatureCanvasView
+        <com.peng.pdfreader.core.widget.SignatureCanvasView
             android:id="@+id/canvas"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
@@ -106,7 +106,7 @@
             android:paddingEnd="0dp"
             android:visibility="gone">
 
-            <com.peng.pdfreader.appcore.widget.ColorPaletteView
+            <com.peng.pdfreader.core.widget.ColorPaletteView
                 android:id="@+id/palette"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
@@ -134,7 +134,7 @@
             android:textSize="12sp" />
 
         <!-- The colour of the next stroke, a 10dp dot inside a 14dp box. -->
-        <com.peng.pdfreader.appcore.widget.ColorPaletteView
+        <com.peng.pdfreader.core.widget.ColorPaletteView
             android:id="@+id/swatch"
             android:layout_width="14dp"
             android:layout_height="14dp"

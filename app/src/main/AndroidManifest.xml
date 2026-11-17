@@ -49,6 +49,24 @@
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="${admobAppId}" />
 
+        <!--
+          The automatic initialisation of the Google sdk is switched off: the
+          providers run before the first activity and a missing or still
+          placeholder configuration would take the app down before the splash
+          screen is visible. The app starts the sdk itself, in a guarded way.
+        -->
+        <provider
+            android:name="com.google.firebase.provider.FirebaseInitProvider"
+            android:authorities="${applicationId}.firebaseinitprovider"
+            android:exported="false"
+            tools:node="remove" />
+
+        <provider
+            android:name="com.google.android.gms.ads.MobileAdsInitProvider"
+            android:authorities="${applicationId}.mobileadsinitprovider"
+            android:exported="false"
+            tools:node="remove" />
+
         <activity
             android:name=".ui.activities.SplashActivity"
             android:exported="true"

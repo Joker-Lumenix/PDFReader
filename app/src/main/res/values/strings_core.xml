@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   Copy that is shared by several features: the messages of the PDF engine
-  errors and the file name suffix of an annotated document.
+  errors, the file name suffix of an annotated document and the accessibility
+  labels of the icon only controls.
 -->
 <resources>
     <string name="error_pdf_unreadable">无法读取该文件，请确认它仍然存在</string>
@@ -18,4 +19,13 @@
     <string name="error_weak_password">密码至少需要 4 位</string>
     <string name="error_io">文件读写失败，请重试</string>
     <string name="annotated_suffix">批注</string>
+
+    <!-- Accessibility labels of the icon only controls. -->
+    <string name="label_back" translatable="false">Back</string>
+    <string name="label_more" translatable="false">More</string>
+    <string name="label_select" translatable="false">Select</string>
+    <string name="label_file_icon" translatable="false">File</string>
+    <string name="label_tab_icon" translatable="false">Tab</string>
+    <string name="label_empty_state" translatable="false">Empty</string>
+    <string name="label_ad_icon" translatable="false">Ad</string>
 </resources>

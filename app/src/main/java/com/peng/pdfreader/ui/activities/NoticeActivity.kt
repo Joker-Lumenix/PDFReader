@@ -31,9 +31,8 @@ class NoticeActivity : BaseActivity() {
             bodyRes = R.string.notice_privacy_body
         }
 
-        binding.titleBar.title = getString(titleRes)
-        binding.titleBar.showBack = true
-        binding.titleBar.onBackClick = { finish() }
+        binding.tvTitle.text = getString(titleRes)
+        binding.ivBack.setOnClickListener { finish() }
 
         binding.tvNoticeTitle.text = getString(titleRes)
         binding.tvNoticeBody.text = getString(bodyRes)

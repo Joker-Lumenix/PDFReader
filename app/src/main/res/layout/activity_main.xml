@@ -32,7 +32,7 @@
 
    </FrameLayout>
 
-    <com.peng.pdfreader.appcore.widget.BottomNavBar
+    <com.peng.pdfreader.core.widget.BottomNavBar
         android:id="@+id/bottomNav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Empty state block of the design: a 148dp illustration, a left aligned title
+  (20sp / 600 / #333333), a left aligned hint (14sp / 400 / #666666) and an
+  optional 137x43 gradient pill.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="20dp"
+    android:paddingEnd="20dp"
+    android:paddingTop="20dp"
+    android:paddingBottom="20dp">
+
+    <ImageView
+        android:id="@+id/ivIllustration"
+        android:layout_width="148dp"
+        android:layout_height="148dp"
+        android:layout_gravity="center_horizontal"
+        android:contentDescription="@string/label_empty_state" />
+
+    <TextView
+        android:id="@+id/tvTitle"
+        style="@style/TextAppearance.AppCore.EmptyTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="start" />
+
+    <TextView
+        android:id="@+id/tvHint"
+        style="@style/TextAppearance.AppCore.Body"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:gravity="start"
+        android:textColor="@color/text_tertiary" />
+
+    <TextView
+        android:id="@+id/tvAction"
+        style="@style/TextAppearance.AppCore.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="43dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/gradient_red"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:minWidth="137dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:visibility="gone" />
+
+</LinearLayout>

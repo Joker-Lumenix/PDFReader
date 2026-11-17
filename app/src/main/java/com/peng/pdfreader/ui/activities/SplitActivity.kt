@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.peng.pdfreader.R
-import com.peng.pdfreader.appcore.pdf.PdfEngine
+import com.peng.pdfreader.core.pdf.PdfEngine
 import com.peng.pdfreader.base.BaseActivity
 import com.peng.pdfreader.data.DocType
 import com.peng.pdfreader.data.Document
@@ -55,9 +55,8 @@ class SplitActivity : BaseActivity() {
         binding = ToolsActivitySplitBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.titleBar.showBack = true
-        binding.titleBar.title = getString(R.string.split)
-        binding.titleBar.onBackClick = { onBackPressedDispatcher.onBackPressed() }
+        binding.tvTitle.text = getString(R.string.split)
+        binding.ivBack.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
         binding.banner.background = ToolShapes.roundRect(this, ToolShapes.BANNER_BLUE, 8f)
 

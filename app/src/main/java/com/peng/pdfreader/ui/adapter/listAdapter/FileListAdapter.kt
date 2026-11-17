@@ -1,4 +1,4 @@
-﻿package com.peng.pdfreader.ui.adapter.listAdapter
+package com.peng.pdfreader.ui.adapter.listAdapter
 
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -8,9 +8,9 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.peng.pdfreader.R
-import com.peng.pdfreader.appcore.widget.FileItemUiState
-import com.peng.pdfreader.appcore.widget.FileListItemView
-import com.peng.pdfreader.appcore.widget.createForList
+import com.peng.pdfreader.core.widget.FileItemUiState
+import com.peng.pdfreader.core.widget.FileListItemView
+import com.peng.pdfreader.core.widget.createForList
 import com.peng.pdfreader.data.Document
 
 /**

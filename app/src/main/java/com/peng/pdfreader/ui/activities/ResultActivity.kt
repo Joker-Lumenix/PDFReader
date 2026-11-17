@@ -7,8 +7,8 @@ import android.view.View
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.peng.pdfreader.R
-import com.peng.pdfreader.appcore.pdf.PdfEngine
-import com.peng.pdfreader.appcore.util.Logger
+import com.peng.pdfreader.core.pdf.PdfEngine
+import com.peng.pdfreader.core.util.Logger
 import com.peng.pdfreader.base.BaseActivity
 import com.peng.pdfreader.base.ShareFileProvider
 import com.peng.pdfreader.data.Document
@@ -44,9 +44,8 @@ class ResultActivity : BaseActivity() {
         binding = ActivityToolsResultBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.titleBar.showBack = true
-        binding.titleBar.title = getString(R.string.result)
-        binding.titleBar.onBackClick = { onBackPressedDispatcher.onBackPressed() }
+        binding.tvTitle.text = getString(R.string.result)
+        binding.ivBack.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
         val document = repository.byId(intent.getStringExtra(EXTRA_DOC_ID).orEmpty())
         if (document == null) {

@@ -2,7 +2,7 @@ package com.peng.pdfreader.ui.uiData
 
 import android.content.Context
 import com.peng.pdfreader.R
-import com.peng.pdfreader.appcore.widget.AdContent
+import com.peng.pdfreader.core.widget.AdContent
 
 /**
  * The sample content of the ad slots.

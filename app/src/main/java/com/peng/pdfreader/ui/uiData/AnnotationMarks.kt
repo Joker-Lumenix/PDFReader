@@ -2,8 +2,8 @@ package com.peng.pdfreader.ui.uiData
 
 import android.graphics.Path
 import android.graphics.RectF
-import com.peng.pdfreader.appcore.widget.PdfMark
-import com.peng.pdfreader.appcore.widget.PdfMarkKind
+import com.peng.pdfreader.core.widget.PdfMark
+import com.peng.pdfreader.core.widget.PdfMarkKind
 import com.peng.pdfreader.data.Annotation
 import com.peng.pdfreader.data.AnnotationType
 

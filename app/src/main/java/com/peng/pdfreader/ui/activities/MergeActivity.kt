@@ -4,15 +4,13 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
-import android.view.Gravity
 import android.view.View
-import android.widget.FrameLayout
-import android.widget.ImageView
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.peng.pdfreader.R
-import com.peng.pdfreader.appcore.widget.FileListItemDecoration
+import com.peng.pdfreader.core.widget.FileListItemDecoration
 import com.peng.pdfreader.base.BaseActivity
 import com.peng.pdfreader.base.ShareFileProvider
 import com.peng.pdfreader.data.DocType
@@ -44,9 +42,6 @@ class MergeActivity : BaseActivity() {
     private val selection = linkedSetOf<String>()
     private var documents: List<Document> = emptyList()
 
-    private lateinit var shareAction: ImageView
-    private lateinit var addAction: ImageView
-
     private val pickAdapter by lazy {
         DocumentPickAdapter(
             multiSelect = true,
@@ -74,12 +69,17 @@ class MergeActivity : BaseActivity() {
         binding = ToolsActivityMergeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.titleBar.showBack = true
-        binding.titleBar.onBackClick = { onBackPressedDispatcher.onBackPressed() }
-        shareAction = buildAction(R.mipmap.ic_share_app) { shareSelection() }
-        addAction = buildAction(R.mipmap.ic_add_circle) { showStep(Step.SELECT) }
-        binding.titleBar.addAction(shareAction)
-        binding.titleBar.addAction(addAction)
+        binding.ivBack.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
+        binding.ivShare.setImageResource(R.mipmap.ic_share_app)
+        binding.ivShare.imageTintList = ColorStateList.valueOf(
+            ContextCompat.getColor(this, R.color.text_secondary),
+        )
+        binding.ivShare.setOnClickListener { shareSelection() }
+        binding.ivAdd.setImageResource(R.mipmap.ic_add_circle)
+        binding.ivAdd.imageTintList = ColorStateList.valueOf(
+            ContextCompat.getColor(this, R.color.text_secondary),
+        )
+        binding.ivAdd.setOnClickListener { showStep(Step.SELECT) }
 
         binding.rvFiles.layoutManager = LinearLayoutManager(this)
         binding.rvFiles.adapter = pickAdapter
@@ -108,8 +108,8 @@ class MergeActivity : BaseActivity() {
         binding.rvFiles.visibility = if (step == Step.SELECT) View.VISIBLE else View.GONE
         binding.rvOrder.visibility = if (step == Step.ORDER) View.VISIBLE else View.GONE
         binding.bottomBar.visibility = View.VISIBLE
-        shareAction.visibility = if (step == Step.SELECT) View.VISIBLE else View.GONE
-        addAction.visibility = if (step == Step.ORDER) View.VISIBLE else View.GONE
+        binding.ivShare.visibility = if (step == Step.SELECT) View.VISIBLE else View.GONE
+        binding.ivAdd.visibility = if (step == Step.ORDER) View.VISIBLE else View.GONE
 
         when (step) {
             Step.SELECT -> refreshSelectStep()
@@ -119,7 +119,7 @@ class MergeActivity : BaseActivity() {
 
 
     private fun refreshSelectStep() {
-        binding.titleBar.title = getString(R.string.selected_count, selection.size)
+        binding.tvTitle.text = getString(R.string.selected_count, selection.size)
         binding.btnAction.setText(R.string.next)
         binding.btnAction.isEnabled = selection.isNotEmpty()
         binding.btnAction.alpha = if (selection.isNotEmpty()) 1f else 0.5f
@@ -128,7 +128,7 @@ class MergeActivity : BaseActivity() {
     }
 
     private fun refreshOrderStep() {
-        binding.titleBar.title = getString(R.string.merge)
+        binding.tvTitle.text = getString(R.string.merge)
         binding.btnAction.text = getString(R.string.merge_count, selection.size)
         binding.btnAction.isEnabled = selection.isNotEmpty()
         binding.btnAction.alpha = if (selection.isNotEmpty()) 1f else 0.5f
@@ -225,14 +225,6 @@ class MergeActivity : BaseActivity() {
             startActivity(Intent.createChooser(intent, getString(R.string.share)))
         }.onFailure { toast(R.string.tools_not_available) }
     }
-
-    private fun buildAction(iconRes: Int, onClick: () -> Unit): ImageView =
-        ImageView(this).apply {
-            layoutParams = FrameLayout.LayoutParams(dp(24), dp(24), Gravity.CENTER_VERTICAL)
-            setImageResource(iconRes)
-            imageTintList = ColorStateList.valueOf(getColor(R.color.text_secondary))
-            setOnClickListener { onClick() }
-        }
 
     private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
 

@@ -20,8 +20,8 @@
 ## 技术栈约定
 
 - Kotlin + Android View 体系（XML 布局 + ViewBinding + RecyclerView）。**不使用 Jetpack Compose**。
-- 模块划分：`:appcore` 为可复用的预览内核（PDF 引擎、OOXML 解析、预览自定义 View、通用弹窗基类），`:app` 为业务层。
-- 所有自定义 View 统一放在 `com.peng.pdfreader.appcore.widget` 一个包内。
+- 只有一个 `:app` 模块。预览内核（PDF 引擎、OOXML 解析、预览自定义 View、通用弹窗基类）在 `com.peng.pdfreader.core` 包内，业务层在 `com.peng.pdfreader.ui` / `feature` 等包内。
+- 所有自定义 View 统一放在 `com.peng.pdfreader.core.widget` 一个包内。
 - 代码中不得出现全路径类名，一律使用 `import`。
 - 依赖必须来自海外仓库（`google()` / `mavenCentral()` / `gradlePluginPortal()`），不得引入国内镜像。
 
@@ -33,7 +33,7 @@
 
 ## 日志约定
 
-- 统一走 `com.peng.pdfreader.appcore.util.Logger`，内部以 `BuildConfig.DEBUG` 门控。
+- 统一走 `com.peng.pdfreader.core.util.Logger`，内部以 `BuildConfig.DEBUG` 门控。
 - release 构建由 `app/proguard-rules.pro` 的 `-assumenosideeffects class android.util.Log` 剥离所有日志。
 - debug 包允许中文日志；release 包内不得残留任何日志调用。
 

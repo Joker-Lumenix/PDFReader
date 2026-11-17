@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The banner ad of the design (360x72): an app icon, the title, the AD badge,
+  the description and the install button.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="72dp"
+    android:background="@color/surface_card"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="24dp"
+    android:paddingEnd="12dp">
+
+    <ImageView
+        android:id="@+id/ivIcon"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:contentDescription="@string/label_ad_icon" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvTitle"
+                style="@style/TextAppearance.AppCore.ItemTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1" />
+
+            <TextView
+                android:id="@+id/tvBadge"
+                style="@style/TextAppearance.AppCore.TypeChip"
+                android:layout_width="28dp"
+                android:layout_height="14dp"
+                android:layout_marginStart="7dp"
+                android:background="@drawable/bg_ad_badge"
+                android:gravity="center"
+                android:textColor="@color/white" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvDescription"
+            style="@style/TextAppearance.AppCore.Meta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:ellipsize="end"
+            android:maxLines="1" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvAction"
+        style="@style/TextAppearance.AppCore.AdAction"
+        android:layout_width="80dp"
+        android:layout_height="32dp"
+        android:background="@drawable/bg_ad_action"
+        android:gravity="center"
+        android:textColor="@color/white" />
+
+</LinearLayout>

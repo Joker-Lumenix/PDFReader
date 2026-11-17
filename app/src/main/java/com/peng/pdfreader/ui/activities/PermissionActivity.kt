@@ -13,7 +13,7 @@ import android.provider.Settings
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import com.peng.pdfreader.appcore.util.Logger
+import com.peng.pdfreader.core.util.Logger
 import com.peng.pdfreader.base.BaseActivity
 import com.peng.pdfreader.data.DocumentRepository
 import com.peng.pdfreader.data.SharedStorage

@@ -3,7 +3,7 @@ package com.peng.pdfreader.base
 import android.app.Application
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
-import com.peng.pdfreader.appcore.util.Logger
+import com.peng.pdfreader.core.util.Logger
 import com.peng.pdfreader.data.AppPrefs
 import com.peng.pdfreader.data.DocumentRepository
 

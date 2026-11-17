@@ -7,10 +7,10 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.peng.pdfreader.appcore.util.Thumbnails
-import com.peng.pdfreader.appcore.widget.FileItemUiState
-import com.peng.pdfreader.appcore.widget.FileListItemView
-import com.peng.pdfreader.appcore.widget.createForList
+import com.peng.pdfreader.core.util.Thumbnails
+import com.peng.pdfreader.core.widget.FileItemUiState
+import com.peng.pdfreader.core.widget.FileListItemView
+import com.peng.pdfreader.core.widget.createForList
 import com.peng.pdfreader.data.DocType
 import com.peng.pdfreader.data.Document
 import com.peng.pdfreader.data.DocumentRepository

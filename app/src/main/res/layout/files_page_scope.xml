@@ -21,7 +21,7 @@
         android:paddingBottom="12dp"
         android:scrollbars="none" />
 
-    <com.peng.pdfreader.appcore.widget.EmptyStateView
+    <com.peng.pdfreader.core.widget.EmptyStateView
         android:id="@+id/emptyState"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

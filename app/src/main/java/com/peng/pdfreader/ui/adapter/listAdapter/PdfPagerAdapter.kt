@@ -3,10 +3,10 @@ package com.peng.pdfreader.ui.adapter.listAdapter
 import android.graphics.RectF
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.peng.pdfreader.appcore.pdf.PdfEngine
-import com.peng.pdfreader.appcore.widget.PdfMark
-import com.peng.pdfreader.appcore.widget.PdfPageView
-import com.peng.pdfreader.appcore.widget.ReadingMode
+import com.peng.pdfreader.core.pdf.PdfEngine
+import com.peng.pdfreader.core.widget.PdfMark
+import com.peng.pdfreader.core.widget.PdfPageView
+import com.peng.pdfreader.core.widget.ReadingMode
 import java.io.File
 
 /**

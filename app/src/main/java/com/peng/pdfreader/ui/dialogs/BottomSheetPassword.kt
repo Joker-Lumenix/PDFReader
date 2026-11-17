@@ -11,8 +11,8 @@ import android.view.inputmethod.EditorInfo
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import com.peng.pdfreader.R
-import com.peng.pdfreader.appcore.pdf.PdfVault
-import com.peng.pdfreader.appcore.widget.BaseBottomSheetDialog
+import com.peng.pdfreader.core.pdf.PdfVault
+import com.peng.pdfreader.core.widget.BaseBottomSheetDialog
 import com.peng.pdfreader.databinding.LockSheetPasswordBinding
 import com.peng.pdfreader.feature.lock.sheet.LockErrorIconDrawable
 import com.peng.pdfreader.feature.lock.sheet.LockPasswordMask
@@ -142,7 +142,7 @@ class BottomSheetPassword : BaseBottomSheetDialog() {
 
     /**
      * The field of the design is #f4f4f4 with a 12dp radius, the shared drawable
-     * of :appcore rounds it with 16dp, so the sheet draws its own background.
+     * of the core package rounds it with 16dp, so the sheet draws its own background.
      */
     private fun applyFieldBackground() {
         val views = binding ?: return

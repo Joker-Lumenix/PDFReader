@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.peng.pdfreader.appcore.widget.AdSlotView
+import com.peng.pdfreader.core.widget.AdSlotView
 import com.peng.pdfreader.ads.Ads
 import com.peng.pdfreader.base.BaseFragment
 import com.peng.pdfreader.data.Document

@@ -7,8 +7,8 @@ import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.View
 import com.peng.pdfreader.R
-import com.peng.pdfreader.appcore.widget.ColorPaletteView
-import com.peng.pdfreader.appcore.widget.InkStroke
+import com.peng.pdfreader.core.widget.ColorPaletteView
+import com.peng.pdfreader.core.widget.InkStroke
 import com.peng.pdfreader.base.BaseActivity
 import com.peng.pdfreader.databinding.ActivitySignatureBinding
 import com.peng.pdfreader.ui.uiData.AnnotationPayload

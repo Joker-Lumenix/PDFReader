@@ -13,8 +13,6 @@ import android.print.PrintManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
@@ -23,11 +21,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.peng.pdfreader.R
-import com.peng.pdfreader.appcore.util.Logger
-import com.peng.pdfreader.appcore.util.Thumbnails
-import com.peng.pdfreader.appcore.widget.EmptyStateView
-import com.peng.pdfreader.appcore.widget.FileItemUiState
-import com.peng.pdfreader.appcore.widget.FileListItemDecoration
+import com.peng.pdfreader.core.util.Logger
+import com.peng.pdfreader.core.util.Thumbnails
+import com.peng.pdfreader.core.widget.EmptyStateView
+import com.peng.pdfreader.core.widget.FileItemUiState
+import com.peng.pdfreader.core.widget.FileListItemDecoration
 import com.peng.pdfreader.base.BaseFragment
 import com.peng.pdfreader.base.ShareFileProvider
 import com.peng.pdfreader.data.DocType
@@ -77,7 +75,7 @@ import kotlinx.coroutines.withContext
  * The type filter and the sort order are persisted in [AppPrefs]; the scope
  * and the direction of the sort live in [FilesPrefs]. The list itself is
  * rendered by [FileListAdapter] and every row is the shared
- * [com.peng.pdfreader.appcore.widget.FileListItemView].
+ * [com.peng.pdfreader.core.widget.FileListItemView].
  */
 class FilesFragment : BaseFragment() {
 
@@ -175,44 +173,22 @@ class FilesFragment : BaseFragment() {
     // ------------------------------------------------------------------ setup
 
     private fun setupTitleBar() {
-        binding.titleBar.title = getString(R.string.nav_files)
-        binding.titleBar.onBackClick = { exitSelection() }
+        binding.tvTitle.text = getString(R.string.nav_files)
+        binding.ivBack.setOnClickListener { exitSelection() }
         // The design draws the back arrow half transparent (files-Selected).
-        binding.titleBar.findViewById<ImageView>(R.id.ivBack)?.imageTintList =
+        binding.ivBack.imageTintList =
             ColorStateList.valueOf(Color.argb(128, 39, 38, 54))
 
         // The three actions of the title bar (design: files):
         // the search opens the search page, the file selection opens the
         // selection page and the sort opens the rules of the order.
-        val search = ImageView(requireContext()).apply {
-            setImageResource(R.mipmap.ic_search_red)
-            contentDescription = getString(R.string.search)
-            setOnClickListener { openSearchPage() }
-        }
-        val select = ImageView(requireContext()).apply {
-            setImageResource(R.mipmap.ic_file_choose)
-            contentDescription = getString(R.string.select_file)
-            setOnClickListener { openSelectPage() }
-        }
-        val sort = ImageView(requireContext()).apply {
-            setImageResource(R.mipmap.ic_sort)
-            contentDescription = getString(R.string.files_sort_title)
-            setOnClickListener { openSortSheet() }
-        }
-        val actions = LinearLayout(requireContext()).apply {
-            orientation = LinearLayout.HORIZONTAL
-            addView(search, actionParams(endMargin = dp(16)))
-            addView(select, actionParams(endMargin = dp(16)))
-            addView(sort, actionParams())
-        }
-        binding.titleBar.addAction(actions)
-        searchAction = search
-        selectAction = select
-        sortAction = sort
+        binding.ivSearch.setOnClickListener { openSearchPage() }
+        binding.ivSelect.setOnClickListener { openSelectPage() }
+        binding.ivSort.setOnClickListener { openSortSheet() }
+        searchAction = binding.ivSearch
+        selectAction = binding.ivSelect
+        sortAction = binding.ivSort
     }
-
-    private fun actionParams(endMargin: Int = 0): LinearLayout.LayoutParams =
-        LinearLayout.LayoutParams(dp(24), dp(24)).apply { marginEnd = endMargin }
 
     private fun setupScopeTabs() {
         binding.tabAll.setOnClickListener { setScope(FileScope.ALL) }
@@ -533,7 +509,7 @@ class FilesFragment : BaseFragment() {
     }
 
     private fun updateTitle() {
-        binding.titleBar.title = when {
+        binding.tvTitle.text = when {
             selectionMode -> getString(R.string.selected_count, selectedIds.size)
             else -> getString(R.string.nav_files)
         }
@@ -566,7 +542,7 @@ class FilesFragment : BaseFragment() {
         selectedIds.add(docId)
         binding.selectBarDivider.visibility = View.VISIBLE
         binding.selectBar.visibility = View.VISIBLE
-        binding.titleBar.showBack = true
+        binding.ivBack.visibility = View.VISIBLE
         // The design drops the scope row while the selection is active.
         updateScopeRow()
         updateTitleBarActions()
@@ -578,7 +554,7 @@ class FilesFragment : BaseFragment() {
         selectedIds.clear()
         binding.selectBarDivider.visibility = View.GONE
         binding.selectBar.visibility = View.GONE
-        binding.titleBar.showBack = false
+        binding.ivBack.visibility = View.GONE
         updateScopeRow()
         updateTitleBarActions()
         updateSelectionUi()

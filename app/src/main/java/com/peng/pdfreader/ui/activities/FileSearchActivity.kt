@@ -10,10 +10,10 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.peng.pdfreader.R
-import com.peng.pdfreader.appcore.util.Logger
-import com.peng.pdfreader.appcore.util.SystemBarInsets
-import com.peng.pdfreader.appcore.widget.FileItemUiState
-import com.peng.pdfreader.appcore.widget.FileListItemDecoration
+import com.peng.pdfreader.core.util.Logger
+import com.peng.pdfreader.core.util.SystemBarInsets
+import com.peng.pdfreader.core.widget.FileItemUiState
+import com.peng.pdfreader.core.widget.FileListItemDecoration
 import com.peng.pdfreader.base.BaseActivity
 import com.peng.pdfreader.data.Document
 import com.peng.pdfreader.data.AppPrefs
@@ -58,9 +58,8 @@ class FileSearchActivity : BaseActivity() {
     // ------------------------------------------------------------------ setup
 
     private fun setupTitleBar() {
-        binding.titleBar.title = ""
-        binding.titleBar.showBack = true
-        binding.titleBar.onBackClick = { finish() }
+        binding.tvTitle.text = ""
+        binding.ivBack.setOnClickListener { finish() }
     }
 
     private fun setupSearch() {

@@ -11,8 +11,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import com.peng.pdfreader.R
-import com.peng.pdfreader.appcore.util.Logger
-import com.peng.pdfreader.appcore.widget.BaseBottomSheetDialog
+import com.peng.pdfreader.core.util.Logger
+import com.peng.pdfreader.core.widget.BaseBottomSheetDialog
 import com.peng.pdfreader.databinding.SettingsSetDefaultSheetBinding
 
 /**

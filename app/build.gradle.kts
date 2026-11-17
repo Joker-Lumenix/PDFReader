@@ -11,6 +11,28 @@ val admobAppId = "ca-app-pub-3940256099942544~3347511713"
 val adUnitBanner = "ca-app-pub-3940256099942544/6300978111"
 val adUnitCard = "ca-app-pub-3940256099942544/6300978111"
 
+/**
+ * Whether the app carries a real firebase configuration.
+ *
+ * The repository ships a placeholder google-services.json so that the build
+ * works without credentials. The placeholder project is rejected by the sdk,
+ * so firebase is only started once the owner drops in the own file.
+ */
+val firebaseConfigured = run {
+    val file = file("google-services.json")
+    if (!file.exists()) {
+        false
+    } else {
+        runCatching {
+            val number = Regex("\"project_number\"\\s*:\\s*\"([^\"]*)\"")
+                .find(file.readText())
+                ?.groupValues
+                ?.get(1)
+            !number.isNullOrBlank() && number.trim('0').isNotEmpty()
+        }.getOrDefault(false)
+    }
+}
+
 android {
     namespace = "com.peng.pdfreader"
     compileSdk {
@@ -31,6 +53,8 @@ android {
         buildConfigField("String", "ADMOB_APP_ID", "\"$admobAppId\"")
         buildConfigField("String", "AD_UNIT_ID_BANNER", "\"$adUnitBanner\"")
         buildConfigField("String", "AD_UNIT_ID_CARD", "\"$adUnitCard\"")
+        // The firebase sdk is only started with a real configuration.
+        buildConfigField("boolean", "FIREBASE_CONFIGURED", firebaseConfigured.toString())
     }
 
     buildTypes {
@@ -54,6 +78,12 @@ android {
         unitTests.isReturnDefaultValues = true
     }
 
+    // The preview samples live in the assets of the app, the unit tests of the
+    // parsers read them from there.
+    sourceSets.getByName("test") {
+        resources.directories.add("src/main/assets")
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -70,7 +100,6 @@ kotlin {
 }
 
 dependencies {
-    implementation(project(":appcore"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.google.material)
@@ -90,8 +119,6 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.test.runner)
-    // The instrumented test parses the Office samples with the appcore parsers.
-    androidTestImplementation(project(":appcore"))
 }
 
 /**
@@ -99,21 +126,6 @@ dependencies {
  * Firebase project. As long as the placeholder configuration is used the task
  * stays switched off, so the release build works out of the box.
  */
-val firebaseConfigured = run {
-    val file = file("google-services.json")
-    if (!file.exists()) {
-        false
-    } else {
-        runCatching {
-            val number = Regex("\"project_number\"\\s*:\\s*\"([^\"]*)\"")
-                .find(file.readText())
-                ?.groupValues
-                ?.get(1)
-            !number.isNullOrBlank() && number.trim('0').isNotEmpty()
-        }.getOrDefault(false)
-    }
-}
-
 tasks.matching { it.name.contains("CrashlyticsMappingFile") || it.name.contains("CrashlyticsUpload") }
     .configureEach {
         enabled = firebaseConfigured

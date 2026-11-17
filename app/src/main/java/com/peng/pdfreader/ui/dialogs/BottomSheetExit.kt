@@ -8,10 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentManager
 import com.peng.pdfreader.R
-import com.peng.pdfreader.appcore.util.Logger
-import com.peng.pdfreader.appcore.widget.AdSlotView
+import com.peng.pdfreader.core.util.Logger
+import com.peng.pdfreader.core.widget.AdSlotView
 import com.peng.pdfreader.ads.Ads
-import com.peng.pdfreader.appcore.widget.BaseBottomSheetDialog
+import com.peng.pdfreader.core.widget.BaseBottomSheetDialog
 import com.peng.pdfreader.databinding.HomeSheetExitRetentionBinding
 import com.peng.pdfreader.ui.uiData.AdSamples
 import com.peng.pdfreader.ui.activities.ImageToPdfActivity

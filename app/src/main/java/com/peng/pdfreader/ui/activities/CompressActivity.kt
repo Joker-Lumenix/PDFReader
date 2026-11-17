@@ -8,7 +8,7 @@ import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.peng.pdfreader.R
-import com.peng.pdfreader.appcore.widget.FileListItemDecoration
+import com.peng.pdfreader.core.widget.FileListItemDecoration
 import com.peng.pdfreader.base.BaseActivity
 import com.peng.pdfreader.data.DocType
 import com.peng.pdfreader.data.Document
@@ -43,9 +43,8 @@ class CompressActivity : BaseActivity() {
         binding = ToolsActivityCompressBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.titleBar.showBack = true
-        binding.titleBar.title = getString(R.string.compress)
-        binding.titleBar.onBackClick = { onBackPressedDispatcher.onBackPressed() }
+        binding.tvTitle.text = getString(R.string.compress)
+        binding.ivBack.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
 
         binding.rvDocuments.layoutManager = LinearLayoutManager(this)
         binding.rvDocuments.adapter = adapter
@@ -62,7 +61,7 @@ class CompressActivity : BaseActivity() {
 
     private fun showPicker() {
         binding.rvDocuments.visibility = View.VISIBLE
-        binding.titleBar.title = getString(R.string.compress)
+        binding.tvTitle.text = getString(R.string.compress)
         val documents = repository.all().filter { it.type == DocType.PDF }
         adapter.submit(documents)
         if (documents.isEmpty()) {

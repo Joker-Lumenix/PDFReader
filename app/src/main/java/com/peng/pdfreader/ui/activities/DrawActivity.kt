@@ -11,8 +11,8 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.lifecycle.lifecycleScope
 import com.peng.pdfreader.R
-import com.peng.pdfreader.appcore.pdf.PdfEngine
-import com.peng.pdfreader.appcore.widget.ColorPaletteView
+import com.peng.pdfreader.core.pdf.PdfEngine
+import com.peng.pdfreader.core.widget.ColorPaletteView
 import com.peng.pdfreader.base.BaseActivity
 import com.peng.pdfreader.databinding.ActivityDrawBinding
 import com.peng.pdfreader.ui.uiData.AnnotationPayload

@@ -12,8 +12,8 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.peng.pdfreader.R
-import com.peng.pdfreader.appcore.util.Logger
-import com.peng.pdfreader.appcore.widget.BottomNavItem
+import com.peng.pdfreader.core.util.Logger
+import com.peng.pdfreader.core.widget.BottomNavItem
 import com.peng.pdfreader.base.BaseActivity
 import com.peng.pdfreader.base.BaseBackHandler
 import com.peng.pdfreader.data.Document

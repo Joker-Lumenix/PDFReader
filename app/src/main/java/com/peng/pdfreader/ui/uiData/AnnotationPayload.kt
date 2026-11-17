@@ -1,7 +1,7 @@
 package com.peng.pdfreader.ui.uiData
 
 import android.graphics.RectF
-import com.peng.pdfreader.appcore.widget.InkStroke
+import com.peng.pdfreader.core.widget.InkStroke
 import java.util.Locale
 
 /**

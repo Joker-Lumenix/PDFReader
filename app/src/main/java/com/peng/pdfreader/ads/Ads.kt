@@ -7,8 +7,8 @@ import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.LoadAdError
 import com.peng.pdfreader.BuildConfig
-import com.peng.pdfreader.appcore.util.Logger
-import com.peng.pdfreader.appcore.widget.AdSlotView
+import com.peng.pdfreader.core.util.Logger
+import com.peng.pdfreader.core.widget.AdSlotView
 
 /**
  * The ads of the app.
@@ -34,14 +34,23 @@ object Ads {
         adUnitId: String = BuildConfig.AD_UNIT_ID_BANNER,
     ) {
         val context = slot.context
-        val adView = AdView(context)
-        adView.adUnitId = adUnitId
-        adView.setAdSize(
-            AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
-                context,
-                BANNER_WIDTH_DP,
-            ),
-        )
+        // The automatic initialisation of the sdk is switched off in the
+        // manifest, so the slot starts it before it asks for an ad.
+        initialize(context)
+        val adView = runCatching {
+            AdView(context).apply {
+                this.adUnitId = adUnitId
+                setAdSize(
+                    AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(
+                        context,
+                        BANNER_WIDTH_DP,
+                    ),
+                )
+            }
+        }.getOrElse {
+            Logger.e(TAG, "the banner ad could not be created", it)
+            return
+        }
         adView.setAdListener(
             object : AdListener() {
                 override fun onAdLoaded() {
@@ -54,7 +63,8 @@ object Ads {
                 }
             },
         )
-        adView.loadAd(AdRequest.Builder().build())
+        runCatching { adView.loadAd(AdRequest.Builder().build()) }
+            .onFailure { Logger.e(TAG, "the banner ad could not be requested", it) }
     }
 
     /**
@@ -72,8 +82,13 @@ object Ads {
 
     /** Starts the ad sdk, it is called once with the application. */
     fun initialize(context: Context) {
-        com.google.android.gms.ads.MobileAds.initialize(context) {
-            Logger.d(TAG, "the ad sdk is ready")
+        runCatching {
+            com.google.android.gms.ads.MobileAds.initialize(context) {
+                Logger.d(TAG, "the ad sdk is ready")
+            }
+        }.onFailure {
+            // A missing or placeholder app id must not stop the app.
+            Logger.e(TAG, "the ad sdk could not be started", it)
         }
     }
 

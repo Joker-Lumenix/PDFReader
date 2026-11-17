@@ -16,14 +16,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.peng.pdfreader.R
-import com.peng.pdfreader.appcore.util.Logger
+import com.peng.pdfreader.core.util.Logger
 import com.peng.pdfreader.base.BaseFragment
 import com.peng.pdfreader.data.DocType
 import com.peng.pdfreader.data.Document
 import com.peng.pdfreader.data.AppPrefs
 import com.peng.pdfreader.data.DocumentRepository
 import com.peng.pdfreader.databinding.FragmentHomeBinding
-import com.peng.pdfreader.appcore.widget.FilterStripView
+import com.peng.pdfreader.core.widget.FilterStripView
 import com.peng.pdfreader.ui.uiData.FileActions
 import com.peng.pdfreader.ui.dialogs.DialogDeleteConfirm
 import com.peng.pdfreader.ui.dialogs.BottomSheetRename

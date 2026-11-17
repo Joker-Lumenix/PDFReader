@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.TextView
@@ -17,7 +16,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.peng.pdfreader.R
-import com.peng.pdfreader.appcore.pdf.PdfVault
+import com.peng.pdfreader.core.pdf.PdfVault
 import com.peng.pdfreader.data.DocType
 import com.peng.pdfreader.data.Document
 import com.peng.pdfreader.data.DocumentRepository
@@ -42,7 +41,6 @@ abstract class BaseLockActivity : BaseActivity() {
 
     private lateinit var binding: LockActivityFilePickerBinding
     private lateinit var adapter: LockFileAdapter
-    private lateinit var titleAction: ImageView
 
     private val repository by lazy { DocumentRepository.get(this) }
     private var pending: Document? = null
@@ -67,13 +65,11 @@ abstract class BaseLockActivity : BaseActivity() {
         binding = LockActivityFilePickerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.titleBar.title = getString(titleRes)
-        binding.titleBar.showBack = true
-        binding.titleBar.onBackClick = {
+        binding.tvTitle.text = getString(titleRes)
+        binding.ivBack.setOnClickListener {
             if (!handleBackPressed()) finish()
         }
-        titleAction = buildShareAction()
-        binding.titleBar.addAction(titleAction)
+        binding.ivShare.setOnClickListener { sharePendingDocument() }
 
         adapter = LockFileAdapter(
             onFileClick = ::onDocumentPicked,
@@ -111,8 +107,8 @@ abstract class BaseLockActivity : BaseActivity() {
         if (binding.resultPanel.root.visibility == View.VISIBLE) {
             binding.resultPanel.root.visibility = View.GONE
             binding.recycler.visibility = View.VISIBLE
-            binding.titleBar.title = getString(titleRes)
-            titleAction.visibility = View.VISIBLE
+            binding.tvTitle.text = getString(titleRes)
+            binding.ivShare.visibility = View.VISIBLE
             reload()
             return true
         }
@@ -128,7 +124,7 @@ abstract class BaseLockActivity : BaseActivity() {
         adapter.submit(documents)
         binding.recycler.visibility = if (documents.isEmpty()) View.GONE else View.VISIBLE
         binding.emptyState.visibility = if (documents.isEmpty()) View.VISIBLE else View.GONE
-        titleAction.visibility = if (documents.isEmpty()) View.GONE else View.VISIBLE
+        binding.ivShare.visibility = if (documents.isEmpty()) View.GONE else View.VISIBLE
     }
 
     private fun onDocumentPicked(document: Document) {
@@ -266,8 +262,8 @@ abstract class BaseLockActivity : BaseActivity() {
         }
 
         // The result is a page of its own, it shows the title of the design.
-        binding.titleBar.title = getString(R.string.result)
-        titleAction.visibility = View.GONE
+        binding.tvTitle.text = getString(R.string.result)
+        binding.ivShare.visibility = View.GONE
         pending = document
     }
 
@@ -303,19 +299,6 @@ abstract class BaseLockActivity : BaseActivity() {
             repository.importFromUri(this@BaseLockActivity, uri)
             reload()
         }
-    }
-
-    /** The action of the app bar is the share icon of the design. */
-    private fun buildShareAction(): ImageView {
-        val icon = ImageView(this)
-        icon.setImageResource(R.mipmap.ic_share_app)
-        icon.contentDescription = getString(R.string.share)
-        val size = dp(24)
-        icon.layoutParams = FrameLayout.LayoutParams(size, size).apply {
-            gravity = Gravity.CENTER_VERTICAL
-        }
-        icon.setOnClickListener { sharePendingDocument() }
-        return icon
     }
 
     /** Shares the document the page is about. */

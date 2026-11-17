@@ -63,7 +63,7 @@
                 android:contentDescription="@string/preview_save_to_document"
                 android:focusable="true">
 
-                <com.peng.pdfreader.appcore.widget.CheckMarkView
+                <com.peng.pdfreader.core.widget.CheckMarkView
                     android:id="@+id/ivDone"
                     android:layout_width="15dp"
                     android:layout_height="10dp"
@@ -82,7 +82,7 @@
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <com.peng.pdfreader.appcore.widget.DrawCanvasView
+        <com.peng.pdfreader.core.widget.DrawCanvasView
             android:id="@+id/canvas"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
@@ -153,7 +153,7 @@
                 android:layout_marginTop="2dp"
                 android:background="@color/surface_neutral_strong" />
 
-            <com.peng.pdfreader.appcore.widget.ColorPaletteView
+            <com.peng.pdfreader.core.widget.ColorPaletteView
                 android:id="@+id/palette"
                 android:layout_width="wrap_content"
                 android:layout_height="28dp"

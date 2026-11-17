@@ -10,7 +10,7 @@ import com.peng.pdfreader.data.DocType
 import com.peng.pdfreader.data.Document
 import com.peng.pdfreader.data.DocumentRepository
 import com.peng.pdfreader.databinding.ToolsDialogDocumentPickerBinding
-import com.peng.pdfreader.appcore.widget.BaseBottomSheetDialog
+import com.peng.pdfreader.core.widget.BaseBottomSheetDialog
 import com.peng.pdfreader.ui.adapter.listAdapter.DocumentPickAdapter
 
 /**

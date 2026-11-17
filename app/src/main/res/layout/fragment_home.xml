@@ -149,7 +149,7 @@
       文件类型筛选条: 全部 / PDF / Word / Excel / PPT。
       条目的几何属性都在这个自定义View里面, 见 FilterStripView 的注释。
     -->
-    <com.peng.pdfreader.appcore.widget.FilterStripView
+    <com.peng.pdfreader.core.widget.FilterStripView
         android:id="@+id/filterStrip"
         android:layout_width="match_parent"
         android:layout_height="44dp"
