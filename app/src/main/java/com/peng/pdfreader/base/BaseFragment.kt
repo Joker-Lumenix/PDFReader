@@ -22,7 +22,7 @@ abstract class BaseFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        // The page is below the status bar, see applyTopInset().
+               // 页面在状态栏下面，具体的处理见 applyTopInset()。
         applyTopInset()
         val dispatcher = requireActivity().onBackPressedDispatcher
         // Tied to the view lifecycle, the callback is removed automatically
@@ -42,34 +42,31 @@ abstract class BaseFragment : Fragment() {
     }
 
     /**
-     * Moves the top bar of the page below the status bar.
+     * 把页面的顶部标题栏移到状态栏下面。
      *
-     * From Android 15 on the app draws edge to edge, so the content of a page
-     * would start behind the status bar. The top bar of the page takes the
-     * inset as padding, its own background still reaches the status bar.
+     * 从 Android 15 开始应用是全屏绘制的，页面的内容会顶到状态栏下面。
+     * 有标题栏的页面把状态栏的高度算进标题栏，标题栏自己的背景仍然铺满
+     * 状态栏那一条，状态栏和标题栏因此是同一个颜色。
      */
     protected fun applyTopInset() {
         val root = view ?: return
-        // A page with a top bar takes the inset there, its own background still
-        // reaches the status bar. A page without one takes it at its root.
+        // 有标题栏的页面把 inset 加在标题栏上，标题栏的背景仍然铺到状态栏；
+        // 没有标题栏的页面把 inset 加在页面根布局上。
         val bar = root.findViewById<View>(R.id.topBar)
         val target = bar ?: root
         ViewCompat.setOnApplyWindowInsetsListener(target) { view, insets ->
             val top = SystemBarInsets.top(insets)
             if (bar != null) {
-                // The bar of the design is 63dp tall, the status bar sits above
-                // it: the bar grows by the inset, its content keeps its place
-                // in the design.
+                // 设计稿里的标题栏是 63dp 高，状态栏在它上面：标题栏按 inset
+                // 变高，里面的内容仍然留在设计稿的位置上。
                 if (baseHeight == 0) baseHeight = view.layoutParams.height
                 val params = view.layoutParams
                 if (params.height != baseHeight + top) {
                     params.height = baseHeight + top
                     view.layoutParams = params
                 }
-                // The content of the bar is centred in the bar, so it has to
-                // move by half of the inset - a RelativeLayout centres its
-                // children without the padding of the bar, a LinearLayout with
-                // them.
+                // 标题栏里的内容是在标题栏里居中的，所以要整体下移半个 inset：
+                // RelativeLayout 居中时不看标题栏的 padding，LinearLayout 看。
                 if (view is ViewGroup) {
                     for (index in 0 until view.childCount) {
                         view.getChildAt(index).translationY = top / 2f
@@ -83,12 +80,12 @@ abstract class BaseFragment : Fragment() {
         ViewCompat.requestApplyInsets(target)
     }
 
-    /** The height of the top bar without the inset of the status bar. */
+    /** 标题栏在没有状态栏 inset 时的高度。 */
     private var baseHeight = 0
 
     override fun onDestroyView() {
         super.onDestroyView()
-        // The view of the fragment is gone, the next one starts from scratch.
+        // 这个 fragment 的界面已经销毁，下一个界面从头开始。
         baseHeight = 0
     }
 
