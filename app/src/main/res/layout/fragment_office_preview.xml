@@ -113,7 +113,7 @@
     </FrameLayout>
 
     <LinearLayout
-        android:id="@+id/bottomToolbar"
+        android:id="@+id/bottomBar"
         android:layout_width="match_parent"
         android:layout_height="74dp"
         android:orientation="horizontal"

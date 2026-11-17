@@ -102,34 +102,76 @@ object XlsxParser {
         49 to "@",
     )
 
-    fun parse(pkg: OoxmlPackage): XlsxWorkbook? {
-        val theme = readTheme(pkg)
-        val sharedStrings = readSharedStrings(pkg)
-        val styles = readStyles(pkg, theme)
-        val workbook = pkg.node(WORKBOOK_PART)
-        val sheetNodes = workbook?.child("sheets")?.children("sheet").orEmpty()
+    fun parse(pkg: OoxmlPackage): XlsxWorkbook? = Reader(pkg).readAll()
 
-        val sheets = ArrayList<XlsxSheet>(sheetNodes.size)
-        for (index in sheetNodes.indices) {
-            val sheetNode = sheetNodes[index]
-            val name = sheetNode.attr("name") ?: "Sheet${index + 1}"
-            val part = resolveSheetPart(pkg, sheetNode, index) ?: continue
-            parseWorksheet(pkg, part, name, sharedStrings, styles, theme)?.let { sheets.add(it) }
-        }
-        if (sheets.isEmpty()) {
-            val parts = pkg.partNames()
-                .filter { it.startsWith("xl/worksheets/") && it.endsWith(".xml") }
-                .sorted()
-            for (index in parts.indices) {
-                parseWorksheet(pkg, parts[index], "Sheet${index + 1}", sharedStrings, styles, theme)
-                    ?.let { sheets.add(it) }
+    /**
+     * Reads a workbook sheet by sheet.
+     *
+     * The shared strings and the styles of the workbook are read once, the
+     * sheets are read one after the other, so the reader can show the first
+     * sheet while the rest of the workbook is still read. The package has to
+     * stay open until every sheet is read.
+     */
+    class Reader(private val pkg: OoxmlPackage) {
+
+        private val theme = readTheme(pkg)
+        private val sharedStrings = readSharedStrings(pkg)
+        private val styles = readStyles(pkg, theme)
+        private val workbook = pkg.node(WORKBOOK_PART)
+        private val sheetNodes = workbook?.child("sheets")?.children("sheet").orEmpty()
+        private val index: List<SheetIndex>
+
+        init {
+            val list = ArrayList<SheetIndex>()
+            for (position in sheetNodes.indices) {
+                val sheetNode = sheetNodes[position]
+                val name = sheetNode.attr("name") ?: "Sheet${position + 1}"
+                val part = resolveSheetPart(pkg, sheetNode, position) ?: continue
+                list += SheetIndex(name, part)
             }
+            if (list.isEmpty()) {
+                val parts = pkg.partNames()
+                    .filter { it.startsWith("xl/worksheets/") && it.endsWith(".xml") }
+                    .sorted()
+                parts.forEachIndexed { position, part ->
+                    list += SheetIndex("Sheet${position + 1}", part)
+                }
+            }
+            index = list
         }
-        if (sheets.isEmpty()) return null
 
-        val active = workbook?.child("bookViews")?.child("workbookView")?.attrInt("activeTab") ?: 0
-        return XlsxWorkbook(sheets, active.coerceIn(0, sheets.size - 1))
+        /** The number of the sheets of the workbook. */
+        val sheetCount: Int get() = index.size
+
+        /** The name of the sheet with the given index. */
+        fun sheetName(position: Int): String = index.getOrNull(position)?.name.orEmpty()
+
+        /** The index of the sheet that is shown first. */
+        val activeSheetIndex: Int
+            get() {
+                val active = workbook?.child("bookViews")?.child("workbookView")?.attrInt("activeTab") ?: 0
+                return active.coerceIn(0, maxOf(0, sheetCount - 1))
+            }
+
+        /** Reads one sheet of the workbook. */
+        fun readSheet(position: Int): XlsxSheet? {
+            val entry = index.getOrNull(position) ?: return null
+            return parseWorksheet(pkg, entry.part, entry.name, sharedStrings, styles, theme)
+        }
+
+        /** Reads the whole workbook. */
+        fun readAll(): XlsxWorkbook? {
+            val sheets = ArrayList<XlsxSheet>()
+            for (position in 0 until index.size) {
+                readSheet(position)?.let { sheets += it }
+            }
+            if (sheets.isEmpty()) return null
+            return XlsxWorkbook(sheets, activeSheetIndex.coerceIn(0, sheets.size - 1))
+        }
     }
+
+    /** The name and the part of a sheet of the workbook. */
+    data class SheetIndex(val name: String, val part: String)
 
     // ------------------------------------------------------------------ parts
 

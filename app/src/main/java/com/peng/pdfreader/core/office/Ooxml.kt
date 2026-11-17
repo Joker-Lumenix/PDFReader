@@ -5,6 +5,7 @@ import org.w3c.dom.Element
 import org.w3c.dom.Node
 import java.io.ByteArrayInputStream
 import java.io.File
+import java.io.InputStream
 import java.util.zip.ZipFile
 import javax.xml.parsers.DocumentBuilderFactory
 
@@ -55,6 +56,17 @@ class OoxmlPackage private constructor(private val zip: ZipFile) : AutoCloseable
         zip.getEntry(name)?.let { entry ->
             zip.getInputStream(entry).use { it.readBytes() }
         }
+    }.getOrNull()
+
+    /**
+     * The stream of a part.
+     *
+     * The caller has to close the stream. A streaming parser reads the big
+     * parts of a document through it, so the part never sits in the memory
+     * of the phone as a whole.
+     */
+    fun stream(name: String): InputStream? = runCatching {
+        zip.getEntry(name)?.let { entry -> zip.getInputStream(entry) }
     }.getOrNull()
 
     fun text(name: String): String? = textCache.getOrPut(name) {
@@ -131,17 +143,76 @@ class OoxmlPackage private constructor(private val zip: ZipFile) : AutoCloseable
     }
 }
 
-/** Namespace agnostic wrapper around a DOM element. */
-class OoxmlNode(val element: Element) {
+/**
+ * A node of an XML tree.
+ *
+ * The parsers of the app work with two kinds of trees: the small parts of a
+ * document are read into a DOM tree, the big parts are read with a streaming
+ * parser, which never builds a tree at all. Both are handled through this
+ * interface, so the code that reads the properties of a paragraph or of a run
+ * does not care where the tree comes from.
+ */
+interface XmlNode {
 
+    /** The name of the node, the namespace prefix is left out. */
     val localName: String
+
+    /** The text of the node and of all of its descendants. */
+    val text: String
+
+    /** The child nodes of the node. */
+    fun nodes(): List<XmlNode>
+
+    /** The child nodes with the given name. */
+    fun children(name: String): List<XmlNode>
+
+    /** The first child node with one of the given names. */
+    fun child(vararg names: String): XmlNode?
+
+    /** The attribute with one of the given names, the prefix is left out. */
+    fun attr(vararg names: String): String?
+
+    /** All the descendants of the node with the given name. */
+    fun descendants(name: String): List<XmlNode>
+
+    /** All the descendants of the node with one of the given names. */
+    fun descendants(vararg names: String): List<XmlNode> =
+        names.flatMap { descendants(it) }
+
+    /** The attribute with one of the given names as a number. */
+    fun attrInt(vararg names: String): Int? = attr(*names)?.trim()?.toDoubleOrNull()?.toInt()
+
+    /** The attribute with one of the given names as a number. */
+    fun attrLong(vararg names: String): Long? = attr(*names)?.trim()?.toDoubleOrNull()?.toLong()
+
+    /** The attribute with one of the given names as a number. */
+    fun attrFloat(vararg names: String): Float? = attr(*names)?.trim()?.toFloatOrNull()
+
+    /** The attribute with one of the given names as a flag. */
+    fun attrBool(vararg names: String): Boolean? = when (attr(*names)?.trim()?.lowercase()) {
+        "1", "true", "on" -> true
+        "0", "false", "off" -> false
+        else -> null
+    }
+
+    /** True when the node carries the given flag attribute. */
+    fun flag(vararg names: String): Boolean {
+        val value = attr(*names) ?: return false
+        return value.trim().lowercase() !in setOf("0", "false", "off")
+    }
+}
+
+/** Namespace agnostic wrapper around a DOM element. */
+class OoxmlNode(val element: Element) : XmlNode {
+
+    override val localName: String
         get() = element.localName ?: element.tagName.substringAfterLast(':')
 
     /** Concatenated text of all descendants. */
-    val text: String
+    override val text: String
         get() = element.textContent ?: ""
 
-    fun nodes(): List<OoxmlNode> {
+    override fun nodes(): List<OoxmlNode> {
         val result = ArrayList<OoxmlNode>()
         val children = element.childNodes
         for (index in 0 until children.length) {
@@ -153,16 +224,16 @@ class OoxmlNode(val element: Element) {
         return result
     }
 
-    fun children(name: String): List<OoxmlNode> = nodes().filter { it.localName == name }
+    override fun children(name: String): List<OoxmlNode> = nodes().filter { it.localName == name }
 
-    fun child(vararg names: String): OoxmlNode? {
+    override fun child(vararg names: String): OoxmlNode? {
         for (name in names) {
             nodes().firstOrNull { it.localName == name }?.let { return it }
         }
         return null
     }
 
-    fun descendants(name: String): List<OoxmlNode> {
+    override fun descendants(name: String): List<OoxmlNode> {
         val result = ArrayList<OoxmlNode>()
         fun walk(node: OoxmlNode) {
             node.nodes().forEach {
@@ -174,11 +245,8 @@ class OoxmlNode(val element: Element) {
         return result
     }
 
-    fun descendants(vararg names: String): List<OoxmlNode> =
-        names.flatMap { descendants(it) }
-
     /** Attribute lookup by local name (namespace prefixes are ignored). */
-    fun attr(vararg names: String): String? {
+    override fun attr(vararg names: String): String? {
         for (name in names) {
             val attributes = element.attributes
             for (index in 0 until attributes.length) {
@@ -191,23 +259,98 @@ class OoxmlNode(val element: Element) {
         }
         return null
     }
+}
 
-    fun attrInt(vararg names: String): Int? = attr(*names)?.trim()?.toDoubleOrNull()?.toInt()
+/**
+ * A node of a tree that was read with a streaming parser.
+ *
+ * The tree is only built for the small parts of a document - the properties of
+ * a paragraph, of a run or of a section - the body of the document is never
+ * held as a tree.
+ */
+class SaxNode internal constructor(
+    override val localName: String,
+    private val attributes: Map<String, String>,
+) : XmlNode {
 
-    fun attrLong(vararg names: String): Long? = attr(*names)?.trim()?.toDoubleOrNull()?.toLong()
+    private val children = ArrayList<SaxNode>()
+    private val textBuilder = StringBuilder()
 
-    fun attrFloat(vararg names: String): Float? = attr(*names)?.trim()?.toFloatOrNull()
+    override val text: String
+        get() = textBuilder.toString() + children.joinToString("") { it.text }
 
-    fun attrBool(vararg names: String): Boolean? = when (attr(*names)?.trim()?.lowercase()) {
-        "1", "true", "on" -> true
-        "0", "false", "off" -> false
-        else -> null
+    override fun nodes(): List<XmlNode> = children
+
+    override fun children(name: String): List<XmlNode> = children.filter { it.localName == name }
+
+    override fun child(vararg names: String): XmlNode? {
+        for (name in names) {
+            children.firstOrNull { it.localName == name }?.let { return it }
+        }
+        return null
     }
 
-    /** True when the node carries the given flag attribute (w:val style booleans). */
-    fun flag(vararg names: String): Boolean {
-        val value = attr(*names) ?: return false
-        return value.trim().lowercase() !in setOf("0", "false", "off")
+    override fun descendants(name: String): List<XmlNode> {
+        val result = ArrayList<XmlNode>()
+        fun walk(node: SaxNode) {
+            node.children.forEach {
+                if (it.localName == name) result += it
+                walk(it)
+            }
+        }
+        walk(this)
+        return result
+    }
+
+    override fun attr(vararg names: String): String? {
+        for (name in names) {
+            attributes[name]?.let { return it }
+        }
+        return null
+    }
+
+    internal fun addChild(node: SaxNode) {
+        children += node
+    }
+
+    internal fun appendText(value: String) {
+        textBuilder.append(value)
+    }
+}
+
+/**
+ * Collects a small part of a document while the parser walks over it.
+ *
+ * The collector is used for the parts that are needed as a tree: the
+ * properties of a paragraph, of a run and of a section.
+ */
+class SaxCollector {
+
+    private val stack = ArrayList<SaxNode>()
+
+    /** The tree that was collected. */
+    var root: SaxNode? = null
+        private set
+
+    /** True when the collected element is closed. */
+    val isComplete: Boolean get() = stack.isEmpty()
+
+    /** Opens an element of the collected tree. */
+    fun start(localName: String, attributes: Map<String, String>) {
+        val node = SaxNode(localName, attributes)
+        val parent = stack.lastOrNull()
+        if (parent == null) root = node else parent.addChild(node)
+        stack += node
+    }
+
+    /** Closes an element of the collected tree. */
+    fun end() {
+        if (stack.isNotEmpty()) stack.removeAt(stack.size - 1)
+    }
+
+    /** Adds text to the element that is open. */
+    fun text(value: String) {
+        stack.lastOrNull()?.appendText(value)
     }
 }
 

@@ -95,10 +95,54 @@ class XlsxPreviewView @JvmOverloads constructor(
     private var dragging = false
     private var selectedCell: Pair<Int, Int>? = null
 
+    /** The names of the sheets of the workbook. */
+    private val sheetNames = ArrayList<String>()
+
+    /** The sheets of the workbook, a sheet that is not read yet is empty. */
+    private val sheets = ArrayList<XlsxSheet?>()
+
+    /** The number of the sheets of the workbook. */
+    var sheetCount: Int = 0
+        set(value) {
+            field = value
+            while (sheets.size < value) sheets.add(null)
+            invalidate()
+        }
+
+    /** The index of the sheet that is shown first. */
+    var activeSheetIndex: Int = 0
+
+    /**
+     * Sets the name of a sheet of the workbook.
+     *
+     * The names are known before the sheets are read, so the tabs of the
+     * workbook are on the screen right away.
+     */
+    fun setSheetName(index: Int, name: String) {
+        while (sheetNames.size <= index) sheetNames.add("")
+        sheetNames[index] = name
+        invalidate()
+    }
+
+    /** Adds a sheet to the workbook. */
+    fun setSheet(index: Int, sheet: XlsxSheet) {
+        while (sheets.size <= index) sheets.add(null)
+        sheets[index] = sheet
+        if (sheetCount <= index) sheetCount = index + 1
+        invalidate()
+    }
+
     /** The workbook that is rendered. */
     var workbook: XlsxWorkbook? = null
         set(value) {
             field = value
+            sheetNames.clear()
+            sheets.clear()
+            value?.sheets?.forEach {
+                sheetNames.add(it.name)
+                sheets.add(it)
+            }
+            sheetCount = sheets.size
             sheetIndex = value?.activeSheetIndex ?: 0
             scrollX = 0f
             scrollY = 0f
@@ -108,7 +152,7 @@ class XlsxPreviewView @JvmOverloads constructor(
     /** Index of the sheet that is rendered. */
     var sheetIndex: Int = 0
         set(value) {
-            val count = workbook?.sheets?.size ?: 0
+            val count = sheets.size
             val bounded = if (count == 0) 0 else value.coerceIn(0, count - 1)
             if (field != bounded) {
                 field = bounded
@@ -132,28 +176,27 @@ class XlsxPreviewView @JvmOverloads constructor(
         isClickable = true
     }
 
-    private fun currentSheet(): XlsxSheet? = workbook?.sheets?.getOrNull(sheetIndex)
+    private fun currentSheet(): XlsxSheet? = sheets.getOrNull(sheetIndex)
 
     override fun onDraw(canvas: Canvas) {
-        val sheet = currentSheet() ?: return
+        val sheet = currentSheet()
         drawTabs(canvas)
+        if (sheet == null) return
         drawGrid(canvas, sheet)
     }
 
     private fun drawTabs(canvas: Canvas) {
-        val sheets = workbook?.sheets.orEmpty()
         canvas.drawRect(0f, 0f, width.toFloat(), tabStripHeight, tabBackgroundPaint)
         var x = dp(4f)
-        sheets.forEachIndexed { index, sheet ->
-            val label = sheet.name
+        sheetNames.forEachIndexed { index, name ->
             val paint = if (index == sheetIndex) tabActivePaint else tabPaint
             paint.textSize = dp(13f)
-            val textWidth = paint.measureText(label)
+            val textWidth = paint.measureText(name)
             if (index == sheetIndex) {
                 canvas.drawRect(x, dp(4f), x + textWidth + dp(16f), tabStripHeight - dp(2f), tabActiveBackgroundPaint)
                 canvas.drawRect(x, tabStripHeight - dp(2f), x + textWidth + dp(16f), tabStripHeight, tabIndicatorPaint)
             }
-            canvas.drawText(label, x + dp(8f), tabStripHeight - dp(10f), paint)
+            canvas.drawText(name, x + dp(8f), tabStripHeight - dp(10f), paint)
             x += textWidth + dp(24f)
         }
     }
@@ -337,9 +380,8 @@ class XlsxPreviewView @JvmOverloads constructor(
     private fun handleTap(x: Float, y: Float) {
         if (y <= tabStripHeight) {
             var tabLeft = dp(4f)
-            val sheets = workbook?.sheets.orEmpty()
-            sheets.forEachIndexed { index, sheet ->
-                val textWidth = tabPaint.measureText(sheet.name)
+            sheetNames.forEachIndexed { index, name ->
+                val textWidth = tabPaint.measureText(name)
                 if (x in tabLeft..(tabLeft + textWidth + dp(16f))) {
                     sheetIndex = index
                     return

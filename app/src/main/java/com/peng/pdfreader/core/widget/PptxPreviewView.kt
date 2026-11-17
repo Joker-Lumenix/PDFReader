@@ -44,11 +44,59 @@ class PptxPreviewView @JvmOverloads constructor(
     private val pager = ViewPager2(context)
     private val adapter = SlideAdapter()
 
+    /** The slides that are read so far. */
+    private val slides = ArrayList<PptxSlide?>()
+
+    /** The width of the deck in deck dp. */
+    private var deckWidthDp = 0f
+
+    /** The height of the deck in deck dp. */
+    private var deckHeightDp = 0f
+
+    /** The number of the slides of the deck. */
+    var slideCount: Int = 0
+        set(value) {
+            field = value
+            while (slides.size < value) slides.add(null)
+            adapter.notifyDataSetChanged()
+        }
+
+    /** The size of the deck, the slides are scaled into it. */
+    fun setDeckSize(widthDp: Float, heightDp: Float) {
+        deckWidthDp = widthDp
+        deckHeightDp = heightDp
+        invalidate()
+    }
+
+    /**
+     * Adds a slide to the deck.
+     *
+     * The slides are read one after the other, the deck grows while it is
+     * read, so the first slide is on the screen right away.
+     */
+    fun appendSlide(slide: PptxSlide) {
+        val index = slides.indexOfFirst { it == null }
+        if (index < 0) {
+            slides.add(slide)
+            slideCount = slides.size
+            adapter.notifyItemInserted(slides.size - 1)
+            return
+        }
+        slides[index] = slide
+        adapter.notifyItemChanged(index)
+    }
+
     /** The deck that is rendered. */
     var deck: PptxDeck? = null
         set(value) {
             field = value
-            adapter.deck = value
+            slides.clear()
+            value?.slides?.forEach { slides.add(it) }
+            if (value != null) {
+                deckWidthDp = value.widthDp
+                deckHeightDp = value.heightDp
+                slideCount = slides.size
+            }
             adapter.notifyDataSetChanged()
             if (value != null && value.slides.isNotEmpty()) {
                 pager.setCurrentItem(0, false)
@@ -83,8 +131,6 @@ class PptxPreviewView @JvmOverloads constructor(
 
     private inner class SlideAdapter : RecyclerView.Adapter<SlideHolder>() {
 
-        var deck: PptxDeck? = null
-
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SlideHolder {
             val view = PptxSlideView(parent.context)
             // ViewPager2 only accepts pages that fill it completely.
@@ -96,11 +142,10 @@ class PptxPreviewView @JvmOverloads constructor(
         }
 
         override fun onBindViewHolder(holder: SlideHolder, position: Int) {
-            val current = deck ?: return
-            holder.view.bind(current.slides.getOrNull(position), current)
+            holder.view.bind(slides.getOrNull(position), deckWidthDp, deckHeightDp)
         }
 
-        override fun getItemCount(): Int = deck?.slides?.size ?: 0
+        override fun getItemCount(): Int = slides.size
     }
 
     private class SlideHolder(val view: PptxSlideView) : RecyclerView.ViewHolder(view)
@@ -119,35 +164,37 @@ class PptxSlideView(context: Context) : View(context) {
     private val bulletPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     private var slide: PptxSlide? = null
-    private var deck: PptxDeck? = null
+    private var deckWidthDp = 0f
+    private var deckHeightDp = 0f
 
     /** The bitmaps of the pictures of the slide, every picture is decoded once. */
     private val bitmaps = HashMap<PptxShape.Picture, Bitmap>()
 
     /** Binds a slide to the view. */
-    fun bind(slide: PptxSlide?, deck: PptxDeck) {
+    fun bind(slide: PptxSlide?, deckWidthDp: Float, deckHeightDp: Float) {
         this.slide = slide
-        this.deck = deck
+        this.deckWidthDp = deckWidthDp
+        this.deckHeightDp = deckHeightDp
         bitmaps.clear()
         invalidate()
     }
 
     override fun onDraw(canvas: Canvas) {
         val current = slide ?: return
-        val currentDeck = deck ?: return
         if (width == 0 || height == 0) return
+        if (deckWidthDp <= 0f || deckHeightDp <= 0f) return
 
         val scale = min(
-            width / currentDeck.widthDp.coerceAtLeast(1f),
-            height / currentDeck.heightDp.coerceAtLeast(1f),
+            width / deckWidthDp.coerceAtLeast(1f),
+            height / deckHeightDp.coerceAtLeast(1f),
         )
-        val left = (width - currentDeck.widthDp * scale) / 2f
-        val top = (height - currentDeck.heightDp * scale) / 2f
+        val left = (width - deckWidthDp * scale) / 2f
+        val top = (height - deckHeightDp * scale) / 2f
         val slideRect = RectF(
             left,
             top,
-            left + currentDeck.widthDp * scale,
-            top + currentDeck.heightDp * scale,
+            left + deckWidthDp * scale,
+            top + deckHeightDp * scale,
         )
 
         current.background?.let {

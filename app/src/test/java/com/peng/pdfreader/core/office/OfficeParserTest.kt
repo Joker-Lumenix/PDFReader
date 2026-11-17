@@ -1,7 +1,13 @@
 package com.peng.pdfreader.core.office
 
 import com.peng.pdfreader.core.office.docx.DocxBlock
+import com.peng.pdfreader.core.office.docx.DocxBodyReader
+import com.peng.pdfreader.core.office.docx.DocxDocument
+import com.peng.pdfreader.core.office.docx.DocxImageReader
+import com.peng.pdfreader.core.office.docx.DocxNumberingTable
 import com.peng.pdfreader.core.office.docx.DocxParser
+import com.peng.pdfreader.core.office.docx.DocxSection
+import com.peng.pdfreader.core.office.docx.DocxStyleTable
 import com.peng.pdfreader.core.office.pptx.PptxParser
 import com.peng.pdfreader.core.office.pptx.PptxShape
 import com.peng.pdfreader.core.office.xlsx.XlsxParser
@@ -45,6 +51,68 @@ class OfficeParserTest {
             "the document should have a table",
             blocks.any { it is DocxBlock.Table },
         )
+    }
+
+    /**
+     * The streaming parser and the tree reader have to deliver the same
+     * document.
+     *
+     * The tree reader is the fallback for the platforms whose streaming
+     * parser is not available, so both of them have to read the document the
+     * same way.
+     */
+    @Test
+    fun theWordDocumentIsTheSameWhenItIsReadAsATree() {
+        val pkg = OoxmlPackage.open(sample(SAMPLE_DOCX)) ?: error("package not readable")
+        val streamed = DocxParser.parse(pkg)
+        val tree = readAsTree(pkg)
+        pkg.close()
+
+        assertNotNull("the document should parse", streamed)
+        assertNotNull("the document should parse as a tree", tree)
+        assertEquals("the same number of blocks", streamed!!.blocks.size, tree!!.blocks.size)
+        assertEquals(
+            "the same text",
+            textOf(streamed.blocks),
+            textOf(tree.blocks),
+        )
+        assertEquals(
+            "the same headings",
+            streamed.blocks.filterIsInstance<DocxBlock.Paragraph>().map { it.headingLevel },
+            tree.blocks.filterIsInstance<DocxBlock.Paragraph>().map { it.headingLevel },
+        )
+    }
+
+    /** Reads the sample with the reader that walks over a tree. */
+    private fun readAsTree(pkg: OoxmlPackage): DocxDocument? {
+        val styles = DocxStyleTable.parse(pkg.node("word/styles.xml"))
+        val numbering = DocxNumberingTable.parse(pkg.node("word/numbering.xml"))
+        val reader = DocxBodyReader(styles, numbering, DocxImageReader(pkg))
+        if (!reader.readTree(pkg.node("word/document.xml"))) return null
+        val section = reader.section ?: DocxSection()
+        return DocxDocument(
+            title = "",
+            pageWidthPt = section.widthPt,
+            pageHeightPt = section.heightPt,
+            marginTopPt = section.topPt,
+            marginBottomPt = section.bottomPt,
+            marginLeftPt = section.leftPt,
+            marginRightPt = section.rightPt,
+            defaultFontPt = styles.defaultRun.sizePt ?: 11f,
+            blocks = reader.blocks,
+        )
+    }
+
+    /** The text of the blocks of a document. */
+    private fun textOf(blocks: List<DocxBlock>): String = blocks.joinToString("\n") { block ->
+        when (block) {
+            is DocxBlock.Paragraph -> block.runs.joinToString("") { it.text }
+            is DocxBlock.Table -> block.rows.flatten().joinToString("|") { cell ->
+                cell.blocks.filterIsInstance<DocxBlock.Paragraph>()
+                    .joinToString("") { paragraph -> paragraph.runs.joinToString("") { it.text } }
+            }
+            is DocxBlock.Image -> "image"
+        }
     }
 
     @Test

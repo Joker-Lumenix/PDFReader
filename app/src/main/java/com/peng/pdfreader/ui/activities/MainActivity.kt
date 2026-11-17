@@ -44,10 +44,17 @@ import kotlinx.coroutines.withContext
 class MainActivity : BaseActivity() {
 
     /**
-     * The tabs of the app have a top bar of their own and take the inset of
-     * the status bar there, the shell must not move them a second time.
+     * The tabs of the app have a top bar of their own and take the inset of the
+     * status bar there, the shell must not move them a second time.
      */
     override val takesStatusBarInset: Boolean = false
+
+    /**
+     * The bottom navigation bar takes the inset of the navigation bar itself,
+     * the shell must not move its content a second time.
+     */
+    override val takesBottomInset: Boolean = false
+
 
     private lateinit var binding: ActivityMainBinding
 

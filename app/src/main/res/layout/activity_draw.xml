@@ -93,7 +93,7 @@
       The first row carries the stroke sizes, the second one the colours.
     -->
     <LinearLayout
-        android:id="@+id/toolBar"
+        android:id="@+id/bottomBar"
         android:layout_width="match_parent"
         android:layout_height="117dp"
         android:orientation="vertical"

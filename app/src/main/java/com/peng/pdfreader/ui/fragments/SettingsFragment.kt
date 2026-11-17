@@ -29,6 +29,12 @@ import com.peng.pdfreader.utils.SettingsScreen
  */
 class SettingsFragment : BaseFragment() {
 
+    /**
+     * The tab sits above the bottom navigation bar of the shell, the bar takes
+     * the inset of the navigation bar itself.
+     */
+    override val takesBottomInset: Boolean = false
+
     private var _binding: SettingsFragmentBinding? = null
     private val binding get() = _binding!!
 

@@ -18,10 +18,8 @@ import com.peng.pdfreader.R
 import com.peng.pdfreader.core.office.OoxmlPackage
 import com.peng.pdfreader.core.office.docx.DocxDocument
 import com.peng.pdfreader.core.office.docx.DocxParser
-import com.peng.pdfreader.core.office.pptx.PptxDeck
 import com.peng.pdfreader.core.office.pptx.PptxParser
 import com.peng.pdfreader.core.office.xlsx.XlsxParser
-import com.peng.pdfreader.core.office.xlsx.XlsxWorkbook
 import com.peng.pdfreader.core.util.Logger
 import com.peng.pdfreader.core.widget.DocxPreviewView
 import com.peng.pdfreader.core.widget.PptxPreviewView
@@ -42,6 +40,7 @@ import com.peng.pdfreader.utils.PreviewTitleActions
 import java.io.File
 import com.peng.pdfreader.ui.activities.CompressActivity
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
@@ -64,11 +63,10 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
     /** The sheet, slide or page that is on screen. */
     private var currentIndex = 0
 
-    private sealed interface Parsed {
-        class Docx(val document: DocxDocument) : Parsed
-        class Pptx(val deck: PptxDeck) : Parsed
-        class Xlsx(val workbook: XlsxWorkbook) : Parsed
-        class Text(val content: String) : Parsed
+    /** The content of a Word document: the document itself or its text. */
+    private sealed interface WordContent {
+        class Document(val value: DocxDocument) : WordContent
+        class Text(val value: String) : WordContent
     }
 
     override fun onCreateView(
@@ -304,45 +302,166 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
     private fun loadDocument() {
         val doc = document ?: return
         viewLifecycleOwner.lifecycleScope.launch {
-            val parsed = withContext(Dispatchers.IO) {
-                try {
-                    parse(doc)
-                } catch (error: OutOfMemoryError) {
-                    // A big document does not fit into the memory of the phone.
-                    Logger.e(TAG, "the document ${doc.name} is too big to be previewed")
-                    null
-                }
-            }
-            if (_binding == null) return@launch
-            if (parsed == null) {
-                showError()
-                return@launch
-            }
-            when (parsed) {
-                is Parsed.Docx -> showDocx(parsed.document)
-                is Parsed.Pptx -> showPptx(parsed.deck)
-                is Parsed.Xlsx -> showXlsx(parsed.workbook)
-                is Parsed.Text -> showText(parsed.content)
+            when (doc.type) {
+                DocType.WORD -> loadWord(doc)
+                DocType.PPT -> loadPresentation(doc)
+                DocType.EXCEL -> loadWorkbook(doc)
+                DocType.TXT -> loadText(doc)
+                else -> showError()
             }
         }
     }
 
-    private fun parse(doc: Document): Parsed? {
+    /**
+     * Reads a Word document.
+     *
+     * The document is parsed on a background thread, the pages of the
+     * document are laid out afterwards, page by page.
+     */
+    private suspend fun loadWord(doc: Document) {
+        val parsed = withContext(Dispatchers.IO) {
+            try {
+                parseWord(doc)
+            } catch (error: OutOfMemoryError) {
+                // A big document does not fit into the memory of the phone.
+                Logger.e(TAG, "the document ${doc.name} is too big to be previewed")
+                null
+            }
+        }
+        if (_binding == null) return
+        if (parsed == null) {
+            showError()
+            return
+        }
+        when (parsed) {
+            is WordContent.Document -> showDocx(parsed.value)
+            is WordContent.Text -> showText(parsed.value)
+        }
+    }
+
+    /**
+     * Reads a presentation.
+     *
+     * The slides are read one after the other, the first one is on the screen
+     * while the rest of the deck is still read.
+     */
+    private suspend fun loadPresentation(doc: Document) {
+        val file = repository.fileOf(doc)
+        if (!file.exists()) {
+            showError()
+            return
+        }
+        val pkg = withContext(Dispatchers.IO) { OoxmlPackage.open(file) }
+        if (pkg == null) {
+            showError()
+            return
+        }
+        val reader = withContext(Dispatchers.IO) { PptxParser.Reader(pkg) }
+        val preview = PptxPreviewView(requireContext())
+        preview.setDeckSize(reader.widthDp, reader.heightDp)
+        preview.slideCount = reader.slideCount
+        preview.onSlideChanged = { slide -> currentIndex = slide }
+        showContent(preview)
+        try {
+            for (index in 0 until reader.slideCount) {
+                val slide = withContext(Dispatchers.IO) { reader.readSlide(index) } ?: continue
+                if (_binding == null) return
+                preview.appendSlide(slide)
+            }
+        } finally {
+            withContext(NonCancellable + Dispatchers.IO) { pkg.close() }
+        }
+    }
+
+    /**
+     * Reads a spreadsheet.
+     *
+     * The sheets are read one after the other, the first one is on the screen
+     * while the rest of the workbook is still read.
+     */
+    private suspend fun loadWorkbook(doc: Document) {
+        val file = repository.fileOf(doc)
+        if (!file.exists()) {
+            showError()
+            return
+        }
+        val pkg = withContext(Dispatchers.IO) { OoxmlPackage.open(file) }
+        if (pkg == null) {
+            showError()
+            return
+        }
+        val reader = withContext(Dispatchers.IO) { XlsxParser.Reader(pkg) }
+        val preview = XlsxPreviewView(requireContext())
+        preview.sheetCount = reader.sheetCount
+        preview.sheetIndex = reader.activeSheetIndex
+        for (index in 0 until reader.sheetCount) {
+            preview.setSheetName(index, reader.sheetName(index))
+        }
+        preview.onSheetChanged = { sheet -> currentIndex = sheet }
+        showContent(preview)
+        try {
+            for (index in 0 until reader.sheetCount) {
+                val sheet = withContext(Dispatchers.IO) { reader.readSheet(index) } ?: continue
+                if (_binding == null) return
+                preview.setSheet(index, sheet)
+            }
+        } finally {
+            withContext(NonCancellable + Dispatchers.IO) { pkg.close() }
+        }
+    }
+
+    /**
+     * Reads a text document.
+     *
+     * Only the beginning of a big file is read, the rest of it would not fit
+     * into the memory of the phone.
+     */
+    private suspend fun loadText(doc: Document) {
+        val file = repository.fileOf(doc)
+        if (!file.exists()) {
+            showError()
+            return
+        }
+        val content = withContext(Dispatchers.IO) { readText(file) }
+        if (_binding == null) return
+        if (content == null) {
+            showError()
+            return
+        }
+        showText(content)
+    }
+
+    /**
+     * The text of a text document.
+     *
+     * The file is read line by line, so a big file does not fill the memory
+     * of the phone at once.
+     */
+    private fun readText(file: File): String? {
+        return try {
+            val builder = StringBuilder()
+            file.bufferedReader().use { reader ->
+                var line = reader.readLine() ?: return null
+                while (true) {
+                    builder.append(line).append('\n')
+                    if (builder.length > MAX_TEXT_LENGTH) break
+                    line = reader.readLine() ?: break
+                }
+            }
+            builder.toString()
+        } catch (error: Exception) {
+            Logger.e(TAG, "the text file could not be read", error)
+            null
+        }
+    }
+
+    private fun parseWord(doc: Document): WordContent? {
         val file = repository.fileOf(doc)
         if (!file.exists()) return null
-        if (doc.type == DocType.TXT) {
-            val content = runCatching { file.readText() }.getOrNull() ?: return null
-            return Parsed.Text(content)
-        }
         return try {
             val pkg = OoxmlPackage.open(file) ?: return textFallback(doc, file)
             try {
-                when (doc.type) {
-                    DocType.WORD -> DocxParser.parse(pkg)?.let { Parsed.Docx(it) }
-                    DocType.PPT -> PptxParser.parse(pkg)?.let { Parsed.Pptx(it) }
-                    DocType.EXCEL -> XlsxParser.parse(pkg)?.let { Parsed.Xlsx(it) }
-                    else -> null
-                } ?: textFallback(doc, file)
+                DocxParser.parse(pkg)?.let { WordContent.Document(it) } ?: textFallback(doc, file)
             } finally {
                 pkg.close()
             }
@@ -363,10 +482,10 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
      * The text is read with a streaming parser, so it needs only a little
      * memory.
      */
-    private fun textFallback(doc: Document, file: File): Parsed? {
+    private fun textFallback(doc: Document, file: File): WordContent? {
         val lines = OfficeText.lines(file)
         if (lines.isEmpty()) return null
-        return Parsed.Text(lines.joinToString("\n"))
+        return WordContent.Text(lines.joinToString("\n"))
     }
 
     private fun showLoading() {
@@ -393,29 +512,8 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
     private fun showDocx(document: DocxDocument) {
         val preview = DocxPreviewView(requireContext())
         preview.document = document
-        val scroll = ScrollView(requireContext())
-        scroll.addView(preview)
-        scroll.setOnScrollChangeListener { _, _, scrollY, _, _ -> preview.updateScrollOffset(scrollY) }
         preview.onPageChanged = { page ->
             currentIndex = page
-        }
-        showContent(scroll)
-    }
-
-    private fun showPptx(deck: PptxDeck) {
-        val preview = PptxPreviewView(requireContext())
-        preview.deck = deck
-        preview.onSlideChanged = { slide ->
-            currentIndex = slide
-        }
-        showContent(preview)
-    }
-
-    private fun showXlsx(workbook: XlsxWorkbook) {
-        val preview = XlsxPreviewView(requireContext())
-        preview.workbook = workbook
-        preview.onSheetChanged = { sheet ->
-            currentIndex = sheet
         }
         showContent(preview)
     }
@@ -443,6 +541,14 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
 
     companion object {
         private const val ARG_DOC_ID = "com.peng.pdfreader.extra.DOC_ID"
+
+        /**
+         * The number of the characters of a text document that are read.
+         *
+         * A text document can be very big, the preview shows the beginning
+         * of it.
+         */
+        private const val MAX_TEXT_LENGTH = 2 * 1024 * 1024
 
         private const val ACTION_RENAME = "rename"
         private const val ACTION_OPEN_WITH = "open_with"

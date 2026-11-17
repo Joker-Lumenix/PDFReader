@@ -52,6 +52,12 @@ import kotlinx.coroutines.withContext
  */
 class HomeFragment : BaseFragment() {
 
+    /**
+     * The tab sits above the bottom navigation bar of the shell, the bar takes
+     * the inset of the navigation bar itself.
+     */
+    override val takesBottomInset: Boolean = false
+
     /** Raised when a quick action card is tapped. */
     var onQuickAction: ((QuickAction) -> Unit)? = null
 

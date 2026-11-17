@@ -30,6 +30,12 @@ class PreviewActivity : BaseActivity() {
      */
     override val takesStatusBarInset: Boolean = false
 
+    /**
+     * The readers have a bottom bar of their own and take the inset of the
+     * navigation bar there, the host must not move them a second time.
+     */
+    override val takesBottomInset: Boolean = false
+
     private lateinit var binding: ActivityPreviewBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {

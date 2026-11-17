@@ -127,34 +127,69 @@ object PptxParser {
      */
     private const val MAX_SLIDES = 200
 
-    fun parse(pkg: OoxmlPackage): PptxDeck? {
-        val presentation = pkg.node("ppt/presentation.xml") ?: return null
-        val theme = OfficeColors.readTheme(pkg)
-        val fonts = readThemeFonts(pkg)
-        val sizeNode = presentation.child("sldSz")
-            ?: presentation.descendants("sldSz").firstOrNull()
-        val cx = sizeNode?.attrLong("cx") ?: DEFAULT_SLIDE_CX
-        val cy = sizeNode?.attrLong("cy") ?: DEFAULT_SLIDE_CY
-        val slides = parseSlides(pkg, presentation, theme, fonts)
-        if (slides.isEmpty()) return null
-        return PptxDeck(
-            slides = slides,
-            widthDp = cx.toDp(),
-            heightDp = cy.toDp(),
-            title = readTitle(pkg),
-        )
+    fun parse(pkg: OoxmlPackage): PptxDeck? = Reader(pkg).readAll()
+
+    /**
+     * Reads a deck slide by slide.
+     *
+     * The slides of a big deck are read one after the other, so the reader
+     * can show the first slide while the rest of the deck is still read. The
+     * package has to stay open until every slide is read.
+     */
+    class Reader(private val pkg: OoxmlPackage) {
+
+        private val theme = OfficeColors.readTheme(pkg)
+        private val fonts = readThemeFonts(pkg)
+
+        /** The parts of the slides of the deck. */
+        private val parts: List<String>
+
+        /** The width of the deck in deck dp. */
+        val widthDp: Float
+
+        /** The height of the deck in deck dp. */
+        val heightDp: Float
+
+        /** The title of the deck. */
+        val title: String
+
+        init {
+            val presentation = pkg.node("ppt/presentation.xml")
+            val sizeNode = presentation?.child("sldSz")
+                ?: presentation?.descendants("sldSz")?.firstOrNull()
+            val cx = sizeNode?.attrLong("cx") ?: DEFAULT_SLIDE_CX
+            val cy = sizeNode?.attrLong("cy") ?: DEFAULT_SLIDE_CY
+            widthDp = cx.toDp()
+            heightDp = cy.toDp()
+            title = readTitle(pkg)
+            parts = slideParts(pkg, presentation)
+        }
+
+        /** The number of the slides of the deck. */
+        val slideCount: Int get() = parts.size
+
+        /** Reads one slide of the deck. */
+        fun readSlide(index: Int): PptxSlide? {
+            val part = parts.getOrNull(index) ?: return null
+            val node = pkg.node(part) ?: return null
+            return parseSlide(pkg, part, node, index + 1, theme, fonts)
+        }
+
+        /** Reads the whole deck. */
+        fun readAll(): PptxDeck? {
+            val slides = ArrayList<PptxSlide>()
+            for (index in 0 until minOf(parts.size, MAX_SLIDES)) {
+                readSlide(index)?.let { slides += it }
+            }
+            if (slides.isEmpty()) return null
+            return PptxDeck(slides = slides, widthDp = widthDp, heightDp = heightDp, title = title)
+        }
     }
 
-    // ---------------------------------------------------------------- slides
-
-    private fun parseSlides(
-        pkg: OoxmlPackage,
-        presentation: OoxmlNode,
-        theme: Map<String, OfficeColor>,
-        fonts: ThemeFonts,
-    ): List<PptxSlide> {
+    /** The parts of the slides of the deck, in the order of the deck. */
+    private fun slideParts(pkg: OoxmlPackage, presentation: OoxmlNode?): List<String> {
         val parts = ArrayList<String>()
-        val idList = presentation.child("sldIdLst")
+        val idList = presentation?.child("sldIdLst")
         if (idList != null) {
             idList.children("sldId").forEach { sldId ->
                 val relId = sldId.relAttr("id") ?: return@forEach
@@ -168,16 +203,10 @@ object PptxParser {
                 .sortedBy { it.slideNumber() }
                 .forEach { parts += it }
         }
-        val result = ArrayList<PptxSlide>()
-        var index = 0
-        parts.forEach { part ->
-            if (index >= MAX_SLIDES) return@forEach
-            val node = pkg.node(part) ?: return@forEach
-            index += 1
-            result += parseSlide(pkg, part, node, index, theme, fonts)
-        }
-        return result
+        return parts
     }
+
+    // ---------------------------------------------------------------- slides
 
     private fun parseSlide(
         pkg: OoxmlPackage,

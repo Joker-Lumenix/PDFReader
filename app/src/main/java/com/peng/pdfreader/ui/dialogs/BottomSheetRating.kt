@@ -32,6 +32,12 @@ import com.peng.pdfreader.ui.activities.FeedbackActivity
  */
 class BottomSheetRating : BaseBottomSheetDialog() {
 
+    /**
+     * The illustration of the design stands on the scrim of the page, so the
+     * sheet has no surface of its own.
+     */
+    override val hasSurface: Boolean = false
+
     private var _binding: SettingsRatingSheetBinding? = null
     private val binding get() = _binding!!
 

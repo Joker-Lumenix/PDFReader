@@ -4,10 +4,11 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.view.WindowInsets
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.view.ViewCompat
+import androidx.core.view.updatePadding
 import com.peng.pdfreader.R
 import com.peng.pdfreader.core.util.SystemBarInsets
 
@@ -43,12 +44,12 @@ class BottomNavBar @JvmOverloads constructor(
      * bar; the bar takes its inset as padding and grows by it.
      */
     private fun applySystemBarInset() {
-        setOnApplyWindowInsetsListener { view, insets ->
-            val bottom = SystemBarInsets.bottom(insets)
-            view.setPadding(0, 0, 0, bottom)
+        val base = paddingBottom
+        ViewCompat.setOnApplyWindowInsetsListener(this) { view, insets ->
+            view.updatePadding(bottom = base + SystemBarInsets.bottom(insets))
             insets
         }
-        requestApplyInsets()
+        ViewCompat.requestApplyInsets(this)
     }
 
     /**

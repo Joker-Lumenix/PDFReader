@@ -92,7 +92,7 @@
         android:background="@color/surface_hairline" />
 
     <LinearLayout
-        android:id="@+id/selectBar"
+        android:id="@+id/bottomBar"
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:background="@color/surface_card"

@@ -156,7 +156,7 @@
     <!-- The bottom bar of the design: 74dp tall, four icons on fixed spots. -->
 
     <LinearLayout
-        android:id="@+id/bottomToolbar"
+        android:id="@+id/bottomBar"
         android:layout_width="match_parent"
         android:layout_height="74dp"
         android:orientation="horizontal"

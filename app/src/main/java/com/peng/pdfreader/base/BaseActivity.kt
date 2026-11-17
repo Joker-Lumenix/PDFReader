@@ -9,10 +9,7 @@ import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.view.ViewCompat
-import androidx.core.view.updatePadding
 import com.peng.pdfreader.R
-import com.peng.pdfreader.core.util.SystemBarInsets
 
 /**
  * Base activity of the app.
@@ -24,6 +21,9 @@ import com.peng.pdfreader.core.util.SystemBarInsets
  * package.
  */
 abstract class BaseActivity : AppCompatActivity() {
+
+    /** The insets of the system bars of the page. */
+    private val insets = PageInsets()
 
     private val backCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -42,23 +42,24 @@ abstract class BaseActivity : AppCompatActivity() {
     }
 
     /**
-     * 页面的内容设置好之后，把顶部标题栏移到状态栏下面。
+     * 页面的内容设置好之后，把顶部标题栏移到状态栏下面，
+     * 把底部工具栏移到导航栏上面。
      *
-     * 从 Android 15 开始应用是全屏绘制的，页面的内容会顶到状态栏下面。
+     * 从 Android 15 开始应用是全屏绘制的，页面的内容会顶到状态栏和导航栏下面。
      */
     override fun setContentView(view: View?) {
         super.setContentView(view)
-        applyTopInset()
+        applyInsets()
     }
 
     override fun setContentView(view: View?, params: android.view.ViewGroup.LayoutParams?) {
         super.setContentView(view, params)
-        applyTopInset()
+        applyInsets()
     }
 
     override fun setContentView(layoutResID: Int) {
         super.setContentView(layoutResID)
-        applyTopInset()
+        applyInsets()
     }
 
     /**
@@ -70,47 +71,29 @@ abstract class BaseActivity : AppCompatActivity() {
     protected open val takesStatusBarInset: Boolean = true
 
     /**
-     * 把页面的顶部标题栏移到状态栏下面。
+     * 页面自己处理导航栏的 inset。
      *
-     * 从 Android 15 开始应用是全屏绘制的，页面的内容会顶到状态栏下面。
-     * 有标题栏的页面把状态栏的高度算进标题栏，标题栏自己的背景仍然铺满
-     * 状态栏那一条，状态栏和标题栏因此是同一个颜色。
+     * 有底部工具栏的页面把 inset 加在工具栏上，没有的页面把 inset 加在页面
+     * 根布局上。承载 fragment 的页面由 fragment 处理，壳由底部导航栏处理。
      */
-    protected fun applyTopInset() {
-        if (!takesStatusBarInset) return
-        // 有标题栏的页面把 inset 加在标题栏上，标题栏的背景仍然铺到状态栏；
-        // 没有标题栏的页面把 inset 加在页面根布局上。
-        val content = findViewById<ViewGroup>(android.R.id.content)
-        val bar = findViewById<View>(R.id.topBar)
-        val target = bar ?: (content?.getChildAt(0) as? View) ?: return
-        ViewCompat.setOnApplyWindowInsetsListener(target) { view, insets ->
-            val top = SystemBarInsets.top(insets)
-            if (bar != null) {
-                // 设计稿里的标题栏是 63dp 高，状态栏在它上面：标题栏按 inset
-                // 变高，里面的内容仍然留在设计稿的位置上。
-                if (baseHeight == 0) baseHeight = view.layoutParams.height
-                val params = view.layoutParams
-                if (params.height != baseHeight + top) {
-                    params.height = baseHeight + top
-                    view.layoutParams = params
-                }
-                // 标题栏里的内容是在标题栏里居中的，所以要整体下移半个 inset：
-                // RelativeLayout 居中时不看标题栏的 padding，LinearLayout 看。
-                if (view is ViewGroup) {
-                    for (index in 0 until view.childCount) {
-                        view.getChildAt(index).translationY = top / 2f
-                    }
-                }
-            } else {
-                view.updatePadding(top = top)
-            }
-            insets
-        }
-        ViewCompat.requestApplyInsets(target)
-    }
+    protected open val takesBottomInset: Boolean = true
 
-    /** 标题栏在没有状态栏 inset 时的高度。 */
-    private var baseHeight = 0
+    /**
+     * 把页面移到系统栏的下面。
+     *
+     * 从 Android 15 开始应用是全屏绘制的，页面的内容会顶到状态栏和导航栏下面。
+     * 有标题栏的页面把状态栏的高度算进标题栏，标题栏自己的背景仍然铺满
+     * 状态栏那一条，状态栏和标题栏因此是同一个颜色。底部工具栏拿导航栏的
+     * 高度的方式是一样的。
+     */
+    protected fun applyInsets() {
+        if (!takesStatusBarInset && !takesBottomInset) return
+        val content = findViewById<ViewGroup>(android.R.id.content)
+        val root = content?.getChildAt(0) as? View ?: return
+        val topBar = if (takesStatusBarInset) findViewById<View>(R.id.topBar) else null
+        val bottomBar = if (takesBottomInset) findViewById<View>(R.id.bottomBar) else null
+        insets.apply(root, topBar, bottomBar, takesStatusBarInset, takesBottomInset)
+    }
 
     /**
      * Back key interception.

@@ -7,14 +7,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewOutlineProvider
 import android.widget.FrameLayout
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.updatePadding
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.peng.pdfreader.R
+import com.peng.pdfreader.core.util.SystemBarInsets
 
 /**
  * Base class for every bottom sheet of the app.
@@ -64,6 +66,10 @@ abstract class BaseBottomSheetDialog(
     override fun onCreateDialog(savedInstanceState: Bundle?): android.app.Dialog {
         val dialog = BottomSheetDialog(requireContext(), theme)
         dialog.setCanceledOnTouchOutside(dismissOnClickOutside)
+        // The window must not paint a surface of its own. Material gives the
+        // window a white panel and that panel shows behind the rounded top
+        // corners of the design, which makes them look square.
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         isCancelable = dismissOnBackPress
         return dialog
     }
@@ -82,11 +88,10 @@ abstract class BaseBottomSheetDialog(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT,
         )
-        // The surface of the design (16dp radius at the top) belongs to the
-        // sheet, the content of the sheet must not cover those corners.
-        sheet.background = ContextCompat.getDrawable(requireContext(), R.drawable.bg_sheet_top_r16)
-        sheet.clipToOutline = true
-        sheet.outlineProvider = ViewOutlineProvider.BACKGROUND
+        // The surface of the design is the background of the container itself
+        // (16dp radius at the top, square corners at the bottom). The panel
+        // of the dialog stays transparent, see onStart.
+        sheetContainer = sheet
         val content = createContentView(inflater, sheet)
         content.background = null
         sheet.addView(content)
@@ -95,14 +100,7 @@ abstract class BaseBottomSheetDialog(
 
     override fun onStart() {
         super.onStart()
-        // The container draws the rounded surface itself, so the default sheet
-        // background has to go.
         dialog?.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)?.apply {
-            background = ContextCompat.getDrawable(requireContext(), R.drawable.bg_sheet_top_r16)
-            // The 16dp radius at the top of the design: the sheet is cut with
-            // the outline of its own background.
-            clipToOutline = true
-            outlineProvider = ViewOutlineProvider.BACKGROUND
             // The sheet has to grow with its content and it has to stay above
             // the keyboard, the design shows it right above it.
             val behavior = BottomSheetBehavior.from(this)
@@ -117,6 +115,21 @@ abstract class BaseBottomSheetDialog(
             if (behavior.state != BottomSheetBehavior.STATE_EXPANDED) {
                 behavior.state = BottomSheetBehavior.STATE_EXPANDED
             }
+            // The panel of the Material dialog paints a surface of its own.
+            // It is cleared here, so the only surface that is visible is the
+            // one of the container: the panel of the design, a white surface
+            // with a 16dp radius at the top and square corners at the bottom.
+            //
+            // The window is transparent as well, so nothing shows behind the
+            // rounded top corners.
+            background = null
+            dialog?.window?.decorView?.setBackgroundColor(Color.TRANSPARENT)
+            sheetContainer?.background = if (hasSurface) {
+                ContextCompat.getDrawable(requireContext(), R.drawable.bg_sheet_top_r16)
+            } else {
+                null
+            }
+            applyNavigationBarInset()
         }
         // Tapping the page behind the sheet closes it.
         dialog?.findViewById<View>(com.google.android.material.R.id.touch_outside)
@@ -124,6 +137,33 @@ abstract class BaseBottomSheetDialog(
                 if (dismissOnClickOutside) dismissAllowingStateLoss()
             }
     }
+
+    /**
+     * The bottom of the sheet stays above the navigation bar.
+     *
+     * The app is drawn edge to edge, so on Android 15 and later the sheet
+     * reaches the bottom of the screen and the navigation bar would cover its
+     * last row. The inset is added to the padding of the container. Before
+     * Android 15 the window of the dialog is already inset by the system and
+     * the inset is zero, so nothing changes there.
+     */
+    private fun applyNavigationBarInset() {
+        val container = sheetContainer ?: return
+        val base = container.paddingBottom
+        ViewCompat.setOnApplyWindowInsetsListener(container) { view, insets ->
+            view.updatePadding(bottom = base + SystemBarInsets.bottom(insets))
+            insets
+        }
+        ViewCompat.requestApplyInsets(container)
+    }
+
+    /**
+     * Whether the sheet shows the surface of the design.
+     *
+     * The rating sheet stands on the scrim of the page, it has no surface of
+     * its own.
+     */
+    protected open val hasSurface: Boolean = true
 
     /** The height of the screen, a sheet never grows beyond it. */
     protected fun screenHeight(): Int = resources.displayMetrics.heightPixels
@@ -142,6 +182,7 @@ abstract class BaseBottomSheetDialog(
 
         /** Argument key of the "back press to dismiss" switch. */
         const val ARG_DISMISS_ON_BACK = "com.peng.pdfreader.core.DISMISS_ON_BACK"
+
     }
 }
 
@@ -210,3 +251,8 @@ abstract class BaseAlertDialog(
     private fun dp(value: Int): Int =
         (value * resources.displayMetrics.density).toInt()
 }
+
+
+
+
+

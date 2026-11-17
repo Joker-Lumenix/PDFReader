@@ -48,7 +48,7 @@ class DrawActivity : BaseActivity() {
             updateHistoryButtons()
         }
 
-        binding.toolBar.background = GradientDrawable().apply {
+        binding.bottomBar.background = GradientDrawable().apply {
             cornerRadii = floatArrayOf(dp(16f), dp(16f), dp(16f), dp(16f), 0f, 0f, 0f, 0f)
             setColor(TOOLBAR_BACKGROUND)
         }

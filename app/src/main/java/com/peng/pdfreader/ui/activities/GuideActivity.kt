@@ -12,7 +12,6 @@ import androidx.core.content.ContextCompat
 import androidx.viewpager2.widget.ViewPager2
 import com.peng.pdfreader.R
 import com.peng.pdfreader.core.util.Logger
-import com.peng.pdfreader.core.util.SystemBarInsets
 import com.peng.pdfreader.base.BaseActivity
 import com.peng.pdfreader.databinding.GuideActivityBinding
 import com.peng.pdfreader.data.AppPrefs
@@ -40,28 +39,12 @@ class GuideActivity : BaseActivity() {
         binding = GuideActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        applyNavigationBarInset()
-
         binding.pager.adapter = GuidePageAdapter(pages)
         binding.pager.registerOnPageChangeCallback(pageChangeCallback)
 
         buildPageIndicator()
 
         binding.btnNext.setOnClickListener { onNextClicked() }
-    }
-
-    /**
-     * Keeps the next button above the navigation bar.
-     *
-     * The app draws edge to edge, so the window reaches behind the navigation
-     * bar; the button takes its inset as padding.
-     */
-    private fun applyNavigationBarInset() {
-        binding.root.setOnApplyWindowInsetsListener { view, insets ->
-            view.setPadding(0, 0, 0, SystemBarInsets.bottom(insets))
-            insets
-        }
-        binding.root.requestApplyInsets()
     }
 
     override fun onDestroy() {
