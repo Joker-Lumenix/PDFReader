@@ -18,19 +18,25 @@ import com.peng.pdfreader.utils.FileUi
 import com.peng.pdfreader.utils.PageCountDrawable
 
 /**
- * The file action sheet (design: home-more).
+ * The file action sheet of the PDF files (design: home-more).
  *
  * Header with the thumbnail, the name, the meta line and the collect toggle,
  * four quick actions (rename / open with / share / print) and the options card
  * with the five document operations.
  *
- * Everything except the collect toggle is handed back to the page through the
- * fragment result API; the sheet itself never navigates.
+ * The sheet never navigates: it reports the picked operation through the
+ * fragment result API and the page runs it.
  */
 class BottomSheetMoreActionPdf : BaseBottomSheetDialog() {
 
     private var _binding: FilesSheetFileActionBinding? = null
     private val binding get() = _binding!!
+
+    /** The four quick actions at the top of the sheet. */
+    var quickActions: List<Action> = emptyList()
+
+    /** The operations of the options card below them. */
+    var optionActions: List<Action> = emptyList()
 
     override fun createContentView(inflater: LayoutInflater, container: ViewGroup?): View {
         _binding = FilesSheetFileActionBinding.inflate(inflater, container, false)
@@ -92,16 +98,58 @@ class BottomSheetMoreActionPdf : BaseBottomSheetDialog() {
         )
     }
 
+    /**
+     * Binds the actions of the caller onto the slots of the design.
+     *
+     * A slot without an action is hidden, so the sheet also works with fewer
+     * actions than the design shows.
+     */
     private fun bindActions(doc: Document) {
-        binding.actionRename.setOnClickListener { send(doc, FileActions.RENAME) }
-        binding.actionOpenWith.setOnClickListener { send(doc, FileActions.OPEN_WITH) }
-        binding.actionShare.setOnClickListener { send(doc, FileActions.SHARE) }
-        binding.actionPrint.setOnClickListener { send(doc, FileActions.PRINT) }
-        binding.rowSplit.setOnClickListener { send(doc, FileActions.SPLIT) }
-        binding.rowCompress.setOnClickListener { send(doc, FileActions.COMPRESS) }
-        binding.rowMerge.setOnClickListener { send(doc, FileActions.MERGE) }
-        binding.rowLock.setOnClickListener { send(doc, FileActions.LOCK) }
-        binding.rowDelete.setOnClickListener { send(doc, FileActions.DELETE) }
+        val quick = quickActions.ifEmpty { defaultQuickActions() }
+        val options = optionActions.ifEmpty { defaultOptionActions() }
+        bindQuickActions(doc, quick)
+        bindOptionActions(doc, options)
+    }
+
+    private fun bindQuickActions(doc: Document, actions: List<Action>) {
+        val slots = listOf(
+            Triple(binding.actionRename, binding.ivActionRename, binding.tvActionRename),
+            Triple(binding.actionOpenWith, binding.ivActionOpenWith, binding.tvActionOpenWith),
+            Triple(binding.actionShare, binding.ivActionShare, binding.tvActionShare),
+            Triple(binding.actionPrint, binding.ivActionPrint, binding.tvActionPrint),
+        )
+        slots.forEachIndexed { index, (slot, icon, label) ->
+            val action = actions.getOrNull(index)
+            if (action == null) {
+                slot.visibility = View.GONE
+                return@forEachIndexed
+            }
+            slot.visibility = View.VISIBLE
+            icon.setImageResource(action.iconRes)
+            label.text = action.label
+            slot.setOnClickListener { send(doc, action.id) }
+        }
+    }
+
+    private fun bindOptionActions(doc: Document, actions: List<Action>) {
+        val slots = listOf(
+            Triple(binding.rowSplit, binding.ivRowSplit, binding.tvRowSplit),
+            Triple(binding.rowCompress, binding.ivRowCompress, binding.tvRowCompress),
+            Triple(binding.rowMerge, binding.ivRowMerge, binding.tvRowMerge),
+            Triple(binding.rowLock, binding.ivRowLock, binding.tvRowLock),
+            Triple(binding.rowDelete, binding.ivRowDelete, binding.tvRowDelete),
+        )
+        slots.forEachIndexed { index, (slot, icon, label) ->
+            val action = actions.getOrNull(index)
+            if (action == null) {
+                slot.visibility = View.GONE
+                return@forEachIndexed
+            }
+            slot.visibility = View.VISIBLE
+            icon.setImageResource(action.iconRes)
+            label.text = action.label
+            slot.setOnClickListener { send(doc, action.id) }
+        }
     }
 
     private fun send(doc: Document, action: String) {
@@ -115,6 +163,26 @@ class BottomSheetMoreActionPdf : BaseBottomSheetDialog() {
         dismissAllowingStateLoss()
     }
 
+    /** An action of the sheet. */
+    data class Action(val id: String, val label: String, val iconRes: Int)
+
+    /** The four quick actions of the design. */
+    private fun defaultQuickActions(): List<Action> = listOf(
+        Action(FileActions.RENAME, getString(R.string.rename), R.mipmap.ic_rename_red),
+        Action(FileActions.OPEN_WITH, getString(R.string.files_open_with), R.mipmap.ic_open_with),
+        Action(FileActions.SHARE, getString(R.string.files_share), R.mipmap.ic_share_red),
+        Action(FileActions.PRINT, getString(R.string.files_print), R.mipmap.ic_print),
+    )
+
+    /** The five operations of the options card of the design. */
+    private fun defaultOptionActions(): List<Action> = listOf(
+        Action(FileActions.SPLIT, getString(R.string.split), R.mipmap.ic_split_pdf),
+        Action(FileActions.COMPRESS, getString(R.string.compress), R.mipmap.ic_compress),
+        Action(FileActions.MERGE, getString(R.string.merge), R.mipmap.ic_merge_pdf),
+        Action(FileActions.LOCK, getString(R.string.encrypt), R.mipmap.ic_lock),
+        Action(FileActions.DELETE, getString(R.string.delete), R.mipmap.ic_delete_red),
+    )
+
     companion object {
         private const val ARG_DOC_ID = "docId"
 
@@ -122,6 +190,23 @@ class BottomSheetMoreActionPdf : BaseBottomSheetDialog() {
         fun show(manager: FragmentManager, docId: String) {
             BottomSheetMoreActionPdf().apply {
                 arguments = bundleOf(ARG_DOC_ID to docId)
+            }.show(manager, TAG)
+        }
+
+        /**
+         * Shows the action sheet for the given document with the actions of
+         * the caller.
+         */
+        fun show(
+            manager: FragmentManager,
+            docId: String,
+            quickActions: List<Action>,
+            optionActions: List<Action>,
+        ) {
+            BottomSheetMoreActionPdf().apply {
+                arguments = bundleOf(ARG_DOC_ID to docId)
+                this.quickActions = quickActions
+                this.optionActions = optionActions
             }.show(manager, TAG)
         }
 

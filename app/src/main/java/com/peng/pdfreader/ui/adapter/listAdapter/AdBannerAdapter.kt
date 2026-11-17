@@ -3,6 +3,7 @@ package com.peng.pdfreader.ui.adapter.listAdapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.peng.pdfreader.ads.Ads
 import com.peng.pdfreader.appcore.widget.AdContent
 import com.peng.pdfreader.appcore.widget.AdSlotView
 import com.peng.pdfreader.databinding.FilesItemAdBannerBinding
@@ -10,8 +11,8 @@ import com.peng.pdfreader.databinding.FilesItemAdBannerBinding
 /**
  * The ad banner at the top of the file list (design: files-筛选).
  *
- * The app does not bundle an ad sdk, the slot only reserves the space and
- * renders the local sample.
+ * The slot shows the local sample artwork of the design until the ad of the
+ * banner arrives.
  */
 class AdBannerAdapter(
     private val content: AdContent,
@@ -29,6 +30,7 @@ class AdBannerAdapter(
     override fun onBindViewHolder(holder: BannerHolder, position: Int) {
         holder.binding.adSlot.style = AdSlotView.Style.BANNER
         holder.binding.adSlot.content = content
+        Ads.loadBanner(holder.binding.adSlot)
     }
 
     override fun getItemCount(): Int = 1

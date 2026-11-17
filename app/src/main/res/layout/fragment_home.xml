@@ -7,6 +7,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/surface_muted"
     android:orientation="vertical">
@@ -144,60 +145,25 @@
         </LinearLayout>
     </LinearLayout>
 
-    <!-- file type filter strip: All / PDF / Word / Excel / PPT -->
     <!--
-      todo 可以将这个封装为一个自定义View，支持如下属性：
-      1、支持设定选中/未选中时颜色，
-      2、文本字体大小，单位sp
-      3、指示器宽高、圆角，单位dp
-      4、指示器具体文本的距离，单位dp
-      5、支持设定每一个条目的宽高，单位dp
-      注：该自定义View需要加中文注释以及用法，之后可能对该自定义View进行升级
-       -->
-    <LinearLayout
+      文件类型筛选条: 全部 / PDF / Word / Excel / PPT。
+      条目的几何属性都在这个自定义View里面, 见 FilterStripView 的注释。
+    -->
+    <com.peng.pdfreader.appcore.widget.FilterStripView
         android:id="@+id/filterStrip"
         android:layout_width="match_parent"
         android:layout_height="44dp"
         android:layout_marginTop="4dp"
         android:layout_marginBottom="12dp"
-        android:orientation="horizontal">
-
-        <include
-            android:id="@+id/filterAll"
-            layout="@layout/home_item_filter"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
-
-        <include
-            android:id="@+id/filterPdf"
-            layout="@layout/home_item_filter"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
-
-        <include
-            android:id="@+id/filterWord"
-            layout="@layout/home_item_filter"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
-
-        <include
-            android:id="@+id/filterExcel"
-            layout="@layout/home_item_filter"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
-
-        <include
-            android:id="@+id/filterPpt"
-            layout="@layout/home_item_filter"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1" />
-
-    </LinearLayout>
+        app:filterIndicatorColor="@color/brand_primary"
+        app:filterIndicatorGap="12dp"
+        app:filterIndicatorHeight="2dp"
+        app:filterIndicatorRadius="1dp"
+        app:filterIndicatorWidth="44dp"
+        app:filterItemHeight="44dp"
+        app:filterLabelTextSize="14sp"
+        app:filterSelectedColor="@color/brand_primary"
+        app:filterUnselectedColor="@color/text_disabled" />
 
     <!-- one page per file type, swiped horizontally -->
     <androidx.viewpager2.widget.ViewPager2

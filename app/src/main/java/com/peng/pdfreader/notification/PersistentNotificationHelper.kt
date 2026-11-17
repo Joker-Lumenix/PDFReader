@@ -7,6 +7,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.widget.RemoteViews
 import androidx.core.app.NotificationCompat
 import com.peng.pdfreader.ui.activities.MainActivity
 import com.peng.pdfreader.R
@@ -14,10 +15,10 @@ import com.peng.pdfreader.R
 /**
  * The quiet "always there" notification of the app.
  *
- * It is a plain notification on a low importance channel with the four quick
- * actions of the design; no service is involved, so the user can still swipe
- * it away. A truly persistent notification would need a foreground service -
- * that decision is still open (see the report).
+ * It is a plain notification on a low importance channel; the expanded view
+ * carries the four quick actions of the design - print, scan, lock and
+ * compress - as a row of icons with their labels. No service is involved, so
+ * the user can still swipe it away.
  */
 object PersistentNotificationHelper {
 
@@ -62,26 +63,18 @@ object PersistentNotificationHelper {
             .setShowWhen(false)
             .setContentIntent(contentIntent(context, ACTION_OPEN, 0))
 
-        builder.addAction(
-            R.mipmap.ic_print,
-            context.getString(R.string.quick_entry_print),
-            contentIntent(context, ACTION_PRINT, 1),
-        )
-        builder.addAction(
-            R.mipmap.ic_camera,
-            context.getString(R.string.quick_entry_scan),
-            contentIntent(context, ACTION_SCAN, 2),
-        )
-        builder.addAction(
-            R.mipmap.ic_lock,
-            context.getString(R.string.app_lock),
-            contentIntent(context, ACTION_LOCK, 3),
-        )
-        builder.addAction(
-            R.mipmap.ic_compress,
-            context.getString(R.string.compress),
-            contentIntent(context, ACTION_COMPRESS, 4),
-        )
+        // The row of the design: four entries with an icon and a label.
+        val views = RemoteViews(context.packageName, R.layout.notification_quick_actions)
+        views.setTextViewText(R.id.tvQuickPrint, context.getString(R.string.quick_entry_print))
+        views.setTextViewText(R.id.tvQuickScan, context.getString(R.string.quick_entry_scan))
+        views.setTextViewText(R.id.tvQuickLock, context.getString(R.string.app_lock))
+        views.setTextViewText(R.id.tvQuickCompress, context.getString(R.string.compress))
+        views.setOnClickPendingIntent(R.id.quickPrint, contentIntent(context, ACTION_PRINT, 1))
+        views.setOnClickPendingIntent(R.id.quickScan, contentIntent(context, ACTION_SCAN, 2))
+        views.setOnClickPendingIntent(R.id.quickLock, contentIntent(context, ACTION_LOCK, 3))
+        views.setOnClickPendingIntent(R.id.quickCompress, contentIntent(context, ACTION_COMPRESS, 4))
+        builder.setCustomBigContentView(views)
+
         return builder.build()
     }
 

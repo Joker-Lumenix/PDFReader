@@ -44,6 +44,15 @@ abstract class BaseBottomSheetDialog(
     var dismissOnBackPress: Boolean = true
         private set
 
+    /**
+     * The container of the sheet body.
+     *
+     * It carries the rounded surface of the design. A sheet that draws its own
+     * surface - the rating sheet with its illustration - clears it.
+     */
+    protected var sheetContainer: FrameLayout? = null
+        private set
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.getBoolean(ARG_DISMISS_OUTSIDE)?.let { dismissOnClickOutside = it }
@@ -63,7 +72,16 @@ abstract class BaseBottomSheetDialog(
         savedInstanceState: Bundle?,
     ): View {
         val sheet = inflater.inflate(R.layout.widget_bottom_sheet, container, false) as FrameLayout
+        // A dialog fragment has no container, so the inflated root carries no
+        // layout params at all. The bottom sheet would then fall back to
+        // MATCH_PARENT x MATCH_PARENT, cover the whole page and leave no room
+        // for the scrim. The sheet is as tall as its content.
+        sheet.layoutParams = FrameLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+        )
         sheet.addView(createContentView(inflater, sheet))
+        sheetContainer = sheet
         return sheet
     }
 
@@ -78,6 +96,9 @@ abstract class BaseBottomSheetDialog(
             val behavior = BottomSheetBehavior.from(this)
             behavior.isFitToContents = true
             behavior.skipCollapsed = true
+            // The sheets of the design are fixed panels: they are opened
+            // completely and they cannot be dragged.
+            behavior.isDraggable = false
             // A sheet that is taller than the screen stops at the height of
             // the screen, its body scrolls inside of it.
             behavior.maxHeight = screenHeight()
@@ -85,6 +106,11 @@ abstract class BaseBottomSheetDialog(
                 behavior.state = BottomSheetBehavior.STATE_EXPANDED
             }
         }
+        // Tapping the page behind the sheet closes it.
+        dialog?.findViewById<View>(com.google.android.material.R.id.touch_outside)
+            ?.setOnClickListener {
+                if (dismissOnClickOutside) dismissAllowingStateLoss()
+            }
     }
 
     /** The height of the screen, a sheet never grows beyond it. */
@@ -92,6 +118,11 @@ abstract class BaseBottomSheetDialog(
 
     /** Builds the sheet body. */
     abstract fun createContentView(inflater: LayoutInflater, container: ViewGroup?): View
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        sheetContainer = null
+    }
 
     companion object {
         /** Argument key of the "tap outside to dismiss" switch. */

@@ -11,9 +11,9 @@ import com.peng.pdfreader.appcore.R
 /**
  * An ad slot of the design.
  *
- * The app does not bundle an ad sdk, so the slot only reserves the space and
- * renders the local sample artwork. The two layouts of the design are the
- * banner (360x72) and the card (312x118).
+ * The slot reserves the space of the design and renders the local sample
+ * artwork until a real ad arrives; the ad then takes the whole slot. The two
+ * layouts of the design are the banner (360x72) and the card (312x118).
  */
 class AdSlotView @JvmOverloads constructor(
     context: Context,
@@ -36,6 +36,12 @@ class AdSlotView @JvmOverloads constructor(
     private var badgeView: TextView? = null
     private var actionView: TextView? = null
 
+    /** The holder of the sample artwork of the design. */
+    private val sampleHost = FrameLayout(context)
+
+    /** The holder of the real ad. */
+    private val adHost = FrameLayout(context)
+
     /** The layout that is shown inside the slot. */
     var style: Style = Style.BANNER
         set(value) {
@@ -51,21 +57,27 @@ class AdSlotView @JvmOverloads constructor(
         }
 
     init {
+        addView(
+            sampleHost,
+            LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT),
+        )
+        addView(adHost, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+        adHost.visibility = GONE
         inflateStyle()
     }
 
     private fun inflateStyle() {
-        removeAllViews()
+        sampleHost.removeAllViews()
         val layout = when (style) {
             Style.BANNER -> R.layout.widget_ad_banner
             Style.CARD -> R.layout.widget_ad_card
         }
-        LayoutInflater.from(context).inflate(layout, this, true)
-        iconView = findViewById(R.id.ivIcon)
-        titleView = findViewById(R.id.tvTitle)
-        descriptionView = findViewById(R.id.tvDescription)
-        badgeView = findViewById(R.id.tvBadge)
-        actionView = findViewById(R.id.tvAction)
+        LayoutInflater.from(context).inflate(layout, sampleHost, true)
+        iconView = sampleHost.findViewById(R.id.ivIcon)
+        titleView = sampleHost.findViewById(R.id.tvTitle)
+        descriptionView = sampleHost.findViewById(R.id.tvDescription)
+        badgeView = sampleHost.findViewById(R.id.tvBadge)
+        actionView = sampleHost.findViewById(R.id.tvAction)
         bind()
     }
 
@@ -76,6 +88,28 @@ class AdSlotView @JvmOverloads constructor(
         descriptionView?.text = sample.description
         badgeView?.text = sample.badge
         actionView?.text = sample.actionText
+    }
+
+    /**
+     * Puts a real ad into the slot.
+     *
+     * The sample artwork of the design is hidden, the ad takes its place.
+     */
+    fun setAdView(view: android.view.View) {
+        adHost.removeAllViews()
+        adHost.addView(
+            view,
+            LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT),
+        )
+        adHost.visibility = VISIBLE
+        sampleHost.visibility = GONE
+    }
+
+    /** Removes the real ad, the sample artwork of the design comes back. */
+    fun clearAdView() {
+        adHost.removeAllViews()
+        adHost.visibility = GONE
+        sampleHost.visibility = VISIBLE
     }
 }
 

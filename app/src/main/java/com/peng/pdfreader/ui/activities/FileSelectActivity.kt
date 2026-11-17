@@ -21,10 +21,12 @@ import com.peng.pdfreader.data.AppPrefs
 import com.peng.pdfreader.data.DocumentRepository
 import com.peng.pdfreader.databinding.ActivityFileSelectBinding
 import com.peng.pdfreader.ui.adapter.listAdapter.FileListAdapter
+import com.peng.pdfreader.ui.activities.CompressActivity
 import com.peng.pdfreader.ui.dialogs.DialogDeleteConfirm
 import com.peng.pdfreader.ui.dialogs.BottomSheetRename
-import com.peng.pdfreader.ui.dialogs.BottomSheetMoreActionPdf
+import com.peng.pdfreader.ui.dialogs.DocumentActionSheet
 import com.peng.pdfreader.ui.dialogs.PopWindowFileFilter
+import com.peng.pdfreader.ui.uiData.FileActions
 import com.peng.pdfreader.utils.DocumentThumbnails
 import com.peng.pdfreader.utils.FileUi
 import kotlinx.coroutines.Dispatchers
@@ -68,22 +70,11 @@ class FileSelectActivity : BaseActivity() {
     // ------------------------------------------------------------------ setup
 
     private fun setupTitleBar() {
-        binding.titleBar.showBack = true
-        binding.titleBar.onBackClick = { finishWithSelection() }
+        binding.ivBack.setOnClickListener {
+            finishWithSelection()
+        }
         updateTitle()
 
-        // The design puts the type filter on the right hand side of the bar,
-        // it is painted in the brand red.
-        val filter = ImageView(this).apply {
-            setImageResource(R.mipmap.ic_filter)
-            imageTintList = ColorStateList.valueOf(
-                ContextCompat.getColor(this@FileSelectActivity, R.color.brand_primary),
-            )
-            contentDescription = getString(R.string.all)
-            setOnClickListener { openFilterMenu() }
-        }
-        binding.titleBar.addAction(filter)
-        filterAction = filter
     }
 
     private fun setupList() {
@@ -94,7 +85,7 @@ class FileSelectActivity : BaseActivity() {
                 }
 
                 override fun onRowMore(document: Document) {
-                    BottomSheetMoreActionPdf.show(supportFragmentManager, document.id)
+                    DocumentActionSheet.show(this@FileSelectActivity, supportFragmentManager, document)
                 }
 
                 override fun onRowChecked(document: Document, checked: Boolean) {
@@ -132,6 +123,15 @@ class FileSelectActivity : BaseActivity() {
 
     private fun registerResults() {
         supportFragmentManager.setFragmentResultListener(
+            FileActions.REQUEST_KEY,
+            this,
+        ) { _, bundle ->
+            onFileAction(
+                bundle.getString(FileActions.KEY_ACTION),
+                bundle.getString(FileActions.KEY_DOC_ID),
+            )
+        }
+        supportFragmentManager.setFragmentResultListener(
             BottomSheetRename.REQUEST_KEY,
             this,
         ) { _, _ -> load() }
@@ -142,6 +142,44 @@ class FileSelectActivity : BaseActivity() {
             selectedIds.clear()
             load()
         }
+    }
+
+    /** Runs the operation that was picked in the more sheet of a row. */
+    private fun onFileAction(action: String?, docId: String?) {
+        if (action == null || docId == null) return
+        when (action) {
+            FileActions.RENAME -> BottomSheetRename.show(supportFragmentManager, docId)
+            FileActions.DELETE -> DialogDeleteConfirm.show(supportFragmentManager, listOf(docId))
+            FileActions.OPEN_WITH -> openWith(docId)
+            FileActions.SHARE -> shareDocument(docId)
+            FileActions.COMPRESS -> CompressActivity.start(this, docId)
+            FileActions.CHANGED -> load()
+            else -> toast(getString(R.string.files_feature_unavailable))
+        }
+    }
+
+    /** Hands the document to another application. */
+    private fun openWith(docId: String) {
+        val document = repository.byId(docId) ?: return
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(ShareFileProvider.uriFor(this@FileSelectActivity, repository.fileOf(document)), mimeType(document))
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        runCatching { startActivity(intent) }
+            .onFailure { toast(getString(R.string.files_feature_unavailable)) }
+    }
+
+    /** Shares the document with another application. */
+    private fun shareDocument(docId: String) {
+        val document = repository.byId(docId) ?: return
+        val uri = ShareFileProvider.uriFor(this, repository.fileOf(document))
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = mimeType(document)
+            putExtra(Intent.EXTRA_STREAM, uri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        runCatching { startActivity(Intent.createChooser(intent, getString(R.string.files_share))) }
+            .onFailure { toast(getString(R.string.files_feature_unavailable)) }
     }
 
     // ------------------------------------------------------------------ data
@@ -226,7 +264,7 @@ class FileSelectActivity : BaseActivity() {
     }
 
     private fun updateTitle() {
-        binding.titleBar.title = getString(R.string.selected_count, selectedIds.size)
+        binding.tvTitle.text = getString(R.string.selected_count, selectedIds.size)
     }
 
     // ------------------------------------------------------------------ actions

@@ -116,16 +116,19 @@ class PptxSlideView(context: Context) : View(context) {
     private val fillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.FILL }
     private val linePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE }
     private val bitmapPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { isFilterBitmap = true }
-    private val textPaint = TextPaint(Paint.ANTI_ALIAS_FLAG)
     private val bulletPaint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     private var slide: PptxSlide? = null
     private var deck: PptxDeck? = null
 
+    /** The bitmaps of the pictures of the slide, every picture is decoded once. */
+    private val bitmaps = HashMap<PptxShape.Picture, Bitmap>()
+
     /** Binds a slide to the view. */
     fun bind(slide: PptxSlide?, deck: PptxDeck) {
         this.slide = slide
         this.deck = deck
+        bitmaps.clear()
         invalidate()
     }
 
@@ -152,6 +155,10 @@ class PptxSlideView(context: Context) : View(context) {
             canvas.drawRect(slideRect, fillPaint)
         }
 
+        // The shapes live in the coordinate space of the slide, so the canvas
+        // is moved to the top left corner of the slide before they are drawn.
+        canvas.save()
+        canvas.translate(left, top)
         for (shape in current.shapes) {
             when (shape) {
                 is PptxShape.Rectangle -> drawRectangle(canvas, shape, scale)
@@ -160,6 +167,7 @@ class PptxSlideView(context: Context) : View(context) {
                 is PptxShape.Table -> drawTable(canvas, shape, scale)
             }
         }
+        canvas.restore()
     }
 
     private fun drawRectangle(canvas: Canvas, shape: PptxShape.Rectangle, scale: Float) {
@@ -176,7 +184,7 @@ class PptxSlideView(context: Context) : View(context) {
     }
 
     private fun drawPicture(canvas: Canvas, shape: PptxShape.Picture, scale: Float) {
-        val bitmap = decode(shape.bytes) ?: return
+        val bitmap = bitmaps.getOrPut(shape) { decode(shape.bytes) ?: return }
         val rect = shape.rect(scale)
         canvas.drawBitmap(bitmap, null, rect, bitmapPaint)
     }
@@ -187,7 +195,7 @@ class PptxSlideView(context: Context) : View(context) {
             fillPaint.color = OfficeColors.toAndroid(it)
             canvas.drawRect(rect, fillPaint)
         }
-        val layouts = shape.paragraphs.map { buildLayout(it, rect.width().toInt().coerceAtLeast(1), scale) }
+        val layouts = shape.paragraphs.map { buildLayout(it, rect.width(), scale) }
         val total = layouts.sumOf { it.height.toDouble() }.toFloat()
         var y = rect.top
         if (shape.anchor == "center") {
@@ -196,19 +204,21 @@ class PptxSlideView(context: Context) : View(context) {
             y = rect.bottom - total
         }
         layouts.forEachIndexed { index, layout ->
-            canvas.save()
-            canvas.translate(rect.left, y)
-            layout.draw(canvas)
-            canvas.restore()
             val paragraph = shape.paragraphs.getOrNull(index)
             val bullet = paragraph?.bullet
+            // A bulleted paragraph keeps a gutter for its bullet.
+            val gutter = if (bullet != null) indentOf(paragraph, scale) else 0f
+            canvas.save()
+            canvas.translate(rect.left + gutter, y)
+            layout.draw(canvas)
+            canvas.restore()
             if (bullet != null) {
                 bulletPaint.color = paragraph.style.color?.let { OfficeColors.toAndroid(it) }
                     ?: context.getColor(R.color.text_primary)
                 bulletPaint.textSize = -layout.getLineAscent(0) * 0.8f
                 canvas.drawText(
                     bullet,
-                    rect.left + dp(2f) + paragraph.level * dp(8f),
+                    rect.left + paragraph.level * gutter * 0.5f,
                     y + layout.getLineBaseline(0),
                     bulletPaint,
                 )
@@ -222,35 +232,32 @@ class PptxSlideView(context: Context) : View(context) {
         val borderColour = context.getColor(R.color.surface_border_strong)
         var y = rect.top
         shape.rows.forEachIndexed { rowIndex, row ->
-            val rowHeight = shape.rowHeightsDp.getOrNull(rowIndex)?.times(scale) ?: dp(24f)
+            val rowHeight = shape.rowHeightsDp.getOrNull(rowIndex)?.times(scale) ?: (24f * scale)
             var x = rect.left
             row.forEachIndexed { columnIndex, cell ->
-                val columnWidth = shape.columnWidthsDp.getOrNull(columnIndex)?.times(scale) ?: dp(80f)
+                val columnWidth = shape.columnWidthsDp.getOrNull(columnIndex)?.times(scale) ?: (80f * scale)
                 cell.background?.let {
                     fillPaint.color = OfficeColors.toAndroid(it)
                     canvas.drawRect(x, y, x + columnWidth, y + rowHeight, fillPaint)
                 }
                 val colour = cell.color?.let { OfficeColors.toAndroid(it) } ?: context.getColor(R.color.text_primary)
-                textPaint.color = colour
-                textPaint.textSize = dp(12f)
-                textPaint.typeface = Typeface.create(Typeface.DEFAULT, if (cell.bold) Typeface.BOLD else Typeface.NORMAL)
-                val baseline = y + rowHeight / 2f - (textPaint.descent() + textPaint.ascent()) / 2f
-                val paint = textPaint
+                val paint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
+                    this.color = colour
+                    // The text of a cell follows the height of its row.
+                    textSize = max(6f * scale, rowHeight * 0.45f)
+                    typeface = Typeface.create(Typeface.DEFAULT, if (cell.bold) Typeface.BOLD else Typeface.NORMAL)
+                    textAlign = when (cell.alignment) {
+                        "center" -> Paint.Align.CENTER
+                        "right" -> Paint.Align.RIGHT
+                        else -> Paint.Align.LEFT
+                    }
+                }
+                val baseline = y + rowHeight / 2f - (paint.descent() + paint.ascent()) / 2f
+                val inset = 4f * scale
                 when (cell.alignment) {
-                    "center" -> {
-                        paint.textAlign = Paint.Align.CENTER
-                        canvas.drawText(cell.text, x + columnWidth / 2f, baseline, paint)
-                    }
-
-                    "right" -> {
-                        paint.textAlign = Paint.Align.RIGHT
-                        canvas.drawText(cell.text, x + columnWidth - dp(4f), baseline, paint)
-                    }
-
-                    else -> {
-                        paint.textAlign = Paint.Align.LEFT
-                        canvas.drawText(cell.text, x + dp(4f), baseline, paint)
-                    }
+                    "center" -> canvas.drawText(cell.text, x + columnWidth / 2f, baseline, paint)
+                    "right" -> canvas.drawText(cell.text, x + columnWidth - inset, baseline, paint)
+                    else -> canvas.drawText(cell.text, x + inset, baseline, paint)
                 }
                 x += columnWidth
             }
@@ -261,11 +268,17 @@ class PptxSlideView(context: Context) : View(context) {
         }
     }
 
-    private fun buildLayout(paragraph: PptxParagraph, widthPx: Int, scale: Float): StaticLayout {
+    /**
+     * Builds the layout of one paragraph.
+     *
+     * Every paragraph gets its own paint: a layout keeps the paint it was
+     * built with, so a shared one would draw every paragraph with the size of
+     * the last one.
+     */
+    private fun buildLayout(paragraph: PptxParagraph, widthPx: Float, scale: Float): StaticLayout {
         val style = paragraph.style
         val builder = SpannableStringBuilder()
-        val text = paragraph.text
-        builder.append(text)
+        builder.append(paragraph.text)
         if (style.bold || style.italic) {
             val typeface = when {
                 style.bold && style.italic -> Typeface.BOLD_ITALIC
@@ -277,27 +290,42 @@ class PptxSlideView(context: Context) : View(context) {
         if (style.underline) {
             builder.setSpan(UnderlineSpan(), 0, builder.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
-        textPaint.color = style.color?.let { OfficeColors.toAndroid(it) }
-            ?: context.getColor(R.color.text_primary)
-        textPaint.textSize = max(dp(8f), style.sizePt * scale * 4f / 3f)
-        textPaint.typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
-        val indent = if (paragraph.bullet != null) dp(16f) else 0f
+        val paint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = style.color?.let { OfficeColors.toAndroid(it) }
+                ?: context.getColor(R.color.text_primary)
+            // One point is 4/3 of a deck dp.
+            textSize = max(MIN_TEXT_SIZE_DP * scale, style.sizePt * scale * 4f / 3f)
+            typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
+        }
+        val indent = indentOf(paragraph, scale)
         val alignment = when (style.alignment) {
             "center" -> Layout.Alignment.ALIGN_CENTER
             "right" -> Layout.Alignment.ALIGN_OPPOSITE
             else -> Layout.Alignment.ALIGN_NORMAL
         }
         return StaticLayout.Builder
-            .obtain(builder, 0, builder.length, textPaint, max(1, (widthPx - indent).toInt()))
+            .obtain(builder, 0, builder.length, paint, max(1, (widthPx - indent).toInt()))
             .setAlignment(alignment)
             .setIncludePad(false)
             .build()
     }
 
+    /** The gutter a bulleted paragraph keeps for its bullet. */
+    private fun indentOf(paragraph: PptxParagraph?, scale: Float): Float =
+        if (paragraph?.bullet != null) BULLET_INDENT_DP * scale else 0f
+
     private fun decode(bytes: ByteArray): Bitmap? =
         runCatching { BitmapFactory.decodeByteArray(bytes, 0, bytes.size) }.getOrNull()
 
     private fun dp(value: Float): Float = value * density
+
+    private companion object {
+        /** The smallest text of a slide, in deck dp. */
+        const val MIN_TEXT_SIZE_DP = 8f
+
+        /** The gutter of a bulleted paragraph, in deck dp. */
+        const val BULLET_INDENT_DP = 16f
+    }
 }
 
 /** The pixel rectangle of a shape. */

@@ -40,7 +40,7 @@ import com.peng.pdfreader.databinding.FragmentFilesBinding
 import com.peng.pdfreader.ui.uiData.FileActions
 import com.peng.pdfreader.ui.adapter.listAdapter.AdBannerAdapter
 import com.peng.pdfreader.ui.adapter.listAdapter.DocumentPrintAdapter
-import com.peng.pdfreader.ui.dialogs.BottomSheetMoreActionPdf
+import com.peng.pdfreader.ui.dialogs.DocumentActionSheet
 import com.peng.pdfreader.ui.dialogs.PopWindowFileFilter
 import com.peng.pdfreader.ui.dialogs.BottomSheetSort
 import com.peng.pdfreader.utils.FileScope
@@ -298,7 +298,7 @@ class FilesFragment : BaseFragment() {
             }
 
             override fun onRowMore(document: Document) {
-                BottomSheetMoreActionPdf.show(childFragmentManager, document.id)
+                DocumentActionSheet.show(requireContext(), childFragmentManager, document)
             }
 
             override fun onRowChecked(document: Document, checked: Boolean) {

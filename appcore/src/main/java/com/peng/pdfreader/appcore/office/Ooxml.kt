@@ -192,6 +192,19 @@ object OfficeColors {
 
     private const val EMU_PER_DP = 9525f
 
+    /**
+     * The presentation colours and the theme slots they point at.
+     *
+     * A theme stores its colours under the slots `dk1` / `lt1` / `dk2` / `lt2`,
+     * the drawings refer to them with the names `tx1` / `bg1` / `tx2` / `bg2`.
+     */
+    private val PRESENTATION_COLORS = mapOf(
+        "tx1" to "dk1",
+        "bg1" to "lt1",
+        "tx2" to "dk2",
+        "bg2" to "lt2",
+    )
+
     fun emuToDp(value: Int): Float = value / EMU_PER_DP
 
     fun emuToPt(value: Int): Float = value / 12700f
@@ -204,6 +217,12 @@ object OfficeColors {
         scheme.nodes().forEach { slot ->
             val color = colorOf(slot, emptyMap())
             if (color != null) result[slot.localName] = color
+        }
+        // The presentation colours are aliases of the theme slots, a shape that
+        // paints itself with "tx1" needs the "dk1" colour of the theme.
+        PRESENTATION_COLORS.forEach { (presentation, slot) ->
+            val color = result[slot] ?: result[presentation] ?: return@forEach
+            result[presentation] = color
         }
         return result
     }
@@ -224,7 +243,8 @@ object OfficeColors {
                 ?: colorNode.attr("val")?.let { parseHex(it) }
             "schemeClr" -> {
                 val slot = colorNode.attr("val") ?: return null
-                theme[slot] ?: theme[slot.replaceFirstChar { it.uppercase() }]
+                val themeSlot = PRESENTATION_COLORS[slot] ?: slot
+                theme[themeSlot] ?: theme[slot] ?: theme[slot.replaceFirstChar { it.uppercase() }]
             }
             "prstClr" -> null
             else -> null

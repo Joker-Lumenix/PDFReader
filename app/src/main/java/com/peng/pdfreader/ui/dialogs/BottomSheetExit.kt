@@ -10,6 +10,7 @@ import androidx.fragment.app.FragmentManager
 import com.peng.pdfreader.R
 import com.peng.pdfreader.appcore.util.Logger
 import com.peng.pdfreader.appcore.widget.AdSlotView
+import com.peng.pdfreader.ads.Ads
 import com.peng.pdfreader.appcore.widget.BaseBottomSheetDialog
 import com.peng.pdfreader.databinding.HomeSheetExitRetentionBinding
 import com.peng.pdfreader.ui.uiData.AdSamples
@@ -48,6 +49,7 @@ class BottomSheetExit : BaseBottomSheetDialog() {
 
         binding.adSlot.style = AdSlotView.Style.CARD
         binding.adSlot.content = AdSamples.card(requireContext())
+        Ads.loadCard(binding.adSlot)
 
         binding.featureCard.setOnClickListener { openFeature() }
         binding.btnTry.setOnClickListener { openFeature() }

@@ -81,6 +81,36 @@ class OfficeParserTest {
         )
     }
 
+    /**
+     * The shapes of a slide live in the coordinate space of the slide.
+     *
+     * The reader draws them with the origin of the slide, so the parser has to
+     * deliver the coordinates of the slide and not the ones of the page.
+     */
+    @Test
+    fun theShapesOfASlideUseTheCoordinatesOfTheSlide() {
+        val pkg = OoxmlPackage.open(sample(SAMPLE_PPTX)) ?: error("package not readable")
+        val deck = PptxParser.parse(pkg)
+        pkg.close()
+
+        val slide = deck!!.slides.first()
+        val boxes = slide.shapes.filter { it.widthDp > 0f && it.heightDp > 0f }
+        assertTrue("the slide should have shapes with a geometry", boxes.isNotEmpty())
+        boxes.forEach { shape ->
+            assertTrue(
+                "a shape of the slide should be inside of it, but $shape is not",
+                shape.leftDp >= 0f && shape.topDp >= 0f &&
+                    shape.leftDp + shape.widthDp <= deck.widthDp + 1f &&
+                    shape.topDp + shape.heightDp <= deck.heightDp + 1f,
+            )
+        }
+        // The first text box of the sample sits at 113.4dp / 234.3dp.
+        val first = boxes.minByOrNull { it.topDp }
+        assertNotNull("the slide should have a shape", first)
+        assertEquals("the left edge of the shape", 113.4f, first!!.leftDp, 0.5f)
+        assertEquals("the top edge of the shape", 234.3f, first.topDp, 0.5f)
+    }
+
     companion object {
         private const val SAMPLE_DOCX = "2025全球技术架构演进方案及规范.docx"
         private const val SAMPLE_XLSX = "季度经营指标跟踪表.xlsx"

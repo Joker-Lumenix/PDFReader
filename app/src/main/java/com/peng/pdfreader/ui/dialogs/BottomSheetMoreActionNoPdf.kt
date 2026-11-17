@@ -10,8 +10,10 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.DrawableRes
+import androidx.core.os.bundleOf
 import com.peng.pdfreader.R
 import com.peng.pdfreader.appcore.widget.BaseBottomSheetDialog
+import com.peng.pdfreader.ui.uiData.FileActions
 
 /**
  * The overflow menu of the reader.
@@ -39,6 +41,15 @@ class BottomSheetMoreActionNoPdf : BaseBottomSheetDialog() {
 
     /** The logo of the file. */
     var documentLogo: Drawable? = null
+
+    /**
+     * The id of the document the sheet belongs to.
+     *
+     * When it is set, the picked action is reported through the fragment result
+     * API, exactly like the sheet of the PDF files does it. The pages that show
+     * the sheet therefore do not have to know how it is built.
+     */
+    var documentId: String = ""
 
     /** Raised with the id of the tapped action. */
     var onActionSelected: ((String) -> Unit)? = null
@@ -102,6 +113,17 @@ class BottomSheetMoreActionNoPdf : BaseBottomSheetDialog() {
 
     private fun pick(action: Action) {
         onActionSelected?.invoke(action.id)
+        // The pages of the lists listen to the fragment result API, the sheet
+        // reports the operation the same way the sheet of the PDF files does.
+        if (documentId.isNotEmpty()) {
+            parentFragmentManager.setFragmentResult(
+                FileActions.REQUEST_KEY,
+                bundleOf(
+                    FileActions.KEY_ACTION to action.id,
+                    FileActions.KEY_DOC_ID to documentId,
+                ),
+            )
+        }
         dismiss()
     }
 

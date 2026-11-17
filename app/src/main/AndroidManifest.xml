@@ -41,6 +41,14 @@
         android:theme="@style/Theme.PdfReader"
         android:requestLegacyExternalStorage="true">
 
+        <!--
+          The id of the AdMob app. It points at the public test app of Google,
+          the owner replaces it with the id of the own AdMob account.
+        -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="${admobAppId}" />
+
         <activity
             android:name=".ui.activities.SplashActivity"
             android:exported="true"
@@ -139,10 +147,6 @@
 
         <activity
             android:name=".ui.activities.NoticeActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".ui.activities.RatingActivity"
             android:exported="false" />
 
         <!-- The file permission step of the start up flow. -->

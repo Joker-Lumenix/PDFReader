@@ -38,7 +38,10 @@ import com.peng.pdfreader.ui.activities.SignatureActivity
 import com.peng.pdfreader.ui.adapter.listAdapter.PdfPagerAdapter
 import com.peng.pdfreader.ui.uiData.AnnotationMarks
 import com.peng.pdfreader.ui.uiData.AnnotationPayload
+import com.peng.pdfreader.ui.uiData.FileActions
 import com.peng.pdfreader.ui.dialogs.BottomSheetMoreActionNoPdf
+import com.peng.pdfreader.ui.dialogs.BottomSheetMoreActionPdf
+import com.peng.pdfreader.ui.dialogs.DialogDeleteConfirm
 import com.peng.pdfreader.ui.dialogs.DialogFailure
 import com.peng.pdfreader.ui.dialogs.DialogNote
 import com.peng.pdfreader.ui.dialogs.BottomSheetOutline
@@ -55,7 +58,11 @@ import java.util.Locale
 import java.util.UUID
 
 /**
- * todo 签名以及涂鸦功能目前按照UI设计的样式做。之后再增加功能是在添加下划线这些功能
+ * The reader of the app.
+ *
+ * The signature and the free hand follow the design of the bottom bar, the
+ * strip above it carries the marks of the reader: highlight, underline, strike
+ * through, free hand, note and signature.
  */
 class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
 
@@ -136,6 +143,8 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
             selectTool(AnnotationType.DRAW)
         }
 
+        setupAnnotationToolbar()
+
         binding.pager.registerOnPageChangeCallback(
             object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
@@ -144,7 +153,26 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
                 }
             },
         )
+        registerResults()
         loadDocument()
+    }
+
+    /** Listens to the operations of the more sheet of the reader. */
+    private fun registerResults() {
+        parentFragmentManager.setFragmentResultListener(
+            FileActions.REQUEST_KEY,
+            viewLifecycleOwner,
+        ) { _, bundle ->
+            val action = bundle.getString(FileActions.KEY_ACTION) ?: return@setFragmentResultListener
+            onPreviewAction(action)
+        }
+        parentFragmentManager.setFragmentResultListener(
+            DialogDeleteConfirm.REQUEST_KEY,
+            viewLifecycleOwner,
+        ) { _, _ ->
+            // The document is gone, the reader closes itself.
+            activity?.finish()
+        }
     }
 
     override fun onPause() {
@@ -350,6 +378,61 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
 
     private fun showMoreActions() {
         val doc = document
+        if (doc == null) return
+        if (doc.type == DocType.PDF) {
+            // A PDF file uses the sheet of the design (home-more): four quick
+            // actions above the card of the document operations.
+            BottomSheetMoreActionPdf.show(
+                parentFragmentManager,
+                doc.id,
+                quickActions = listOf(
+                    BottomSheetMoreActionPdf.Action(
+                        ACTION_OUTLINE,
+                        getString(R.string.preview_outline),
+                        R.mipmap.ic_menu,
+                    ),
+                    BottomSheetMoreActionPdf.Action(
+                        ACTION_BOOKMARK,
+                        getString(R.string.preview_add_bookmark),
+                        R.mipmap.ic_collect_unselect,
+                    ),
+                    BottomSheetMoreActionPdf.Action(
+                        ACTION_READING_MODE,
+                        getString(R.string.preview_reading_mode),
+                        R.mipmap.ic_eye_open,
+                    ),
+                    BottomSheetMoreActionPdf.Action(
+                        ACTION_RENAME,
+                        getString(R.string.rename),
+                        R.mipmap.ic_rename_black,
+                    ),
+                ),
+                optionActions = listOf(
+                    BottomSheetMoreActionPdf.Action(
+                        ACTION_SHARE,
+                        getString(R.string.preview_share),
+                        R.mipmap.ic_share_square_black,
+                    ),
+                    BottomSheetMoreActionPdf.Action(
+                        ACTION_OPEN_WITH,
+                        getString(R.string.preview_open_with),
+                        R.mipmap.ic_open_with,
+                    ),
+                    BottomSheetMoreActionPdf.Action(
+                        ACTION_COMPRESS,
+                        getString(R.string.compress),
+                        R.mipmap.ic_compress,
+                    ),
+                    BottomSheetMoreActionPdf.Action(
+                        ACTION_DELETE,
+                        getString(R.string.delete),
+                        R.mipmap.ic_delete_red,
+                    ),
+                ),
+            )
+            return
+        }
+        // Every other format uses the lighter overflow menu of the reader.
         val sheet = BottomSheetMoreActionNoPdf.create(
             actions = listOf(
                 BottomSheetMoreActionNoPdf.Action(
@@ -378,24 +461,33 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
                 getString(R.string.compress),
                 R.mipmap.ic_compress,
             ),
-            documentName = doc?.name.orEmpty(),
-            documentType = doc?.let { getString(it.type.labelRes) }.orEmpty(),
+            documentName = doc.name,
+            documentType = getString(doc.type.labelRes),
             documentMeta = documentMeta(),
-            documentLogo = doc?.let {
-                ContextCompat.getDrawable(requireContext(), it.type.logoRes)
-            },
+            documentLogo = ContextCompat.getDrawable(requireContext(), doc.type.logoRes),
         )
-        sheet.onActionSelected = { id ->
-            when (id) {
-                ACTION_OUTLINE -> showOutline()
-                ACTION_BOOKMARK -> addBookmark()
-                ACTION_READING_MODE -> showReadingModeDialog()
-                ACTION_RENAME -> showRenameDialog()
-                ACTION_SHARE -> share()
-                ACTION_COMPRESS -> compress()
-            }
-        }
+        sheet.onActionSelected = { id -> onPreviewAction(id) }
         sheet.show(parentFragmentManager, "preview_more")
+    }
+
+    /** Runs the operation that was picked in the more sheet of the reader. */
+    private fun onPreviewAction(id: String) {
+        when (id) {
+            ACTION_OUTLINE -> showOutline()
+            ACTION_BOOKMARK -> addBookmark()
+            ACTION_READING_MODE -> showReadingModeDialog()
+            ACTION_RENAME -> showRenameDialog()
+            ACTION_SHARE -> share()
+            ACTION_OPEN_WITH -> openWith()
+            ACTION_COMPRESS -> compress()
+            ACTION_DELETE -> deleteDocument()
+        }
+    }
+
+    /** Asks whether the document should really be removed. */
+    private fun deleteDocument() {
+        val doc = document ?: return
+        DialogDeleteConfirm.show(parentFragmentManager, listOf(doc.id))
     }
 
     /** Opens the compressor of the app for the current document. */
@@ -486,11 +578,49 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
     private fun closeAnnotationBar() {
         activeTool = null
         pagerAdapter?.applySelection(false, null)
+        updateAnnotationToolbar()
+    }
 
+    /**
+     * The strip of the annotation tools.
+     *
+     * Only a PDF file carries annotations, so the strip stays away for the
+     * other formats.
+     */
+    private fun setupAnnotationToolbar() {
+        val toolbar = binding.annotationToolbar
+        toolbar.toolHighlight.setOnClickListener { selectTool(AnnotationType.HIGHLIGHT) }
+        toolbar.toolUnderline.setOnClickListener { selectTool(AnnotationType.UNDERLINE) }
+        toolbar.toolStrikethrough.setOnClickListener { selectTool(AnnotationType.STRIKETHROUGH) }
+        toolbar.toolDraw.setOnClickListener { selectTool(AnnotationType.DRAW) }
+        toolbar.toolNote.setOnClickListener { selectTool(AnnotationType.NOTE) }
+        toolbar.toolSignature.setOnClickListener { selectTool(AnnotationType.SIGNATURE) }
+        toolbar.root.visibility =
+            if (document?.type == DocType.PDF) View.VISIBLE else View.GONE
+    }
+
+    /** Highlights the tool that is active. */
+    private fun updateAnnotationToolbar() {
+        val toolbar = binding.annotationToolbar
+        val chips = listOf(
+            toolbar.toolHighlight to AnnotationType.HIGHLIGHT,
+            toolbar.toolUnderline to AnnotationType.UNDERLINE,
+            toolbar.toolStrikethrough to AnnotationType.STRIKETHROUGH,
+            toolbar.toolDraw to AnnotationType.DRAW,
+            toolbar.toolNote to AnnotationType.NOTE,
+            toolbar.toolSignature to AnnotationType.SIGNATURE,
+        )
+        val colour = ContextCompat.getColor(requireContext(), R.color.brand_primary)
+        val idle = ContextCompat.getColor(requireContext(), R.color.text_secondary)
+        chips.forEach { (chip, type) ->
+            chip.setTextColor(if (activeTool == type) colour else idle)
+            chip.isSelected = activeTool == type
+        }
     }
 
     private fun selectTool(type: AnnotationType) {
         activeTool = type
+        updateAnnotationToolbar()
         when (type) {
             AnnotationType.HIGHLIGHT,
             AnnotationType.UNDERLINE,
@@ -514,6 +644,7 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
         addAnnotation(type, AnnotationPayload.encodeRect(rect))
         activeTool = null
         pagerAdapter?.applySelection(false, null)
+        updateAnnotationToolbar()
     }
 
     private fun showNoteDialog() {
@@ -642,7 +773,9 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
         private const val ACTION_READING_MODE = "reading_mode"
         private const val ACTION_RENAME = "rename"
         private const val ACTION_SHARE = "share"
+        private const val ACTION_OPEN_WITH = "open_with"
         private const val ACTION_COMPRESS = "compress"
+        private const val ACTION_DELETE = "delete"
 
         /** The name of the file is smaller than a page title. */
         private const val TITLE_SIZE_SP = 15f

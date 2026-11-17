@@ -113,6 +113,12 @@ object PptxParser {
     private const val DEFAULT_LINE_WIDTH_DP = 1f
     private const val EMU_PER_DP = 9525f
 
+    /** A placeholder without a type is a body placeholder. */
+    private const val DEFAULT_PLACEHOLDER = "body"
+
+    /** The height of a table row that does not declare one. */
+    private const val DEFAULT_ROW_HEIGHT_DP = 24f
+
     fun parse(pkg: OoxmlPackage): PptxDeck? {
         val presentation = pkg.node("ppt/presentation.xml") ?: return null
         val theme = OfficeColors.readTheme(pkg)
@@ -173,20 +179,78 @@ object PptxParser {
         fonts: ThemeFonts,
     ): PptxSlide {
         val context = SlideContext(pkg, part, theme, fonts)
-        val cSld = node.child("cSld")
         val shapes = ArrayList<PptxShape>()
-        cSld?.child("spTree")?.nodes()?.forEach { child ->
-            when (child.localName) {
-                "sp" -> shapes += parseShape(child, context)
-                "pic" -> parsePicture(child, context)?.let { shapes += it }
-                "graphicFrame" -> parseTable(child, context)?.let { shapes += it }
-            }
+        cSld(node)?.child("spTree")?.nodes()?.forEach { child ->
+            parseNode(child, context, shapes, Transform.IDENTITY)
         }
         return PptxSlide(
             index = index,
             shapes = shapes,
-            background = resolveBackground(cSld, context),
+            background = resolveBackground(cSld(node), context),
             notes = parseNotes(context),
+        )
+    }
+
+    private fun cSld(node: OoxmlNode): OoxmlNode? = node.child("cSld")
+
+    /**
+     * Reads one node of the shape tree.
+     *
+     * A group carries its own coordinate space, so the shapes inside of it are
+     * mapped into the space of the slide with the transform of the group.
+     */
+    private fun parseNode(
+        node: OoxmlNode,
+        context: SlideContext,
+        shapes: MutableList<PptxShape>,
+        transform: Transform,
+    ) {
+        when (node.localName) {
+            "sp" -> shapes += parseShape(node, context, transform)
+            "pic" -> parsePicture(node, context, transform)?.let { shapes += it }
+            "graphicFrame" -> parseTable(node, context, transform)?.let { shapes += it }
+            "grpSp" -> {
+                // The group carries its own coordinate space in the group
+                // properties: the offset, the extent and the child space.
+                val group = groupTransform(node.child("grpSpPr")?.child("xfrm"))
+                // The shape tree of a group repeats the group properties, the
+                // children follow them.
+                node.nodes().filter { it.localName == "sp" || it.localName == "pic" ||
+                    it.localName == "graphicFrame" || it.localName == "grpSp"
+                }.forEach { child ->
+                    parseNode(child, context, shapes, transform.then(group))
+                }
+            }
+        }
+    }
+
+    /**
+     * The mapping of the children of a group into the space of the slide.
+     *
+     * The children live in their own coordinate space (`chOff` / `chExt`), the
+     * group places that space at `off` and scales it to `ext`.
+     */
+    private fun groupTransform(xfrm: OoxmlNode?): Transform {
+        if (xfrm == null) return Transform.IDENTITY
+        val off = xfrm.child("off")
+        val ext = xfrm.child("ext")
+        val chOff = xfrm.child("chOff")
+        val chExt = xfrm.child("chExt")
+        val left = (off?.attrLong("x") ?: 0L).toDp()
+        val top = (off?.attrLong("y") ?: 0L).toDp()
+        val width = (ext?.attrLong("cx") ?: 0L).toDp()
+        val height = (ext?.attrLong("cy") ?: 0L).toDp()
+        val childLeft = (chOff?.attrLong("x") ?: 0L).toDp()
+        val childTop = (chOff?.attrLong("y") ?: 0L).toDp()
+        val childWidth = (chExt?.attrLong("cx") ?: 0L).toDp()
+        val childHeight = (chExt?.attrLong("cy") ?: 0L).toDp()
+        val scaleX = if (childWidth > 0f) width / childWidth else 1f
+        val scaleY = if (childHeight > 0f) height / childHeight else 1f
+        return Transform(
+            offsetX = left - childLeft * scaleX,
+            offsetY = top - childTop * scaleY,
+            scaleX = scaleX,
+            scaleY = scaleY,
         )
     }
 
@@ -223,10 +287,15 @@ object PptxParser {
 
     // --------------------------------------------------------------- shapes
 
-    private fun parseShape(sp: OoxmlNode, context: SlideContext): List<PptxShape> {
+    private fun parseShape(
+        sp: OoxmlNode,
+        context: SlideContext,
+        transform: Transform,
+    ): List<PptxShape> {
         val spPr = sp.child("spPr")
         val ph = sp.child("nvSpPr")?.child("nvPr")?.child("ph")
-        val phType = ph?.attr("type")
+        // A placeholder without a type is a body placeholder.
+        val phType = ph?.attr("type") ?: DEFAULT_PLACEHOLDER
         val phIdx = ph?.attr("idx")
         val layoutPh = matchPlaceholder(context.layoutPlaceholders, phType, phIdx)
         val masterPh = matchPlaceholder(context.masterPlaceholders, phType, phIdx)
@@ -234,14 +303,14 @@ object PptxParser {
         val xfrm = spPr?.child("xfrm")
             ?: layoutPh?.xfrm
             ?: masterPh?.xfrm
-            ?: return emptyList()
-        val off = xfrm.child("off")
-        val ext = xfrm.child("ext")
-        val left = (off?.attrLong("x") ?: 0L).toDp()
-        val top = (off?.attrLong("y") ?: 0L).toDp()
-        val width = (ext?.attrLong("cx") ?: 0L).toDp()
-        val height = (ext?.attrLong("cy") ?: 0L).toDp()
-        val rotation = (xfrm.attrFloat("rot") ?: 0f) / 60000f
+        // A shape without any geometry is rare, but it must not disappear.
+        val off = xfrm?.child("off")
+        val ext = xfrm?.child("ext")
+        val left = transform.mapX((off?.attrLong("x") ?: 0L).toDp())
+        val top = transform.mapY((off?.attrLong("y") ?: 0L).toDp())
+        val width = transform.mapWidth((ext?.attrLong("cx") ?: 0L).toDp())
+        val height = transform.mapHeight((ext?.attrLong("cy") ?: 0L).toDp())
+        val rotation = (xfrm?.attrFloat("rot") ?: 0f) / 60000f
         val preset = spPr?.child("prstGeom")?.attr("prst") ?: "rect"
         val fill = fillOf(spPr, context.theme)
         val line = lineOf(spPr, context.theme)
@@ -283,7 +352,11 @@ object PptxParser {
         return result
     }
 
-    private fun parsePicture(pic: OoxmlNode, context: SlideContext): PptxShape.Picture? {
+    private fun parsePicture(
+        pic: OoxmlNode,
+        context: SlideContext,
+        transform: Transform,
+    ): PptxShape.Picture? {
         val xfrm = pic.child("spPr")?.child("xfrm") ?: return null
         val off = xfrm.child("off")
         val ext = xfrm.child("ext")
@@ -293,35 +366,51 @@ object PptxParser {
         val bytes = context.pkg.bytes(part) ?: return null
         return PptxShape.Picture(
             bytes = bytes,
-            leftDp = (off?.attrLong("x") ?: 0L).toDp(),
-            topDp = (off?.attrLong("y") ?: 0L).toDp(),
-            widthDp = (ext?.attrLong("cx") ?: 0L).toDp(),
-            heightDp = (ext?.attrLong("cy") ?: 0L).toDp(),
+            leftDp = transform.mapX((off?.attrLong("x") ?: 0L).toDp()),
+            topDp = transform.mapY((off?.attrLong("y") ?: 0L).toDp()),
+            widthDp = transform.mapWidth((ext?.attrLong("cx") ?: 0L).toDp()),
+            heightDp = transform.mapHeight((ext?.attrLong("cy") ?: 0L).toDp()),
         )
     }
 
-    private fun parseTable(frame: OoxmlNode, context: SlideContext): PptxShape.Table? {
+    private fun parseTable(
+        frame: OoxmlNode,
+        context: SlideContext,
+        transform: Transform,
+    ): PptxShape.Table? {
         val tbl = frame.child("graphic")?.child("graphicData")?.child("tbl") ?: return null
         val columns = tbl.child("tblGrid")?.children("gridCol").orEmpty()
-        val columnWidths = columns.map { (it.attrLong("w") ?: 0L).toDp() }
+        val columnWidths = columns.map { transform.mapWidth((it.attrLong("w") ?: 0L).toDp()) }
         if (columnWidths.isEmpty()) return null
         val rows = ArrayList<List<PptxTableCell>>()
         val rowHeights = ArrayList<Float>()
         tbl.children("tr").forEach { tr ->
-            rowHeights += (tr.attrLong("h") ?: 0L).toDp()
+            // The height of a row is a minimum, many decks leave it out.
+            rowHeights += transform.mapHeight((tr.attrLong("h") ?: 0L).toDp())
             rows += tr.children("tc").map { tc -> parseCell(tc, context) }
         }
         val xfrm = frame.child("xfrm")
         val off = xfrm?.child("off")
         val ext = xfrm?.child("ext")
+        val width = transform.mapWidth((ext?.attrLong("cx") ?: 0L).toDp())
+        val height = transform.mapHeight((ext?.attrLong("cy") ?: 0L).toDp())
+        // A table without row heights shares the height of the frame.
+        if (rowHeights.all { it <= 0f } && rows.isNotEmpty()) {
+            val share = height / rows.size
+            for (index in rowHeights.indices) rowHeights[index] = share
+        } else {
+            for (index in rowHeights.indices) {
+                if (rowHeights[index] <= 0f) rowHeights[index] = DEFAULT_ROW_HEIGHT_DP
+            }
+        }
         return PptxShape.Table(
             rows = rows,
             columnWidthsDp = columnWidths,
             rowHeightsDp = rowHeights,
-            leftDp = (off?.attrLong("x") ?: 0L).toDp(),
-            topDp = (off?.attrLong("y") ?: 0L).toDp(),
-            widthDp = ext?.attrLong("cx")?.toDp() ?: columnWidths.sum(),
-            heightDp = ext?.attrLong("cy")?.toDp() ?: rowHeights.sum(),
+            leftDp = transform.mapX((off?.attrLong("x") ?: 0L).toDp()),
+            topDp = transform.mapY((off?.attrLong("y") ?: 0L).toDp()),
+            widthDp = width,
+            heightDp = height,
         )
     }
 
@@ -360,7 +449,7 @@ object PptxParser {
     private fun buildTextContext(
         sp: OoxmlNode,
         context: SlideContext,
-        phType: String?,
+        phType: String,
         layoutPh: PhInfo?,
         masterPh: PhInfo?,
     ): TextContext {
@@ -650,6 +739,41 @@ private fun Long.toDp(): Float =
 
 // -------------------------------------------------------------- internals
 
+/**
+ * The mapping of a coordinate space into the space of the slide.
+ *
+ * A group of shapes lives in its own coordinate space, the transform maps it
+ * into the space of the slide: the shapes are moved by the offset and scaled
+ * by the factors.
+ */
+private class Transform(
+    val offsetX: Float,
+    val offsetY: Float,
+    val scaleX: Float,
+    val scaleY: Float,
+) {
+    fun mapX(value: Float): Float = value * scaleX + offsetX
+
+    fun mapY(value: Float): Float = value * scaleY + offsetY
+
+    fun mapWidth(value: Float): Float = value * scaleX
+
+    fun mapHeight(value: Float): Float = value * scaleY
+
+    /** Combines this transform with the one of a group inside of it. */
+    fun then(group: Transform): Transform = Transform(
+        offsetX = mapX(group.offsetX),
+        offsetY = mapY(group.offsetY),
+        scaleX = scaleX * group.scaleX,
+        scaleY = scaleY * group.scaleY,
+    )
+
+    companion object {
+        /** The identity: the coordinates are used as they are. */
+        val IDENTITY = Transform(0f, 0f, 1f, 1f)
+    }
+}
+
 private class ThemeFonts(val major: String?, val minor: String?)
 
 private class PhInfo(
@@ -711,7 +835,8 @@ private class SlideContext(
         spTree.nodes().filter { it.localName == "sp" }.forEach { sp ->
             val ph = sp.child("nvSpPr")?.child("nvPr")?.child("ph") ?: return@forEach
             result += PhInfo(
-                type = ph.attr("type"),
+                // A placeholder without a type is a body placeholder.
+                type = ph.attr("type") ?: "body",
                 idx = ph.attr("idx"),
                 xfrm = sp.child("spPr")?.child("xfrm"),
                 lstStyle = sp.child("txBody")?.child("lstStyle"),

@@ -141,6 +141,18 @@
 
     </FrameLayout>
 
+    <!--
+      The annotation tools of the reader: highlight, underline, strike through,
+      free hand, note and signature. The signature and the free hand follow the
+      design of the bottom bar, the underline and the other marks are the tools
+      of the strip.
+    -->
+    <include
+        android:id="@+id/annotationToolbar"
+        layout="@layout/preview_annotation_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
     <!-- The bottom bar of the design: 74dp tall, four icons on fixed spots. -->
 
     <LinearLayout

@@ -7,6 +7,10 @@
   - type chip at (72, 370), meta line at (111, 368)
   - four quick actions, 32x32 tiles at y=420, labels at y=460
   - option card 320x224 at (20, 502) with five rows of 44dp
+
+  The sheet binds the actions of the caller onto these slots: the four quick
+  actions and the five rows of the option card. A slot without an action is
+  hidden.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -106,6 +110,7 @@
             android:orientation="vertical">
 
             <ImageView
+                android:id="@+id/ivActionRename"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_gravity="center"
@@ -114,6 +119,7 @@
                 android:src="@mipmap/ic_rename_red" />
 
             <TextView
+                android:id="@+id/tvActionRename"
                 style="@style/TextAppearance.AppCore.Body"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -136,6 +142,7 @@
             android:orientation="vertical">
 
             <ImageView
+                android:id="@+id/ivActionOpenWith"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_gravity="center"
@@ -144,13 +151,14 @@
                 android:src="@mipmap/ic_open_with" />
 
             <TextView
+                android:id="@+id/tvActionOpenWith"
                 style="@style/TextAppearance.AppCore.Body"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                android:maxLines="1"
                 android:ellipsize="end"
                 android:gravity="center"
+                android:maxLines="1"
                 android:fontFamily="sans-serif-medium"
                 android:text="@string/files_open_with"
                 android:textColor="@color/text_secondary"
@@ -169,6 +177,7 @@
             android:orientation="vertical">
 
             <ImageView
+                android:id="@+id/ivActionShare"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_gravity="center"
@@ -177,6 +186,7 @@
                 android:src="@mipmap/ic_share_red" />
 
             <TextView
+                android:id="@+id/tvActionShare"
                 style="@style/TextAppearance.AppCore.Body"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -199,6 +209,7 @@
             android:orientation="vertical">
 
             <ImageView
+                android:id="@+id/ivActionPrint"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:layout_gravity="center"
@@ -207,6 +218,7 @@
                 android:src="@mipmap/ic_print" />
 
             <TextView
+                android:id="@+id/tvActionPrint"
                 style="@style/TextAppearance.AppCore.Body"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -241,6 +253,7 @@
             android:paddingEnd="12dp">
 
             <ImageView
+                android:id="@+id/ivRowSplit"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:background="@drawable/bg_card_r4"
@@ -250,6 +263,7 @@
                 android:src="@mipmap/ic_split_pdf" />
 
             <TextView
+                android:id="@+id/tvRowSplit"
                 style="@style/TextAppearance.AppCore.Body"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -274,6 +288,7 @@
             android:paddingEnd="12dp">
 
             <ImageView
+                android:id="@+id/ivRowCompress"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:background="@drawable/bg_card_r4"
@@ -283,6 +298,7 @@
                 android:src="@mipmap/ic_compress" />
 
             <TextView
+                android:id="@+id/tvRowCompress"
                 style="@style/TextAppearance.AppCore.Body"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -307,6 +323,7 @@
             android:paddingEnd="12dp">
 
             <ImageView
+                android:id="@+id/ivRowMerge"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:background="@drawable/bg_card_r4"
@@ -316,6 +333,7 @@
                 android:src="@mipmap/ic_merge_pdf" />
 
             <TextView
+                android:id="@+id/tvRowMerge"
                 style="@style/TextAppearance.AppCore.Body"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -340,6 +358,7 @@
             android:paddingEnd="12dp">
 
             <ImageView
+                android:id="@+id/ivRowLock"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:background="@drawable/bg_card_r4"
@@ -349,6 +368,7 @@
                 android:src="@mipmap/ic_lock" />
 
             <TextView
+                android:id="@+id/tvRowLock"
                 style="@style/TextAppearance.AppCore.Body"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -373,6 +393,7 @@
             android:paddingEnd="12dp">
 
             <ImageView
+                android:id="@+id/ivRowDelete"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:background="@drawable/bg_card_r4"
@@ -382,6 +403,7 @@
                 android:src="@mipmap/ic_delete_red" />
 
             <TextView
+                android:id="@+id/tvRowDelete"
                 style="@style/TextAppearance.AppCore.Body"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"

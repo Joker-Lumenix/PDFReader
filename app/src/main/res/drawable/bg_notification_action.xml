@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The surface of an icon of the quick actions of the ongoing notification: a
+  rounded square in the brand colour, as the design shows it.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#476bf9" />
+    <corners android:radius="6dp" />
+</shape>

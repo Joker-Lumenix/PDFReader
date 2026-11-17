@@ -23,11 +23,11 @@ import com.peng.pdfreader.data.Document
 import com.peng.pdfreader.data.AppPrefs
 import com.peng.pdfreader.data.DocumentRepository
 import com.peng.pdfreader.databinding.FragmentHomeBinding
-import com.peng.pdfreader.databinding.HomeItemFilterBinding
+import com.peng.pdfreader.appcore.widget.FilterStripView
 import com.peng.pdfreader.ui.uiData.FileActions
 import com.peng.pdfreader.ui.dialogs.DialogDeleteConfirm
 import com.peng.pdfreader.ui.dialogs.BottomSheetRename
-import com.peng.pdfreader.ui.dialogs.BottomSheetMoreActionPdf
+import com.peng.pdfreader.ui.dialogs.DocumentActionSheet
 import com.peng.pdfreader.ui.dialogs.BottomSheetSort
 import com.peng.pdfreader.utils.FileSortOption
 import com.peng.pdfreader.utils.FilesPrefs
@@ -81,7 +81,8 @@ class HomeFragment : BaseFragment() {
 
     private lateinit var pagerAdapter: HomePagerAdapter
 
-    private val filterSegments = mutableListOf<Pair<HomeItemFilterBinding, DocType?>>()
+    /** The id of a segment of the filter strip and the file type behind it. */
+    private val filterTypes = mutableListOf<Pair<String, DocType?>>()
     private var filter: DocType? = null
     /** Guards the two way sync between the strip and the pager. */
     private var syncingPager = false
@@ -123,7 +124,7 @@ class HomeFragment : BaseFragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        filterSegments.clear()
+        filterTypes.clear()
         _binding = null
     }
 
@@ -182,17 +183,24 @@ class HomeFragment : BaseFragment() {
     // ---------------------------------------------------------------- filter strip
 
     private fun setupFilterStrip() {
-        filterSegments += listOf(
-            binding.filterAll to null,
-            binding.filterPdf to DocType.PDF,
-            binding.filterWord to DocType.WORD,
-            binding.filterExcel to DocType.EXCEL,
-            binding.filterPpt to DocType.PPT,
+        // The strip of the design is a custom view, it draws the segments
+        // itself: All / PDF / Word / Excel / PPT.
+        filterTypes.clear()
+        filterTypes += listOf(
+            FILTER_ALL to null,
+            FILTER_PDF to DocType.PDF,
+            FILTER_WORD to DocType.WORD,
+            FILTER_EXCEL to DocType.EXCEL,
+            FILTER_PPT to DocType.PPT,
         )
-        filterSegments.forEachIndexed { index, (segment, type) ->
-            segment.filterLabel.setText(type?.labelRes ?: R.string.all)
-            segment.root.setOnClickListener { selectFilter(type) }
-            segment.root.tag = index
+        binding.filterStrip.items = filterTypes.map { (id, type) ->
+            FilterStripView.Item(
+                id = id,
+                label = getString(type?.labelRes ?: R.string.all),
+            )
+        }
+        binding.filterStrip.onItemSelected = { id ->
+            selectFilter(filterTypes.firstOrNull { it.first == id }?.second)
         }
         applyFilterState()
     }
@@ -213,17 +221,9 @@ class HomeFragment : BaseFragment() {
     }
 
     private fun applyFilterState() {
-        val context = requireContext()
-        filterSegments.forEach { (segment, type) ->
-            val active = type == filter
-            segment.filterLabel.setTextColor(
-                ContextCompat.getColor(
-                    context,
-                    if (active) R.color.brand_primary else R.color.text_disabled,
-                ),
-            )
-            segment.filterIndicator.visibility = if (active) View.VISIBLE else View.INVISIBLE
-        }
+        // The strip shows the filter of the list, the list follows the strip.
+        val selected = filterTypes.firstOrNull { it.second == filter }?.first ?: FILTER_ALL
+        binding.filterStrip.selectedId = selected
     }
 
     // ---------------------------------------------------------------- document pager
@@ -247,11 +247,11 @@ class HomeFragment : BaseFragment() {
     /**
      * The row menu of the design (home-more).
      *
-     * The sheet of the files feature carries the header, the four quick
-     * actions and the options card of the design, so it is reused here.
+     * A PDF file uses the sheet of the design with the option card, every other
+     * format uses the lighter overflow menu of the reader.
      */
     private fun openDocumentSheet(document: Document) {
-        BottomSheetMoreActionPdf.show(childFragmentManager, document.id)
+        DocumentActionSheet.show(requireContext(), childFragmentManager, document)
     }
 
     /**
@@ -384,5 +384,12 @@ class HomeFragment : BaseFragment() {
             DocType.EXCEL,
             DocType.PPT,
         )
+
+        /** The ids of the segments of the filter strip. */
+        private const val FILTER_ALL = "all"
+        private const val FILTER_PDF = "pdf"
+        private const val FILTER_WORD = "word"
+        private const val FILTER_EXCEL = "excel"
+        private const val FILTER_PPT = "ppt"
     }
 }

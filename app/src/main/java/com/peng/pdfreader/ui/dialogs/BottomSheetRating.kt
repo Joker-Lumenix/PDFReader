@@ -1,4 +1,4 @@
-package com.peng.pdfreader.ui.activities
+package com.peng.pdfreader.ui.dialogs
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
@@ -7,40 +7,47 @@ import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.FragmentManager
 import com.peng.pdfreader.BuildConfig
 import com.peng.pdfreader.R
 import com.peng.pdfreader.appcore.util.Logger
-import com.peng.pdfreader.base.BaseActivity
-import com.peng.pdfreader.databinding.SettingsRatingActivityBinding
-import com.peng.pdfreader.utils.SettingsScreen
+import com.peng.pdfreader.appcore.widget.BaseBottomSheetDialog
+import com.peng.pdfreader.databinding.SettingsRatingSheetBinding
+import com.peng.pdfreader.ui.activities.FeedbackActivity
 
 /**
  * Rating sheet of the design.
  *
- * The sheet floats above the app: the window stays transparent, the layout
- * draws the 75% scrim, the illustration that peeks over the top edge of the
- * sheet and the sheet itself.
+ * The sheet floats above the app: the illustration peeks over the top edge of
+ * the sheet, the question, the "top rating" bubble and the five stars follow.
  *
  * Five stars can be picked. Up to three stars send the user to the feedback
  * page, four and five stars open the store listing.
  */
-class RatingActivity : BaseActivity() {
+class BottomSheetRating : BaseBottomSheetDialog() {
 
-    private lateinit var binding: SettingsRatingActivityBinding
+    private var _binding: SettingsRatingSheetBinding? = null
+    private val binding get() = _binding!!
 
     /** The number of stars the user picked, 0 when nothing is picked yet. */
     private var rating = 0
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        // The sheet is drawn above the app, so the window must not paint a
-        // background of its own.
-        window.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+    override fun createContentView(inflater: LayoutInflater, container: ViewGroup?): View {
+        _binding = SettingsRatingSheetBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
-        binding = SettingsRatingActivityBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        // The illustration of the design stands on the scrim of the page, so
+        // the surface of the sheet is only drawn by the sheet itself.
+        sheetContainer?.background = ColorDrawable(Color.TRANSPARENT)
 
         applyTitle()
         applyHalos()
@@ -48,8 +55,21 @@ class RatingActivity : BaseActivity() {
         applyIllustration()
         updateAction()
 
-        binding.scrim.setOnClickListener { continueFlow() }
         binding.btnAction.setOnClickListener { onActionClicked() }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        // The scrim of the design is a 75 % black layer over the page.
+        dialog?.window?.apply {
+            addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+            setDimAmount(SCRIM_ALPHA)
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     /** The question of the design: one line, 20sp medium, #343a63. */
@@ -65,7 +85,7 @@ class RatingActivity : BaseActivity() {
 
     private fun oval(colorRes: Int): GradientDrawable = GradientDrawable().apply {
         shape = GradientDrawable.OVAL
-        setColor(ContextCompat.getColor(this@RatingActivity, colorRes))
+        setColor(ContextCompat.getColor(requireContext(), colorRes))
     }
 
     private fun applyStars() {
@@ -129,28 +149,15 @@ class RatingActivity : BaseActivity() {
         when {
             rating == 0 -> Unit
             rating <= 3 -> {
-                SettingsScreen.start(this, Intent(this, FeedbackActivity::class.java))
-                continueFlow()
+                startActivity(Intent(requireContext(), FeedbackActivity::class.java))
+                dismissAllowingStateLoss()
             }
 
             else -> {
                 openStore()
-                continueFlow()
+                dismissAllowingStateLoss()
             }
         }
-    }
-
-    /**
-     * Leaves the page.
-     *
-     * During the start up flow the permission step follows, otherwise the page
-     * simply closes.
-     */
-    private fun continueFlow() {
-        if (intent.getBooleanExtra(EXTRA_CONTINUE_FLOW, false)) {
-            PermissionActivity.startAsFlowStep(this)
-        }
-        finish()
     }
 
     private fun openStore() {
@@ -173,14 +180,19 @@ class RatingActivity : BaseActivity() {
             startActivity(webIntent)
         } catch (error: ActivityNotFoundException) {
             Logger.e(TAG, "no browser installed", error)
-            Toast.makeText(this, R.string.rating_store_missing, Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.rating_store_missing, Toast.LENGTH_SHORT).show()
         }
     }
 
     companion object {
-        private const val TAG = "RatingActivity"
+        private const val TAG = "BottomSheetRating"
 
-        /** Set when the page is a step of the start up flow. */
-        const val EXTRA_CONTINUE_FLOW = "com.peng.pdfreader.extra.CONTINUE_FLOW"
+        /** The scrim of the design: 75 % black. */
+        private const val SCRIM_ALPHA = 0.75f
+
+        /** Opens the rating sheet. */
+        fun show(manager: FragmentManager) {
+            BottomSheetRating().show(manager, TAG)
+        }
     }
 }

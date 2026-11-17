@@ -18,7 +18,7 @@ import com.peng.pdfreader.ui.activities.FeedbackActivity
 import com.peng.pdfreader.ui.activities.LanguageActivity
 import com.peng.pdfreader.ui.uiData.language.LanguageCatalog
 import com.peng.pdfreader.ui.activities.NoticeActivity
-import com.peng.pdfreader.ui.activities.RatingActivity
+import com.peng.pdfreader.ui.dialogs.BottomSheetRating
 import com.peng.pdfreader.utils.SettingsScreen
 
 /**
@@ -138,7 +138,7 @@ class SettingsFragment : BaseFragment() {
     }
 
     private fun openRating() {
-        SettingsScreen.start(requireContext(), Intent(requireContext(), RatingActivity::class.java))
+        BottomSheetRating.show(childFragmentManager)
     }
 
     private fun openNotice(type: String) {

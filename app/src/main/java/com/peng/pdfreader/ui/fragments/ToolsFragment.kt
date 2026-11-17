@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.peng.pdfreader.appcore.widget.AdSlotView
+import com.peng.pdfreader.ads.Ads
 import com.peng.pdfreader.base.BaseFragment
 import com.peng.pdfreader.data.Document
 import com.peng.pdfreader.databinding.FragmentToolsBinding
@@ -40,9 +41,11 @@ class ToolsFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // The banner ad of the design sits below the grid of the tools.
+        // The banner ad of the design sits below the grid of the tools. The
+        // slot shows the sample artwork until the ad arrives.
         binding.adBanner.style = AdSlotView.Style.BANNER
         binding.adBanner.content = AdSamples.banner(requireContext())
+        Ads.loadBanner(binding.adBanner)
 
         initToolSelected()
     }
