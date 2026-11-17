@@ -6,6 +6,7 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdSize
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.MobileAds
 import com.peng.pdfreader.BuildConfig
 import com.peng.pdfreader.core.util.Logger
 import com.peng.pdfreader.core.widget.AdSlotView
@@ -51,18 +52,16 @@ object Ads {
             Logger.e(TAG, "the banner ad could not be created", it)
             return
         }
-        adView.setAdListener(
-            object : AdListener() {
-                override fun onAdLoaded() {
-                    slot.setAdView(adView)
-                }
+        adView.adListener = object : AdListener() {
+            override fun onAdLoaded() {
+                slot.setAdView(adView)
+            }
 
-                override fun onAdFailedToLoad(error: LoadAdError) {
-                    // The sample artwork of the design stays visible.
-                    Logger.w(TAG, "the banner ad could not be loaded: ${error.code}")
-                }
-            },
-        )
+            override fun onAdFailedToLoad(error: LoadAdError) {
+                // The sample artwork of the design stays visible.
+                Logger.w(TAG, "the banner ad could not be loaded: ${error.code}")
+            }
+        }
         runCatching { adView.loadAd(AdRequest.Builder().build()) }
             .onFailure { Logger.e(TAG, "the banner ad could not be requested", it) }
     }
@@ -83,7 +82,7 @@ object Ads {
     /** Starts the ad sdk, it is called once with the application. */
     fun initialize(context: Context) {
         runCatching {
-            com.google.android.gms.ads.MobileAds.initialize(context) {
+            MobileAds.initialize(context) {
                 Logger.d(TAG, "the ad sdk is ready")
             }
         }.onFailure {

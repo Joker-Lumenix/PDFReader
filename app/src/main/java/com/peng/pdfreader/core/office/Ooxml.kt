@@ -30,6 +30,14 @@ class OoxmlPackage private constructor(private val zip: ZipFile) : AutoCloseable
     private val textCache = HashMap<String, String?>()
 
     companion object {
+        /**
+         * Parts bigger than this are not kept in the cache.
+         *
+         * The tree of a big slide or of the body of a Word document is big as
+         * well, a whole document would not fit into the memory of the phone.
+         */
+        private const val CACHE_LIMIT = 2 * 1024 * 1024
+
         fun open(file: File): OoxmlPackage? = runCatching {
             OoxmlPackage(ZipFile(file))
         }.onFailure {
@@ -54,13 +62,29 @@ class OoxmlPackage private constructor(private val zip: ZipFile) : AutoCloseable
     }
 
     /** Parses a part into a namespace agnostic node tree. */
-    fun node(name: String): OoxmlNode? = cache.getOrPut(name) {
-        val raw = bytes(name) ?: return@getOrPut null
-        runCatching {
+    fun node(name: String): OoxmlNode? {
+        val cached = cache[name]
+        if (cached != null) return cached
+        val raw = bytes(name) ?: return null
+        val parsed = runCatching {
             val document = builder.newDocumentBuilder().parse(ByteArrayInputStream(raw))
             OoxmlNode(document.documentElement)
         }.getOrNull()
+        // The content of a document (the slides, the body, the worksheets) is
+        // not kept: the tree of a whole document would fill the memory of the
+        // phone. The small parts (the theme, the styles) are used again and
+        // again, they stay in the cache.
+        if (!isContentPart(name) && raw.size <= CACHE_LIMIT) cache[name] = parsed
+        return parsed
     }
+
+    /** The parts that carry the content of the document. */
+    private fun isContentPart(name: String): Boolean =
+        name.startsWith("ppt/slides/") ||
+            name.startsWith("ppt/notesSlides/") ||
+            name.startsWith("word/document") ||
+            name.startsWith("xl/worksheets/") ||
+            name.startsWith("xl/sharedStrings")
 
     /** Resolves a relationship id to the part it points at (relative to [base]). */
     fun resolveRelationship(base: String, relationshipId: String): String? {

@@ -81,6 +81,14 @@ object XlsxParser {
         "accent1", "accent2", "accent3", "accent4", "accent5", "accent6",
     )
 
+    /**
+     * The number of rows that are parsed per sheet.
+     *
+     * A big workbook would not fit into the memory of the phone, the preview
+     * shows the first rows of it.
+     */
+    private const val MAX_ROWS = 2000
+
     /** Number format ids that are defined by the specification itself. */
     private val BUILTIN_FORMATS: Map<Int, String> = mapOf(
         0 to "General",
@@ -303,7 +311,9 @@ object XlsxParser {
         val defaultColumnWidthDp = readDefaultColumnWidth(root)
         val defaultRowHeightDp = readDefaultRowHeight(root)
 
-        val rowNodes = root.child("sheetData")?.children("row").orEmpty()
+        val rowNodes = root.child("sheetData")?.children("row")
+            ?.take(MAX_ROWS)
+            .orEmpty()
         val sharedFormulas = readSharedFormulas(rowNodes)
         val drafts = readCells(rowNodes, sharedStrings, sharedFormulas)
         val rowHeights = readRowHeights(rowNodes)

@@ -35,8 +35,11 @@ import com.peng.pdfreader.databinding.FragmentOfficePreviewBinding
 import com.peng.pdfreader.ui.adapter.listAdapter.DocumentPrintAdapter
 import com.peng.pdfreader.ui.dialogs.BottomSheetMoreActionNoPdf
 import com.peng.pdfreader.ui.dialogs.DialogRename
+import com.peng.pdfreader.core.office.OfficeText
 import com.peng.pdfreader.utils.FileSharing
+import com.peng.pdfreader.utils.OfficePrinting
 import com.peng.pdfreader.utils.PreviewTitleActions
+import java.io.File
 import com.peng.pdfreader.ui.activities.CompressActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -227,11 +230,26 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
     /**
      * Prints the document.
      *
-     * The print pipeline of the app rasterises a PDF, so only the formats the
-     * engine can open are sent to the print service.
+     * The print pipeline of the app rasterises a PDF. The Word / Excel /
+     * PowerPoint documents are printed with their text.
      */
     private fun print() {
         val doc = document ?: return
+        if (doc.type == DocType.WORD || doc.type == DocType.EXCEL || doc.type == DocType.PPT) {
+            val printed = OfficePrinting.print(
+                requireContext(),
+                repository.fileOf(doc),
+                doc.name,
+            )
+            if (!printed) {
+                Toast.makeText(
+                    requireContext(),
+                    R.string.preview_feature_unavailable,
+                    Toast.LENGTH_SHORT,
+                ).show()
+            }
+            return
+        }
         if (doc.type != DocType.PDF && doc.type != DocType.IMAGE) {
             Toast.makeText(
                 requireContext(),
@@ -286,7 +304,15 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
     private fun loadDocument() {
         val doc = document ?: return
         viewLifecycleOwner.lifecycleScope.launch {
-            val parsed = withContext(Dispatchers.IO) { parse(doc) }
+            val parsed = withContext(Dispatchers.IO) {
+                try {
+                    parse(doc)
+                } catch (error: OutOfMemoryError) {
+                    // A big document does not fit into the memory of the phone.
+                    Logger.e(TAG, "the document ${doc.name} is too big to be previewed")
+                    null
+                }
+            }
             if (_binding == null) return@launch
             if (parsed == null) {
                 showError()
@@ -308,17 +334,39 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
             val content = runCatching { file.readText() }.getOrNull() ?: return null
             return Parsed.Text(content)
         }
-        val pkg = OoxmlPackage.open(file) ?: return null
         return try {
-            when (doc.type) {
-                DocType.WORD -> DocxParser.parse(pkg)?.let { Parsed.Docx(it) }
-                DocType.PPT -> PptxParser.parse(pkg)?.let { Parsed.Pptx(it) }
-                DocType.EXCEL -> XlsxParser.parse(pkg)?.let { Parsed.Xlsx(it) }
-                else -> null
+            val pkg = OoxmlPackage.open(file) ?: return textFallback(doc, file)
+            try {
+                when (doc.type) {
+                    DocType.WORD -> DocxParser.parse(pkg)?.let { Parsed.Docx(it) }
+                    DocType.PPT -> PptxParser.parse(pkg)?.let { Parsed.Pptx(it) }
+                    DocType.EXCEL -> XlsxParser.parse(pkg)?.let { Parsed.Xlsx(it) }
+                    else -> null
+                } ?: textFallback(doc, file)
+            } finally {
+                pkg.close()
             }
-        } finally {
-            pkg.close()
+        } catch (error: OutOfMemoryError) {
+            // The tree of a big document does not fit into the memory of the
+            // phone, the text of the document is shown instead.
+            Logger.e(TAG, "the document ${doc.name} is too big for the preview")
+            textFallback(doc, file)
+        } catch (error: Exception) {
+            Logger.e(TAG, "the document ${doc.name} could not be parsed", error)
+            textFallback(doc, file)
         }
+    }
+
+    /**
+     * The fallback of a document that does not fit into the memory.
+     *
+     * The text is read with a streaming parser, so it needs only a little
+     * memory.
+     */
+    private fun textFallback(doc: Document, file: File): Parsed? {
+        val lines = OfficeText.lines(file)
+        if (lines.isEmpty()) return null
+        return Parsed.Text(lines.joinToString("\n"))
     }
 
     private fun showLoading() {

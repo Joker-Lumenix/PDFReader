@@ -379,81 +379,30 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
     private fun showMoreActions() {
         val doc = document
         if (doc == null) return
-        if (doc.type == DocType.PDF) {
-            // A PDF file uses the sheet of the design (home-more): four quick
-            // actions above the card of the document operations.
-            BottomSheetMoreActionPdf.show(
-                parentFragmentManager,
-                doc.id,
-                quickActions = listOf(
-                    BottomSheetMoreActionPdf.Action(
-                        ACTION_OUTLINE,
-                        getString(R.string.preview_outline),
-                        R.mipmap.ic_menu,
-                    ),
-                    BottomSheetMoreActionPdf.Action(
-                        ACTION_BOOKMARK,
-                        getString(R.string.preview_add_bookmark),
-                        R.mipmap.ic_collect_unselect,
-                    ),
-                    BottomSheetMoreActionPdf.Action(
-                        ACTION_READING_MODE,
-                        getString(R.string.preview_reading_mode),
-                        R.mipmap.ic_eye_open,
-                    ),
-                    BottomSheetMoreActionPdf.Action(
-                        ACTION_RENAME,
-                        getString(R.string.rename),
-                        R.mipmap.ic_rename_black,
-                    ),
-                ),
-                optionActions = listOf(
-                    BottomSheetMoreActionPdf.Action(
-                        ACTION_SHARE,
-                        getString(R.string.preview_share),
-                        R.mipmap.ic_share_square_black,
-                    ),
-                    BottomSheetMoreActionPdf.Action(
-                        ACTION_OPEN_WITH,
-                        getString(R.string.preview_open_with),
-                        R.mipmap.ic_open_with,
-                    ),
-                    BottomSheetMoreActionPdf.Action(
-                        ACTION_COMPRESS,
-                        getString(R.string.compress),
-                        R.mipmap.ic_compress,
-                    ),
-                    BottomSheetMoreActionPdf.Action(
-                        ACTION_DELETE,
-                        getString(R.string.delete),
-                        R.mipmap.ic_delete_red,
-                    ),
-                ),
-            )
-            return
-        }
-        // Every other format uses the lighter overflow menu of the reader.
+        // The reader uses the overflow menu of the design (sign-more): the
+        // header of the file, the four actions of the reader and the wide row
+        // with the secondary action.
         val sheet = BottomSheetMoreActionNoPdf.create(
             actions = listOf(
                 BottomSheetMoreActionNoPdf.Action(
                     ACTION_OUTLINE,
-                    getString(R.string.rename),
-                    R.mipmap.ic_rename_red,
+                    getString(R.string.preview_outline),
+                    R.mipmap.ic_menu,
                 ),
                 BottomSheetMoreActionNoPdf.Action(
                     ACTION_BOOKMARK,
-                    getString(R.string.files_open_with),
-                    R.mipmap.ic_open_with,
+                    getString(R.string.preview_add_bookmark),
+                    R.mipmap.ic_collect_unselect,
                 ),
                 BottomSheetMoreActionNoPdf.Action(
                     ACTION_READING_MODE,
-                    getString(R.string.share),
-                    R.mipmap.ic_share_red,
+                    getString(R.string.preview_reading_mode),
+                    R.mipmap.ic_eye_open,
                 ),
                 BottomSheetMoreActionNoPdf.Action(
                     ACTION_RENAME,
-                    getString(R.string.print),
-                    R.mipmap.ic_print,
+                    getString(R.string.rename),
+                    R.mipmap.ic_rename_black,
                 ),
             ),
             wideAction = BottomSheetMoreActionNoPdf.Action(

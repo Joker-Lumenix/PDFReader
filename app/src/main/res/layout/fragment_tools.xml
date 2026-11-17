@@ -306,7 +306,7 @@
     <com.peng.pdfreader.core.widget.AdSlotView
         android:id="@+id/adBanner"
         android:layout_width="match_parent"
-        android:layout_height="72dp"
+        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         />
 

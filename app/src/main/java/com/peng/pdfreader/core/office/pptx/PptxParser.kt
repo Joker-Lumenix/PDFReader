@@ -119,6 +119,14 @@ object PptxParser {
     /** The height of a table row that does not declare one. */
     private const val DEFAULT_ROW_HEIGHT_DP = 24f
 
+    /**
+     * The number of slides that are parsed.
+     *
+     * A big presentation would not fit into the memory of the phone, the
+     * preview shows the first slides of it.
+     */
+    private const val MAX_SLIDES = 200
+
     fun parse(pkg: OoxmlPackage): PptxDeck? {
         val presentation = pkg.node("ppt/presentation.xml") ?: return null
         val theme = OfficeColors.readTheme(pkg)
@@ -163,6 +171,7 @@ object PptxParser {
         val result = ArrayList<PptxSlide>()
         var index = 0
         parts.forEach { part ->
+            if (index >= MAX_SLIDES) return@forEach
             val node = pkg.node(part) ?: return@forEach
             index += 1
             result += parseSlide(pkg, part, node, index, theme, fonts)

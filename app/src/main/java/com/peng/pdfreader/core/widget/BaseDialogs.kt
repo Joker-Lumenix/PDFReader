@@ -7,7 +7,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewOutlineProvider
 import android.widget.FrameLayout
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -80,8 +82,14 @@ abstract class BaseBottomSheetDialog(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT,
         )
-        sheet.addView(createContentView(inflater, sheet))
-        sheetContainer = sheet
+        // The surface of the design (16dp radius at the top) belongs to the
+        // sheet, the content of the sheet must not cover those corners.
+        sheet.background = ContextCompat.getDrawable(requireContext(), R.drawable.bg_sheet_top_r16)
+        sheet.clipToOutline = true
+        sheet.outlineProvider = ViewOutlineProvider.BACKGROUND
+        val content = createContentView(inflater, sheet)
+        content.background = null
+        sheet.addView(content)
         return sheet
     }
 
@@ -90,7 +98,11 @@ abstract class BaseBottomSheetDialog(
         // The container draws the rounded surface itself, so the default sheet
         // background has to go.
         dialog?.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)?.apply {
-            background = ColorDrawable(Color.TRANSPARENT)
+            background = ContextCompat.getDrawable(requireContext(), R.drawable.bg_sheet_top_r16)
+            // The 16dp radius at the top of the design: the sheet is cut with
+            // the outline of its own background.
+            clipToOutline = true
+            outlineProvider = ViewOutlineProvider.BACKGROUND
             // The sheet has to grow with its content and it has to stay above
             // the keyboard, the design shows it right above it.
             val behavior = BottomSheetBehavior.from(this)

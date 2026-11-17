@@ -82,6 +82,15 @@ class HomeDocumentActions(private val host: Fragment) {
 
     private fun printDocument(context: Context, docId: String) {
         val document = repository(context).byId(docId) ?: return
+        // The print service rasterises PDFs. The Word / Excel / PowerPoint
+        // documents are printed with their text.
+        if (document.type == DocType.WORD || document.type == DocType.EXCEL ||
+            document.type == DocType.PPT
+        ) {
+            val printed = OfficePrinting.print(context, repository(context).fileOf(document), document.name)
+            if (!printed) toast(context)
+            return
+        }
         if (document.type != DocType.PDF && document.type != DocType.IMAGE) {
             toast(context)
             return

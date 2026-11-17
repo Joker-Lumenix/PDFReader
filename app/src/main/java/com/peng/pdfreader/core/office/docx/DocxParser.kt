@@ -9,7 +9,15 @@ import kotlin.math.roundToInt
 
 private const val TWIP_PER_PT = 20f
 private const val EMU_PER_PT = 12700f
-private const val MAX_LIST_LEVEL = 9
+    private const val MAX_LIST_LEVEL = 9
+
+    /**
+     * The number of blocks (paragraphs and tables) that are parsed.
+     *
+     * A big Word document would not fit into the memory of the phone, the
+     * preview shows the first pages of it.
+     */
+    private const val MAX_BLOCKS = 1500
 
 private fun bulletChar(level: Int): String = when (level) {
     0 -> "•"
@@ -112,6 +120,7 @@ object DocxParser {
         var fallbackTitle: String? = null
 
         body.nodes().forEach { child ->
+            if (blocks.size >= MAX_BLOCKS) return@forEach
             when (child.localName) {
                 "p" -> {
                     val paragraph = parseParagraph(child, styles, numbering, counters, pkg)
