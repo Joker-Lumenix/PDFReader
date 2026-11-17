@@ -532,6 +532,11 @@ class FilesFragment : BaseFragment() {
 
     /** The page that asks for the access to the files. */
     private fun openPermissionPage() {
+        if (SharedStorage.canRead(requireContext())) {
+            // The access to the files is granted already, the page of the
+            // permission has nothing left to show.
+            return
+        }
         startActivity(Intent(requireContext(), PermissionActivity::class.java))
     }
 

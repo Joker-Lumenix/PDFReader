@@ -5,13 +5,11 @@ import android.app.NotificationManager
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.peng.pdfreader.core.util.Logger
 import com.peng.pdfreader.base.BaseActivity
@@ -30,6 +28,10 @@ import kotlinx.coroutines.withContext
  * It is an activity of its own: the start up flow is
  * splash -> onboarding -> permission -> home, every step is its own screen and
  * the home activity stays free of that logic.
+ *
+ * The page never asks for anything by itself: the permission is requested from
+ * the system when the user taps the button of the design. When the app may
+ * already read the files the page is not shown at all.
  *
  * The app bar of the design carries no title, only the close button.
  */
@@ -64,6 +66,15 @@ class PermissionActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // The page is only shown when the permission is missing. When it is
+        // already granted the page closes right away, the user never sees it.
+        if (hasStoragePermission()) {
+            Logger.i(TAG, "the access to the files is granted already, the page is skipped")
+            continueFlow()
+            return
+        }
+
         binding = ActivityPermissionBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -71,23 +82,23 @@ class PermissionActivity : BaseActivity() {
             if (exitToHomeAfterGrant()) goHome() else finish()
         }
 
-        binding.btnAllow.setOnClickListener { openAllFilesSettings() }
-
-        askForReadPermissionIfNeeded()
+        // The page never asks for anything by itself: the request goes to the
+        // system when the user taps the button of the design.
+        binding.btnAllow.setOnClickListener { requestStoragePermission() }
     }
 
     /**
-     * Asks for the runtime permission of the versions below Android 11.
+     * Asks the system for the permission of the page.
      *
-     * From Android 11 on the "access all files" permission replaces it: the
-     * button of the page opens the system screen of that permission and the
-     * page leaves the app once the permission was given.
+     * From Android 11 on the "access all files" permission
+     * (MANAGE_EXTERNAL_STORAGE) is a special access permission: the system
+     * ignores a runtime request for it, the user grants it in the screen of
+     * the system. Below that version the access to the files is a normal
+     * runtime permission and the system shows its own dialog.
      */
-    private fun askForReadPermissionIfNeeded() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) return
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
-            == PackageManager.PERMISSION_GRANTED
-        ) {
+    private fun requestStoragePermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            openAllFilesSettings()
             return
         }
         readStoragePermissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -102,6 +113,10 @@ class PermissionActivity : BaseActivity() {
         if (exitToHomeAfterGrant()) {
             // The permission was given in the system screen, the flow goes on.
             continueFlow()
+        } else {
+            // The page was opened from the app itself, the permission is there
+            // now: the page has nothing left to show.
+            finish()
         }
     }
 
@@ -137,6 +152,8 @@ class PermissionActivity : BaseActivity() {
     private fun hasStoragePermission(): Boolean = SharedStorage.canRead(this)
 
     private fun openAllFilesSettings() {
+        // The screen of the system for MANAGE_EXTERNAL_STORAGE: the user
+        // switches the "access all files" permission there.
         val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             Intent(
                 Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,

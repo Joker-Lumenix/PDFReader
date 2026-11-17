@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.peng.pdfreader.R
 import com.peng.pdfreader.core.util.Logger
+import com.peng.pdfreader.data.SharedStorage
 import com.peng.pdfreader.core.widget.BottomNavItem
 import com.peng.pdfreader.base.BaseActivity
 import com.peng.pdfreader.base.BaseBackHandler
@@ -277,6 +278,12 @@ class MainActivity : BaseActivity() {
     }
 
     private fun openStoragePermission() {
+        if (SharedStorage.canRead(this)) {
+            // The access to the files is granted already, the page of the
+            // permission has nothing left to show.
+            Logger.i(TAG, "the access to the files is granted already")
+            return
+        }
         startActivity(Intent(this, PermissionActivity::class.java))
     }
 
