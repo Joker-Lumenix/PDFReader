@@ -2,6 +2,7 @@ package com.peng.pdfreader.core.util
 
 import android.os.Build
 import android.view.WindowInsets
+import androidx.core.view.WindowInsetsCompat
 
 /**
  * The insets of the system bars.
@@ -21,6 +22,10 @@ object SystemBarInsets {
             insets.systemWindowInsetTop
         }
 
+    /** The height of the status bar inset. */
+    fun top(insets: WindowInsetsCompat): Int =
+        insets.toWindowInsets()?.let { top(it) } ?: 0
+
     /** The height of the navigation bar inset. */
     fun bottom(insets: WindowInsets): Int =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -29,4 +34,8 @@ object SystemBarInsets {
             @Suppress("DEPRECATION")
             insets.systemWindowInsetBottom
         }
+
+    /** The height of the navigation bar inset. */
+    fun bottom(insets: WindowInsetsCompat): Int =
+        insets.toWindowInsets()?.let { bottom(it) } ?: 0
 }

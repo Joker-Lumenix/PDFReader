@@ -46,6 +46,8 @@
         <attr name="filterIndicatorRadius" format="dimension" />
         <!-- 指示器与文本之间的距离，单位dp -->
         <attr name="filterIndicatorGap" format="dimension" />
+        <!-- 标签与条目的上边缘之间的距离，单位dp -->
+        <attr name="filterLabelTopPadding" format="dimension" />
         <!-- 每一个条目的宽度，单位dp，0表示按权重平分 -->
         <attr name="filterItemWidth" format="dimension" />
         <!-- 每一个条目的高度，单位dp -->

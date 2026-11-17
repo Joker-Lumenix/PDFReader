@@ -16,7 +16,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <LinearLayout
+        <LinearLayout android:id="@+id/topBar"
             android:layout_width="match_parent"
             android:layout_height="@dimen/top_bar_height"
             android:background="@color/surface_card"

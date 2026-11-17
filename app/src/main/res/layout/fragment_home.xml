@@ -14,6 +14,7 @@
 
     <!-- 标题 -->
     <RelativeLayout
+        android:id="@+id/topBar"
         android:layout_width="match_parent"
         android:layout_height="63dp"
         android:background="@color/surface_card"
@@ -162,6 +163,7 @@
         app:filterIndicatorWidth="44dp"
         app:filterItemHeight="44dp"
         app:filterLabelTextSize="14sp"
+        app:filterLabelTopPadding="14dp"
         app:filterSelectedColor="@color/brand_primary"
         app:filterUnselectedColor="@color/text_disabled" />
 

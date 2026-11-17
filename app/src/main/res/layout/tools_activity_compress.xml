@@ -12,7 +12,7 @@
     android:orientation="vertical">
 
     <!-- 顶部标题栏：返回按钮 + 标题 -->
-    <LinearLayout
+    <LinearLayout android:id="@+id/topBar"
         android:layout_width="match_parent"
         android:layout_height="63dp"
         android:background="@color/surface_card"

@@ -216,7 +216,15 @@ class DocumentRepository private constructor(private val appContext: Context) {
         }
     }
 
-    fun rename(doc: Document, newName: String) {
+    /**
+     * Renames a document.
+     *
+     * The file of the shared storage can be read but not always written, so the
+     * rename is guarded: a failure is reported and the app stays alive.
+     *
+     * @return true when the document was renamed.
+     */
+    fun rename(doc: Document, newName: String): Boolean {
         val source = File(doc.path)
         // A document of the shared storage keeps its place, only the sandbox
         // stores its files with the id of the document.
@@ -228,10 +236,17 @@ class DocumentRepository private constructor(private val appContext: Context) {
         if (source.exists() && source.absolutePath != target.absolutePath) {
             // The record has to follow the file, otherwise the document would
             // point at a path that no longer exists.
-            if (!source.renameTo(target)) {
-                source.copyTo(target, overwrite = true)
-                source.delete()
+            val moved = runCatching {
+                if (!source.renameTo(target)) {
+                    source.copyTo(target, overwrite = true)
+                    source.delete()
+                }
+                true
+            }.getOrElse {
+                Logger.e(TAG, "the document ${doc.name} could not be renamed", it)
+                false
             }
+            if (!moved) return false
         }
         update(
             doc.copy(
@@ -241,6 +256,7 @@ class DocumentRepository private constructor(private val appContext: Context) {
                 modifiedAt = System.currentTimeMillis(),
             ),
         )
+        return true
     }
 
     fun delete(doc: Document) {

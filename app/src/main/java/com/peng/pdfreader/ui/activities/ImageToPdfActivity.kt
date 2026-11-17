@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.view.Gravity
@@ -22,6 +23,7 @@ import com.peng.pdfreader.R
 import com.peng.pdfreader.base.BaseActivity
 import com.peng.pdfreader.data.DocType
 import com.peng.pdfreader.data.DocumentRepository
+import com.peng.pdfreader.data.SharedStorage
 import com.peng.pdfreader.databinding.ToolsActivityImageToPdfBinding
 import com.peng.pdfreader.ui.adapter.decoration.EdgeGapDecoration
 import com.peng.pdfreader.ui.adapter.listAdapter.ImageRowAdapter
@@ -232,10 +234,20 @@ class ImageToPdfActivity : BaseActivity() {
         rowAdapter.submit(buildRows())
         binding.btnImport.text = getString(R.string.import_count, images.size)
         binding.btnImport.isEnabled = images.isNotEmpty()
-        binding.emptyState.visibility = if (images.isEmpty()) View.VISIBLE else View.GONE
+        // The empty state of the design is the state without the permission.
+        // When the app may read the files the grid with the camera tile is
+        // shown instead of the hint of the permission.
+        val permissionMissing = !SharedStorage.canRead(this)
+        binding.emptyState.visibility = if (permissionMissing) View.VISIBLE else View.GONE
         // the empty state of the design carries the import button only
         binding.stripScroll.visibility = if (images.isEmpty()) View.GONE else View.VISIBLE
         rebuildStrip()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // The permission may have been given in the system screen.
+        refresh()
     }
 
     /** The rows of the list view, the camera comes first. */
@@ -298,9 +310,23 @@ class ImageToPdfActivity : BaseActivity() {
         }
     }
 
+    /**
+     * Opens the screen of the system for the permission of the files.
+     *
+     * From Android 11 on that is the "access all files" permission
+     * (MANAGE_EXTERNAL_STORAGE), the user switches it there. The app comes
+     * back on its own and the page leaves the hint of the permission.
+     */
     private fun openAppSettings() {
-        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-            .setData(Uri.fromParts("package", packageName, null))
+        val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            Intent(
+                Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
+                Uri.fromParts("package", packageName, null),
+            )
+        } else {
+            Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                .setData(Uri.fromParts("package", packageName, null))
+        }
         runCatching { startActivity(intent) }
     }
 

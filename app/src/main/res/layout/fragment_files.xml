@@ -21,7 +21,7 @@
         android:layout_height="wrap_content">
 
         <!-- 顶部标题栏：标题 + 右侧的三个操作 -->
-        <LinearLayout
+        <LinearLayout android:id="@+id/topBar"
             android:layout_width="match_parent"
             android:layout_height="63dp"
             android:background="@color/surface_card"

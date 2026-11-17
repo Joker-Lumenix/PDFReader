@@ -13,7 +13,7 @@
     android:orientation="vertical">
 
     <!-- 顶部标题栏：运行中的任务没有返回按钮，标题也是空的 -->
-    <LinearLayout
+    <LinearLayout android:id="@+id/topBar"
         android:layout_width="match_parent"
         android:layout_height="63dp"
         android:background="@color/surface_card"

@@ -53,6 +53,8 @@ class FileSearchActivity : BaseActivity() {
         setupEmptyState()
 
         binding.etSearch.requestFocus()
+        // The page starts with all the files, the keyword narrows them down.
+        load()
     }
 
     // ------------------------------------------------------------------ setup

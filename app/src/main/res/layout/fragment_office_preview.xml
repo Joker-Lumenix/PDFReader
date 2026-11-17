@@ -11,7 +11,7 @@
     android:background="@color/surface_muted"
     android:orientation="vertical">
 
-    <RelativeLayout
+    <RelativeLayout android:id="@+id/topBar"
         android:layout_width="match_parent"
         android:layout_height="63dp"
         android:background="@color/surface_card"

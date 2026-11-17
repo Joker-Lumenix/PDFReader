@@ -33,11 +33,15 @@ import com.peng.pdfreader.R
  *     app:filterIndicatorHeight="2dp"
  *     app:filterIndicatorRadius="1dp"
  *     app:filterIndicatorGap="12dp"
+ *     app:filterLabelTopPadding="14dp"
  *     app:filterItemHeight="44dp" />
  * ```
  *
  * 条目的文字通过 [items] 传入，点击之后由 [onItemSelected] 回调通知调用方，
  * 选中的条目由 [selectedId] 决定。
+ *
+ * 布局中的尺寸单位是 dp 与 sp，属性本身也是 dp 与 sp：控件在读取之后自己换算成
+ * 像素，代码里设置这些属性时不需要自己换算。
  */
 class FilterStripView @JvmOverloads constructor(
     context: Context,
@@ -109,6 +113,17 @@ class FilterStripView @JvmOverloads constructor(
             refreshIndicators()
         }
 
+    /**
+     * 标签与条目的上边缘之间的距离，单位dp。
+     *
+     * 设计稿中筛选条高 44dp，文字在 14dp 处开始，指示器在底部。
+     */
+    var labelTopPaddingDp: Float = 14f
+        set(value) {
+            field = value
+            refreshLayout()
+        }
+
     /** 每一个条目的宽度，单位dp，0表示按权重平分。 */
     var itemWidthDp: Float = 0f
         set(value) {
@@ -143,7 +158,7 @@ class FilterStripView @JvmOverloads constructor(
     /**
      * 读取布局中的属性。
      *
-     * 属性的默认值来自设计稿：选中 #FF3B5C，未选中 #C4C4C4，文字 14sp，
+     * 属性的默认值来自设计稿：选中 #da232f，未选中 #b4b4b4，文字 14sp，
      * 指示器 44x2dp、圆角 1dp、与文字的距离 12dp，条目 44dp 高。
      */
     init {
@@ -163,26 +178,28 @@ class FilterStripView @JvmOverloads constructor(
                 R.styleable.FilterStripView_filterIndicatorColor,
                 ContextCompat.getColor(context, R.color.brand_primary),
             )
-            labelTextSizeSp = typed.getDimension(
-                R.styleable.FilterStripView_filterLabelTextSize,
-                sp(14f),
+            labelTextSizeSp = spOfDimension(
+                typed.getDimension(R.styleable.FilterStripView_filterLabelTextSize, sp(14f)),
             )
-            indicatorWidthDp = dp(
+            indicatorWidthDp = dpOfDimension(
                 typed.getDimension(R.styleable.FilterStripView_filterIndicatorWidth, dp(44f)),
             )
-            indicatorHeightDp = dp(
+            indicatorHeightDp = dpOfDimension(
                 typed.getDimension(R.styleable.FilterStripView_filterIndicatorHeight, dp(2f)),
             )
-            indicatorRadiusDp = dp(
+            indicatorRadiusDp = dpOfDimension(
                 typed.getDimension(R.styleable.FilterStripView_filterIndicatorRadius, dp(1f)),
             )
-            indicatorGapDp = dp(
+            indicatorGapDp = dpOfDimension(
                 typed.getDimension(R.styleable.FilterStripView_filterIndicatorGap, dp(12f)),
             )
-            itemWidthDp = dp(
+            labelTopPaddingDp = dpOfDimension(
+                typed.getDimension(R.styleable.FilterStripView_filterLabelTopPadding, dp(14f)),
+            )
+            itemWidthDp = dpOfDimension(
                 typed.getDimension(R.styleable.FilterStripView_filterItemWidth, 0f),
             )
-            itemHeightDp = dp(
+            itemHeightDp = dpOfDimension(
                 typed.getDimension(R.styleable.FilterStripView_filterItemHeight, dp(44f)),
             )
         } finally {
@@ -208,9 +225,13 @@ class FilterStripView @JvmOverloads constructor(
         val column = LinearLayout(context).apply {
             orientation = VERTICAL
             gravity = Gravity.CENTER_HORIZONTAL
+            // The design of the home page (home-PDF): the strip is 44dp tall,
+            // the label starts 14dp below its top edge and the indicator sits
+            // at the bottom of the strip.
+            setPadding(0, px(labelTopPaddingDp).toInt(), 0, 0)
             val params = LayoutParams(
-                if (itemWidthDp > 0f) itemWidthDp.toInt() else 0,
-                itemHeightDp.toInt(),
+                if (itemWidthDp > 0f) px(itemWidthDp).toInt() else 0,
+                px(itemHeightDp).toInt(),
             )
             if (itemWidthDp <= 0f) params.weight = 1f
             layoutParams = params
@@ -225,6 +246,8 @@ class FilterStripView @JvmOverloads constructor(
             textSize = labelTextSizeSp
             gravity = Gravity.CENTER
             typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
+            // The line height of the design is 16dp, without the padding of
+            // the font the indicator still fits into the 44dp of the strip.
             includeFontPadding = false
         }
         column.addView(
@@ -236,10 +259,10 @@ class FilterStripView @JvmOverloads constructor(
             background = indicatorDrawable()
         }
         val indicatorParams = LayoutParams(
-            indicatorWidthDp.toInt(),
-            indicatorHeightDp.toInt(),
+            px(indicatorWidthDp).toInt(),
+            px(indicatorHeightDp).toInt(),
         )
-        indicatorParams.topMargin = indicatorGapDp.toInt()
+        indicatorParams.topMargin = px(indicatorGapDp).toInt()
         column.addView(indicator, indicatorParams)
         return column
     }
@@ -271,22 +294,56 @@ class FilterStripView @JvmOverloads constructor(
             val indicator = column.getChildAt(1) ?: continue
             indicator.background = indicatorDrawable()
             val params = indicator.layoutParams as? LayoutParams ?: continue
-            params.width = indicatorWidthDp.toInt()
-            params.height = indicatorHeightDp.toInt()
-            params.topMargin = indicatorGapDp.toInt()
+            params.width = px(indicatorWidthDp).toInt()
+            params.height = px(indicatorHeightDp).toInt()
+            params.topMargin = px(indicatorGapDp).toInt()
             indicator.layoutParams = params
+        }
+    }
+
+    /** Moves the labels of the strip to the offset of the design. */
+    private fun refreshLayout() {
+        for (index in 0 until childCount) {
+            val column = getChildAt(index) as? LinearLayout ?: continue
+            column.setPadding(
+                column.paddingLeft,
+                px(labelTopPaddingDp).toInt(),
+                column.paddingRight,
+                column.paddingBottom,
+            )
         }
     }
 
     private fun indicatorDrawable(): GradientDrawable = GradientDrawable().apply {
         shape = GradientDrawable.RECTANGLE
-        cornerRadius = indicatorRadiusDp
+        cornerRadius = px(indicatorRadiusDp)
         setColor(indicatorColor)
     }
 
+    /** dp 转成像素。 */
+    private fun px(value: Float): Float = value * resources.displayMetrics.density
+
+    /** dp 转成像素，用在布局属性的默认值上。 */
     private fun dp(value: Float): Float =
         TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, value, resources.displayMetrics)
 
+    /** sp 转成像素。 */
     private fun sp(value: Float): Float =
         TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, value, resources.displayMetrics)
+
+    /**
+     * 布局中的尺寸单位是 dp 与 sp，属性本身也是 dp 与 sp：控件在读取之后自己换算成
+     * 像素，代码里设置这些属性时不需要自己换算。
+     */
+    private fun dpOfDimension(px: Float): Float =
+        if (resources.displayMetrics.density > 0f) px / resources.displayMetrics.density else px
+
+    /** 布局中的尺寸单位是 dp 与 sp，属性本身也是 dp 与 sp：控件在读取之后自己换算成
+     * 像素，代码里设置这些属性时不需要自己换算。 */
+    private fun spOfDimension(px: Float): Float =
+        if (resources.displayMetrics.scaledDensity > 0f) {
+            px / resources.displayMetrics.scaledDensity
+        } else {
+            px
+        }
 }

@@ -24,6 +24,12 @@ import com.peng.pdfreader.ui.fragments.PdfPreviewFragment
  */
 class PreviewActivity : BaseActivity() {
 
+    /**
+     * The readers have a top bar of their own and take the inset of the status
+     * bar there, the host must not move them a second time.
+     */
+    override val takesStatusBarInset: Boolean = false
+
     private lateinit var binding: ActivityPreviewBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {

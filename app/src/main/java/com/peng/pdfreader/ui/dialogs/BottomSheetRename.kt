@@ -5,11 +5,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentManager
 import com.peng.pdfreader.R
 import com.peng.pdfreader.core.widget.BaseBottomSheetDialog
+import com.peng.pdfreader.data.Document
 import com.peng.pdfreader.data.DocumentRepository
 import com.peng.pdfreader.databinding.FilesDialogRenameBinding
 
@@ -44,12 +46,18 @@ class BottomSheetRename : BaseBottomSheetDialog() {
             cornerRadius = dp(12).toFloat()
         }
 
-        binding.etName.setText(document.name)
-        binding.etName.setSelection(binding.etName.text.length)
+        // The field carries the name of the file without its suffix, the suffix
+        // is added back when the name is confirmed.
+        val name = document.name
+        val dot = name.lastIndexOf('.')
+        val suffix = if (dot > 0) name.substring(dot) else ""
+        binding.etName.setText(if (dot > 0) name.substring(0, dot) else name)
+        // The whole name is selected, the user types over it.
+        binding.etName.selectAll()
         binding.etName.requestFocus()
         binding.btnClear.setOnClickListener { binding.etName.setText("") }
         binding.btnCancel.setOnClickListener { dismissAllowingStateLoss() }
-        binding.btnOk.setOnClickListener { confirm(document.id) }
+        binding.btnOk.setOnClickListener { confirm(document, suffix) }
     }
 
     override fun onDestroyView() {
@@ -57,17 +65,29 @@ class BottomSheetRename : BaseBottomSheetDialog() {
         _binding = null
     }
 
-    private fun confirm(docId: String) {
-        val document = DocumentRepository.get(requireContext()).byId(docId) ?: return
-        val newName = binding.etName.text?.toString().orEmpty()
+    private fun confirm(document: Document, suffix: String) {
+        val typed = binding.etName.text?.toString()
+            .orEmpty()
             .replace('/', ' ')
             .trim()
-        if (newName.isEmpty() || newName == document.name) {
+        if (typed.isEmpty()) {
             dismissAllowingStateLoss()
             return
         }
-        DocumentRepository.get(requireContext()).rename(document, newName)
-        parentFragmentManager.setFragmentResult(REQUEST_KEY, bundleOf(KEY_DOC_ID to docId))
+        val newName = typed + suffix
+        if (newName == document.name) {
+            dismissAllowingStateLoss()
+            return
+        }
+        // A file of the shared storage can be read but not always written: the
+        // rename reports the failure instead of taking the app down.
+        val renamed = DocumentRepository.get(requireContext()).rename(document, newName)
+        if (!renamed) {
+            Toast.makeText(requireContext(), R.string.files_feature_unavailable, Toast.LENGTH_SHORT)
+                .show()
+            return
+        }
+        parentFragmentManager.setFragmentResult(REQUEST_KEY, bundleOf(KEY_DOC_ID to document.id))
         dismissAllowingStateLoss()
     }
 

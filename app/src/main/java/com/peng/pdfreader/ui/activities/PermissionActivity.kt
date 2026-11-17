@@ -64,6 +64,21 @@ class PermissionActivity : BaseActivity() {
             }
         }
 
+    /**
+     * The screen of the system for the permission.
+     *
+     * The result comes back as soon as the user leaves the screen of the
+     * system: the app goes on by itself when the permission is there.
+     */
+    private val allFilesSettingsLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            Logger.i(TAG, "the screen of the system was left")
+            if (hasStoragePermission()) {
+                Logger.i(TAG, "the permission was given in the screen of the system")
+                continueFlow()
+            }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -164,7 +179,9 @@ class PermissionActivity : BaseActivity() {
         }
 
         try {
-            startActivity(intent)
+            // The launcher comes back as soon as the user leaves the screen of
+            // the system, the app goes on by itself then.
+            allFilesSettingsLauncher.launch(intent)
         } catch (error: ActivityNotFoundException) {
             Logger.w(TAG, "all files access screen is not available")
             startActivity(
