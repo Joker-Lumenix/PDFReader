@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.DashPathEffect
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.RectF
@@ -82,6 +83,8 @@ class SignatureCanvasView @JvmOverloads constructor(
     private val baselinePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.parseColor("#c4c4c4")
         strokeWidth = density
+        // The design draws the signing line as a row of dots.
+        pathEffect = DashPathEffect(floatArrayOf(density, 3f * density), 0f)
     }
 
     private val strokes = ArrayList<Stroke>()

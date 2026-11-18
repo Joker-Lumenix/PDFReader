@@ -7,7 +7,6 @@
     <string name="preview_open_with">열기</string>
     <string name="preview_share">공유</string>
     <string name="preview_more">더보기</string>
-    <string name="preview_page_indicator">%1$d / %2$d</string>
     <string name="preview_outline">목차</string>
     <string name="preview_add_bookmark">현재 페이지에 책갈피 추가</string>
     <string name="preview_reading_mode">읽기 모드</string>
@@ -30,7 +29,6 @@
     <string name="preview_save_to_document">문서에 저장</string>
     <string name="preview_signature_saved">서명을 저장했습니다</string>
     <string name="preview_signature_failed">페이지가 아직 준비되지 않았습니다. 다시 시도해 주세요</string>
-    <string name="preview_draw_saved">표시를 저장하고 주석이 있는 사본을 만들었습니다</string>
     <string name="preview_print">인쇄</string>
     <string name="preview_feature_unavailable">이 기능은 아직 사용할 수 없습니다</string>
     <string name="preview_loading">문서를 읽는 중…</string>
@@ -38,7 +36,8 @@
     <string name="preview_load_failed_hint">파일이 손상되었거나 아직 지원하지 않는 형식일 수 있습니다</string>
     <string name="preview_retry">다시 시도</string>
     <string name="preview_rename_hint">새 파일 이름을 입력하세요</string>
-    <string name="preview_cd_back">뒤로</string>
+    <string name="preview_cd_close">닫기</string>
+    <string name="preview_draw_done">그림을 저장했습니다</string>
     <string name="preview_cd_more">더 많은 작업</string>
     <string name="preview_cd_rename">이름 변경</string>
     <string name="preview_cd_undo">실행 취소</string>

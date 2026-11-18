@@ -62,7 +62,9 @@ object AnnotationPayload {
             .mapNotNull { segment ->
                 val fields = segment.split(":")
                 if (fields.size < 3) return@mapNotNull null
-                val colour = fields[0].toIntOrNull(16) ?: return@mapNotNull null
+                // The colour is written as an unsigned number, so it is read
+                // as a long: an alpha of 255 does not fit into an int.
+                val colour = fields[0].toLongOrNull(16)?.toInt() ?: return@mapNotNull null
                 val width = fields[1].toFloatOrNull() ?: 0f
                 val values = fields[2].trim().split(' ')
                     .mapNotNull { it.toFloatOrNull() }

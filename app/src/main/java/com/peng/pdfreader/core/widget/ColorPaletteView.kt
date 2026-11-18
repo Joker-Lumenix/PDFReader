@@ -49,7 +49,7 @@ class ColorPaletteView @JvmOverloads constructor(
         }
 
     /** Stroke width of the ring around the selected swatch, in pixels. */
-    var ringWidth: Float = dp(1.5f)
+    var ringWidth: Float = dp(2f)
         set(value) {
             field = value.coerceAtLeast(0f)
             requestLayout()
@@ -130,8 +130,9 @@ class ColorPaletteView @JvmOverloads constructor(
             if (showSelectionRing && index == selectedIndex) {
                 ringPaint.color = ringColor
                 ringPaint.strokeWidth = ringWidth
-                // The ring of the design is 24dp around a 20dp swatch.
-                canvas.drawCircle(centreX, centreY, radius + dp(2f) - ringWidth / 2f, ringPaint)
+                // The ring of the design sits on the swatch: its inner edge
+                // touches the colour and it is two pixels wide.
+                canvas.drawCircle(centreX, centreY, radius + ringWidth / 2f, ringPaint)
             }
             fillPaint.color = colour
             canvas.drawCircle(centreX, centreY, radius, fillPaint)

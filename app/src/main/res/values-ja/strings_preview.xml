@@ -7,7 +7,6 @@
     <string name="preview_open_with">開く</string>
     <string name="preview_share">共有</string>
     <string name="preview_more">その他</string>
-    <string name="preview_page_indicator">%1$d / %2$d</string>
     <string name="preview_outline">目次</string>
     <string name="preview_add_bookmark">このページにブックマークを追加</string>
     <string name="preview_reading_mode">閲覧モード</string>
@@ -30,7 +29,6 @@
     <string name="preview_save_to_document">ドキュメントに保存</string>
     <string name="preview_signature_saved">署名を保存しました</string>
     <string name="preview_signature_failed">ページがまだ準備中です。もう一度お試しください</string>
-    <string name="preview_draw_saved">注釈を保存し、注釈付きのコピーを作成しました</string>
     <string name="preview_print">印刷</string>
     <string name="preview_feature_unavailable">この機能はまだ利用できません</string>
     <string name="preview_loading">ドキュメントを読み込み中…</string>
@@ -38,7 +36,8 @@
     <string name="preview_load_failed_hint">ファイルが破損しているか、まだ対応していない形式です</string>
     <string name="preview_retry">再試行</string>
     <string name="preview_rename_hint">新しいファイル名を入力</string>
-    <string name="preview_cd_back">戻る</string>
+    <string name="preview_cd_close">閉じる</string>
+    <string name="preview_draw_done">注釈を保存しました</string>
     <string name="preview_cd_more">その他の操作</string>
     <string name="preview_cd_rename">名前を変更</string>
     <string name="preview_cd_undo">元に戻す</string>

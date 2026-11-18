@@ -16,6 +16,8 @@
     <dimen name="gutter_sm">8dp</dimen>
     <dimen name="gutter">16dp</dimen>
     <dimen name="top_bar_height">64dp</dimen>
+    <!-- The bar of the editors of the design (draw, sign) is 56dp tall. -->
+    <dimen name="top_bar_height_editor">56dp</dimen>
     <dimen name="nav_bar_height">80dp</dimen>
     <!-- Corner radii -->
     <dimen name="radius_xs">2dp</dimen>

@@ -7,7 +7,6 @@
     <string name="preview_open_with">Open with</string>
     <string name="preview_share">Share</string>
     <string name="preview_more">More</string>
-    <string name="preview_page_indicator">%1$d / %2$d</string>
     <string name="preview_outline">Outline</string>
     <string name="preview_add_bookmark">Bookmark this page</string>
     <string name="preview_reading_mode">Reading mode</string>
@@ -21,16 +20,15 @@
     <string name="preview_tool_strikethrough">Strikethrough</string>
     <string name="preview_tool_draw">Draw</string>
     <string name="preview_tool_note">Note</string>
-    <string name="preview_tool_signature">Signature</string>
+    <string name="preview_tool_signature">Sign</string>
     <string name="preview_select_area">Drag on the page to select an area</string>
     <string name="preview_note_hint">Enter a note</string>
     <string name="preview_note_save">Save note</string>
-    <string name="preview_color">Colour</string>
+    <string name="preview_color">Color</string>
     <string name="preview_add_signature">Add</string>
     <string name="preview_save_to_document">Save to document</string>
     <string name="preview_signature_saved">Signature saved</string>
     <string name="preview_signature_failed">The page is not ready yet, please try again</string>
-    <string name="preview_draw_saved">Markup saved and an annotated copy created</string>
     <string name="preview_print">Print</string>
     <string name="preview_feature_unavailable">This feature is not available yet</string>
     <string name="preview_loading">Parsing document…</string>
@@ -38,7 +36,8 @@
     <string name="preview_load_failed_hint">The file may be damaged or in an unsupported format</string>
     <string name="preview_retry">Retry</string>
     <string name="preview_rename_hint">Enter a new file name</string>
-    <string name="preview_cd_back">Back</string>
+    <string name="preview_cd_close">Close</string>
+    <string name="preview_draw_done">Drawing saved</string>
     <string name="preview_cd_more">More actions</string>
     <string name="preview_cd_rename">Rename</string>
     <string name="preview_cd_undo">Undo</string>

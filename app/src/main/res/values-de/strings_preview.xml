@@ -7,7 +7,6 @@
     <string name="preview_open_with">Öffnen mit</string>
     <string name="preview_share">Teilen</string>
     <string name="preview_more">Mehr</string>
-    <string name="preview_page_indicator">%1$d / %2$d</string>
     <string name="preview_outline">Inhaltsverzeichnis</string>
     <string name="preview_add_bookmark">Lesezeichen für diese Seite setzen</string>
     <string name="preview_reading_mode">Lesemodus</string>
@@ -30,7 +29,6 @@
     <string name="preview_save_to_document">In Dokument speichern</string>
     <string name="preview_signature_saved">Unterschrift gespeichert</string>
     <string name="preview_signature_failed">Die Seite ist noch nicht bereit, bitte erneut versuchen</string>
-    <string name="preview_draw_saved">Markierungen gespeichert, kommentierte Kopie erstellt</string>
     <string name="preview_print">Drucken</string>
     <string name="preview_feature_unavailable">Diese Funktion ist vorübergehend nicht verfügbar</string>
     <string name="preview_loading">Dokument wird analysiert…</string>
@@ -38,7 +36,8 @@
     <string name="preview_load_failed_hint">Die Datei ist möglicherweise beschädigt oder das Format wird noch nicht unterstützt</string>
     <string name="preview_retry">Erneut versuchen</string>
     <string name="preview_rename_hint">Neuen Dateinamen eingeben</string>
-    <string name="preview_cd_back">Zurück</string>
+    <string name="preview_cd_close">Schließen</string>
+    <string name="preview_draw_done">Zeichnung gespeichert</string>
     <string name="preview_cd_more">Weitere Aktionen</string>
     <string name="preview_cd_rename">Umbenennen</string>
     <string name="preview_cd_undo">Rückgängig</string>

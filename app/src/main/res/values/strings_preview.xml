@@ -15,7 +15,6 @@
     <string name="preview_more">更多</string>
 
     <!-- reader -->
-    <string name="preview_page_indicator">%1$d / %2$d</string>
     <string name="preview_outline">目录大纲</string>
     <string name="preview_add_bookmark">添加当前页书签</string>
     <string name="preview_reading_mode">阅读视觉模式</string>
@@ -42,7 +41,6 @@
     <string name="preview_save_to_document">保存到文档</string>
     <string name="preview_signature_saved">签名已保存</string>
     <string name="preview_signature_failed">页面尚未就绪，请稍后重试</string>
-    <string name="preview_draw_saved">标注已保存，并生成批注版文档</string>
 
     <!-- more sheet -->
     <string name="preview_print">打印</string>
@@ -56,7 +54,8 @@
     <string name="preview_rename_hint">输入新的文件名</string>
 
     <!-- content descriptions -->
-    <string name="preview_cd_back">返回</string>
+    <string name="preview_cd_close">关闭</string>
+    <string name="preview_draw_done">标注已保存</string>
     <string name="preview_cd_more">更多操作</string>
     <string name="preview_cd_rename">重命名</string>
     <string name="preview_cd_undo">撤销</string>

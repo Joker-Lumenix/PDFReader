@@ -3,7 +3,6 @@ package com.peng.pdfreader.ui.activities
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
-import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.View
 import com.peng.pdfreader.R
@@ -28,7 +27,7 @@ class SignatureActivity : BaseActivity() {
         binding = ActivitySignatureBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.ivBack.setOnClickListener { finish() }
+        binding.ivClose.setOnClickListener { finish() }
         binding.flDone.setOnClickListener { confirm() }
         binding.ivUndo.setOnClickListener {
             binding.canvas.undo()
@@ -44,9 +43,6 @@ class SignatureActivity : BaseActivity() {
         binding.canvas.strokeWidth = dp(3f)
         binding.canvas.onStrokesChanged = { updateHistoryButtons() }
 
-        binding.llPalette.background = GradientDrawable().apply {
-            setColor(PALETTE_BACKGROUND)
-        }
         binding.palette.colors = ColorPaletteView.DEFAULT_COLORS
         binding.palette.swatchDiameter = dp(20f)
         binding.palette.itemSpacing = dp(16f)
@@ -84,7 +80,10 @@ class SignatureActivity : BaseActivity() {
         binding.swatch.colors = listOf(colour)
         binding.swatch.selectedIndex = 0
         binding.swatch.swatchDiameter = dp(10f)
-        binding.swatch.showSelectionRing = false
+        // The design shows the colour inside a thin light ring.
+        binding.swatch.showSelectionRing = true
+        binding.swatch.ringWidth = dp(2f)
+        binding.swatch.ringColor = Color.parseColor("#d8d8d8")
     }
 
     private fun updateHistoryButtons() {
@@ -157,7 +156,6 @@ class SignatureActivity : BaseActivity() {
         const val EXTRA_ASPECT = "com.peng.pdfreader.extra.SIGNATURE_ASPECT"
 
         private val DEFAULT_COLOUR = Color.parseColor("#333333")
-        private const val PALETTE_BACKGROUND = 0xCC313131.toInt()
 
         /** The intent that opens the editor. */
         fun createIntent(context: Context): Intent = Intent(context, SignatureActivity::class.java)

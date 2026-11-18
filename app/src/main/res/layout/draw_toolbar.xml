@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The tool bar of the free hand drawing.
+  Two rows on the dark surface of the design: the stroke sizes above, the
+  colours below. The tool bar is shared by the annotation editor and by the
+  drawing mode of the reader, so both look the same.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawToolbar"
+    android:layout_width="match_parent"
+    android:layout_height="117dp"
+    android:orientation="vertical"
+    android:paddingTop="19dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="24dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="20dp">
+
+        <ImageView
+            android:id="@+id/ivSize"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="@string/preview_cd_size"
+            android:src="@mipmap/ic_size"
+            app:tint="@color/white" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="13dp"
+            android:background="@color/surface_neutral_strong" />
+
+        <LinearLayout
+            android:id="@+id/llSizes"
+            android:layout_width="wrap_content"
+            android:layout_height="24dp"
+            android:layout_marginStart="56dp"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:layout_marginTop="30dp"
+        android:gravity="top"
+        android:orientation="horizontal"
+        android:paddingStart="20dp">
+
+        <ImageView
+            android:id="@+id/ivDraw"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginTop="2dp"
+            android:contentDescription="@string/preview_tool_draw"
+            android:src="@mipmap/ic_draw" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="13dp"
+            android:layout_marginTop="2dp"
+            android:background="@color/surface_neutral_strong" />
+
+        <com.peng.pdfreader.core.widget.ColorPaletteView
+            android:id="@+id/palette"
+            android:layout_width="wrap_content"
+            android:layout_height="28dp"
+            android:layout_marginStart="13dp" />
+    </LinearLayout>
+
+</LinearLayout>

@@ -19,7 +19,7 @@
 
         <LinearLayout android:id="@+id/topBar"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/top_bar_height"
+            android:layout_height="@dimen/top_bar_height_editor"
             android:background="@color/surface_card"
             android:gravity="center_vertical"
             android:orientation="horizontal"
@@ -27,11 +27,11 @@
             android:paddingEnd="20dp">
 
             <ImageView
-                android:id="@+id/ivBack"
+                android:id="@+id/ivClose"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:contentDescription="@string/preview_cd_back"
-                android:src="@mipmap/ic_back" />
+                android:contentDescription="@string/preview_cd_close"
+                android:src="@mipmap/ic_close" />
 
             <Space
                 android:layout_width="0dp"
@@ -92,74 +92,10 @@
       The dark tool bar of the design: 117dp tall, 16dp rounded on top.
       The first row carries the stroke sizes, the second one the colours.
     -->
-    <LinearLayout
-        android:id="@+id/bottomBar"
+    <include
+        android:id="@+id/drawToolbar"
+        layout="@layout/draw_toolbar"
         android:layout_width="match_parent"
-        android:layout_height="117dp"
-        android:orientation="vertical"
-        android:paddingTop="19dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="24dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingStart="20dp">
-
-            <ImageView
-                android:id="@+id/ivSize"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:contentDescription="@string/preview_cd_size"
-                android:src="@mipmap/ic_size"
-                app:tint="@color/white" />
-
-            <View
-                android:layout_width="1dp"
-                android:layout_height="24dp"
-                android:layout_marginStart="13dp"
-                android:background="@color/surface_neutral_strong" />
-
-            <LinearLayout
-                android:id="@+id/llSizes"
-                android:layout_width="wrap_content"
-                android:layout_height="24dp"
-                android:layout_marginStart="56dp"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="32dp"
-            android:layout_marginTop="30dp"
-            android:gravity="top"
-            android:orientation="horizontal"
-            android:paddingStart="20dp">
-
-            <ImageView
-                android:id="@+id/ivDraw"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginTop="2dp"
-                android:contentDescription="@string/preview_tool_draw"
-                android:src="@mipmap/ic_draw"
-                app:tint="@color/white" />
-
-            <View
-                android:layout_width="1dp"
-                android:layout_height="24dp"
-                android:layout_marginStart="13dp"
-                android:layout_marginTop="2dp"
-                android:background="@color/surface_neutral_strong" />
-
-            <com.peng.pdfreader.core.widget.ColorPaletteView
-                android:id="@+id/palette"
-                android:layout_width="wrap_content"
-                android:layout_height="28dp"
-                android:layout_marginStart="13dp" />
-        </LinearLayout>
-
-    </LinearLayout>
+        android:layout_height="117dp" />
 
 </LinearLayout>

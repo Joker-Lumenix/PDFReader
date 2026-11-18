@@ -2,6 +2,7 @@ package com.peng.pdfreader.core.widget
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.ColorMatrix
@@ -18,10 +19,12 @@ import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
+import com.peng.pdfreader.R
 import com.peng.pdfreader.core.pdf.PdfEngine
 import com.peng.pdfreader.core.util.Logger
 import java.io.File
 import java.util.concurrent.RejectedExecutionException
+import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.sqrt
 import kotlin.math.min
@@ -81,14 +84,11 @@ class PdfPageView @JvmOverloads constructor(
 
     private val density = resources.displayMetrics.density
 
-    /** Radius of the round buttons of the selection box. */
-    private val buttonRadius = 9f * density
-
-    /** The tint of the design sits two pixels inside the frame. */
-    private val placementInset = 2f * density
-
     /** How close a finger has to be to hit a round button. */
     private val buttonTouchRadius = 14f * density
+
+    /** How far a finger has to travel to turn the page while drawing. */
+    private val pageSwipeDistance = 28f * density
 
     private val bitmapPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         isFilterBitmap = true
@@ -113,28 +113,41 @@ class PdfPageView @JvmOverloads constructor(
         style = Paint.Style.FILL
         color = Color.parseColor("#33fb4141")
     }
-    private val placementFillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        style = Paint.Style.FILL
-        color = Color.parseColor("#0dfb4141")
-    }
     private val placementBorderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
-        color = Color.parseColor("#d8d8d8")
-        strokeWidth = density
+        // The frame of the design is a red line around the signature.
+        color = Color.parseColor("#fb4141")
+        strokeWidth = 2f * density
     }
     private val placementInkPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
         strokeCap = Paint.Cap.ROUND
         strokeJoin = Paint.Join.ROUND
     }
-    private val buttonPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.FILL }
-    private val glyphPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        style = Paint.Style.STROKE
-        strokeCap = Paint.Cap.ROUND
-        strokeJoin = Paint.Join.ROUND
-        color = Color.WHITE
-        strokeWidth = 1.5f * density
+    private val pageBadgePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.FILL
+        // The label of the page of the design: a half transparent black tile.
+        color = Color.parseColor("#80121111")
     }
+    private val pageBadgeTextPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        color = Color.WHITE
+        textSize = 12f * density
+        textAlign = Paint.Align.CENTER
+    }
+
+    /** The red cross that throws the placed signature away. */
+    private val deleteIcon: Bitmap? = BitmapFactory.decodeResource(resources, R.mipmap.ic_close_red)
+
+    /** The arrows that scale the placed signature. */
+    private val resizeIcon: Bitmap? = BitmapFactory.decodeResource(resources, R.mipmap.ic_drag)
+
+    /** Whether the number of the page is painted on it (design: sign-1). */
+    var showPageBadge: Boolean = false
+        set(value) {
+            if (field == value) return
+            field = value
+            invalidate()
+        }
 
     private val mainHandler = Handler(Looper.getMainLooper())
 
@@ -162,13 +175,46 @@ class PdfPageView @JvmOverloads constructor(
     private var placementAspect = 1f
     private val placementBox = RectF()
     private var placementActive = false
-    private var placementLocked = false
     private var draggingPlacement = false
+    private var resizingPlacement = false
     private var lastTouchX = 0f
     private var lastTouchY = 0f
 
-    /** Raised when the user accepts the placed signature. */
-    var onPlacementAccepted: ((List<InkStroke>) -> Unit)? = null
+    // ------------------------------------------------------------------ free hand ink
+
+    /** The ink that lies on the page, expressed as fractions of the page. */
+    private var inkStrokes: List<InkStroke> = emptyList()
+
+    /** The stroke that is being drawn, in screen pixels. */
+    private val inkPath = Path()
+    private val inkPoints = ArrayList<Float>()
+    private var inkDrawing = false
+    private var inkSwipe = false
+    private var inkStartX = 0f
+    private var inkStartY = 0f
+    private var inkLastX = 0f
+    private var inkLastY = 0f
+
+    /** Whether the user may draw on the page. */
+    var inkEnabled: Boolean = false
+        set(value) {
+            if (field == value) return
+            field = value
+            if (!value) resetInk()
+            invalidate()
+        }
+
+    /** Colour of the next stroke. */
+    var inkColour: Int = Color.parseColor("#fb4141")
+
+    /** Width of the next stroke, in pixels. */
+    var inkWidth: Float = 3f * density
+
+    /** Raised with the stroke the user has just drawn, in page fractions. */
+    var onInkStroke: ((InkStroke) -> Unit)? = null
+
+    /** Raised when a swipe asks for another page, -1 or 1. */
+    var onPageSwipe: ((Int) -> Unit)? = null
 
     /** Raised when the user throws the placed signature away. */
     var onPlacementCancelled: (() -> Unit)? = null
@@ -311,7 +357,7 @@ class PdfPageView @JvmOverloads constructor(
      * Puts a signature on the page and lets the user drag it into place.
      *
      * The signature is shown inside the selection box of the design: a light
-     * grey frame with a delete button on the top left corner and an accept
+     * grey frame with a delete button on the top left corner and a resize
      * button on the bottom right corner.
      *
      * @param strokes the ink, normalised against the box of the signature
@@ -322,7 +368,6 @@ class PdfPageView @JvmOverloads constructor(
         placementStrokes = strokes
         placementAspect = if (aspect > 0f) aspect else 1f
         placementActive = true
-        placementLocked = false
         val page = bitmap
         val pageAspect = if (page != null && page.height > 0) {
             page.width.toFloat() / page.height.toFloat()
@@ -339,25 +384,11 @@ class PdfPageView @JvmOverloads constructor(
     fun cancelSignaturePlacement() {
         if (!placementActive) return
         placementActive = false
-        placementLocked = false
         placementStrokes = null
         draggingPlacement = false
+        resizingPlacement = false
         invalidate()
         onPlacementCancelled?.invoke()
-    }
-
-    /**
-     * Accepts the position of the signature.
-     *
-     * The signature stays on the page without its selection box - the host
-     * confirms it with the "Add" bar of the design.
-     */
-    private fun acceptSignaturePlacement() {
-        if (placementStrokes == null) return
-        placementLocked = true
-        draggingPlacement = false
-        invalidate()
-        onPlacementAccepted?.invoke(placedStrokes())
     }
 
     /**
@@ -370,9 +401,9 @@ class PdfPageView @JvmOverloads constructor(
         if (placementStrokes == null) return null
         val placed = placedStrokes()
         placementActive = false
-        placementLocked = false
         placementStrokes = null
         draggingPlacement = false
+        resizingPlacement = false
         invalidate()
         return placed
     }
@@ -391,6 +422,19 @@ class PdfPageView @JvmOverloads constructor(
             // The width of a stroke is a fraction of the signature box.
             InkStroke(stroke.color, stroke.width * placementBox.width(), points)
         }
+    }
+
+    // ------------------------------------------------------------------ free hand ink
+
+    /** Puts the ink of the page on it. */
+    fun setInk(strokes: List<InkStroke>) {
+        inkStrokes = strokes
+        invalidate()
+    }
+
+    /** Renders the page again, e.g. after the document was written. */
+    fun refresh() {
+        requestRender(resetViewport = false)
     }
 
     // ------------------------------------------------------------------ rendering
@@ -526,6 +570,8 @@ class PdfPageView @JvmOverloads constructor(
         }
 
         drawMarks(canvas, page, scale)
+        drawInk(canvas, page, scale)
+        drawPageBadge(canvas)
         drawSelection(canvas)
         drawPlacement(canvas)
     }
@@ -601,16 +647,13 @@ class PdfPageView @JvmOverloads constructor(
      * Draws the signature that waits for its confirmation.
      *
      * The frame of the design is a light grey box with a delete button on the
-     * top left corner and an accept button on the bottom right corner.
+     * top left corner and a resize button on the bottom right corner.
      */
     private fun drawPlacement(canvas: Canvas) {
         val strokes = placementStrokes ?: return
         val box = placementBoxOnScreen()
-        if (!placementLocked) {
-            // The tint of the design sits two pixels inside the frame.
-            canvas.drawRect(inset(box, placementInset), placementFillPaint)
-            canvas.drawRect(box, placementBorderPaint)
-        }
+        // The frame of the design is a red line, the page shows through it.
+        canvas.drawRect(box, placementBorderPaint)
 
         strokes.forEach { stroke ->
             placementInkPaint.color = stroke.color
@@ -632,9 +675,79 @@ class PdfPageView @JvmOverloads constructor(
             canvas.drawPath(path, placementInkPaint)
         }
 
-        if (!placementLocked) {
-            drawRoundButton(canvas, box.left, box.top, DELETE_COLOUR, cross = true)
-            drawRoundButton(canvas, box.right, box.bottom, ACCEPT_COLOUR, cross = false)
+        drawPlacementButton(canvas, box.left, box.top, deleteIcon)
+        drawPlacementButton(canvas, box.right, box.bottom, resizeIcon)
+    }
+
+    /**
+     * Draws one of the round buttons of the selection box.
+     *
+     * The buttons are the icons of the app: the red cross throws the
+     * signature away, the arrows scale it.
+     */
+    private fun drawPlacementButton(canvas: Canvas, cx: Float, cy: Float, icon: Bitmap?) {
+        if (icon == null) return
+        val size = 18f * density
+        val rect = RectF(cx - size / 2f, cy - size / 2f, cx + size / 2f, cy + size / 2f)
+        canvas.drawBitmap(icon, null, rect, bitmapPaint)
+    }
+
+    /**
+     * Draws the label of the page (design: sign-1).
+     *
+     * The design puts a small dark tile with the number of the page in the
+     * top left corner of every page.
+     */
+    private fun drawPageBadge(canvas: Canvas) {
+        if (!showPageBadge || bitmap == null) return
+        val left = pageRect.left + 8f * density
+        val top = pageRect.top + 8f * density
+        val rect = RectF(left, top, left + 31f * density, top + 18f * density)
+        canvas.drawRoundRect(rect, 4f * density, 4f * density, pageBadgePaint)
+        val metrics = pageBadgeTextPaint.fontMetrics
+        val baseline = rect.centerY() - (metrics.ascent + metrics.descent) / 2f
+        canvas.drawText("P${pageIndex + 1}", rect.centerX(), baseline, pageBadgeTextPaint)
+    }
+
+    /**
+     * Draws the ink of the page.
+     *
+     * The strokes are fractions of the page, so they follow the page while it
+     * is zoomed or panned.
+     */
+    private fun drawInk(canvas: Canvas, page: Bitmap, scale: Float) {
+        if (inkStrokes.isNotEmpty()) {
+            canvas.save()
+            canvas.translate(pageRect.left, pageRect.top)
+            canvas.scale(scale, scale)
+            inkStrokes.forEach { stroke ->
+                if (stroke.isEmpty) return@forEach
+                inkPaint.color = stroke.color
+                // The width of a stroke is a fraction of the page width.
+                inkPaint.strokeWidth = (stroke.width * page.width).coerceAtLeast(1f)
+                val path = Path()
+                var first = true
+                var index = 0
+                while (index + 1 < stroke.points.size) {
+                    val x = stroke.points[index] * page.width
+                    val y = stroke.points[index + 1] * page.height
+                    if (first) {
+                        path.moveTo(x, y)
+                        first = false
+                    } else {
+                        path.lineTo(x, y)
+                    }
+                    index += 2
+                }
+                canvas.drawPath(path, inkPaint)
+            }
+            canvas.restore()
+        }
+        if (inkDrawing) {
+            // The stroke of the finger is still in screen pixels.
+            inkPaint.color = inkColour
+            inkPaint.strokeWidth = inkWidth
+            canvas.drawPath(inkPath, inkPaint)
         }
     }
 
@@ -646,24 +759,9 @@ class PdfPageView @JvmOverloads constructor(
         rect.bottom - amount,
     )
 
-    private fun drawRoundButton(canvas: Canvas, cx: Float, cy: Float, colour: Int, cross: Boolean) {
-        buttonPaint.color = colour
-        canvas.drawCircle(cx, cy, buttonRadius, buttonPaint)
-        val arm = buttonRadius * 0.45f
-        if (cross) {
-            canvas.drawLine(cx - arm, cy - arm, cx + arm, cy + arm, glyphPaint)
-            canvas.drawLine(cx + arm, cy - arm, cx - arm, cy + arm, glyphPaint)
-        } else {
-            val path = Path().apply {
-                moveTo(cx - arm, cy)
-                lineTo(cx - arm * 0.2f, cy + arm * 0.8f)
-                lineTo(cx + arm, cy - arm * 0.8f)
-            }
-            canvas.drawPath(path, glyphPaint)
-        }
-    }
-
-    /** The selection box of the placement, in screen pixels. */
+    /**
+     * The selection box of the placement, in screen pixels.
+     */
     private fun placementBoxOnScreen(): RectF = RectF(
         pageRect.left + placementBox.left * pageRect.width(),
         pageRect.top + placementBox.top * pageRect.height(),
@@ -674,6 +772,9 @@ class PdfPageView @JvmOverloads constructor(
     // ------------------------------------------------------------------ touch
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
+        if (inkEnabled) {
+            return handleInkTouch(event)
+        }
         if (placementActive) {
             return handlePlacementTouch(event)
         }
@@ -688,32 +789,153 @@ class PdfPageView @JvmOverloads constructor(
         return true
     }
 
-    /** Moves the placed signature, deletes it or confirms it. */
-    private fun handlePlacementTouch(event: MotionEvent): Boolean {
-        if (placementLocked) return true
+    /**
+     * Draws a stroke on the page.
+     *
+     * A swipe that runs across the page turns it instead of drawing, so the
+     * reader can walk through the document while the drawing is on.
+     */
+    private fun handleInkTouch(event: MotionEvent): Boolean {
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
-                // The pager must not steal the drag of the signature.
+                // The stroke belongs to the page, the pager is only let go
+                // when the gesture clearly asks for another page.
                 parent?.requestDisallowInterceptTouchEvent(true)
+                inkStartX = event.x
+                inkStartY = event.y
+                inkLastX = event.x
+                inkLastY = event.y
+                inkDrawing = false
+                inkSwipe = false
+                inkPath.reset()
+                inkPoints.clear()
+                inkPoints.add(event.x)
+                inkPoints.add(event.y)
+                inkPath.moveTo(event.x, event.y)
+                return true
+            }
+
+            MotionEvent.ACTION_MOVE -> {
+                val dx = event.x - inkStartX
+                val dy = event.y - inkStartY
+                if (!inkDrawing && !inkSwipe && abs(dx) > pageSwipeDistance) {
+                    if (abs(dx) > abs(dy)) {
+                        // The gesture turns the page, the stroke is dropped.
+                        inkSwipe = true
+                        inkPath.reset()
+                        inkPoints.clear()
+                        invalidate()
+                        return true
+                    }
+                    inkDrawing = true
+                }
+                if (inkSwipe) return true
+                if (!inkDrawing && abs(dy) > pageSwipeDistance) inkDrawing = true
+                if (!inkDrawing) return true
+                val midX = (inkLastX + event.x) / 2f
+                val midY = (inkLastY + event.y) / 2f
+                inkPath.quadTo(inkLastX, inkLastY, midX, midY)
+                inkPoints.add(event.x)
+                inkPoints.add(event.y)
+                inkLastX = event.x
+                inkLastY = event.y
+                invalidate()
+                return true
+            }
+
+            MotionEvent.ACTION_UP -> {
+                if (inkSwipe) {
+                    val dx = event.x - inkStartX
+                    onPageSwipe?.invoke(if (dx < 0f) 1 else -1)
+                } else if (inkDrawing) {
+                    commitInkStroke()
+                }
+                resetInk()
+                invalidate()
+                return true
+            }
+
+            MotionEvent.ACTION_CANCEL -> {
+                resetInk()
+                invalidate()
+                return true
+            }
+        }
+        return true
+    }
+
+    /**
+     * Hands the stroke of the finger over to the host.
+     *
+     * The points are fractions of the page, so the stroke stays where it was
+     * drawn while the page is zoomed, panned or turned.
+     */
+    private fun commitInkStroke() {
+        val page = bitmap ?: return
+        val pageWidth = pageRect.width().coerceAtLeast(1f)
+        val pageHeight = pageRect.height().coerceAtLeast(1f)
+        if (inkPoints.size < 4) return
+        val points = FloatArray(inkPoints.size)
+        var index = 0
+        while (index + 1 < inkPoints.size) {
+            points[index] = ((inkPoints[index] - pageRect.left) / pageWidth).coerceIn(0f, 1f)
+            points[index + 1] = ((inkPoints[index + 1] - pageRect.top) / pageHeight).coerceIn(0f, 1f)
+            index += 2
+        }
+        onInkStroke?.invoke(InkStroke(inkColour, inkWidth / pageWidth, points))
+    }
+
+    /** Drops the stroke that is being drawn. */
+    private fun resetInk() {
+        inkDrawing = false
+        inkSwipe = false
+        inkPath.reset()
+        inkPoints.clear()
+    }
+
+    /**
+     * Moves the placed signature, resizes it or throws it away.
+     *
+     * A finger that lands outside of the box belongs to the page, so the
+     * reader can still be scrolled while a signature waits.
+     */
+    private fun handlePlacementTouch(event: MotionEvent): Boolean {
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
                 val box = placementBoxOnScreen()
                 val delete = distance(event.x, event.y, box.left, box.top)
-                val accept = distance(event.x, event.y, box.right, box.bottom)
+                val resize = distance(event.x, event.y, box.right, box.bottom)
                 if (delete <= buttonTouchRadius) {
                     cancelSignaturePlacement()
                     return true
                 }
-                if (accept <= buttonTouchRadius) {
-                    acceptSignaturePlacement()
+                if (resize <= buttonTouchRadius) {
+                    // The pager must not steal the drag of the handle.
+                    parent?.requestDisallowInterceptTouchEvent(true)
+                    resizingPlacement = true
+                    lastTouchX = event.x
+                    lastTouchY = event.y
                     return true
                 }
-                draggingPlacement = box.contains(event.x, event.y)
+                if (!box.contains(event.x, event.y)) {
+                    // The page keeps the gesture, the reader can be scrolled.
+                    return false
+                }
+                // The pager must not steal the drag of the signature.
+                parent?.requestDisallowInterceptTouchEvent(true)
+                draggingPlacement = true
                 lastTouchX = event.x
                 lastTouchY = event.y
                 return true
             }
 
             MotionEvent.ACTION_MOVE -> {
-                if (draggingPlacement) {
+                if (resizingPlacement) {
+                    val dx = event.x - lastTouchX
+                    resizePlacement(dx)
+                    lastTouchX = event.x
+                    lastTouchY = event.y
+                } else if (draggingPlacement) {
                     val dx = event.x - lastTouchX
                     val dy = event.y - lastTouchY
                     movePlacement(dx, dy)
@@ -725,6 +947,7 @@ class PdfPageView @JvmOverloads constructor(
 
             MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
                 draggingPlacement = false
+                resizingPlacement = false
                 return true
             }
         }
@@ -738,6 +961,27 @@ class PdfPageView @JvmOverloads constructor(
         val left = (placementBox.left + dx / pageWidth).coerceIn(0f, 1f - placementBox.width())
         val top = (placementBox.top + dy / pageHeight).coerceIn(0f, 1f - placementBox.height())
         placementBox.offset(left - placementBox.left, top - placementBox.top)
+        invalidate()
+    }
+
+    /**
+     * Scales the signature.
+     *
+     * The handle sits in the bottom right corner, so the box grows from its
+     * top left corner and keeps the shape of the signature.
+     */
+    private fun resizePlacement(dx: Float) {
+        val pageWidth = pageRect.width().coerceAtLeast(1f)
+        val pageHeight = pageRect.height().coerceAtLeast(1f)
+        val pageAspect = pageWidth / pageHeight
+        var width = placementBox.width() + dx / pageWidth
+        width = width.coerceIn(MIN_PLACEMENT_WIDTH, 1f - placementBox.left)
+        val height = (width * pageAspect / placementAspect).coerceIn(0.03f, 0.8f)
+        var left = placementBox.left
+        var top = placementBox.top
+        if (left + width > 1f) left = 1f - width
+        if (top + height > 1f) top = 1f - height
+        placementBox.set(left, top, left + width, top + height)
         invalidate()
     }
 
@@ -890,11 +1134,11 @@ class PdfPageView @JvmOverloads constructor(
         /** The width of a placed signature, as a fraction of the page width. */
         private const val PLACEMENT_WIDTH = 0.414f
 
+        /** The narrowest a placed signature may be scaled. */
+        private const val MIN_PLACEMENT_WIDTH = 0.12f
+
         /** The default position of the selection box on the page. */
         private const val PLACEMENT_LEFT = 0.51f
-        private const val PLACEMENT_TOP = 0.5f
-
-        private val DELETE_COLOUR = Color.parseColor("#fb4141")
-        private val ACCEPT_COLOUR = Color.parseColor("#2ee547")
+        private const val PLACEMENT_TOP = 0.58f
     }
 }

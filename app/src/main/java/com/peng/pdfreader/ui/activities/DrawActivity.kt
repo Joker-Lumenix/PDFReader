@@ -13,6 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import com.peng.pdfreader.R
 import com.peng.pdfreader.core.pdf.PdfEngine
 import com.peng.pdfreader.core.widget.ColorPaletteView
+import com.peng.pdfreader.core.widget.IconFilters
 import com.peng.pdfreader.base.BaseActivity
 import com.peng.pdfreader.databinding.ActivityDrawBinding
 import com.peng.pdfreader.ui.uiData.AnnotationPayload
@@ -37,7 +38,7 @@ class DrawActivity : BaseActivity() {
         binding = ActivityDrawBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.ivBack.setOnClickListener { finish() }
+        binding.ivClose.setOnClickListener { finish() }
         binding.flDone.setOnClickListener { confirm() }
         binding.ivUndo.setOnClickListener {
             binding.canvas.undo()
@@ -48,19 +49,21 @@ class DrawActivity : BaseActivity() {
             updateHistoryButtons()
         }
 
-        binding.bottomBar.background = GradientDrawable().apply {
+        binding.drawToolbar.root.background = GradientDrawable().apply {
             cornerRadii = floatArrayOf(dp(16f), dp(16f), dp(16f), dp(16f), 0f, 0f, 0f, 0f)
             setColor(TOOLBAR_BACKGROUND)
         }
 
-        binding.palette.colors = ColorPaletteView.DEFAULT_COLORS.take(PALETTE_COLOURS)
-        binding.palette.swatchDiameter = dp(24f)
-        binding.palette.itemSpacing = dp(20f)
-        binding.palette.ringColor = Color.WHITE
-        binding.palette.selectedIndex = 0
-        binding.palette.onColorSelected = { colour -> binding.canvas.strokeColor = colour }
+        binding.drawToolbar.palette.colors = ColorPaletteView.DEFAULT_COLORS.take(PALETTE_COLOURS)
+        binding.drawToolbar.palette.swatchDiameter = dp(24f)
+        binding.drawToolbar.palette.itemSpacing = dp(20f)
+        binding.drawToolbar.palette.ringColor = Color.WHITE
+        binding.drawToolbar.palette.selectedIndex = 0
+        binding.drawToolbar.palette.onColorSelected = { colour -> binding.canvas.strokeColor = colour }
+        // The design shows the brush of the tool bar alone, without the tile.
+        binding.drawToolbar.ivDraw.colorFilter = IconFilters.whiteGlyph()
 
-        binding.canvas.strokeColor = binding.palette.selectedColor
+        binding.canvas.strokeColor = binding.drawToolbar.palette.selectedColor
         binding.canvas.strokeWidth = dp(STROKE_SIZES[0])
         binding.canvas.onStrokesChanged = { updateHistoryButtons() }
 
@@ -76,7 +79,8 @@ class DrawActivity : BaseActivity() {
      * grows with the size of the stroke.
      */
     private fun buildSizePresets() {
-        binding.llSizes.removeAllViews()
+        val sizes = binding.drawToolbar.llSizes
+        sizes.removeAllViews()
         SIZE_DOTS.forEachIndexed { index, dot ->
             val frame = FrameLayout(this)
             val params = LinearLayout.LayoutParams(dp(24), dp(24))
@@ -100,7 +104,7 @@ class DrawActivity : BaseActivity() {
             frame.addView(dotView, FrameLayout.LayoutParams(diameter, diameter, Gravity.CENTER))
 
             frame.setOnClickListener { binding.canvas.strokeWidth = dp(STROKE_SIZES[index]) }
-            binding.llSizes.addView(frame)
+            sizes.addView(frame)
         }
     }
 

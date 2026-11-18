@@ -18,7 +18,7 @@
 
         <LinearLayout android:id="@+id/topBar"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/top_bar_height"
+            android:layout_height="@dimen/top_bar_height_editor"
             android:background="@color/surface_card"
             android:gravity="center_vertical"
             android:orientation="horizontal"
@@ -26,11 +26,11 @@
             android:paddingEnd="20dp">
 
             <ImageView
-                android:id="@+id/ivBack"
+                android:id="@+id/ivClose"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:contentDescription="@string/preview_cd_back"
-                android:src="@mipmap/ic_back" />
+                android:contentDescription="@string/preview_cd_close"
+                android:src="@mipmap/ic_close" />
 
             <Space
                 android:layout_width="0dp"
@@ -87,22 +87,21 @@
             android:layout_height="match_parent" />
 
         <!--
-          The floating palette of the design: 343dp wide, 48dp tall, four
-          pixels above the colour bar. It shares the dark surface of the
-          drawing tool bar of the free hand editor. The swatches start twelve
-          pixels inside the palette and the last one runs past the edge of the
+          The floating palette of the design: the dark panel with the pointer
+          that shows the colour of the bar below. The swatches start eleven
+          pixels inside the panel and the last one runs past the edge of the
           screen, exactly as in the design.
         -->
         <LinearLayout
             android:id="@+id/llPalette"
-            android:layout_width="343dp"
+            android:layout_width="331dp"
             android:layout_height="48dp"
             android:layout_gravity="bottom|start"
             android:layout_marginStart="17dp"
-            android:layout_marginBottom="4dp"
-            android:gravity="center"
+            android:background="@mipmap/bg_color_choose"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingStart="12dp"
+            android:paddingStart="11dp"
             android:paddingEnd="0dp"
             android:visibility="gone">
 
@@ -134,7 +133,7 @@
             android:textColor="@color/text_secondary"
             android:textSize="12sp" />
 
-        <!-- The colour of the next stroke, a 10dp dot inside a 14dp box. -->
+        <!-- The colour of the next stroke, a 10dp dot inside a 14dp ring. -->
         <com.peng.pdfreader.core.widget.ColorPaletteView
             android:id="@+id/swatch"
             android:layout_width="14dp"

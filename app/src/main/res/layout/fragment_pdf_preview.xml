@@ -15,7 +15,7 @@
 
     <RelativeLayout android:id="@+id/topBar"
         android:layout_width="match_parent"
-        android:layout_height="63dp"
+        android:layout_height="56dp"
         android:background="@color/surface_card"
         >
 
@@ -34,7 +34,7 @@
             android:id="@+id/tvTitle"
             android:textSize="15sp"
             android:textColor="#ff060606"
-            android:textStyle="bold"
+            android:fontFamily="sans-serif-medium"
             android:layout_width="wrap_content"
             android:maxWidth="150dp"
             android:layout_height="wrap_content"
@@ -46,46 +46,29 @@
             tools:text="标题"
             />
 
-        <TextView
-            android:id="@+id/tvL"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="("
-            android:layout_centerVertical="true"
-            android:layout_toRightOf="@+id/tvTitle"
-            android:textColor="#ff060606"
-            android:layout_marginLeft="7dp"
-            />
-
-        <TextView
-            android:id="@+id/tvPageIndicator"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_toRightOf="@+id/tvL"
-            android:textColor="#ff060606"
-            tools:text="2/90"
-            />
-
-        <TextView
-            android:id="@+id/tvR"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text=")"
-            android:layout_centerVertical="true"
-            android:layout_toRightOf="@+id/tvPageIndicator"
-            android:textColor="#ff060606"
-            />
-
-        <ImageView
+        <!--
+          The rename tile of the design: a light tile with the pencil on it.
+          It stands behind the name of the document.
+        -->
+        <FrameLayout
             android:id="@+id/ivRename"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:src="@mipmap/ic_rename_black"
-            android:layout_toEndOf="@+id/tvPageIndicator"
+            android:layout_toEndOf="@+id/tvTitle"
             android:layout_centerVertical="true"
-            android:layout_marginStart="7dp"
-            />
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_rename_tile"
+            android:clickable="true"
+            android:contentDescription="@string/rename"
+            android:focusable="true">
+
+            <ImageView
+                android:layout_width="12dp"
+                android:layout_height="14dp"
+                android:layout_gravity="center"
+                android:contentDescription="@string/rename"
+                android:src="@mipmap/ic_rename_black" />
+        </FrameLayout>
 
         <ImageView
             android:id="@+id/ivMore"
@@ -98,6 +81,88 @@
             />
 
     </RelativeLayout>
+
+    <!--
+      The bar of the drawing mode (design: draw): close, undo, redo and the
+      confirm pill. It takes the place of the bar of the reader while the
+      pages take the ink of the finger.
+    -->
+    <LinearLayout
+        android:id="@+id/editorBar"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="@color/surface_card"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/ivClose"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="@string/preview_cd_close"
+            android:src="@mipmap/ic_close" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <ImageView
+            android:id="@+id/ivUndo"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="16dp"
+            android:contentDescription="@string/preview_cd_undo"
+            android:src="@mipmap/ic_undo_unable" />
+
+        <ImageView
+            android:id="@+id/ivRedo"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="16dp"
+            android:contentDescription="@string/preview_cd_redo"
+            android:src="@mipmap/ic_restore_unable" />
+
+        <FrameLayout
+            android:id="@+id/flDrawDone"
+            android:layout_width="55dp"
+            android:layout_height="24dp"
+            android:background="@drawable/gradient_red"
+            android:clickable="true"
+            android:contentDescription="@string/preview_cd_done"
+            android:focusable="true">
+
+            <com.peng.pdfreader.core.widget.CheckMarkView
+                android:id="@+id/ivDrawDone"
+                android:layout_width="15dp"
+                android:layout_height="10dp"
+                android:layout_gravity="center" />
+        </FrameLayout>
+
+        <!--
+          The confirm pill of the signature mode (design: sign-down): it
+          writes the signature into the document.
+        -->
+        <FrameLayout
+            android:id="@+id/flSignDone"
+            android:layout_width="55dp"
+            android:layout_height="24dp"
+            android:background="@drawable/gradient_red"
+            android:clickable="true"
+            android:contentDescription="@string/preview_cd_done"
+            android:focusable="true"
+            android:visibility="gone">
+
+            <com.peng.pdfreader.core.widget.CheckMarkView
+                android:id="@+id/ivSignDone"
+                android:layout_width="15dp"
+                android:layout_height="10dp"
+                android:layout_gravity="center" />
+        </FrameLayout>
+    </LinearLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -125,7 +190,8 @@
                 android:id="@+id/ivAdd"
                 android:layout_width="16dp"
                 android:layout_height="16dp"
-                android:contentDescription="@string/preview_cd_add_signature" />
+                android:contentDescription="@string/preview_cd_add_signature"
+                android:src="@mipmap/ic_add_circle" />
 
             <TextView
                 android:id="@+id/tvAdd"
@@ -242,5 +308,17 @@
         </LinearLayout>
 
     </LinearLayout>
+
+    <!--
+      The tool bar of the drawing mode (design: draw): the stroke sizes and
+      the colours of the ink. It takes the place of the bars of the reader
+      while the pages are drawn on.
+    -->
+    <include
+        android:id="@+id/drawToolbar"
+        layout="@layout/draw_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="117dp"
+        android:visibility="gone" />
 
 </LinearLayout>

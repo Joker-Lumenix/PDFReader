@@ -7,7 +7,6 @@
     <string name="preview_open_with">فتح بـ</string>
     <string name="preview_share">مشاركة</string>
     <string name="preview_more">المزيد</string>
-    <string name="preview_page_indicator">%1$d / %2$d</string>
     <string name="preview_outline">الفهرس</string>
     <string name="preview_add_bookmark">إضافة إشارة مرجعية لهذه الصفحة</string>
     <string name="preview_reading_mode">وضع القراءة</string>
@@ -30,7 +29,6 @@
     <string name="preview_save_to_document">حفظ في المستند</string>
     <string name="preview_signature_saved">تم حفظ التوقيع</string>
     <string name="preview_signature_failed">الصفحة ليست جاهزة بعد، حاول مرة أخرى</string>
-    <string name="preview_draw_saved">تم حفظ العلامات وإنشاء نسخة مُعلَّمة</string>
     <string name="preview_print">طباعة</string>
     <string name="preview_feature_unavailable">هذه الميزة غير متاحة مؤقتًا</string>
     <string name="preview_loading">جارٍ تحليل المستند…</string>
@@ -38,7 +36,8 @@
     <string name="preview_load_failed_hint">قد يكون الملف تالفًا أو أن صيغته غير مدعومة بعد</string>
     <string name="preview_retry">إعادة المحاولة</string>
     <string name="preview_rename_hint">أدخل اسم الملف الجديد</string>
-    <string name="preview_cd_back">رجوع</string>
+    <string name="preview_cd_close">إغلاق</string>
+    <string name="preview_draw_done">تم حفظ التعليق التوضيحي</string>
     <string name="preview_cd_more">إجراءات أخرى</string>
     <string name="preview_cd_rename">إعادة تسمية</string>
     <string name="preview_cd_undo">تراجع</string>

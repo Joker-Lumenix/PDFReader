@@ -1,9 +1,11 @@
 package com.peng.pdfreader.ui.adapter.listAdapter
 
+import android.graphics.Color
 import android.graphics.RectF
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.peng.pdfreader.core.pdf.PdfEngine
+import com.peng.pdfreader.core.widget.InkStroke
 import com.peng.pdfreader.core.widget.PdfMark
 import com.peng.pdfreader.core.widget.PdfPageView
 import com.peng.pdfreader.core.widget.ReadingMode
@@ -34,6 +36,43 @@ class PdfPagerAdapter(
     private var selectionEnabled = false
     private var selectionListener: ((Int, RectF) -> Unit)? = null
 
+    /** Supplies the ink of a page. */
+    var inkProvider: ((Int) -> List<InkStroke>)? = null
+
+    /** Raised with the stroke the user has drawn on a page. */
+    var onInkStroke: ((Int, InkStroke) -> Unit)? = null
+
+    /** Raised when a page asks for another page. */
+    var onPageSwipe: ((Int) -> Unit)? = null
+
+    /** Whether the user may draw on the pages. */
+    var inkEnabled: Boolean = false
+        set(value) {
+            field = value
+            views.values.forEach { it.inkEnabled = value }
+        }
+
+    /** Colour of the next stroke. */
+    var inkColour: Int = Color.parseColor("#fb4141")
+        set(value) {
+            field = value
+            views.values.forEach { it.inkColour = value }
+        }
+
+    /** Width of the next stroke, in pixels. */
+    var inkWidth: Float = 0f
+        set(value) {
+            field = value
+            if (value > 0f) views.values.forEach { it.inkWidth = value }
+        }
+
+    /** Whether the number of the page is painted on it (design: sign-1). */
+    var showPageBadge: Boolean = false
+        set(value) {
+            field = value
+            views.values.forEach { it.showPageBadge = value }
+        }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
         val view = PdfPageView(parent.context)
         // ViewPager2 only accepts pages that fill it completely.
@@ -51,6 +90,7 @@ class PdfPagerAdapter(
         view.setMarks(marksProvider?.invoke(position).orEmpty())
         view.onRenderFailed = { onRenderFailed?.invoke() }
         applySelectionTo(view, position)
+        applyInkTo(view, position)
         if (image) {
             view.setImage(file)
         } else {
@@ -72,6 +112,16 @@ class PdfPagerAdapter(
     /** Repaints the marks of one page. */
     fun refreshMarks(position: Int) {
         views[position]?.setMarks(marksProvider?.invoke(position).orEmpty())
+    }
+
+    /** Repaints the marks of every page that is alive. */
+    fun refreshMarks() {
+        views.forEach { (position, view) -> view.setMarks(marksProvider?.invoke(position).orEmpty()) }
+    }
+
+    /** Repaints the ink of one page. */
+    fun refreshInk(position: Int) {
+        views[position]?.setInk(inkProvider?.invoke(position).orEmpty())
     }
 
     /** The view of a page, when it is alive. */
@@ -100,6 +150,17 @@ class PdfPagerAdapter(
         } else {
             { rect: RectF -> listener(position, rect) }
         }
+    }
+
+    /** Gives the page the ink of the document and the tools of the reader. */
+    private fun applyInkTo(view: PdfPageView, position: Int) {
+        view.inkEnabled = inkEnabled
+        view.inkColour = inkColour
+        view.showPageBadge = showPageBadge
+        if (inkWidth > 0f) view.inkWidth = inkWidth
+        view.setInk(inkProvider?.invoke(position).orEmpty())
+        view.onInkStroke = { stroke -> onInkStroke?.invoke(position, stroke) }
+        view.onPageSwipe = { direction -> onPageSwipe?.invoke(direction) }
     }
 
     /** Switches the reading mode of every page that is alive. */

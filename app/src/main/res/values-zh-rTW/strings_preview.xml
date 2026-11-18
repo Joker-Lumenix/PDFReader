@@ -7,7 +7,6 @@
     <string name="preview_open_with">開啟方式</string>
     <string name="preview_share">分享</string>
     <string name="preview_more">更多</string>
-    <string name="preview_page_indicator">%1$d / %2$d</string>
     <string name="preview_outline">目錄大綱</string>
     <string name="preview_add_bookmark">加入目前頁書籤</string>
     <string name="preview_reading_mode">閱讀視覺模式</string>
@@ -30,7 +29,6 @@
     <string name="preview_save_to_document">儲存到文件</string>
     <string name="preview_signature_saved">簽名已儲存</string>
     <string name="preview_signature_failed">頁面尚未就緒，請稍後重試</string>
-    <string name="preview_draw_saved">標註已儲存，並已產生批註版文件</string>
     <string name="preview_print">列印</string>
     <string name="preview_feature_unavailable">此功能暫時無法使用</string>
     <string name="preview_loading">正在解析文件…</string>
@@ -38,7 +36,8 @@
     <string name="preview_load_failed_hint">檔案可能已損毀或格式尚未支援</string>
     <string name="preview_retry">重試</string>
     <string name="preview_rename_hint">輸入新的檔案名稱</string>
-    <string name="preview_cd_back">返回</string>
+    <string name="preview_cd_close">關閉</string>
+    <string name="preview_draw_done">標註已儲存</string>
     <string name="preview_cd_more">更多操作</string>
     <string name="preview_cd_rename">重新命名</string>
     <string name="preview_cd_undo">復原</string>
