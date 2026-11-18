@@ -23,13 +23,17 @@ import com.peng.pdfreader.ui.activities.MergeActivity
 import com.peng.pdfreader.ui.activities.SplitActivity
 
 /**
- * Runs the operation that was picked in the document sheet of the home tab.
+ * Runs the operation that was picked in the document sheet.
  *
  * The sheet (design: home-more) only reports the operation, the running of it
  * stays with the page so that the dialogs, the activities and the list stay in
  * one place.
+ *
+ * The runner is shared by every page that shows the sheet: the home tab and
+ * the reader open the same operations on the same sheet, so a file behaves the
+ * same everywhere.
  */
-class HomeDocumentActions(private val host: Fragment) {
+class DocumentActions(private val host: Fragment) {
 
     /** Runs the operation of the sheet for the given document. */
     fun run(action: String, docId: String) {
@@ -139,6 +143,6 @@ class HomeDocumentActions(private val host: Fragment) {
     }
 
     private companion object {
-        const val TAG = "HomeDocumentActions"
+        const val TAG = "DocumentActions"
     }
 }

@@ -4,8 +4,9 @@
   20dp from the left edge of the card and the 18dp radio button at x=307, so
   23dp from the right edge of the card.
 
-  The selected row of the design is a red gradient pill of 320x40dp that sits
-  8dp from the left and the right edge of the row and 4dp below its top edge.
+  The selected row of the design is a red gradient pill that sits 8dp from the
+  left and the right edge of the row and 4dp below its top edge - the pill
+  therefore carries the name and the radio button of the row.
 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -17,9 +18,12 @@
 
     <View
         android:id="@+id/vSelectedPill"
-        android:layout_width="320dp"
+        android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:layout_gravity="center"
+        android:layout_gravity="top|start"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="8dp"
         android:background="@drawable/gradient_red"
         android:visibility="gone"
         tools:visibility="visible" />

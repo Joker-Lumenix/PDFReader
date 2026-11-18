@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.FrameLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
@@ -118,6 +119,11 @@ abstract class BaseBottomSheetDialog(
 
     override fun onStart() {
         super.onStart()
+        // The scrim of the design is a 75 % black layer over the page.
+        dialog?.window?.apply {
+            addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
+            setDimAmount(SCRIM_ALPHA)
+        }
         dialog?.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)?.apply {
             // The sheet has to grow with its content and it has to stay above
             // the keyboard, the design shows it right above it.
@@ -210,6 +216,9 @@ abstract class BaseBottomSheetDialog(
 
         /** Argument key of the "back press to dismiss" switch. */
         const val ARG_DISMISS_ON_BACK = "com.peng.pdfreader.core.DISMISS_ON_BACK"
+
+        /** The scrim of the design: 75 % black over the page. */
+        private const val SCRIM_ALPHA = 0.75f
 
     }
 }

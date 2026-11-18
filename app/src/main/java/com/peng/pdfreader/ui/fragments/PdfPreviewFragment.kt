@@ -6,7 +6,6 @@ import android.graphics.Color
 import android.graphics.RectF
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
-import android.text.format.Formatter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,7 +14,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.widget.ViewPager2
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.peng.pdfreader.R
 import com.peng.pdfreader.core.pdf.PdfEngine
 import com.peng.pdfreader.core.pdf.PdfError
@@ -39,22 +37,17 @@ import com.peng.pdfreader.ui.adapter.listAdapter.PdfPagerAdapter
 import com.peng.pdfreader.ui.uiData.AnnotationMarks
 import com.peng.pdfreader.ui.uiData.AnnotationPayload
 import com.peng.pdfreader.ui.uiData.FileActions
-import com.peng.pdfreader.ui.dialogs.BottomSheetMoreActionNoPdf
-import com.peng.pdfreader.ui.dialogs.BottomSheetMoreActionPdf
+import com.peng.pdfreader.ui.dialogs.BottomSheetRename
+import com.peng.pdfreader.ui.dialogs.DocumentActionSheet
 import com.peng.pdfreader.ui.dialogs.DialogDeleteConfirm
 import com.peng.pdfreader.ui.dialogs.DialogFailure
 import com.peng.pdfreader.ui.dialogs.DialogNote
-import com.peng.pdfreader.ui.dialogs.BottomSheetOutline
-import com.peng.pdfreader.ui.dialogs.DialogRename
 import com.peng.pdfreader.utils.FileSharing
-import com.peng.pdfreader.utils.PreviewTitleActions
-import com.peng.pdfreader.ui.activities.CompressActivity
+import com.peng.pdfreader.utils.DocumentActions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Locale
 import java.util.UUID
 
 /**
@@ -116,7 +109,7 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
         }
 
         binding.ivRename.setOnClickListener {
-            showRenameDialog()
+            showRenameSheet()
         }
         binding.ivMore.setOnClickListener {
             showMoreActions()
@@ -125,8 +118,6 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
         binding.llShare.setOnClickListener {
             share()
         }
-
-        binding.llShare.setOnClickListener { share() }
 
         // The confirmation bar of the design carries the signature over.
         binding.addBar.background = GradientDrawable().apply {
@@ -157,16 +148,28 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
         loadDocument()
     }
 
-    /** Listens to the operations of the more sheet of the reader. */
+    /**
+     * Listens to the operations of the more sheet of the reader.
+     *
+     * The sheet is the one of the file list (design: home-more) and the
+     * operations are run by the shared runner, so a file behaves the same in
+     * the reader and in the list.
+     */
     private fun registerResults() {
-        parentFragmentManager.setFragmentResultListener(
+        childFragmentManager.setFragmentResultListener(
             FileActions.REQUEST_KEY,
             viewLifecycleOwner,
         ) { _, bundle ->
             val action = bundle.getString(FileActions.KEY_ACTION) ?: return@setFragmentResultListener
-            onPreviewAction(action)
+            val docId = bundle.getString(FileActions.KEY_DOC_ID) ?: return@setFragmentResultListener
+            DocumentActions(this).run(action, docId)
+            refreshDocument()
         }
-        parentFragmentManager.setFragmentResultListener(
+        childFragmentManager.setFragmentResultListener(
+            BottomSheetRename.REQUEST_KEY,
+            viewLifecycleOwner,
+        ) { _, _ -> refreshDocument() }
+        childFragmentManager.setFragmentResultListener(
             DialogDeleteConfirm.REQUEST_KEY,
             viewLifecycleOwner,
         ) { _, _ ->
@@ -212,7 +215,13 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
         openDocument(doc, file)
     }
 
-    private fun openDocument(doc: Document, file: File) {
+    /**
+     * Opens the document in the pager.
+     *
+     * @param startPage the page the reader starts on, the last page of the
+     * document when it is negative.
+     */
+    private fun openDocument(doc: Document, file: File, startPage: Int = -1) {
         viewLifecycleOwner.lifecycleScope.launch {
             val outcome = withContext(Dispatchers.IO) {
                 if (doc.type == DocType.IMAGE) PdfOpen.Opened(1) else PdfEngine.open(file)
@@ -235,13 +244,36 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
                 AnnotationMarks.marksOf(repository.annotationsOf(doc.id), page)
             }
             adapter.onRenderFailed = { reportRenderFailure() }
+            // The old adapter holds the pages of the file that was open before.
+            pagerAdapter?.release()
             pagerAdapter = adapter
             binding.pager.adapter = adapter
-            val start = (doc.lastPage - 1).coerceIn(0, pageCount - 1)
+            val start = if (startPage >= 0) {
+                startPage.coerceIn(0, pageCount - 1)
+            } else {
+                (doc.lastPage - 1).coerceIn(0, pageCount - 1)
+            }
             if (start > 0) binding.pager.setCurrentItem(start, false)
             currentPage = start
             updateIndicator()
         }
+    }
+
+    /**
+     * Reads the document again.
+     *
+     * The sheet may have renamed the file or changed its favourite state: the
+     * title follows the document and a renamed file is opened again, so the
+     * pages keep coming.
+     */
+    private fun refreshDocument() {
+        val doc = document ?: return
+        val updated = repository.byId(doc.id) ?: return
+        document = updated
+        binding.tvTitle.text = updated.name
+        if (updated.path == doc.path) return
+        val page = currentPage
+        openDocument(updated, repository.fileOf(updated), page)
     }
 
     /**
@@ -341,189 +373,33 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
 
     // ------------------------------------------------------------------ actions
 
-    private fun toggleFavorite() {
-        val doc = document ?: return
-        repository.toggleFavorite(doc)
-        val updated = repository.byId(doc.id) ?: return
-        document = updated
-    }
-
     private fun share() {
         val doc = document ?: return
         val file = repository.fileOf(doc)
         FileSharing.share(requireContext(), file, FileSharing.mimeTypeOf(doc.name))
     }
 
-    private fun openWith() {
+    /**
+     * The more sheet of the reader (design: home-more).
+     *
+     * The reader opens the sheet of the file list: the same operations, the
+     * same sheet and the same behaviour, so a file behaves the same wherever
+     * it is opened from.
+     */
+    private fun showMoreActions() {
         val doc = document ?: return
-        val file = repository.fileOf(doc)
-        val opened = FileSharing.openWith(requireContext(), file, FileSharing.mimeTypeOf(doc.name))
-        if (!opened) {
-            Toast.makeText(requireContext(), R.string.no_permissions, Toast.LENGTH_SHORT).show()
-        }
+        DocumentActionSheet.show(requireContext(), childFragmentManager, doc)
     }
 
     /**
-     * The three actions of the app bar: rename, share and the overflow.
+     * The rename sheet of the app (design: home-PDF-rename).
      *
-     * The design puts the rename tile at x=174, the share at x=276 and the
-     * overflow at x=316.
+     * The reader renames its file with the sheet of the list, so the name is
+     * written the same way everywhere.
      */
-    private fun buildTitleActions(): View = PreviewTitleActions.build(
-        requireContext(),
-        onRename = { showRenameDialog() },
-        onShare = { share() },
-        onMore = { showMoreActions() },
-    )
-
-    private fun showMoreActions() {
-        val doc = document
-        if (doc == null) return
-        // The reader uses the overflow menu of the design (sign-more): the
-        // header of the file, the four actions of the reader and the wide row
-        // with the secondary action.
-        val sheet = BottomSheetMoreActionNoPdf.create(
-            actions = listOf(
-                BottomSheetMoreActionNoPdf.Action(
-                    ACTION_OUTLINE,
-                    getString(R.string.preview_outline),
-                    R.mipmap.ic_menu,
-                ),
-                BottomSheetMoreActionNoPdf.Action(
-                    ACTION_BOOKMARK,
-                    getString(R.string.preview_add_bookmark),
-                    R.mipmap.ic_collect_unselect,
-                ),
-                BottomSheetMoreActionNoPdf.Action(
-                    ACTION_READING_MODE,
-                    getString(R.string.preview_reading_mode),
-                    R.mipmap.ic_eye_open,
-                ),
-                BottomSheetMoreActionNoPdf.Action(
-                    ACTION_RENAME,
-                    getString(R.string.rename),
-                    R.mipmap.ic_rename_black,
-                ),
-            ),
-            wideAction = BottomSheetMoreActionNoPdf.Action(
-                ACTION_COMPRESS,
-                getString(R.string.compress),
-                R.mipmap.ic_compress,
-            ),
-            documentName = doc.name,
-            documentType = getString(doc.type.labelRes),
-            documentMeta = documentMeta(),
-            documentLogo = ContextCompat.getDrawable(requireContext(), doc.type.logoRes),
-        )
-        sheet.onActionSelected = { id -> onPreviewAction(id) }
-        // The document id is needed by the favourite button of the sheet.
-        sheet.documentId = doc.id
-        sheet.show(parentFragmentManager, "preview_more")
-    }
-
-    /** Runs the operation that was picked in the more sheet of the reader. */
-    private fun onPreviewAction(id: String) {
-        when (id) {
-            ACTION_OUTLINE -> showOutline()
-            ACTION_BOOKMARK -> addBookmark()
-            ACTION_READING_MODE -> showReadingModeDialog()
-            ACTION_RENAME -> showRenameDialog()
-            ACTION_SHARE -> share()
-            ACTION_OPEN_WITH -> openWith()
-            ACTION_COMPRESS -> compress()
-            ACTION_DELETE -> deleteDocument()
-        }
-    }
-
-    /** Asks whether the document should really be removed. */
-    private fun deleteDocument() {
+    private fun showRenameSheet() {
         val doc = document ?: return
-        DialogDeleteConfirm.show(parentFragmentManager, listOf(doc.id))
-    }
-
-    /** Opens the compressor of the app for the current document. */
-    private fun compress() {
-        val doc = document ?: return
-        CompressActivity.start(requireContext(), doc.id)
-    }
-
-    /** The meta line of the more sheet: the date and the size of the file. */
-    private fun documentMeta(): String {
-        val doc = document ?: return ""
-        val date = SimpleDateFormat("MM-dd HH:mm", Locale.getDefault()).format(doc.modifiedAt)
-        val size = Formatter.formatShortFileSize(requireContext(), doc.sizeBytes)
-        return "$date · $size"
-    }
-
-    private fun showRenameDialog() {
-        val doc = document ?: return
-        val dialog = DialogRename.create(doc.name)
-        dialog.onNameEntered = { name ->
-            if (name.isNotEmpty()) {
-                val extension = doc.name.substringAfterLast('.', "")
-                val safeName = if (extension.isEmpty() || name.contains('.')) name else "$name.$extension"
-                repository.rename(doc, safeName)
-                val updated = repository.byId(doc.id)
-                if (updated != null) {
-                    document = updated
-                    binding.tvTitle.text = updated.name
-                }
-            }
-        }
-        dialog.show(parentFragmentManager, "preview_rename")
-    }
-
-    private fun addBookmark() {
-        val doc = document ?: return
-        repository.addBookmark(doc.id, currentPage + 1, getString(R.string.preview_cd_page, currentPage + 1))
-        Toast.makeText(requireContext(), R.string.preview_bookmark_added, Toast.LENGTH_SHORT).show()
-    }
-
-    private fun showOutline() {
-        val doc = document ?: return
-        viewLifecycleOwner.lifecycleScope.launch {
-            val entries = withContext(Dispatchers.IO) {
-                PdfEngine.extractOutline(repository.fileOf(doc))
-            }
-            if (_binding == null) return@launch
-            if (entries.isEmpty()) {
-                Toast.makeText(requireContext(), R.string.no_outline, Toast.LENGTH_SHORT).show()
-                return@launch
-            }
-            val sheet = BottomSheetOutline.create(entries.map { it.title }, entries.map { it.page })
-            sheet.onEntrySelected = { index ->
-                val page = entries.getOrNull(index)?.page
-                if (page != null) jumpToPage(page - 1)
-            }
-            sheet.show(parentFragmentManager, "preview_outline")
-        }
-    }
-
-    private fun jumpToPage(index: Int) {
-        if (pageCount <= 0) return
-        binding.pager.setCurrentItem(index.coerceIn(0, pageCount - 1), true)
-    }
-
-    private fun showReadingModeDialog() {
-        val labels = arrayOf(
-            getString(R.string.preview_mode_light),
-            getString(R.string.preview_mode_sepia),
-            getString(R.string.preview_mode_night),
-            getString(R.string.preview_mode_black),
-        )
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle(R.string.preview_reading_mode)
-            .setItems(labels) { _, which ->
-                val mode = when (which) {
-                    0 -> ReadingMode.LIGHT
-                    1 -> ReadingMode.SEPIA
-                    2 -> ReadingMode.NIGHT_INVERT
-                    else -> ReadingMode.BLACK
-                }
-                prefs.readingMode = mode
-                pagerAdapter?.applyReadingMode(readingMode())
-            }
-            .show()
+        BottomSheetRename.show(childFragmentManager, doc.id)
     }
 
     private fun closeAnnotationBar() {
@@ -718,15 +594,6 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
 
     companion object {
         private const val ARG_DOC_ID = "com.peng.pdfreader.extra.DOC_ID"
-
-        private const val ACTION_OUTLINE = "outline"
-        private const val ACTION_BOOKMARK = "bookmark"
-        private const val ACTION_READING_MODE = "reading_mode"
-        private const val ACTION_RENAME = "rename"
-        private const val ACTION_SHARE = "share"
-        private const val ACTION_OPEN_WITH = "open_with"
-        private const val ACTION_COMPRESS = "compress"
-        private const val ACTION_DELETE = "delete"
 
         /** The name of the file is smaller than a page title. */
         private const val TITLE_SIZE_SP = 15f

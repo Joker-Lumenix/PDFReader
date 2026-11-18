@@ -7,7 +7,6 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.peng.pdfreader.R
 import com.peng.pdfreader.databinding.LanguageRowBinding
-import com.peng.pdfreader.ui.uiData.language.LanguageCatalog
 import com.peng.pdfreader.ui.uiData.language.LanguageOption
 import com.peng.pdfreader.ui.uiData.language.LanguageRadioDrawable
 
@@ -19,6 +18,7 @@ import com.peng.pdfreader.ui.uiData.language.LanguageRadioDrawable
  * with an empty ring.
  */
 class LanguageAdapter(
+    private val options: List<LanguageOption>,
     private val onSelected: (LanguageOption) -> Unit,
 ) : RecyclerView.Adapter<LanguageAdapter.OptionHolder>() {
 
@@ -30,7 +30,7 @@ class LanguageAdapter(
     }
 
     override fun onBindViewHolder(holder: OptionHolder, position: Int) {
-        val option = LanguageCatalog.options[position]
+        val option = options[position]
         val context = holder.itemView.context
         val selected = position == selectedIndex
 
@@ -47,12 +47,12 @@ class LanguageAdapter(
         holder.itemView.setOnClickListener { onSelected(option) }
     }
 
-    override fun getItemCount(): Int = LanguageCatalog.options.size
+    override fun getItemCount(): Int = options.size
 
     /** Highlights the given option, `null` clears the selection. */
     fun select(option: LanguageOption?) {
         val previous = selectedIndex
-        val index = option?.let { LanguageCatalog.options.indexOf(it) } ?: RecyclerView.NO_POSITION
+        val index = option?.let { options.indexOf(it) } ?: RecyclerView.NO_POSITION
         selectedIndex = if (index >= 0) index else RecyclerView.NO_POSITION
         if (previous != RecyclerView.NO_POSITION) notifyItemChanged(previous)
         if (selectedIndex != RecyclerView.NO_POSITION) notifyItemChanged(selectedIndex)

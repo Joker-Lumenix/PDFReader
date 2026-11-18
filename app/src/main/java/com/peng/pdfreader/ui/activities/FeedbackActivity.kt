@@ -5,8 +5,11 @@ import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.view.WindowManager
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.peng.pdfreader.R
 import com.peng.pdfreader.core.util.Logger
 import com.peng.pdfreader.base.BaseActivity
@@ -33,8 +36,31 @@ class FeedbackActivity : BaseActivity() {
 
         binding.tvHeading.text = getString(R.string.feedback_heading)
         applyInputSurface()
+        applyKeyboardInsets()
 
         binding.btnSubmit.setOnClickListener { submit() }
+    }
+
+    /**
+     * The keyboard pushes the card of the design up, the submit button stays
+     * visible above it.
+     *
+     * The app draws edge to edge since Android 15, the window does not shrink
+     * for the keyboard any more - the card takes the inset itself.
+     */
+    private fun applyKeyboardInsets() {
+        val card = binding.cardFeedback
+        val params = card.layoutParams as? ViewGroup.MarginLayoutParams ?: return
+        val base = params.bottomMargin
+        ViewCompat.setOnApplyWindowInsetsListener(card) { view, insets ->
+            val keyboard = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom -
+                insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
+            val layout = view.layoutParams as ViewGroup.MarginLayoutParams
+            layout.bottomMargin = base + keyboard.coerceAtLeast(0)
+            view.layoutParams = layout
+            insets
+        }
+        ViewCompat.requestApplyInsets(card)
     }
 
     /** Input surface of the design: #f5f5f5 with a 6.4dp radius. */

@@ -11,6 +11,7 @@ import com.peng.pdfreader.databinding.LanguageActivityBinding
 import com.peng.pdfreader.ui.adapter.listAdapter.LanguageAdapter
 import com.peng.pdfreader.ui.uiData.language.LanguageCatalog
 import com.peng.pdfreader.ui.uiData.language.LanguageOption
+import java.util.Locale
 
 /**
  * Language selection page.
@@ -19,15 +20,15 @@ import com.peng.pdfreader.ui.uiData.language.LanguageOption
  * [AppCompatDelegate.setApplicationLocales]; the activity is recreated by the
  * framework afterwards, so the whole app switches to the new language.
  *
- * The design starts with nothing selected - the "Next" button stays disabled
- * until the user picks a language - and it marks the selected row with the red
- * gradient pill.
+ * The page shows the language of the system when the app speaks it - that one
+ * is marked right away. When the system speaks another language, the list
+ * carries the entry that follows the system.
  */
 class LanguageActivity : BaseActivity() {
 
     private lateinit var binding: LanguageActivityBinding
 
-    private val adapter = LanguageAdapter { option -> onOptionClicked(option) }
+    private lateinit var adapter: LanguageAdapter
 
     private var selected: LanguageOption? = null
 
@@ -36,21 +37,31 @@ class LanguageActivity : BaseActivity() {
         binding = LanguageActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.tvTitle.text = getString(R.string.language_selection)
+        binding.tvTitle.text = getString(R.string.language)
         binding.ivBack.setOnClickListener { finish() }
 
+        // The language of the system decides what the page shows: when the app
+        // speaks it, it is marked right away, otherwise the list carries the
+        // entry that follows the system.
+        val systemLocale = LanguageCatalog.systemLocale(this)
+        adapter = LanguageAdapter(LanguageCatalog.optionsFor(systemLocale)) { option ->
+            onOptionClicked(option)
+        }
         binding.rvLanguages.layoutManager = LinearLayoutManager(this)
         binding.rvLanguages.adapter = adapter
 
         binding.btnNext.setOnClickListener { applySelection() }
 
-        restoreSelection()
+        restoreSelection(systemLocale)
     }
 
-    /** Pre-selects the language the app currently runs in. */
-    private fun restoreSelection() {
-        val applied = AppCompatDelegate.getApplicationLocales()[0]?.toLanguageTag()
-        val option = LanguageCatalog.find(applied)
+    /**
+     * Marks the language of the system, or the entry that follows it when the
+     * app does not speak the language of the system.
+     */
+    private fun restoreSelection(systemLocale: Locale) {
+        val option = LanguageCatalog.optionFor(systemLocale)
+            ?: LanguageCatalog.followSystemOption()
         selected = option
         adapter.select(option)
         updateNextState()
@@ -74,7 +85,12 @@ class LanguageActivity : BaseActivity() {
         val option = selected ?: return
         AppPrefs.get(this).language = option.code
         AppCompatDelegate.setApplicationLocales(
-            LocaleListCompat.forLanguageTags(LanguageCatalog.toLanguageTag(option.code)),
+            if (option.code == LanguageCatalog.FOLLOW_SYSTEM) {
+                // An empty list hands the language back to the system.
+                LocaleListCompat.getEmptyLocaleList()
+            } else {
+                LocaleListCompat.forLanguageTags(LanguageCatalog.toLanguageTag(option.code))
+            },
         )
     }
 }

@@ -5,7 +5,6 @@ import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -54,17 +53,6 @@ class BottomSheetMoreActionNoPdf : BaseBottomSheetDialog() {
 
     /** Raised with the id of the tapped action. */
     var onActionSelected: ((String) -> Unit)? = null
-
-    /**
-     * The scrim of the design is a 75 % black layer over the page.
-     */
-    override fun onStart() {
-        super.onStart()
-        dialog?.window?.apply {
-            addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
-            setDimAmount(SCRIM_ALPHA)
-        }
-    }
 
     override fun createContentView(inflater: LayoutInflater, container: ViewGroup?): View {
         val view = inflater.inflate(R.layout.dialog_file_more_action_nopdf, container, false)
@@ -197,9 +185,6 @@ class BottomSheetMoreActionNoPdf : BaseBottomSheetDialog() {
 
         /** The surface of the wide row of the design. */
         private const val WIDE_ROW_COLOR = 0xFFF5F5F5.toInt()
-
-        /** The scrim of the design: 75 % black. */
-        private const val SCRIM_ALPHA = 0.75f
 
         /** Creates the sheet for the given actions. */
         fun create(

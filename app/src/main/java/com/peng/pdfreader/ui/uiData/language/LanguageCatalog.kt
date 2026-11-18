@@ -1,7 +1,12 @@
 package com.peng.pdfreader.ui.uiData.language
 
+import android.app.LocaleManager
+import android.content.Context
+import android.os.Build
+import android.os.LocaleList
 import androidx.annotation.StringRes
 import com.peng.pdfreader.R
+import java.util.Locale
 
 /** One entry of the language list. */
 data class LanguageOption(
@@ -18,6 +23,9 @@ data class LanguageOption(
  */
 object LanguageCatalog {
 
+    /** The code of the entry that keeps the language of the system. */
+    const val FOLLOW_SYSTEM = "system"
+
     val options: List<LanguageOption> = listOf(
         LanguageOption("en", R.string.language_en),
         LanguageOption("fr", R.string.language_fr),
@@ -32,6 +40,54 @@ object LanguageCatalog {
         LanguageOption("zh-CN", R.string.language_zh_cn),
         LanguageOption("zh-rTW", R.string.language_zh_tw),
     )
+
+    /**
+     * The list of the language page.
+     *
+     * The app speaks the languages of [options]. When the system speaks another
+     * language, the list carries the entry that follows the system, so the user
+     * can go back to the language of the device.
+     */
+    fun optionsFor(locale: Locale): List<LanguageOption> {
+        if (optionFor(locale) != null) return options
+        return listOf(followSystemOption()) + options
+    }
+
+    /**
+     * The option of the given locale, `null` when the app has no language for it.
+     *
+     * The region of the locale falls back to the language: `en-US` is served by
+     * the English of the app - as long as the app has one variant of it only.
+     */
+    fun optionFor(locale: Locale): LanguageOption? {
+        val tag = locale.toLanguageTag()
+        options.firstOrNull { toLanguageTag(it.code).equals(tag, ignoreCase = true) }?.let { return it }
+        val language = locale.language.lowercase()
+        val same = options.filter {
+            toLanguageTag(it.code).substringBefore('-').lowercase() == language
+        }
+        return same.singleOrNull()
+    }
+
+    /** The entry that follows the language of the system. */
+    fun followSystemOption(): LanguageOption =
+        LanguageOption(FOLLOW_SYSTEM, R.string.settings_follow_system)
+
+    /**
+     * The locale of the system.
+     *
+     * The language the user has set for the app does not change the language
+     * of the device: the system locales carry it (Android 13 and later), on
+     * the older systems the default list of the process is the one of the
+     * device.
+     */
+    fun systemLocale(context: Context): Locale {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val manager = context.getSystemService(LocaleManager::class.java)
+            manager?.systemLocales?.takeIf { !it.isEmpty }?.let { return it[0] }
+        }
+        return LocaleList.getDefault()[0] ?: Locale.getDefault()
+    }
 
     /** The option of the given tag, `null` when the tag is unknown. */
     fun find(code: String?): LanguageOption? {

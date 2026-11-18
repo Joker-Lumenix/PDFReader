@@ -50,23 +50,21 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:layout_margin="12dp"
+        android:background="@drawable/bg_card_r8"
+        >
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvLanguages"
-            android:layout_width="0dp"
-            android:layout_height="649dp"
-            android:layout_marginStart="@dimen/space_m"
-            android:layout_marginTop="@dimen/space_m"
-            android:layout_marginEnd="@dimen/space_m"
-            android:background="@drawable/bg_card_r8"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:clipToPadding="false"
-            android:paddingTop="@dimen/space_s"
-            android:paddingBottom="@dimen/space_s"
+            android:layout_marginBottom="12dp"
+            android:paddingVertical="12dp"
             android:scrollbars="none"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/btnNext"
             tools:itemCount="4"
             tools:listitem="@layout/language_row" />
 
@@ -74,12 +72,11 @@
             android:id="@+id/btnNext"
             android:layout_width="0dp"
             android:layout_height="48dp"
-            android:layout_marginStart="24dp"
-            android:layout_marginEnd="24dp"
-            android:layout_marginBottom="@dimen/space_xxl"
+            android:layout_marginBottom="20dp"
             android:background="@drawable/bg_btn_unable_r16"
             android:backgroundTint="@null"
             android:enabled="false"
+            android:layout_marginHorizontal="8dp"
             android:fontFamily="sans-serif-medium"
             android:letterSpacing="0"
             android:stateListAnimator="@null"

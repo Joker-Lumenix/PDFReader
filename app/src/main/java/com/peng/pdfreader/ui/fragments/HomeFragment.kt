@@ -34,7 +34,7 @@ import com.peng.pdfreader.utils.FilesPrefs
 import com.peng.pdfreader.ui.adapter.listAdapter.HomeDocumentAdapter
 import com.peng.pdfreader.ui.adapter.pageAdapter.HomePagerAdapter
 import com.peng.pdfreader.ui.uiData.QuickAction
-import com.peng.pdfreader.utils.HomeDocumentActions
+import com.peng.pdfreader.utils.DocumentActions
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -273,7 +273,7 @@ class HomeFragment : BaseFragment() {
         ) { _, bundle ->
             val action = bundle.getString(FileActions.KEY_ACTION) ?: return@setFragmentResultListener
             val docId = bundle.getString(FileActions.KEY_DOC_ID) ?: return@setFragmentResultListener
-            HomeDocumentActions(this@HomeFragment).run(action, docId)
+            DocumentActions(this@HomeFragment).run(action, docId)
             refreshDocuments()
         }
         childFragmentManager.setFragmentResultListener(
