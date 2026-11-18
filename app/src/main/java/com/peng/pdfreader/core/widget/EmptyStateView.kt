@@ -28,7 +28,7 @@ class EmptyStateView @JvmOverloads constructor(
 
     init {
         orientation = VERTICAL
-        LayoutInflater.from(context).inflate(R.layout.widget_empty_state, this, true)
+        LayoutInflater.from(context).inflate(R.layout.empty_state, this, true)
 
         illustration = findViewById(R.id.ivIllustration)
         titleView = findViewById(R.id.tvTitle)

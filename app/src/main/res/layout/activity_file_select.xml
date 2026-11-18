@@ -51,6 +51,7 @@
             android:id="@+id/ivChooseAll"
             android:layout_width="24dp"
             android:layout_height="24dp"
+            android:contentDescription="@string/select_all"
             android:src="@mipmap/ic_square_red"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
@@ -89,14 +90,16 @@
         android:id="@+id/selectBarDivider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/surface_hairline" />
+        android:background="@color/surface_hairline"
+        android:visibility="gone" />
 
     <LinearLayout
         android:id="@+id/bottomBar"
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:background="@color/surface_card"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:visibility="gone">
 
         <LinearLayout
             android:id="@+id/actionSelectShare"

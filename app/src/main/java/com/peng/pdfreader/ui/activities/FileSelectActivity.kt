@@ -47,6 +47,9 @@ class FileSelectActivity : BaseActivity() {
     /** The ids of the picked files. */
     private val selectedIds = mutableSetOf<String>()
 
+    /** The documents of the list, they carry the state of the rows. */
+    private var documents: List<Document> = emptyList()
+
     /** The action that opens the type filter popover. */
     private var filterAction: View? = null
 
@@ -73,8 +76,10 @@ class FileSelectActivity : BaseActivity() {
         binding.ivBack.setOnClickListener {
             finishWithSelection()
         }
+        // The button of the title bar picks every file of the list, a second
+        // tap drops the selection again.
+        binding.ivChooseAll.setOnClickListener { toggleSelectAll() }
         updateTitle()
-
     }
 
     private fun setupList() {
@@ -198,6 +203,7 @@ class FileSelectActivity : BaseActivity() {
     }
 
     private fun render(documents: List<Document>) {
+        this.documents = documents
         val rows = documents.map { document ->
             val checked = document.id in selectedIds
             FileListAdapter.Row(
@@ -210,11 +216,12 @@ class FileSelectActivity : BaseActivity() {
                     thumbnail = thumbnails.of(this, document),
                     showThumbnail = true,
                     showType = true,
-                    // The design shows the "more" affordance on every row that
-                    // is not selected, the selection mark takes its place.
-                    showMore = !checked,
-                    showCheckbox = checked,
+                    // The selection mark sits on the right of the row, the
+                    // design shows no "more" affordance on this page.
+                    showMore = false,
+                    showCheckbox = true,
                     checkboxAtEnd = true,
+                    squareCheckbox = true,
                     checked = checked,
                     encrypted = document.isEncrypted,
                 ),
@@ -246,6 +253,22 @@ class FileSelectActivity : BaseActivity() {
     private fun setSelected(docId: String, selected: Boolean) {
         if (selected) selectedIds.add(docId) else selectedIds.remove(docId)
         updateSelectionUi()
+        // The rows carry the state of the selection, they have to follow it.
+        render(documents)
+    }
+
+    /**
+     * Picks every file of the list, a second tap drops the selection again.
+     */
+    private fun toggleSelectAll() {
+        val ids = documents.map { it.id }
+        val everythingPicked = ids.isNotEmpty() && selectedIds.size == ids.size
+        selectedIds.clear()
+        if (!everythingPicked) {
+            selectedIds.addAll(ids)
+        }
+        // The rows carry the state of the selection, they have to follow it.
+        render(documents)
     }
 
     /**
@@ -254,6 +277,11 @@ class FileSelectActivity : BaseActivity() {
      */
     private fun updateSelectionUi() {
         val single = selectedIds.size == 1
+        // The merge works on PDF files only, it leaves the bar when the
+        // selection carries another type of file.
+        val onlyPdf = selectedIds.all { repository.byId(it)?.type == DocType.PDF }
+        binding.actionSelectSecond.visibility =
+            if (single || onlyPdf) View.VISIBLE else View.GONE
         binding.ivActionSelectSecond.setImageResource(
             if (single) R.mipmap.ic_rename_black else R.mipmap.ic_merge_black,
         )
@@ -261,7 +289,47 @@ class FileSelectActivity : BaseActivity() {
             if (single) R.string.rename else R.string.files_action_merge,
         )
         binding.actionSelectEdit.visibility = if (single) View.VISIBLE else View.GONE
+        // The bar of the actions only shows when a file is picked.
+        animateActionBar(selectedIds.isNotEmpty())
+        // The button of the title bar is checked when every file is picked.
+        val everythingPicked = documents.isNotEmpty() && selectedIds.size == documents.size
+        binding.ivChooseAll.setImageResource(
+            if (everythingPicked) R.mipmap.ic_checkbox_square_select else R.mipmap.ic_square_red,
+        )
         updateTitle()
+    }
+
+    /**
+     * The bar of the actions slides in from the bottom when a file is picked
+     * and slides away when the selection is gone.
+     */
+    private fun animateActionBar(show: Boolean) {
+        val bar = binding.bottomBar
+        val height = bar.layoutParams.height.toFloat()
+        binding.selectBarDivider.visibility = if (show) View.VISIBLE else View.GONE
+        if (show) {
+            if (bar.visibility == View.VISIBLE) return
+            bar.visibility = View.VISIBLE
+            bar.translationY = height
+            bar.alpha = 0f
+            bar.animate()
+                .translationY(0f)
+                .alpha(1f)
+                .setDuration(ACTION_BAR_ANIM_MS)
+                .start()
+        } else {
+            if (bar.visibility != View.VISIBLE) return
+            bar.animate()
+                .translationY(height)
+                .alpha(0f)
+                .setDuration(ACTION_BAR_ANIM_MS)
+                .withEndAction {
+                    bar.visibility = View.GONE
+                    bar.translationY = 0f
+                    bar.alpha = 1f
+                }
+                .start()
+        }
     }
 
     private fun updateTitle() {
@@ -337,6 +405,9 @@ class FileSelectActivity : BaseActivity() {
 
     companion object {
         private const val ROW_GAP = 12
+
+        /** How long the bar of the actions takes to slide in and out. */
+        private const val ACTION_BAR_ANIM_MS = 200L
 
         /** The ids of the picked files inside the result intent. */
         const val EXTRA_SELECTED_IDS = "com.peng.pdfreader.extra.SELECTED_IDS"

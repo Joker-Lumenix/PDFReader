@@ -70,8 +70,8 @@ class FileListItemView @JvmOverloads constructor(
         set(value) {
             field = value
             checkbox.setImageResource(
-                if (value) R.drawable.ic_checkbox_square_select
-                else R.drawable.ic_checkbox_square_unselect,
+                if (value) R.mipmap.ic_checkbox_square_select
+                else R.mipmap.ic_checkbox_square_unselect,
             )
         }
 
@@ -147,6 +147,8 @@ class FileListItemView @JvmOverloads constructor(
  * @param badge small coloured badge next to the title (advertising rows)
  * @param inlineAction inline pill button rendered next to the title
  * @param checkboxAtEnd whether the selection mark sits on the right of the row
+ * @param squareCheckbox whether the selection mark is a square, the files tab
+ *   marks the selection with a circle
  * @param encrypted the file carries the vault container, the row shows the
  *   corner badge of the design
  */
@@ -164,6 +166,7 @@ data class FileItemUiState(
     val badge: String? = null,
     val inlineActionText: String? = null,
     val checkboxAtEnd: Boolean = false,
+    val squareCheckbox: Boolean = false,
     val encrypted: Boolean = false,
 )
 

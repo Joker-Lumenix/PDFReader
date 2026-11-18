@@ -1,7 +1,10 @@
 package com.peng.pdfreader.ui.dialogs
 
+import android.content.Context
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.peng.pdfreader.data.Document
 import com.peng.pdfreader.data.DocumentRepository
@@ -21,7 +24,14 @@ import kotlinx.coroutines.withContext
  * The sheet stays open until the cipher is done, so the error of the design can
  * be rendered inside of it.
  */
-class DocumentCipher(private val host: Fragment) {
+class DocumentCipher(
+    private val host: LifecycleOwner,
+    private val manager: FragmentManager,
+    private val context: Context,
+) {
+
+    /** The cipher runs in the fragment manager of the host. */
+    constructor(host: Fragment) : this(host, host.childFragmentManager, host.requireContext())
 
     /** The document the cipher works on. */
     private var pending: Document? = null
@@ -37,21 +47,21 @@ class DocumentCipher(private val host: Fragment) {
     fun decrypt(documentId: String) = run(documentId, BottomSheetPassword.Mode.UNLOCK)
 
     private fun run(documentId: String, mode: BottomSheetPassword.Mode) {
-        val document = DocumentRepository.get(host.requireContext()).byId(documentId) ?: return
+        val document = DocumentRepository.get(context).byId(documentId) ?: return
         pending = document
-        host.childFragmentManager.setFragmentResultListener(
+        manager.setFragmentResultListener(
             BottomSheetPassword.RESULT_KEY,
-            host.viewLifecycleOwner,
+            host,
         ) { _, bundle ->
             onPassword(bundle.getString(BottomSheetPassword.KEY_PASSWORD).orEmpty(), mode)
         }
         BottomSheetPassword.newInstance(mode)
-            .show(host.childFragmentManager, BottomSheetPassword.TAG)
+            .show(manager, BottomSheetPassword.TAG)
     }
 
     private fun onPassword(password: String, mode: BottomSheetPassword.Mode) {
         val document = pending ?: return
-        val context = host.requireContext().applicationContext
+        val context = context.applicationContext
         val sheet = currentSheet()
         host.lifecycleScope.launch {
             val outcome = withContext(Dispatchers.IO) {
@@ -79,7 +89,7 @@ class DocumentCipher(private val host: Fragment) {
      * The library changed, the list behind the sheet has to know it.
      */
     private fun reportChanged(document: Document) {
-        host.childFragmentManager.setFragmentResult(
+        manager.setFragmentResult(
             FileActions.REQUEST_KEY,
             bundleOf(
                 FileActions.KEY_ACTION to FileActions.CHANGED,
@@ -90,5 +100,5 @@ class DocumentCipher(private val host: Fragment) {
 
     /** The sheet that is currently on screen, if any. */
     private fun currentSheet(): BottomSheetPassword? =
-        host.childFragmentManager.findFragmentByTag(BottomSheetPassword.TAG) as? BottomSheetPassword
+        manager.findFragmentByTag(BottomSheetPassword.TAG) as? BottomSheetPassword
 }

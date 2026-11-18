@@ -1,5 +1,8 @@
 package com.peng.pdfreader.ui.adapter.listAdapter
 
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
@@ -28,13 +31,13 @@ class FileListAdapter(
     /**
      * One row: the document plus the state that is rendered for it.
      *
-     * [titleColor] overrides the colour of the name, the search hits paint it
-     * in the light brand colour (design: files-搜索).
+     * [titleHighlight] is the keyword of a search hit, it is painted in the
+     * brand colour while the rest of the name keeps the colour of the design.
      */
     data class Row(
         val document: Document,
         val state: FileItemUiState,
-        val titleColor: Int? = null,
+        val titleHighlight: String? = null,
     )
 
     /** Everything the list can report back to the page. */
@@ -59,8 +62,8 @@ class FileListAdapter(
         fun bind(row: Row, callbacks: Callbacks) {
             item.bind(row.state)
             applyTypeChipMetrics(item)
-            applyTitleColor(item, row.titleColor)
-            applyCheckboxIcon(item, row.state.checked)
+            applyTitleColor(item, row)
+            applyCheckboxIcon(item, row)
             item.onClick = { callbacks.onRowClick(row.document) }
             item.onMoreClick = { callbacks.onRowMore(row.document) }
             item.onCheckedChange = { checked -> callbacks.onRowChecked(row.document, checked) }
@@ -70,22 +73,43 @@ class FileListAdapter(
             }
         }
 
-        /** A search hit paints the name in the light brand colour. */
-        private fun applyTitleColor(item: FileListItemView, color: Int?) {
+        /**
+         * A search hit paints the keyword in the brand colour, the rest of the
+         * name keeps the colour of the design.
+         */
+        private fun applyTitleColor(item: FileListItemView, row: Row) {
             val title = item.findViewById<TextView>(R.id.tvTitle) ?: return
-            title.setTextColor(
-                color ?: ContextCompat.getColor(item.context, R.color.text_secondary),
-            )
+            val normal = ContextCompat.getColor(item.context, R.color.text_secondary)
+            val keyword = row.titleHighlight?.trim().orEmpty()
+            val name = title.text?.toString().orEmpty()
+            val start = if (keyword.isEmpty()) -1 else name.indexOf(keyword, ignoreCase = true)
+            if (start < 0) {
+                title.text = name
+                title.setTextColor(normal)
+                return
+            }
+            title.text = SpannableString(name).apply {
+                setSpan(
+                    ForegroundColorSpan(
+                        ContextCompat.getColor(item.context, R.color.brand_primary_light),
+                    ),
+                    start,
+                    start + keyword.length,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE,
+                )
+            }
+            title.setTextColor(normal)
         }
 
         /**
-         * The selection marks the row with a circle, the shared widget ships a
-         * square one (design: files-Selected).
+         * The files tab marks the selection with a circle, the selection page
+         * of the design uses a square - the shared widget already shows it.
          */
-        private fun applyCheckboxIcon(item: FileListItemView, checked: Boolean) {
+        private fun applyCheckboxIcon(item: FileListItemView, row: Row) {
+            if (row.state.squareCheckbox) return
             val box = item.findViewById<ImageView>(R.id.ivCheckbox) ?: return
             box.setImageResource(
-                if (checked) {
+                if (row.state.checked) {
                     R.mipmap.ic_checkbox_circle_select
                 } else {
                     R.mipmap.ic_checkbox_circle_unselect
@@ -127,7 +151,8 @@ class FileListAdapter(
                 oldItem.document.id == newItem.document.id
 
             override fun areContentsTheSame(oldItem: Row, newItem: Row): Boolean =
-                oldItem.state == newItem.state && oldItem.titleColor == newItem.titleColor
+                oldItem.state == newItem.state &&
+                    oldItem.titleHighlight == newItem.titleHighlight
         }
     }
 }
