@@ -89,7 +89,7 @@ class MainActivity : BaseActivity() {
             openScanner()
         }
 
-        binding.bottomNav.setItems(navItems(), TAB_HOME) { tab -> showTab(tab) }
+        binding.bottomBar.setItems(navItems(), TAB_HOME) { tab -> showTab(tab) }
         if (savedInstanceState == null) {
             showTab(TAB_HOME)
         }
@@ -190,7 +190,7 @@ class MainActivity : BaseActivity() {
             transaction.show(existing)
         }
         transaction.commitAllowingStateLoss()
-        binding.bottomNav.selectTab(tab)
+        binding.bottomBar.selectTab(tab)
         currentTab = tab
         applyScanButton(tab)
     }
