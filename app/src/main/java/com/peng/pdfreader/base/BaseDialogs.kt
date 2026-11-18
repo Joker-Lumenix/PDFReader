@@ -67,8 +67,17 @@ abstract class BaseBottomSheetDialog(
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.getBoolean(ARG_DISMISS_OUTSIDE)?.let { dismissOnClickOutside = it }
-        arguments?.getBoolean(ARG_DISMISS_ON_BACK)?.let { dismissOnBackPress = it }
+        // A key that is not in the bundle must not switch the behaviour off:
+        // the bundle of a sheet usually carries other values and getBoolean
+        // answers false for a key that is not there.
+        arguments?.let { args ->
+            if (args.containsKey(ARG_DISMISS_OUTSIDE)) {
+                dismissOnClickOutside = args.getBoolean(ARG_DISMISS_OUTSIDE)
+            }
+            if (args.containsKey(ARG_DISMISS_ON_BACK)) {
+                dismissOnBackPress = args.getBoolean(ARG_DISMISS_ON_BACK)
+            }
+        }
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -233,10 +242,17 @@ abstract class BaseAlertDialog(
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.getBoolean(BaseBottomSheetDialog.ARG_DISMISS_OUTSIDE)
-            ?.let { dismissOnClickOutside = it }
-        arguments?.getBoolean(BaseBottomSheetDialog.ARG_DISMISS_ON_BACK)
-            ?.let { dismissOnBackPress = it }
+        // A key that is not in the bundle must not switch the behaviour off:
+        // the bundle of a dialog usually carries other values and getBoolean
+        // answers false for a key that is not there.
+        arguments?.let { args ->
+            if (args.containsKey(BaseBottomSheetDialog.ARG_DISMISS_OUTSIDE)) {
+                dismissOnClickOutside = args.getBoolean(BaseBottomSheetDialog.ARG_DISMISS_OUTSIDE)
+            }
+            if (args.containsKey(BaseBottomSheetDialog.ARG_DISMISS_ON_BACK)) {
+                dismissOnBackPress = args.getBoolean(BaseBottomSheetDialog.ARG_DISMISS_ON_BACK)
+            }
+        }
         isCancelable = dismissOnBackPress
     }
 
