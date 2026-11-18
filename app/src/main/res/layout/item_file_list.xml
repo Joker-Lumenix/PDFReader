@@ -144,6 +144,6 @@
             android:layout_height="24dp"
             android:layout_marginStart="8dp"
             android:contentDescription="@string/label_more"
-            android:src="@drawable/ic_more_dots" />
+            android:src="@mipmap/ic_more" />
     </LinearLayout>
 </FrameLayout>
