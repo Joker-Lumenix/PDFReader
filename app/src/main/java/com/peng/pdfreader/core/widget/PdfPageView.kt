@@ -113,6 +113,11 @@ class PdfPageView @JvmOverloads constructor(
         style = Paint.Style.FILL
         color = Color.parseColor("#33fb4141")
     }
+    private val placementFillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.FILL
+        // The design lays a faint red film inside the frame of the signature.
+        color = Color.parseColor("#0dfb4141")
+    }
     private val placementBorderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
         // The frame of the design is a red line around the signature.
@@ -646,13 +651,15 @@ class PdfPageView @JvmOverloads constructor(
     /**
      * Draws the signature that waits for its confirmation.
      *
-     * The frame of the design is a light grey box with a delete button on the
-     * top left corner and a resize button on the bottom right corner.
+     * The frame of the design is a red line with a faint red film inside it,
+     * a delete button on the top left corner and a resize button on the
+     * bottom right corner.
      */
     private fun drawPlacement(canvas: Canvas) {
         val strokes = placementStrokes ?: return
         val box = placementBoxOnScreen()
-        // The frame of the design is a red line, the page shows through it.
+        // The film of the design sits two pixels inside the frame.
+        canvas.drawRect(inset(box, 2f * density), placementFillPaint)
         canvas.drawRect(box, placementBorderPaint)
 
         strokes.forEach { stroke ->
@@ -1139,6 +1146,6 @@ class PdfPageView @JvmOverloads constructor(
 
         /** The default position of the selection box on the page. */
         private const val PLACEMENT_LEFT = 0.51f
-        private const val PLACEMENT_TOP = 0.58f
+        private const val PLACEMENT_TOP = 0.704f
     }
 }

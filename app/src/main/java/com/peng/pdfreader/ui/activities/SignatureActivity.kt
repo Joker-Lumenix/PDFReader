@@ -80,9 +80,10 @@ class SignatureActivity : BaseActivity() {
         binding.swatch.colors = listOf(colour)
         binding.swatch.selectedIndex = 0
         binding.swatch.swatchDiameter = dp(10f)
-        // The design shows the colour inside a thin light ring.
+        // The design shows the colour inside a thin light ring with a gap.
         binding.swatch.showSelectionRing = true
-        binding.swatch.ringWidth = dp(2f)
+        binding.swatch.ringWidth = dp(1f)
+        binding.swatch.ringGap = dp(1f)
         binding.swatch.ringColor = Color.parseColor("#d8d8d8")
     }
 

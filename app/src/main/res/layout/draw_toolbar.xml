@@ -18,7 +18,7 @@
         android:layout_height="24dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:layout_marginLeft="20dp">
+        >
 
         <ImageView
             android:id="@+id/ivSize"
@@ -26,15 +26,21 @@
             android:layout_height="24dp"
             android:contentDescription="@string/preview_cd_size"
             android:src="@mipmap/ic_size"
+            android:layout_marginLeft="20dp"
             app:tint="@color/white" />
 
         <View
+            android:id="@+id/dividerSize"
             android:layout_width="1dp"
             android:layout_height="24dp"
             android:layout_marginStart="13dp"
             android:layout_toRightOf="@+id/ivSize"
             android:background="@color/surface_neutral_strong" />
 
+        <!--
+          The stroke sizes of the design stand at 114dp, behind the divider of
+          the row.
+        -->
         <LinearLayout
             android:id="@+id/llSizes"
             android:layout_width="wrap_content"
@@ -68,9 +74,10 @@
 
         <com.peng.pdfreader.core.widget.ColorPaletteView
             android:id="@+id/palette"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="28dp"
-            android:layout_marginStart="13dp" />
+            android:layout_marginStart="13dp"
+            android:layout_weight="1" />
     </LinearLayout>
 
 </LinearLayout>

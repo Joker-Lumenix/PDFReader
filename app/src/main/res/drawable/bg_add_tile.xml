@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  The tile of the add action (design: sign-add): a light tile with the plus of
+  the app on it.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#d9d9d9" />
+    <corners android:radius="4dp" />
+</shape>

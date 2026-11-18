@@ -234,11 +234,9 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
             stopDrawing()
             return true
         }
-        val page = currentPageView()
-        if (page != null && page.hasPendingPlacement) {
-            page.cancelSignaturePlacement()
-            return true
-        }
+        // The reader closes itself; a signature that waits for its place is
+        // dropped, only the confirm pill of the design writes it into the
+        // document.
         return false
     }
 
@@ -546,7 +544,9 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
      */
     private fun setupDrawToolbar() {
         val palette = binding.drawToolbar.palette
-        palette.colors = ColorPaletteView.DEFAULT_COLORS.take(DRAW_COLOURS)
+        // The design shows seven colours; more of them are added so the strip
+        // has to be scrolled on a small screen.
+        palette.colors = DRAW_COLOURS
         palette.swatchDiameter = dp(24f)
         palette.itemSpacing = dp(20f)
         palette.ringColor = Color.WHITE
@@ -828,11 +828,9 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
             return
         }
         view.onPlacementCancelled = {
-            // The signature is thrown away, the "Add" bar of the design
-            // offers a new one.
-            showSignatureBar(confirm = false)
-            showAddBar(true)
-            activeTool = null
+            // The signature is thrown away and the reader closes itself:
+            // nothing is written into the document.
+            requireActivity().finish()
         }
         view.beginSignaturePlacement(strokes, aspect)
         showSignatureBar(confirm = true)
@@ -933,7 +931,11 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
         private val STROKE_SIZES = listOf(2f, 4f, 8f)
 
         /** The colours of the ink in the drawing mode. */
-        private const val DRAW_COLOURS = 7
+        private val DRAW_COLOURS: List<Int> = ColorPaletteView.DEFAULT_COLORS + listOf(
+            Color.parseColor("#00bcd4"),
+            Color.parseColor("#d9d9d9"),
+            Color.parseColor("#795548"),
+        )
 
 
         /** Creates the reader for the given document. */

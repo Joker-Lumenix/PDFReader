@@ -6,15 +6,24 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.MotionEvent
+import android.view.VelocityTracker
 import android.view.View
+import android.view.ViewConfiguration
+import android.widget.OverScroller
+import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * Horizontal colour palette with a selection ring.
  *
- * The view paints the ten annotation colours of the design and reports the
- * picked one; it never decides what a colour means. The swatch size and the
- * gap are configurable because the palette is used in three different places
- * (the floating signature palette, the draw colour row and the highlight bar).
+ * The view paints the annotation colours of the design and reports the picked
+ * one; it never decides what a colour means. The swatch size and the gap are
+ * configurable because the palette is used in three different places (the
+ * floating signature palette, the draw colour row and the highlight bar).
+ *
+ * The strip can hold any number of colours: when they do not fit into the
+ * space of the view, a drag scrolls them and a tap picks one.
  */
 class ColorPaletteView @JvmOverloads constructor(
     context: Context,
@@ -23,6 +32,8 @@ class ColorPaletteView @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr) {
 
     private val density = resources.displayMetrics.density
+    private val touchSlop = ViewConfiguration.get(context).scaledTouchSlop
+    private val scroller = OverScroller(context)
 
     private val fillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.FILL }
     private val borderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -49,10 +60,21 @@ class ColorPaletteView @JvmOverloads constructor(
         }
 
     /** Stroke width of the ring around the selected swatch, in pixels. */
-    var ringWidth: Float = dp(2f)
+    var ringWidth: Float = dp(1f)
         set(value) {
             field = value.coerceAtLeast(0f)
             requestLayout()
+        }
+
+    /**
+     * The gap between the swatch and the ring around it.
+     *
+     * The ring of the design does not touch the colour, a thin gap is left.
+     */
+    var ringGap: Float = dp(1f)
+        set(value) {
+            field = value.coerceAtLeast(0f)
+            invalidate()
         }
 
     /** Whether the selection ring is painted. */
@@ -81,6 +103,7 @@ class ColorPaletteView @JvmOverloads constructor(
         set(value) {
             field = value.toList()
             if (selectedIndex > field.lastIndex) selectedIndex = field.lastIndex
+            scrollTo(scrollOffset)
             invalidate()
         }
 
@@ -105,6 +128,16 @@ class ColorPaletteView @JvmOverloads constructor(
     /** Raised with the picked colour. */
     var onColorSelected: ((Int) -> Unit)? = null
 
+    /** How far the colours are scrolled, in pixels. */
+    private var scrollOffset = 0f
+
+    /** Where the finger went down, in view pixels. */
+    private var downX = 0f
+    private var downY = 0f
+    private var lastX = 0f
+    private var dragging = false
+    private var velocityTracker: VelocityTracker? = null
+
     init {
         isClickable = true
     }
@@ -124,15 +157,24 @@ class ColorPaletteView @JvmOverloads constructor(
         val radius = swatchDiameter / 2f
         val centreY = height / 2f
         val startX = paddingLeft + radius
-        val step = swatchDiameter + spacing()
+        val step = swatchDiameter + itemSpacing
+        // The colours that do not fit into the view are scrolled.
+        canvas.save()
+        canvas.clipRect(0f, 0f, width.toFloat(), height.toFloat())
+        canvas.translate(-scrollOffset, 0f)
         colors.forEachIndexed { index, colour ->
             val centreX = startX + index * step
             if (showSelectionRing && index == selectedIndex) {
                 ringPaint.color = ringColor
                 ringPaint.strokeWidth = ringWidth
-                // The ring of the design sits on the swatch: its inner edge
-                // touches the colour and it is two pixels wide.
-                canvas.drawCircle(centreX, centreY, radius + ringWidth / 2f, ringPaint)
+                // The ring of the design is a thin circle with a gap between
+                // it and the colour: 28dp around a 24dp swatch.
+                canvas.drawCircle(
+                    centreX,
+                    centreY,
+                    radius + ringGap + ringWidth / 2f,
+                    ringPaint,
+                )
             }
             fillPaint.color = colour
             canvas.drawCircle(centreX, centreY, radius, fillPaint)
@@ -141,41 +183,143 @@ class ColorPaletteView @JvmOverloads constructor(
                 canvas.drawCircle(centreX, centreY, radius, borderPaint)
             }
         }
+        canvas.restore()
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         when (event.actionMasked) {
-            MotionEvent.ACTION_DOWN -> return true
-            MotionEvent.ACTION_UP -> {
-                val index = indexAt(event.x)
-                if (index >= 0) {
-                    selectedIndex = index
-                    onColorSelected?.invoke(colors[index])
-                }
-                performClick()
+            MotionEvent.ACTION_DOWN -> {
+                downX = event.x
+                downY = event.y
+                lastX = event.x
+                dragging = false
+                scroller.forceFinished(true)
+                velocityTracker?.recycle()
+                velocityTracker = VelocityTracker.obtain()
+                velocityTracker?.addMovement(event)
                 return true
             }
 
-            MotionEvent.ACTION_CANCEL -> return true
+            MotionEvent.ACTION_MOVE -> {
+                velocityTracker?.addMovement(event)
+                val dx = event.x - lastX
+                if (!dragging &&
+                    abs(event.x - downX) > touchSlop &&
+                    abs(event.x - downX) > abs(event.y - downY)
+                ) {
+                    // The strip owns the gesture, the page behind it must not
+                    // take it over.
+                    dragging = true
+                    parent?.requestDisallowInterceptTouchEvent(true)
+                }
+                if (dragging) {
+                    scrollBy(-dx)
+                    lastX = event.x
+                }
+                return true
+            }
+
+            MotionEvent.ACTION_UP -> {
+                velocityTracker?.addMovement(event)
+                if (dragging) {
+                    fling()
+                } else {
+                    pick(event.x)
+                }
+                releaseTracker()
+                parent?.requestDisallowInterceptTouchEvent(false)
+                return true
+            }
+
+            MotionEvent.ACTION_CANCEL -> {
+                releaseTracker()
+                parent?.requestDisallowInterceptTouchEvent(false)
+                return true
+            }
         }
         return super.onTouchEvent(event)
     }
 
+    override fun computeScroll() {
+        if (scroller.computeScrollOffset()) {
+            scrollOffset = scroller.currX.toFloat()
+            invalidate()
+            postInvalidateOnAnimation()
+        }
+    }
+
     override fun performClick(): Boolean = super.performClick()
+
+    /** Picks the swatch under the finger. */
+    private fun pick(x: Float) {
+        val index = indexAt(x + scrollOffset)
+        if (index >= 0) {
+            selectedIndex = index
+            onColorSelected?.invoke(colors[index])
+        }
+        performClick()
+    }
+
+    /** Scrolls the strip by the given distance. */
+    private fun scrollBy(distance: Float) {
+        scrollTo(scrollOffset + distance)
+    }
+
+    /** Moves the strip to the given place. */
+    private fun scrollTo(offset: Float) {
+        val clamped = offset.coerceIn(0f, maxScroll())
+        if (clamped != scrollOffset) {
+            scrollOffset = clamped
+            invalidate()
+        }
+    }
+
+    /** How far the strip can be scrolled. */
+    private fun maxScroll(): Float = max(0f, contentWidth() - width)
+
+    /** The width of all the swatches together. */
+    private fun contentWidth(): Float {
+        val count = colors.size
+        if (count == 0) return 0f
+        return count * swatchDiameter + (count - 1) * itemSpacing
+    }
+
+    /** Lets the strip glide on after the finger left it. */
+    private fun fling() {
+        val max = maxScroll()
+        if (max <= 0f) return
+        val tracker = velocityTracker ?: return
+        tracker.computeCurrentVelocity(1000)
+        val velocity = tracker.xVelocity
+        scroller.forceFinished(true)
+        scroller.fling(
+            scrollOffset.toInt(),
+            0,
+            -velocity.toInt(),
+            0,
+            0,
+            max.toInt(),
+            0,
+            0,
+        )
+        postInvalidateOnAnimation()
+    }
+
+    private fun releaseTracker() {
+        velocityTracker?.recycle()
+        velocityTracker = null
+    }
 
     private fun indexAt(x: Float): Int {
         if (colors.isEmpty()) return -1
         val radius = swatchDiameter / 2f
         val startX = paddingLeft + radius
-        val step = swatchDiameter + spacing()
+        val step = swatchDiameter + itemSpacing
         val raw = Math.round((x - startX) / step).toInt()
         if (raw !in colors.indices) return -1
         val centre = startX + raw * step
         return if (Math.abs(x - centre) <= radius + itemSpacing / 2f) raw else -1
     }
-
-    /** The gap between two swatches. */
-    private fun spacing(): Float = itemSpacing
 
     private fun dp(value: Float): Float = value * density
 

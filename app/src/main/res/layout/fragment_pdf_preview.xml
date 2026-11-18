@@ -9,6 +9,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/surface_blue_tint"
     android:orientation="vertical">
@@ -46,29 +47,16 @@
             tools:text="标题"
             />
 
-        <!--
-          The rename tile of the design: a light tile with the pencil on it.
-          It stands behind the name of the document.
-        -->
-        <FrameLayout
+        <ImageView
             android:id="@+id/ivRename"
             android:layout_width="24dp"
             android:layout_height="24dp"
+            android:layout_gravity="center"
+            android:contentDescription="@string/rename"
             android:layout_toEndOf="@+id/tvTitle"
             android:layout_centerVertical="true"
             android:layout_marginStart="8dp"
-            android:background="@drawable/bg_rename_tile"
-            android:clickable="true"
-            android:contentDescription="@string/rename"
-            android:focusable="true">
-
-            <ImageView
-                android:layout_width="12dp"
-                android:layout_height="14dp"
-                android:layout_gravity="center"
-                android:contentDescription="@string/rename"
-                android:src="@mipmap/ic_rename_black" />
-        </FrameLayout>
+            android:src="@mipmap/ic_rename_black" />
 
         <ImageView
             android:id="@+id/ivMore"
@@ -186,12 +174,24 @@
             android:orientation="horizontal"
             android:visibility="gone">
 
-            <ImageView
+            <!--
+              The add tile of the design: a light grey tile with the white
+              plus of the app on it.
+            -->
+            <FrameLayout
                 android:id="@+id/ivAdd"
                 android:layout_width="16dp"
                 android:layout_height="16dp"
-                android:contentDescription="@string/preview_cd_add_signature"
-                android:src="@mipmap/ic_add_circle" />
+                android:background="@drawable/bg_add_tile"
+                android:contentDescription="@string/preview_cd_add_signature">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:contentDescription="@string/preview_cd_add_signature"
+                    android:src="@mipmap/ic_add_circle"
+                    app:tint="@color/white" />
+            </FrameLayout>
 
             <TextView
                 android:id="@+id/tvAdd"
