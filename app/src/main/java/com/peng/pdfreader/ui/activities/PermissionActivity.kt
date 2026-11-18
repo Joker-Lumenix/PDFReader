@@ -1,6 +1,7 @@
 package com.peng.pdfreader.ui.activities
 
 import android.Manifest
+import android.app.ActivityManager
 import android.app.NotificationManager
 import android.content.ActivityNotFoundException
 import android.content.Context
@@ -8,6 +9,8 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
@@ -47,6 +50,29 @@ class PermissionActivity : BaseActivity() {
 
     /** Whether the home screen was started already. */
     private var homeStarted = false
+
+    /**
+     * The watcher of the permission while the screen of the system is open.
+     *
+     * The screen of the system does not close itself when the permission is
+     * given: the user stays on it and has to go back by hand. The watcher
+     * looks at the permission and brings the app back as soon as it is there.
+     */
+    private val watcher = Handler(Looper.getMainLooper())
+
+    /** The runnable that looks at the permission, it repeats until it is given. */
+    private val permissionWatcher = object : Runnable {
+        override fun run() {
+            if (isFinishing || isDestroyed) return
+            if (!hasStoragePermission()) {
+                watcher.postDelayed(this, PERMISSION_POLL_INTERVAL_MS)
+                return
+            }
+            Logger.i(TAG, "the permission was given in the screen of the system")
+            stopWatchingPermission()
+            bringAppToFront()
+        }
+    }
 
     /**
      * The runtime permission of the versions below Android 11.
@@ -121,6 +147,8 @@ class PermissionActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
+        // The app is in the foreground again, the watcher is not needed.
+        stopWatchingPermission()
         if (!hasStoragePermission()) return
         // The documents of the device are collected right away, so the list is
         // complete when the home screen is opened.
@@ -133,6 +161,61 @@ class PermissionActivity : BaseActivity() {
             // now: the page has nothing left to show.
             finish()
         }
+    }
+
+    override fun onDestroy() {
+        stopWatchingPermission()
+        super.onDestroy()
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        Logger.i(TAG, "the page of the permission came to the front again")
+    }
+
+    /**
+     * Looks at the permission while the screen of the system is open.
+     *
+     * The screen of the system stays open after the permission was given, the
+     * app comes back on its own as soon as the watcher sees the permission.
+     */
+    private fun watchPermission() {
+        watcher.removeCallbacks(permissionWatcher)
+        watcher.post(permissionWatcher)
+    }
+
+    /** Stops the watcher of the permission. */
+    private fun stopWatchingPermission() {
+        watcher.removeCallbacks(permissionWatcher)
+    }
+
+    /**
+     * Brings the app back to the front.
+     *
+     * The screen of the system is in the task of the app - it was started for
+     * a result - so it is closed and the page of the permission comes to the
+     * top of the task. The flow goes on there: the page leaves itself for the
+     * home screen.
+     */
+    private fun bringAppToFront() {
+        // The task of the app comes to the front first, the app is in the
+        // foreground afterwards and may show its own page again.
+        val manager = getSystemService(ActivityManager::class.java)
+        val currentTaskId = taskId
+        runCatching {
+            manager?.appTasks
+                ?.firstOrNull { it.taskInfo?.id == currentTaskId }
+                ?.moveToFront()
+        }
+        // The clear top closes the screen of the system: it is above the page
+        // in the task of the app. The single top keeps the page that is
+        // already running: it takes the new intent instead of a second page
+        // being started.
+        startActivity(
+            Intent(this, javaClass).addFlags(
+                Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+            )
+        )
     }
 
     /**
@@ -182,6 +265,9 @@ class PermissionActivity : BaseActivity() {
             // The launcher comes back as soon as the user leaves the screen of
             // the system, the app goes on by itself then.
             allFilesSettingsLauncher.launch(intent)
+            // The screen of the system stays open after the permission was
+            // given, the watcher brings the app back as soon as it is there.
+            watchPermission()
         } catch (error: ActivityNotFoundException) {
             Logger.w(TAG, "all files access screen is not available")
             startActivity(
@@ -252,6 +338,9 @@ class PermissionActivity : BaseActivity() {
 
     companion object {
         private const val TAG = "PermissionActivity"
+
+        /** How often the permission is looked at while the system screen is open. */
+        private const val PERMISSION_POLL_INTERVAL_MS = 400L
 
         /** Set when the page is a step of the start up flow. */
         const val EXTRA_EXIT_TO_HOME = "com.peng.pdfreader.extra.EXIT_TO_HOME"
