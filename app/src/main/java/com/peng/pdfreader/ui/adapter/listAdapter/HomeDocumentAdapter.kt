@@ -58,6 +58,7 @@ class HomeDocumentAdapter(
                     showThumbnail = true,
                     showType = true,
                     showMore = true,
+                    encrypted = document.isEncrypted,
                 ),
             )
             item.onClick = { onOpen(document) }

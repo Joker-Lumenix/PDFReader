@@ -157,6 +157,7 @@ class FileSearchActivity : BaseActivity() {
                     showType = true,
                     showMore = false,
                     showCheckbox = false,
+                    encrypted = document.isEncrypted,
                 ),
             )
         }

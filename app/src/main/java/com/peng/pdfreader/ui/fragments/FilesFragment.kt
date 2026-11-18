@@ -41,12 +41,12 @@ import com.peng.pdfreader.ui.adapter.listAdapter.DocumentPrintAdapter
 import com.peng.pdfreader.ui.dialogs.DocumentActionSheet
 import com.peng.pdfreader.ui.dialogs.PopWindowFileFilter
 import com.peng.pdfreader.ui.dialogs.BottomSheetSort
+import com.peng.pdfreader.ui.dialogs.DocumentCipher
 import com.peng.pdfreader.utils.FileScope
 import com.peng.pdfreader.utils.FileSortOption
 import com.peng.pdfreader.utils.FileUi
 import com.peng.pdfreader.utils.FilesPrefs
 import com.peng.pdfreader.utils.PageCountDrawable
-import com.peng.pdfreader.ui.activities.LockActivity
 import com.peng.pdfreader.ui.activities.PreviewActivity
 import com.peng.pdfreader.ui.uiData.AdSamples
 import com.peng.pdfreader.ui.activities.CompressActivity
@@ -396,6 +396,7 @@ class FilesFragment : BaseFragment() {
                     showCheckbox = checked,
                     checkboxAtEnd = true,
                     checked = checked,
+                    encrypted = document.isEncrypted,
                 ),
             )
         }
@@ -610,7 +611,10 @@ class FilesFragment : BaseFragment() {
             FileActions.SPLIT -> SplitActivity.start(requireContext(), docId)
             FileActions.COMPRESS -> CompressActivity.start(requireContext(), docId)
             FileActions.MERGE -> MergeActivity.start(requireContext())
-            FileActions.LOCK -> LockActivity.start(requireContext())
+            // The sheet knows its file, so the cipher runs on it right away:
+            // the password sheet asks for the password, no page in between.
+            FileActions.LOCK -> DocumentCipher(this).encrypt(docId)
+            FileActions.UNLOCK -> DocumentCipher(this).decrypt(docId)
             FileActions.SORT -> BottomSheetSort.show(childFragmentManager)
             FileActions.CHANGED -> load()
             else -> toast(getString(R.string.files_feature_unavailable))

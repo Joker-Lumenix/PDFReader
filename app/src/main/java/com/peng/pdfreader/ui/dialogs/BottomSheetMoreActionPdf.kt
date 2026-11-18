@@ -13,6 +13,7 @@ import com.peng.pdfreader.base.BaseBottomSheetDialog
 import com.peng.pdfreader.data.Document
 import com.peng.pdfreader.data.DocumentRepository
 import com.peng.pdfreader.databinding.FilesSheetFileActionBinding
+import com.peng.pdfreader.feature.lock.VaultCipher
 import com.peng.pdfreader.ui.uiData.FileActions
 import com.peng.pdfreader.utils.FileUi
 import com.peng.pdfreader.utils.PageCountDrawable
@@ -106,7 +107,7 @@ class BottomSheetMoreActionPdf : BaseBottomSheetDialog() {
      */
     private fun bindActions(doc: Document) {
         val quick = quickActions.ifEmpty { defaultQuickActions() }
-        val options = optionActions.ifEmpty { defaultOptionActions() }
+        val options = optionActions.ifEmpty { defaultOptionActions(doc) }
         bindQuickActions(doc, quick)
         bindOptionActions(doc, options)
     }
@@ -175,13 +176,22 @@ class BottomSheetMoreActionPdf : BaseBottomSheetDialog() {
     )
 
     /** The five operations of the options card of the design. */
-    private fun defaultOptionActions(): List<Action> = listOf(
-        Action(FileActions.SPLIT, getString(R.string.split), R.mipmap.ic_split_pdf),
-        Action(FileActions.COMPRESS, getString(R.string.compress), R.mipmap.ic_compress),
-        Action(FileActions.MERGE, getString(R.string.merge), R.mipmap.ic_merge_pdf),
-        Action(FileActions.LOCK, getString(R.string.encrypt), R.mipmap.ic_lock),
-        Action(FileActions.DELETE, getString(R.string.delete), R.mipmap.ic_delete_red),
-    )
+    private fun defaultOptionActions(doc: Document): List<Action> {
+        // A document that carries the vault container is decrypted, a normal
+        // one is encrypted. The row of the design is the same for both.
+        val encrypted = VaultCipher.isEncrypted(requireContext(), doc)
+        return listOf(
+            Action(FileActions.SPLIT, getString(R.string.split), R.mipmap.ic_split_pdf),
+            Action(FileActions.COMPRESS, getString(R.string.compress), R.mipmap.ic_compress),
+            Action(FileActions.MERGE, getString(R.string.merge), R.mipmap.ic_merge_pdf),
+            Action(
+                if (encrypted) FileActions.UNLOCK else FileActions.LOCK,
+                getString(if (encrypted) R.string.decrypt else R.string.encrypt),
+                R.mipmap.ic_lock,
+            ),
+            Action(FileActions.DELETE, getString(R.string.delete), R.mipmap.ic_delete_red),
+        )
+    }
 
     companion object {
         private const val ARG_DOC_ID = "docId"

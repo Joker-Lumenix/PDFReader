@@ -89,6 +89,7 @@ class DocumentPickAdapter(
                     showCheckbox = multiSelect && isChecked,
                     checkboxAtEnd = selectionAtEnd,
                     checked = isChecked,
+                    encrypted = doc.isEncrypted,
                 ),
             )
             item.onClick = { document?.let(onClick) }

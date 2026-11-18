@@ -16,8 +16,8 @@ import com.peng.pdfreader.data.DocumentRepository
 import com.peng.pdfreader.ui.uiData.FileActions
 import com.peng.pdfreader.ui.dialogs.DialogDeleteConfirm
 import com.peng.pdfreader.ui.dialogs.BottomSheetRename
+import com.peng.pdfreader.ui.dialogs.DocumentCipher
 import com.peng.pdfreader.ui.adapter.listAdapter.DocumentPrintAdapter
-import com.peng.pdfreader.ui.activities.LockActivity
 import com.peng.pdfreader.ui.activities.CompressActivity
 import com.peng.pdfreader.ui.activities.MergeActivity
 import com.peng.pdfreader.ui.activities.SplitActivity
@@ -43,7 +43,10 @@ class HomeDocumentActions(private val host: Fragment) {
             FileActions.SPLIT -> SplitActivity.start(context, docId)
             FileActions.COMPRESS -> CompressActivity.start(context, docId)
             FileActions.MERGE -> MergeActivity.start(context)
-            FileActions.LOCK -> LockActivity.start(context)
+            // The sheet knows its file, so the cipher runs on it right away:
+            // the password sheet asks for the password, no page in between.
+            FileActions.LOCK -> DocumentCipher(host).encrypt(docId)
+            FileActions.UNLOCK -> DocumentCipher(host).decrypt(docId)
             // The favourite toggle already changed the document, the page
             // refreshes the list on its own.
             FileActions.CHANGED -> Unit

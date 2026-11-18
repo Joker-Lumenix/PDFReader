@@ -62,6 +62,7 @@ class MergeOrderAdapter(
                     showType = true,
                     // the design of the ordered list shows the "more" affordance
                     showMore = true,
+                    encrypted = doc.isEncrypted,
                 ),
             )
             binding.item.onClick = {}

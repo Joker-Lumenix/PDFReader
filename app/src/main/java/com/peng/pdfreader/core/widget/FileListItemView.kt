@@ -5,7 +5,8 @@ import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.LinearLayout
+import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.TextView
 import com.peng.pdfreader.R
 
@@ -20,7 +21,7 @@ class FileListItemView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : LinearLayout(context, attrs, defStyleAttr) {
+) : FrameLayout(context, attrs, defStyleAttr) {
 
     private val checkbox: android.widget.ImageView
     private val thumbnail: android.widget.ImageView
@@ -29,7 +30,8 @@ class FileListItemView @JvmOverloads constructor(
     private val inlineAction: TextView
     private val typeChip: TextView
     private val meta: TextView
-    private val more: android.widget.ImageView
+    private val more: ImageView
+    private val lockCorner: FrameLayout
 
     /** Raised when the row itself is tapped. */
     var onClick: (() -> Unit)? = null
@@ -41,8 +43,7 @@ class FileListItemView @JvmOverloads constructor(
     var onInlineActionClick: (() -> Unit)? = null
 
     init {
-        orientation = HORIZONTAL
-        LayoutInflater.from(context).inflate(R.layout.widget_file_list_item, this, true)
+        LayoutInflater.from(context).inflate(R.layout.item_file_list, this, true)
 
         checkbox = findViewById(R.id.ivCheckbox)
         thumbnail = findViewById(R.id.ivThumbnail)
@@ -52,6 +53,7 @@ class FileListItemView @JvmOverloads constructor(
         typeChip = findViewById(R.id.tvType)
         meta = findViewById(R.id.tvMeta)
         more = findViewById(R.id.ivMore)
+        lockCorner = findViewById(R.id.ivLockCorner)
 
         setOnClickListener { onClick?.invoke() }
         more.setOnClickListener { onMoreClick?.invoke() }
@@ -99,6 +101,9 @@ class FileListItemView @JvmOverloads constructor(
 
         more.visibility = if (state.showMore) VISIBLE else GONE
 
+        // The corner badge marks a file that carries the vault container.
+        lockCorner.visibility = if (state.encrypted) VISIBLE else GONE
+
         badge.visibility = if (state.badge.isNullOrEmpty()) GONE else VISIBLE
         state.badge?.let { badge.text = it }
 
@@ -124,10 +129,7 @@ class FileListItemView @JvmOverloads constructor(
     }
 
     /** The row the layout inflated into this view. */
-    private fun innerRow(): ViewGroup {
-        val child = getChildAt(0) as? ViewGroup ?: return this
-        return child
-    }
+    private fun innerRow(): ViewGroup = findViewById(R.id.rowContent) ?: this
 }
 
     /**
@@ -145,6 +147,8 @@ class FileListItemView @JvmOverloads constructor(
  * @param badge small coloured badge next to the title (advertising rows)
  * @param inlineAction inline pill button rendered next to the title
  * @param checkboxAtEnd whether the selection mark sits on the right of the row
+ * @param encrypted the file carries the vault container, the row shows the
+ *   corner badge of the design
  */
 data class FileItemUiState(
     val name: String,
@@ -160,6 +164,7 @@ data class FileItemUiState(
     val badge: String? = null,
     val inlineActionText: String? = null,
     val checkboxAtEnd: Boolean = false,
+    val encrypted: Boolean = false,
 )
 
 /** Height of a document row, measured from the design. */

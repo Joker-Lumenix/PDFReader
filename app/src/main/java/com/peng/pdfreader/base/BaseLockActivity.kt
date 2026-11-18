@@ -16,11 +16,11 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.peng.pdfreader.R
-import com.peng.pdfreader.core.pdf.PdfVault
 import com.peng.pdfreader.data.DocType
 import com.peng.pdfreader.data.Document
 import com.peng.pdfreader.data.DocumentRepository
 import com.peng.pdfreader.databinding.LockActivityFilePickerBinding
+import com.peng.pdfreader.feature.lock.VaultCipher
 import com.peng.pdfreader.ui.adapter.listAdapter.LockFileAdapter
 import com.peng.pdfreader.ui.dialogs.BottomSheetPassword
 import com.peng.pdfreader.ui.widget.LockThumbnailDrawable
@@ -156,12 +156,20 @@ abstract class BaseLockActivity : BaseActivity() {
 
     private fun onPasswordEntered(password: String) {
         val document = pending ?: return
+        val context = applicationContext
         lifecycleScope.launch {
-            val outcome = withContext(Dispatchers.IO) { runOperation(document, password) }
+            val outcome = withContext(Dispatchers.IO) {
+                when (mode) {
+                    BottomSheetPassword.Mode.LOCK -> VaultCipher.lock(context, document, password)
+                    // The unlock page and the "enter password" sheet both decrypt.
+                    BottomSheetPassword.Mode.UNLOCK, BottomSheetPassword.Mode.ENTER ->
+                        VaultCipher.unlock(context, document, password)
+                }
+            }
             outcome.fold(
                 onSuccess = { file ->
                     currentSheet()?.dismiss()
-                    showResult(registerResult(document, file))
+                    showResult(file)
                 },
                 onFailure = { error ->
                     currentSheet()?.setBusy(false)
@@ -171,42 +179,8 @@ abstract class BaseLockActivity : BaseActivity() {
         }
     }
 
-    /** Runs the cipher on a worker thread and returns the produced file. */
-    private fun runOperation(document: Document, password: String): Result<File> {
-        val source = repository.fileOf(document)
-        val target = File(cacheDir, "lock-${System.currentTimeMillis()}.tmp")
-        return when (mode) {
-            BottomSheetPassword.Mode.LOCK -> PdfVault.lock(source, target, password)
-            // The unlock page and the "enter password" sheet both decrypt.
-            BottomSheetPassword.Mode.UNLOCK, BottomSheetPassword.Mode.ENTER ->
-                PdfVault.unlock(source, target, password)
-        }
-    }
-
-    /** Stores the produced document in the sandbox. */
-    private fun registerResult(source: Document, file: File): Document {
-        val name = when (mode) {
-            BottomSheetPassword.Mode.LOCK -> lockedName(source.name)
-            else -> unlockedName(source.name)
-        }
-        val stored = repository.addExisting(name, DocType.PDF, file)
-        val document = stored.copy(
-            isEncrypted = mode == BottomSheetPassword.Mode.LOCK,
-            pageCount = source.pageCount,
-        )
-        repository.update(document)
-        file.delete()
-        return document
-    }
-
     private fun showOperationError(error: Throwable) {
-        val message = when (error) {
-            is PdfVault.VaultError.WrongPassword -> getString(R.string.lock_wrong_password)
-            is PdfVault.VaultError.NotEncrypted -> getString(R.string.lock_not_encrypted)
-            is PdfVault.VaultError.WeakPassword ->
-                error.message ?: getString(R.string.lock_operation_failed)
-            else -> getString(R.string.lock_operation_failed)
-        }
+        val message = VaultCipher.errorMessage(this, error)
         val dialog = currentSheet()
         if (dialog != null && dialog.isAdded) {
             dialog.showError(message)
@@ -329,24 +303,11 @@ abstract class BaseLockActivity : BaseActivity() {
     }
 
     /** True when the document is stored in the vault. */
-    protected fun isVaultFile(document: Document): Boolean =
-        document.isEncrypted || PdfVault.isEncrypted(repository.fileOf(document))
+    protected fun isVaultFile(document: Document): Boolean = VaultCipher.isEncrypted(this, document)
 
     private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
 
-    private fun lockedName(name: String): String {
-        val base = name.substringBeforeLast('.', name)
-        return if (base.endsWith(LOCKED_SUFFIX)) "$base.pdf" else "$base$LOCKED_SUFFIX.pdf"
-    }
-
-    private fun unlockedName(name: String): String {
-        val base = name.substringBeforeLast('.', name)
-        val clean = if (base.endsWith(LOCKED_SUFFIX)) base.dropLast(LOCKED_SUFFIX.length) else base
-        return "$clean.pdf"
-    }
-
     private companion object {
-        const val LOCKED_SUFFIX = "_locked"
         const val PDF_MIME = "application/pdf"
         const val MENU_SHARE = 1
         const val MENU_IMPORT = 2

@@ -25,7 +25,13 @@ object FileActions {
     const val SPLIT = "split"
     const val COMPRESS = "compress"
     const val MERGE = "merge"
+
+    /** The file is encrypted with a password. */
     const val LOCK = "lock"
+
+    /** The password of the file is removed. */
+    const val UNLOCK = "unlock"
+
     const val DELETE = "delete"
 
     /** Opens the sort sheet of the list (design: files-选择). */

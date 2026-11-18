@@ -11,10 +11,9 @@ import android.view.inputmethod.EditorInfo
 import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import com.peng.pdfreader.R
-import com.peng.pdfreader.core.pdf.PdfVault
 import com.peng.pdfreader.base.BaseBottomSheetDialog
+import com.peng.pdfreader.core.pdf.PdfVault
 import com.peng.pdfreader.databinding.LockSheetPasswordBinding
-import com.peng.pdfreader.feature.lock.sheet.LockErrorIconDrawable
 import com.peng.pdfreader.feature.lock.sheet.LockPasswordMask
 
 /**
@@ -107,7 +106,6 @@ class BottomSheetPassword : BaseBottomSheetDialog() {
         views.tvTitle.setTextColor(color(R.color.brand_primary_light))
         views.tvSubtitle.setTextColor(color(R.color.text_accent_orange))
         views.etPassword.setTextColor(color(R.color.brand_primary_light))
-        views.ivError.setImageDrawable(LockErrorIconDrawable())
         views.tvError.text = message
         views.errorRow.visibility = View.VISIBLE
     }

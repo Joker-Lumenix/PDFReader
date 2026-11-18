@@ -216,6 +216,7 @@ class FileSelectActivity : BaseActivity() {
                     showCheckbox = checked,
                     checkboxAtEnd = true,
                     checked = checked,
+                    encrypted = document.isEncrypted,
                 ),
             )
         }

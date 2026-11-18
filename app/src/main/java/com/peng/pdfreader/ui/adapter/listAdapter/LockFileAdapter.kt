@@ -77,6 +77,7 @@ class LockFileAdapter(
                     ),
                     showType = true,
                     showMore = true,
+                    encrypted = item.isEncrypted,
                 ),
             )
         }
