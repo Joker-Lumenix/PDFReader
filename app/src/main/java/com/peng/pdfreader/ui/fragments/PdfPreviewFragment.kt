@@ -569,8 +569,7 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
     /**
      * Builds the three stroke sizes of the design.
      *
-     * Every preset is a white ring with a white dot in the middle; the dot
-     * grows with the size of the stroke.
+     * Every preset is a white dot; the dot grows with the size of the stroke.
      */
     private fun buildSizePresets() {
         val sizes = binding.drawToolbar.llSizes
@@ -580,14 +579,6 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
             val params = LinearLayout.LayoutParams(dp(24), dp(24))
             if (index < SIZE_DOTS.lastIndex) params.marginEnd = dp(30)
             frame.layoutParams = params
-
-            val ring = View(requireContext())
-            ring.background = GradientDrawable().apply {
-                shape = GradientDrawable.OVAL
-                setColor(Color.TRANSPARENT)
-                setStroke(dp(1), Color.WHITE)
-            }
-            frame.addView(ring, FrameLayout.LayoutParams(dp(24), dp(24)))
 
             val dotView = View(requireContext())
             dotView.background = GradientDrawable().apply {
