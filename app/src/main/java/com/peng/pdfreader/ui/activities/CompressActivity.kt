@@ -72,25 +72,28 @@ class CompressActivity : BaseActivity() {
     /**
      * Runs the compression behind the shared progress page.
      *
+     * The compressed file takes the place of the original one - the operation
+     * works on the file of the document, it does not create a copy of it.
      * The progress page opens the result page as soon as the job is done.
      */
     private fun compress(document: Document) {
-        val out = ToolOutput.file(this, "compressed.pdf")
+        val source = repository.fileOf(document)
+        val temporary = ToolOutput.file(this, "compressed.pdf")
         lifecycleScope.launch {
             ToolFlow.run(this@CompressActivity, getString(R.string.tools_compress_running)) { report ->
-                val outcome = engine.compress(repository.fileOf(document), out, QUALITY) { current, total ->
+                val outcome = engine.compress(source, temporary, QUALITY) { current, total ->
                     report(if (total <= 0) 0 else current * 100 / total)
                 }
                 val result = outcome.getOrThrow()
-                val produced = repository.addExisting(
-                    ToolOutput.uniqueName(
-                        document.name.substringBeforeLast('.') + "_compressed",
-                        ".pdf",
-                    ),
-                    DocType.PDF,
-                    out,
+                // The compressed file replaces the original one.
+                temporary.copyTo(source, overwrite = true)
+                temporary.delete()
+                val updated = document.copy(
+                    sizeBytes = source.length(),
+                    modifiedAt = System.currentTimeMillis(),
                 )
-                ToolFlow.sizes(produced.id, result.originalSize, result.newSize)
+                repository.update(updated)
+                ToolFlow.sizes(updated.id, result.originalSize, result.newSize)
             }
             // The job is done, the progress page takes over with the result.
             finish()

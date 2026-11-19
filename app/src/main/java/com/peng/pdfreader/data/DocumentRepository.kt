@@ -5,6 +5,9 @@ import android.net.Uri
 import android.provider.OpenableColumns
 import com.peng.pdfreader.core.util.Logger
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
@@ -24,6 +27,18 @@ class DocumentRepository private constructor(private val appContext: Context) {
     private val documents = mutableListOf<Document>()
     private val annotations = mutableMapOf<String, MutableList<Annotation>>()
     private val bookmarks = mutableMapOf<String, MutableList<Bookmark>>()
+
+    /**
+     * The documents that changed.
+     *
+     * The lists of the app listen to it and refresh the row of the document
+     * that changed - a lock, an unlock or a rename does not reload the whole
+     * list.
+     */
+    private val changes = MutableSharedFlow<Document>(extraBufferCapacity = 16)
+
+    /** The documents that changed, newest change first. */
+    val changed: SharedFlow<Document> = changes.asSharedFlow()
 
     /** When the shared storage was scanned the last time. */
     private var lastSharedSyncAt = 0L
@@ -126,6 +141,7 @@ class DocumentRepository private constructor(private val appContext: Context) {
         )
         documents.add(0, doc)
         persist()
+        changes.tryEmit(doc)
         return doc
     }
 
@@ -213,6 +229,8 @@ class DocumentRepository private constructor(private val appContext: Context) {
         if (index >= 0) {
             documents[index] = doc
             persist()
+            // The lists refresh the row of the document.
+            changes.tryEmit(doc)
         }
     }
 

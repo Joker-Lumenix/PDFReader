@@ -1,4 +1,4 @@
-package com.peng.pdfreader.base
+package com.peng.pdfreader.ui.activities
 
 import android.content.Context
 import android.content.Intent
@@ -16,13 +16,14 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.peng.pdfreader.R
+import com.peng.pdfreader.base.BaseActivity
 import com.peng.pdfreader.data.DocType
 import com.peng.pdfreader.data.Document
 import com.peng.pdfreader.data.DocumentRepository
-import com.peng.pdfreader.databinding.LockActivityFilePickerBinding
+import com.peng.pdfreader.databinding.ActivityToolFilePickerBinding
 import com.peng.pdfreader.feature.lock.VaultCipher
+import com.peng.pdfreader.feature.tools.print.ToolPrintRunner
 import com.peng.pdfreader.ui.adapter.listAdapter.LockFileAdapter
-import com.peng.pdfreader.ui.activities.ResultActivity
 import com.peng.pdfreader.ui.dialogs.BottomSheetPassword
 import com.peng.pdfreader.utils.ToolRowThumbnails
 import kotlinx.coroutines.Dispatchers
@@ -30,18 +31,37 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /**
- * Shared behaviour of the lock and the unlock page.
+ * The file selection page of the PDF tools (design "lock PDF").
  *
- * The page shows the PDF files of the sandbox, asks for a password and reports
- * the result. The two pages only differ in the mode and in which documents
- * they accept, everything else is identical.
+ * Every tool that works on a document of the sandbox starts here: lock,
+ * unlock, split, print and compress. The page shows the documents, the button
+ * in the top right corner searches in the list and the rows carry no action of
+ * their own - the whole row picks the file.
  *
- * The button in the top right corner searches in the list, the field of the
- * search takes the place of the title. The rows carry no action of their own.
+ * The lock and the unlock flow ask for a password afterwards, the other tools
+ * hand the document over to their own page.
  */
-abstract class BaseLockActivity : BaseActivity() {
+class ToolFilePickerActivity : BaseActivity() {
 
-    private lateinit var binding: LockActivityFilePickerBinding
+    /** The tool the page serves. */
+    enum class Mode {
+        /** Encrypt the document with a password. */
+        LOCK,
+
+        /** Remove the password of an encrypted document. */
+        UNLOCK,
+
+        /** Split the document into new ones. */
+        SPLIT,
+
+        /** Print the document. */
+        PRINT,
+
+        /** Compress the document. */
+        COMPRESS,
+    }
+
+    private lateinit var binding: ActivityToolFilePickerBinding
     private lateinit var adapter: LockFileAdapter
 
     private val repository by lazy { DocumentRepository.get(this) }
@@ -50,14 +70,11 @@ abstract class BaseLockActivity : BaseActivity() {
     /** The documents the page shows, the search filters them. */
     private var documents: List<Document> = emptyList()
 
-    /** Lock or unlock - decides the sheet copy and the operation. */
-    protected abstract val mode: BottomSheetPassword.Mode
-
-    /** Title of the page. */
-    protected abstract val titleRes: Int
-
-    /** Documents the page offers for the operation. */
-    protected abstract fun accepts(document: Document): Boolean
+    /** The tool the page serves. */
+    private val mode: Mode
+        get() = intent.getStringExtra(EXTRA_MODE)
+            ?.let { name -> Mode.entries.firstOrNull { it.name == name } }
+            ?: Mode.LOCK
 
     /** The pictures of the rows, the first page of every document. */
     private val rowThumbnails by lazy {
@@ -72,10 +89,12 @@ abstract class BaseLockActivity : BaseActivity() {
         setTheme(R.style.Theme_PdfReader)
         super.onCreate(savedInstanceState)
 
-        binding = LockActivityFilePickerBinding.inflate(layoutInflater)
+        binding = ActivityToolFilePickerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.tvTitle.text = getString(titleRes)
+        // The design shows a file picker, the title is "Select file" (design:
+        // lock PDF).
+        binding.tvTitle.text = getString(R.string.lock_page_select)
         binding.ivBack.setOnClickListener {
             if (!handleBackPressed()) finish()
         }
@@ -173,9 +192,37 @@ abstract class BaseLockActivity : BaseActivity() {
         binding.emptyState.visibility = if (documents.isEmpty()) View.VISIBLE else View.GONE
     }
 
+    /** The documents the tool of the page works with. */
+    private fun accepts(document: Document): Boolean = when (mode) {
+        // The unlock flow only offers the documents of the vault, they carry
+        // the lock badge of the design.
+        Mode.UNLOCK -> VaultCipher.isEncrypted(this, document)
+        else -> !VaultCipher.isEncrypted(this, document)
+    }
+
+    /**
+     * The document was picked.
+     *
+     * The lock and the unlock flow ask for the password, the other tools hand
+     * the document over to their own page.
+     */
     private fun onDocumentPicked(document: Document) {
-        pending = document
-        BottomSheetPassword.newInstance(mode).show(supportFragmentManager, BottomSheetPassword.TAG)
+        when (mode) {
+            Mode.LOCK, Mode.UNLOCK -> {
+                pending = document
+                val sheetMode = if (mode == Mode.LOCK) {
+                    BottomSheetPassword.Mode.LOCK
+                } else {
+                    BottomSheetPassword.Mode.UNLOCK
+                }
+                BottomSheetPassword.newInstance(sheetMode)
+                    .show(supportFragmentManager, BottomSheetPassword.TAG)
+            }
+
+            Mode.SPLIT -> SplitActivity.start(this, document.id)
+            Mode.PRINT -> ToolPrintRunner.print(this, document)
+            Mode.COMPRESS -> CompressActivity.start(this, document.id)
+        }
     }
 
     // ------------------------------------------------------------------ operation
@@ -185,11 +232,10 @@ abstract class BaseLockActivity : BaseActivity() {
         val context = applicationContext
         lifecycleScope.launch {
             val outcome = withContext(Dispatchers.IO) {
-                when (mode) {
-                    BottomSheetPassword.Mode.LOCK -> VaultCipher.lock(context, document, password)
-                    // The unlock page and the "enter password" sheet both decrypt.
-                    BottomSheetPassword.Mode.UNLOCK, BottomSheetPassword.Mode.ENTER ->
-                        VaultCipher.unlock(context, document, password)
+                if (mode == Mode.LOCK) {
+                    VaultCipher.lock(context, document, password)
+                } else {
+                    VaultCipher.unlock(context, document, password)
                 }
             }
             outcome.fold(
@@ -225,7 +271,7 @@ abstract class BaseLockActivity : BaseActivity() {
      */
     private fun showResult(document: Document) {
         val title = getString(
-            if (mode == BottomSheetPassword.Mode.LOCK) {
+            if (mode == Mode.LOCK) {
                 R.string.lock_result_locked
             } else {
                 R.string.lock_result_unlocked
@@ -240,7 +286,7 @@ abstract class BaseLockActivity : BaseActivity() {
 
     private fun importDocument(uri: Uri) {
         lifecycleScope.launch {
-            repository.importFromUri(this@BaseLockActivity, uri)
+            repository.importFromUri(this@ToolFilePickerActivity, uri)
             reload()
         }
     }
@@ -262,13 +308,19 @@ abstract class BaseLockActivity : BaseActivity() {
         title.gravity = Gravity.START
     }
 
-    /** True when the document is stored in the vault. */
-    protected fun isVaultFile(document: Document): Boolean = VaultCipher.isEncrypted(this, document)
-
     private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
 
-    private companion object {
-        const val PDF_MIME = "application/pdf"
-        const val STATE_PENDING = "lock_pending_document"
+    companion object {
+        private const val EXTRA_MODE = "com.peng.pdfreader.extra.TOOL_MODE"
+        private const val PDF_MIME = "application/pdf"
+        private const val STATE_PENDING = "tool_picker_pending_document"
+
+        /** Opens the file selection page for the given tool. */
+        fun start(context: Context, mode: Mode) {
+            context.startActivity(
+                Intent(context, ToolFilePickerActivity::class.java)
+                    .putExtra(EXTRA_MODE, mode.name),
+            )
+        }
     }
 }

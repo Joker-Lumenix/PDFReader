@@ -7,17 +7,11 @@ import android.view.ViewGroup
 import com.peng.pdfreader.core.widget.AdSlotView
 import com.peng.pdfreader.ads.Ads
 import com.peng.pdfreader.base.BaseFragment
-import com.peng.pdfreader.data.Document
 import com.peng.pdfreader.databinding.FragmentToolsBinding
-import com.peng.pdfreader.ui.activities.LockActivity
-import com.peng.pdfreader.ui.activities.UnlockActivity
+import com.peng.pdfreader.ui.activities.ToolFilePickerActivity
 import com.peng.pdfreader.ui.uiData.AdSamples
 import com.peng.pdfreader.ui.activities.ImageToPdfActivity
 import com.peng.pdfreader.ui.activities.MergeActivity
-import com.peng.pdfreader.ui.activities.SplitActivity
-import com.peng.pdfreader.ui.dialogs.BottomSheetToolDocumentPicker
-import com.peng.pdfreader.feature.tools.pack.ZipRunner
-import com.peng.pdfreader.feature.tools.print.ToolPrintRunner
 import com.peng.pdfreader.feature.tools.scanner.ToolScanner
 
 /**
@@ -61,8 +55,10 @@ class ToolsFragment : BaseFragment() {
         binding.llImageToPDF.setOnClickListener {
             ImageToPdfActivity.start(requireContext())
         }
+        // Every tool that works on a document of the sandbox starts with the
+        // same file selection page (design "lock PDF").
         binding.llSplitPDF.setOnClickListener {
-            SplitActivity.start(requireContext())
+            ToolFilePickerActivity.start(requireContext(), ToolFilePickerActivity.Mode.SPLIT)
         }
         binding.llMergePDF.setOnClickListener {
             MergeActivity.start(requireContext())
@@ -71,21 +67,17 @@ class ToolsFragment : BaseFragment() {
             ToolScanner.launch(this)
         }
         binding.llLockPDF.setOnClickListener {
-            LockActivity.start(requireContext())
+            ToolFilePickerActivity.start(requireContext(), ToolFilePickerActivity.Mode.LOCK)
         }
         binding.llUnlockPDF.setOnClickListener {
-            UnlockActivity.start(requireContext())
+            ToolFilePickerActivity.start(requireContext(), ToolFilePickerActivity.Mode.UNLOCK)
         }
         binding.llPrintPDF.setOnClickListener {
-            pickDocumentThen { doc -> ToolPrintRunner.print(this, doc) }
+            ToolFilePickerActivity.start(requireContext(), ToolFilePickerActivity.Mode.PRINT)
         }
         binding.llCompressPDF.setOnClickListener {
-            pickDocumentThen { doc -> ZipRunner.pack(this, doc) }
+            ToolFilePickerActivity.start(requireContext(), ToolFilePickerActivity.Mode.COMPRESS)
         }
-    }
-
-    private fun pickDocumentThen(action: (Document) -> Unit) {
-        BottomSheetToolDocumentPicker.show(childFragmentManager) { doc -> action(doc) }
     }
 
     override fun onDestroyView() {

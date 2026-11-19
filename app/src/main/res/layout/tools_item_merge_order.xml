@@ -2,31 +2,35 @@
 <!--
   A document of the ordered merge list (design "merge-2").
 
-  The card is 304x72 at x=42, the red minus of the design sits at x=15 and
-  the handle that starts the drag sits at the end of the card.
+  Geometry of the design (360x760):
+  - the red minus 18x18 at x=15, its frame is 24x24 at x=12
+  - the card at x=42, 6 behind the minus, it fills the rest of the row and
+    keeps a 12 gap at the right border
+  - the handle 24x24 at the end of the card, the lines inside it are 15x12
 -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="84dp">
+    android:layout_height="84dp"
+    android:orientation="horizontal">
 
     <!-- the remove button of the design, a red minus in a circle -->
     <ImageView
         android:id="@+id/btnRemove"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:layout_gravity="top|start"
         android:layout_marginTop="24dp"
+        android:layout_marginEnd="6dp"
         android:clickable="true"
         android:contentDescription="@string/tools_merge_remove"
         android:focusable="true"
+        android:padding="3dp"
         android:src="@mipmap/ic_minus" />
 
     <FrameLayout
         android:id="@+id/card"
-        android:layout_width="304dp"
+        android:layout_width="0dp"
         android:layout_height="72dp"
-        android:layout_gravity="top|end"
-        android:layout_marginEnd="14dp">
+        android:layout_weight="1">
 
         <com.peng.pdfreader.core.widget.FileListItemView
             android:id="@+id/item"
@@ -36,10 +40,10 @@
         <!-- the handle of the design, it starts the drag of the row -->
         <ImageView
             android:id="@+id/ivDrag"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:layout_gravity="end|center_vertical"
-            android:layout_marginEnd="10dp"
+            android:layout_marginEnd="12dp"
             android:clickable="true"
             android:contentDescription="@string/tools_merge_drag"
             android:focusable="true"
@@ -47,4 +51,4 @@
 
     </FrameLayout>
 
-</FrameLayout>
+</LinearLayout>

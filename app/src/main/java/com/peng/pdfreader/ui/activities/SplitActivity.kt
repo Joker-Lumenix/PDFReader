@@ -54,7 +54,14 @@ class SplitActivity : BaseActivity() {
 
     /** The adapter of the second step, it shows the marked pages only. */
     private val orderAdapter by lazy {
-        SplitPageAdapter(lifecycleScope, { }, ::renderPage)
+        SplitPageAdapter(
+            scope = lifecycleScope,
+            onToggle = { },
+            renderer = ::renderPage,
+            // The tiles of the second step carry no action of their own, the
+            // drag starts as soon as the finger touches them.
+            onDragStart = { holder -> orderHelper.startDrag(holder) },
+        )
     }
 
     /** The file of the document, the pages are rendered out of it. */
@@ -202,7 +209,9 @@ class SplitActivity : BaseActivity() {
                 ItemTouchHelper.RIGHT,
             0,
         ) {
-            override fun isLongPressDragEnabled(): Boolean = true
+            // The drag starts at the touch on the tile, the long press is not
+            // needed - the tiles of this step carry no action of their own.
+            override fun isLongPressDragEnabled(): Boolean = false
 
             override fun onMove(
                 recyclerView: RecyclerView,

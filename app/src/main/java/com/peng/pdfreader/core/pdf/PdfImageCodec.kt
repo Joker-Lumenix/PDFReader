@@ -24,17 +24,32 @@ interface ImageCodec {
     /**
      * Decodes JPEG bytes.
      *
+     * @param maxPixels the most pixels the picture may have, 0 for no limit.
+     *   A bigger picture is scaled down, so the memory of the decoder stays
+     *   small - the compressor writes the smaller picture back.
      * @return the decoded image, or null when the data cannot be decoded
      * (unsupported colour space, truncated file, ...).
      */
-    fun decodeJpeg(data: ByteArray): DecodedImage?
+    fun decodeJpeg(data: ByteArray, maxPixels: Int = 0): DecodedImage?
 
     /**
-     * Builds an image from raw 8 bit RGB samples, one byte per channel.
+     * Builds an image from raw 8 bit RGB samples that arrive row by row.
      *
-     * @return the decoded image, or null when the buffer is not usable.
+     * The rows are read one after the other, so a picture of a document never
+     * sits in the memory as a whole - the caller only holds one row.
+     *
+     * @param step the step between two rows that are kept, 2 keeps every
+     *   second row - a picture that is too big for the memory is scaled down
+     *   that way.
+     * @param row the samples of the next row of the picture, null at the end
+     * @return the decoded image, or null when the rows are not usable.
      */
-    fun decodeRgb(width: Int, height: Int, rgb: ByteArray): DecodedImage?
+    fun decodeRgbRows(
+        width: Int,
+        height: Int,
+        step: Int,
+        row: () -> ByteArray?,
+    ): DecodedImage?
 
     /**
      * Encodes an image back to JPEG.

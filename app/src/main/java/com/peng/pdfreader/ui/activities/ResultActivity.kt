@@ -108,7 +108,7 @@ class ResultActivity : BaseActivity() {
         onDraw = {
             startActivity(DrawActivity.createIntent(this, repository.fileOf(document), 1, false))
         },
-        onLock = { LockActivity.start(this) },
+        onLock = { ToolFilePickerActivity.start(this, ToolFilePickerActivity.Mode.LOCK) },
         onShare = { shareDocument(document) },
         onView = { PreviewActivity.start(this, document.id) },
         onRename = { rename(document) },

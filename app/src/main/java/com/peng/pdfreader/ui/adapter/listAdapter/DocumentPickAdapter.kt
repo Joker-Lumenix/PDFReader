@@ -9,10 +9,9 @@ import com.peng.pdfreader.core.widget.FileItemUiState
 import com.peng.pdfreader.core.widget.FileListItemView
 import com.peng.pdfreader.core.widget.createForList
 import com.peng.pdfreader.data.Document
-import com.peng.pdfreader.feature.tools.util.ToolShapes
-import com.peng.pdfreader.utils.ToolRowThumbnails
 import com.peng.pdfreader.utils.PageCountDrawable
 import com.peng.pdfreader.ui.widget.LockThumbnailDrawable
+import com.peng.pdfreader.utils.ToolRowThumbnails
 import com.peng.pdfreader.feature.tools.util.ToolFormatters
 
 /**
@@ -26,8 +25,6 @@ import com.peng.pdfreader.feature.tools.util.ToolFormatters
  *   design of the merge flow puts it there
  * @param showMore the rows carry the "more" affordance, it is only used when
  *   the row has no selection mark
- * @param designCard the rows carry the white card of the merge design instead
- *   of the card of the template
  * @param thumbnails the pictures of the rows, the design of the merge shows
  *   the first page of the document
  */
@@ -37,7 +34,6 @@ class DocumentPickAdapter(
     private val onCheckedChange: ((Document, Boolean) -> Unit)? = null,
     private val selectionAtEnd: Boolean = false,
     private val showMore: Boolean = false,
-    private val designCard: Boolean = false,
     private val thumbnails: ToolRowThumbnails? = null,
 ) : RecyclerView.Adapter<DocumentPickAdapter.Holder>() {
 
@@ -108,12 +104,6 @@ class DocumentPickAdapter(
                     showCheckbox = multiSelect,
                     checkboxAtEnd = selectionAtEnd,
                     checked = isChecked,
-                    // the card of the design is a white surface
-                    cardBackground = if (designCard) {
-                        ToolShapes.roundRect(context, SURFACE_CARD, 12f)
-                    } else {
-                        null
-                    },
                     encrypted = doc.isEncrypted,
                 ),
             )
@@ -144,10 +134,5 @@ class DocumentPickAdapter(
             if (doc.pageCount <= 0) return logo
             return PageCountDrawable(logo, doc.pageCount, context)
         }
-    }
-
-    private companion object {
-        /** The colour of the card of the design. */
-        const val SURFACE_CARD = 0xFFFFFFFF.toInt()
     }
 }

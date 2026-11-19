@@ -1,22 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  The result page of the tool flows (designs "Merged Successfully!" and
-  "压缩结果页").
-
-  The page is shared by every tool: the title bar carries the name of the page,
-  the body shows the produced document, the size comparison or the success
-  title. Which of them is on the screen is decided by the parameters of the
-  intent, not by the tool that opened the page.
-
-  The body scrolls, the feedback card floats over it - the card of the design
-  sits at the bottom of the page and does not move with the content.
-
-  Geometry of the design (360x760):
-  - hero 336x100 at (12, 93)
-  - file card 336x174 at (12, 193), only the bottom corners are rounded
-  - more card 336x204 at (12, 375)
-  - feedback card 336x118 floating at the bottom
--->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -531,12 +513,6 @@
 
     </LinearLayout>
 
-    <!--
-      ==================== feedback ====================
-
-      The card of the design floats over the content: the content scrolls
-      behind it, the card stays where it is.
-    -->
     <FrameLayout
         android:id="@+id/feedbackCard"
         android:layout_width="match_parent"

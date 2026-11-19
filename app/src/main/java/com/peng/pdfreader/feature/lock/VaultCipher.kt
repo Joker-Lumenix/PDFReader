@@ -15,10 +15,9 @@ import java.io.File
  * password afterwards, the more sheet of a document knows its file already and
  * asks for the password right away. Both use this.
  *
- * Encrypting never touches the file of the document: the encrypted document is
- * a new file in the library. Removing the password works the other way round,
- * the encrypted file becomes the plain file again and keeps its place in the
- * library.
+ * Every operation works on the file of the document: the encrypted file takes
+ * the place of the plain one and the plain file takes the place of the
+ * encrypted one, so the library keeps one row for the document.
  */
 object VaultCipher {
 
@@ -26,10 +25,10 @@ object VaultCipher {
     private const val LOCKED_SUFFIX = "_locked"
 
     /**
-     * Encrypts the document and stores the result in the library.
+     * Encrypts the document.
      *
-     * The encrypted document is a new file in the library: the file of the
-     * document stays untouched.
+     * The encrypted file takes the place of the plain one - the operation
+     * works on the file of the document, it does not create a copy of it.
      *
      * @return the encrypted document, or a failure carrying a [PdfVault.VaultError].
      */
@@ -38,23 +37,24 @@ object VaultCipher {
         val source = repository.fileOf(document)
         val target = File(context.cacheDir, "lock-${System.currentTimeMillis()}.tmp")
         return PdfVault.lock(source, target, password).map { file ->
-            val stored = repository.addExisting(lockedName(document.name), DocType.PDF, file)
-            val result = stored.copy(
+            // The encrypted file replaces the plain one.
+            file.copyTo(source, overwrite = true)
+            file.delete()
+            val result = document.copy(
                 isEncrypted = true,
-                pageCount = document.pageCount,
+                sizeBytes = source.length(),
+                modifiedAt = System.currentTimeMillis(),
             )
             repository.update(result)
-            file.delete()
             result
         }
     }
 
     /**
-     * Decrypts the document and stores the result in the library.
+     * Decrypts the document.
      *
-     * The encrypted file becomes the plain file again: it keeps its place in
-     * the library and only the password is gone, so the row of the list shows
-     * the file as a normal one again.
+     * The plain file takes the place of the encrypted one: the row of the
+     * list shows the document as a normal one again and keeps its name.
      *
      * @return the decrypted document, or a failure carrying a [PdfVault.VaultError].
      */
@@ -63,28 +63,15 @@ object VaultCipher {
         val source = repository.fileOf(document)
         val target = File(context.cacheDir, "unlock-${System.currentTimeMillis()}.tmp")
         return PdfVault.unlock(source, target, password).map { plain ->
-            val result = if (isInSandbox(repository, document)) {
-                // The plain file takes the place of the encrypted one.
-                plain.copyTo(source, overwrite = true)
-                val size = source.length()
-                // The name of the file loses the suffix of the vault.
-                repository.rename(document, unlockedName(document.name))
-                val renamed = repository.byId(document.id) ?: document
-                renamed.copy(
-                    isEncrypted = false,
-                    sizeBytes = size,
-                    modifiedAt = System.currentTimeMillis(),
-                ).also { repository.update(it) }
-            } else {
-                // A file outside of the sandbox is never touched, the plain
-                // file becomes a new document of the library.
-                val stored = repository.addExisting(unlockedName(document.name), DocType.PDF, plain)
-                stored.copy(
-                    isEncrypted = false,
-                    pageCount = document.pageCount,
-                ).also { repository.update(it) }
-            }
+            // The plain file replaces the encrypted one.
+            plain.copyTo(source, overwrite = true)
             plain.delete()
+            val result = document.copy(
+                isEncrypted = false,
+                sizeBytes = source.length(),
+                modifiedAt = System.currentTimeMillis(),
+            )
+            repository.update(result)
             result
         }
     }
@@ -118,8 +105,4 @@ object VaultCipher {
         val clean = if (base.endsWith(LOCKED_SUFFIX)) base.dropLast(LOCKED_SUFFIX.length) else base
         return "$clean.pdf"
     }
-
-    /** Whether the file of the document lives in the private sandbox. */
-    private fun isInSandbox(repository: DocumentRepository, document: Document): Boolean =
-        document.path.startsWith(repository.sandboxDir.absolutePath + File.separator)
 }

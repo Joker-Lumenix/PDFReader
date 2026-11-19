@@ -157,13 +157,10 @@
             android:name=".ui.activities.ScanActivity"
             android:exported="false" />
 
-        <!-- Encryption -->
-        <activity
-            android:name=".ui.activities.LockActivity"
-            android:exported="false" />
+        <!-- The file selection page of the PDF tools -->
 
         <activity
-            android:name=".ui.activities.UnlockActivity"
+            android:name=".ui.activities.ToolFilePickerActivity"
             android:exported="false" />
 
         <!-- Settings, language, feedback and onboarding -->

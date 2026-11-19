@@ -145,6 +145,7 @@
                 android:overScrollMode="never"
                 android:paddingStart="12dp"
                 android:paddingTop="12dp"
+                android:paddingEnd="12dp"
                 android:paddingBottom="96dp"
                 android:scrollbars="none" />
 

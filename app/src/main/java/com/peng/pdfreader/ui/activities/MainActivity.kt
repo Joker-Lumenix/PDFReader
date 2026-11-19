@@ -126,8 +126,8 @@ class MainActivity : BaseActivity() {
         val action = intent?.action ?: return
         when (action) {
             PersistentNotificationHelper.ACTION_SCAN -> openScanner()
-            PersistentNotificationHelper.ACTION_LOCK -> LockActivity.start(this)
-            PersistentNotificationHelper.ACTION_COMPRESS -> CompressActivity.start(this)
+            PersistentNotificationHelper.ACTION_LOCK -> ToolFilePickerActivity.start(this, ToolFilePickerActivity.Mode.LOCK)
+            PersistentNotificationHelper.ACTION_COMPRESS -> ToolFilePickerActivity.start(this, ToolFilePickerActivity.Mode.COMPRESS)
             PersistentNotificationHelper.ACTION_PRINT -> showTab(TAB_FILES)
             ACTION_MERGE -> MergeActivity.start(this)
             ACTION_IMAGE_TO_PDF -> ImageToPdfActivity.start(this)

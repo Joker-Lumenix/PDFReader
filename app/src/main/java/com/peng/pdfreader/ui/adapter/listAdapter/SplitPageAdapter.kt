@@ -3,6 +3,7 @@ package com.peng.pdfreader.ui.adapter.listAdapter
 import android.graphics.Bitmap
 import android.util.LruCache
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.peng.pdfreader.databinding.ToolsItemSplitPageBinding
@@ -26,6 +27,7 @@ class SplitPageAdapter(
     private val scope: CoroutineScope,
     private val onToggle: (Int) -> Unit,
     private val renderer: (Int) -> Bitmap? = { null },
+    private val onDragStart: ((RecyclerView.ViewHolder) -> Unit)? = null,
 ) : RecyclerView.Adapter<SplitPageAdapter.Holder>() {
 
     /** One page of the document. */
@@ -103,6 +105,17 @@ class SplitPageAdapter(
             binding.tvNumber.text = page.number.toString()
             binding.tvNumber.background = ToolShapes.badge(context, page.number in selected)
             binding.root.setOnClickListener { onToggle(page.number) }
+            // The tiles of the second step carry no action of their own, the
+            // drag starts as soon as the finger touches them.
+            onDragStart?.let { start ->
+                binding.root.setOnTouchListener { view, event ->
+                    when (event.actionMasked) {
+                        MotionEvent.ACTION_DOWN -> start(this)
+                        MotionEvent.ACTION_UP -> view.performClick()
+                    }
+                    false
+                }
+            }
             showPicture(page.number)
         }
 

@@ -11,6 +11,8 @@ import android.graphics.RectF
 import android.graphics.Shader
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
+import androidx.core.content.ContextCompat
+import com.peng.pdfreader.R
 
 /**
  * The thumbnail of a document in the lock flow.
@@ -27,7 +29,7 @@ class LockThumbnailDrawable(
 ) : Drawable() {
 
     private val res = context.resources
-    private val badge = LockBadgeDrawable(context)
+    private val badge: Drawable? = ContextCompat.getDrawable(context, R.mipmap.ic_lock_corner)
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val chip = RectF()
 
@@ -38,6 +40,17 @@ class LockThumbnailDrawable(
         if (locked) {
             // The page of an encrypted document is blurred.
             drawBlurredPage(canvas, RectF(bounds))
+            // The lock badge of the design sits in the upper left corner.
+            badge?.let {
+                val size = dp(24).toFloat()
+                it.setBounds(
+                    bounds.left.toInt(),
+                    bounds.top.toInt(),
+                    (bounds.left + size).toInt(),
+                    (bounds.top + size).toInt(),
+                )
+                it.draw(canvas)
+            }
         } else {
             // The logo keeps its ratio and sits in the middle of the thumbnail.
             base?.let { logo ->
@@ -47,11 +60,6 @@ class LockThumbnailDrawable(
                 logo.setBounds(left.toInt(), top.toInt(), (left + size).toInt(), (top + size).toInt())
                 logo.draw(canvas)
             }
-        }
-
-        if (locked) {
-            badge.setBounds(bounds.left, bounds.top, bounds.left + dp(24), bounds.top + dp(24))
-            badge.draw(canvas)
         }
 
         if (pageCount > 0) drawPageCount(canvas, RectF(bounds))
@@ -121,12 +129,12 @@ class LockThumbnailDrawable(
 
     override fun setAlpha(alpha: Int) {
         paint.alpha = alpha
-        badge.alpha = alpha
+        badge?.alpha = alpha
     }
 
     override fun setColorFilter(colorFilter: ColorFilter?) {
         paint.colorFilter = colorFilter
-        badge.colorFilter = colorFilter
+        badge?.colorFilter = colorFilter
     }
 
     @Deprecated("Deprecated in Drawable")

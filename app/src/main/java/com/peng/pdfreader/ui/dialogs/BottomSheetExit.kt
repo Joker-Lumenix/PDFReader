@@ -16,7 +16,7 @@ import com.peng.pdfreader.databinding.HomeSheetExitRetentionBinding
 import com.peng.pdfreader.ui.uiData.AdSamples
 import com.peng.pdfreader.ui.activities.ImageToPdfActivity
 import com.peng.pdfreader.ui.activities.MergeActivity
-import com.peng.pdfreader.ui.activities.SplitActivity
+import com.peng.pdfreader.ui.activities.ToolFilePickerActivity
 import com.peng.pdfreader.ui.activities.ScanActivity
 
 /**
@@ -129,7 +129,7 @@ class BottomSheetExit : BaseBottomSheetDialog() {
             Offer(
                 R.string.split,
                 R.mipmap.ic_tools_split_pdf,
-            ) { context -> SplitActivity.start(context) },
+            ) { context -> ToolFilePickerActivity.start(context, ToolFilePickerActivity.Mode.SPLIT) },
         )
 
         /** Shows the sheet. */

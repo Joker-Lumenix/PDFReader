@@ -64,8 +64,6 @@ class MergeActivity : BaseActivity() {
             // the design of the selection step puts the selection mark on the
             // right of every row
             selectionAtEnd = true,
-            // the card of the design is a white surface
-            designCard = true,
             // the design shows the first page of the document
             thumbnails = rowThumbnails,
         )

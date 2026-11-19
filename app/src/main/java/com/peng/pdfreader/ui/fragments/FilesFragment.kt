@@ -15,7 +15,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -149,7 +151,33 @@ class FilesFragment : BaseFragment() {
         setupPager()
         setupSelectBar()
         registerResults()
+        observeChanges()
         load()
+    }
+
+    /**
+     * Refreshes the row of a document that changed.
+     *
+     * A lock, an unlock or a rename changes the state of a single document -
+     * the list follows that document instead of loading the whole table again.
+     */
+    private fun observeChanges() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                repository.changed.collect { changed ->
+                    val index = documents.indexOfFirst { it.id == changed.id }
+                    if (index >= 0) {
+                        // The document changed - the row follows it.
+                        documents = documents.toMutableList().apply { set(index, changed) }
+                        renderList()
+                        return@collect
+                    }
+                    // A new document (the lock writes a copy into the vault) -
+                    // the list has to know about it.
+                    if (repository.byId(changed.id) != null) load()
+                }
+            }
+        }
     }
 
     override fun onResume() {

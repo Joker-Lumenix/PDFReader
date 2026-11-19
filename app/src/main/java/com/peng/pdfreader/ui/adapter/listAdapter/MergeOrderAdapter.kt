@@ -86,8 +86,6 @@ class MergeOrderAdapter(
                     // affordance, the text stops in front of it
                     showMore = false,
                     endInsetDp = END_INSET_DP,
-                    // the card of the design is a white surface
-                    cardBackground = ToolShapes.roundRect(context, SURFACE_CARD, 12f),
                     encrypted = doc.isEncrypted,
                 ),
             )
@@ -127,8 +125,5 @@ class MergeOrderAdapter(
     private companion object {
         /** The room the handle of the design needs at the end of the row. */
         const val END_INSET_DP = 24
-
-        /** The colour of the card of the design. */
-        const val SURFACE_CARD = 0xFFFFFFFF.toInt()
     }
 }

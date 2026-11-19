@@ -12,7 +12,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.peng.pdfreader.R
@@ -87,6 +89,9 @@ class HomeFragment : BaseFragment() {
 
     private lateinit var pagerAdapter: HomePagerAdapter
 
+    /** The documents of the list, a change refreshes a single row. */
+    private var documents: List<Document> = emptyList()
+
     /** The id of a segment of the filter strip and the file type behind it. */
     private val filterTypes = mutableListOf<Pair<String, DocType?>>()
     private var filter: DocType? = null
@@ -115,6 +120,7 @@ class HomeFragment : BaseFragment() {
         setupFilterStrip()
         setupDocumentPager()
         registerResults()
+        observeChanges()
         refreshDocuments()
     }
 
@@ -326,7 +332,27 @@ class HomeFragment : BaseFragment() {
                 repository.query(null, option.sort, null)
             }
             if (_binding == null || !::pagerAdapter.isInitialized) return@launch
-            pagerAdapter.submit(if (option.reverse) documents.reversed() else documents)
+            this@HomeFragment.documents = if (option.reverse) documents.reversed() else documents
+            pagerAdapter.submit(this@HomeFragment.documents)
+        }
+    }
+
+    /**
+     * Refreshes the row of a document that changed.
+     *
+     * A lock, an unlock or a rename changes the state of a single document -
+     * the list follows that document instead of loading the whole table again.
+     */
+    private fun observeChanges() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                DocumentRepository.get(requireContext()).changed.collect { changed ->
+                    val index = documents.indexOfFirst { it.id == changed.id }
+                    if (index < 0) return@collect
+                    documents = documents.toMutableList().apply { set(index, changed) }
+                    pagerAdapter.submit(documents)
+                }
+            }
         }
     }
 
