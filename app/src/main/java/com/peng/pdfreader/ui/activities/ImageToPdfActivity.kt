@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -21,15 +22,11 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.peng.pdfreader.R
 import com.peng.pdfreader.base.BaseActivity
-import com.peng.pdfreader.data.DocType
-import com.peng.pdfreader.data.DocumentRepository
 import com.peng.pdfreader.data.MediaImages
 import com.peng.pdfreader.data.SharedStorage
 import com.peng.pdfreader.databinding.ToolsActivityImageToPdfBinding
-import com.peng.pdfreader.ui.adapter.decoration.PitchGridDecoration
+import com.peng.pdfreader.ui.adapter.decoration.UniformGridDecoration
 import com.peng.pdfreader.ui.adapter.listAdapter.ImageTileAdapter
-import com.peng.pdfreader.feature.tools.engine.ToolEngines
-import com.peng.pdfreader.feature.tools.util.ToolFlow
 import com.peng.pdfreader.feature.tools.util.ToolOutput
 import com.peng.pdfreader.feature.tools.util.ToolShapes
 import kotlinx.coroutines.Dispatchers
@@ -49,9 +46,6 @@ import java.io.File
 class ImageToPdfActivity : BaseActivity() {
 
     private lateinit var binding: ToolsActivityImageToPdfBinding
-
-    private val repository by lazy { DocumentRepository.get(this) }
-    private val engine get() = ToolEngines.current
 
     /** 设备里的图片，页面显示的就是它们。 */
     private val deviceImages = mutableListOf<MediaImages.Image>()
@@ -78,17 +72,14 @@ class ImageToPdfActivity : BaseActivity() {
         ImageTileAdapter(
             onAddClick = { pickImages() },
             onImageClick = { index -> toggleImage(index) },
+            onImageExpand = { index -> viewImage(index) },
         )
     }
 
     private val gridDecoration by lazy {
-        // the tiles of the design sit at x = 12 / 128 / 244, 12 apart
-        PitchGridDecoration(
-            cellWidthPx = dp(104),
-            pitchPx = dp(116),
-            startMarginPx = dp(12),
-            rowSpacingPx = dp(12),
-        )
+        // the three tiles of a row share the width of the screen, the gap
+        // between them and at the border is 12
+        UniformGridDecoration(gapPx = dp(12))
     }
 
     private val picker = registerForActivityResult(
@@ -108,6 +99,19 @@ class ImageToPdfActivity : BaseActivity() {
         loadDeviceImages()
     }
 
+    /**
+     * The processing page builds the document.
+     *
+     * When it is done the page leaves the flow: the result page then goes back
+     * to the page the flow was started from and not to the selection of the
+     * pictures.
+     */
+    private val processing = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) finish()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ToolsActivityImageToPdfBinding.inflate(layoutInflater)
@@ -122,9 +126,6 @@ class ImageToPdfActivity : BaseActivity() {
         }
 
         // the running card of the design is a white surface with a radius of 20
-        binding.loadingCard.background =
-            ToolShapes.roundRect(this, ToolShapes.SURFACE_SHEET, 20f)
-
         binding.rvImages.layoutManager = GridLayoutManager(this, 3)
         binding.rvImages.adapter = adapter
         binding.rvImages.addItemDecoration(gridDecoration)
@@ -162,14 +163,28 @@ class ImageToPdfActivity : BaseActivity() {
             deviceImages.clear()
             deviceImages.addAll(images)
             thumbnails.clear()
+            val size = tileSizePx()
             withContext(Dispatchers.IO) {
                 images.forEach { image ->
-                    MediaImages.thumbnail(this@ImageToPdfActivity, image, THUMBNAIL_SIZE)
+                    MediaImages.thumbnail(this@ImageToPdfActivity, image, size)
                         ?.let { thumbnails[image.id] = it }
                 }
             }
             refresh()
         }
+    }
+
+    /**
+     * The edge of a tile of the grid, in pixels.
+     *
+     * The three tiles of a row share the width of the screen, so the thumbnail
+     * of a tile has to be as big as the tile itself - a smaller one looks
+     * blurry on a screen with many pixels.
+     */
+    private fun tileSizePx(): Int {
+        val gap = dp(12)
+        val width = resources.displayMetrics.widthPixels
+        return ((width - gap * 4) / 3).coerceAtLeast(dp(64))
     }
 
     /** Selects a picture of the device or removes it from the selection. */
@@ -195,8 +210,18 @@ class ImageToPdfActivity : BaseActivity() {
         }
     }
 
-    private fun pickImages() {
-        picker.launch(
+    /**
+     * Opens the picture of the grid in its full size.
+     *
+     * The badge on the bottom right of a tile of the design only looks at the
+     * picture, the processing page is the place where it is turned or deleted.
+     */
+    private fun viewImage(index: Int) {
+        val image = deviceImages.getOrNull(index) ?: return
+        ImageViewerActivity.start(this, image.uri, image.name)
+    }
+
+    private fun pickImages() {        picker.launch(
             PickVisualMediaRequest.Builder()
                 .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly)
                 .build(),
@@ -228,45 +253,31 @@ class ImageToPdfActivity : BaseActivity() {
     }.getOrNull()
 
     private fun decodeThumbnail(file: File): Bitmap? {
+        val size = tileSizePx()
         val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
         BitmapFactory.decodeFile(file.absolutePath, bounds)
         var sample = 1
-        while (bounds.outWidth / sample > THUMBNAIL_SIZE * 2) sample *= 2
+        while (bounds.outWidth / sample > size * 2) sample *= 2
         val options = BitmapFactory.Options().apply { inSampleSize = sample }
         return BitmapFactory.decodeFile(file.absolutePath, options)
     }
 
     // ------------------------------------------------------------------ pdf
 
+    /**
+     * Opens the processing page of the selection.
+     *
+     * The pictures are turned and deleted there, the PDF is built behind the
+     * shared progress page when the user is done.
+     */
     private fun importToPdf() {
         if (selected.isEmpty()) {
             Toast.makeText(this, R.string.tools_image_failed, Toast.LENGTH_SHORT).show()
             return
         }
-        showLoading(true)
-        val out = ToolOutput.file(this, "images.pdf")
-        lifecycleScope.launch {
-            // The job runs behind the shared progress page.
-            ToolFlow.run(this@ImageToPdfActivity, getString(R.string.tools_image_running)) { _ ->
-                val outcome = engine.imagesToPdf(selected.map { it.file }, out)
-                outcome.getOrThrow()
-                val document = repository.addExisting(
-                    ToolOutput.uniqueName("images", ".pdf"),
-                    DocType.PDF,
-                    out,
-                )
-                ToolFlow.success(document.id, getString(R.string.tools_image_done))
-            }
-            showLoading(false)
-            // The job is done, the progress page takes over with the result.
-            finish()
-        }
-    }
-
-    /** The running state of the design "Image to PDF-loading". */
-    private fun showLoading(visible: Boolean) {
-        binding.loadingState.visibility = if (visible) View.VISIBLE else View.GONE
-        binding.btnImport.isEnabled = !visible && selected.isNotEmpty()
+        processing.launch(
+            ImageProcessActivity.intent(this, selected.map { it.file }),
+        )
     }
 
     // ------------------------------------------------------------------ state
@@ -330,7 +341,10 @@ class ImageToPdfActivity : BaseActivity() {
                 topMargin = -dp(4)
                 marginEnd = -dp(4)
             }
-            mark.setImageResource(R.mipmap.ic_ok)
+            // the design draws the mark as a dark circle with a cross in it
+            mark.background = ToolShapes.closeMark(this)
+            mark.setImageResource(R.mipmap.ic_close)
+            mark.setColorFilter(Color.WHITE)
             mark.contentDescription = getString(R.string.tools_image_strip)
             holder.addView(mark)
 
@@ -362,7 +376,6 @@ class ImageToPdfActivity : BaseActivity() {
 
     companion object {
         private const val MAX_IMAGES = 30
-        private const val THUMBNAIL_SIZE = 104
 
         /** Opens the "image to PDF" flow. */
         fun start(context: Context) {

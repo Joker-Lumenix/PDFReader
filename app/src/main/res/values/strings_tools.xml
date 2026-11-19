@@ -94,7 +94,7 @@
     <string name="tools_result_print">打印</string>
     <string name="tools_result_sign">签名</string>
     <string name="tools_result_draw">手绘</string>
-    <string name="tools_result_lock">加密</string>
+    <string name="tools_result_lock">锁定</string>
     <string name="tools_result_share">分享</string>
     <string name="tools_result_view">查看</string>
     <string name="tools_result_feedback">图片转 PDF 满足你的需求吗？</string>
@@ -109,4 +109,16 @@
     <string name="tools_image_albums">相册</string>
     <string name="tools_image_all_albums">所有照片</string>
     <string name="tools_image_album_other">其他相册</string>
+    <string name="tools_image_expand">放大查看</string>
+    <string name="tools_image_view">查看图片</string>
+    <string name="tools_image_rotate_left">左转</string>
+    <string name="tools_image_rotate_right">右转</string>
+    <string name="tools_image_previous">上一张</string>
+    <string name="tools_image_next">下一张</string>
+    <string name="tools_image_counter">%1$d/%2$d</string>
+    <string name="tools_merge_search">搜索</string>
+    <string name="tools_merge_search_hint">搜索</string>
+    <string name="tools_merge_drag">拖动排序</string>
+    <string name="tools_split_select_hint">选择需要的页面。</string>
+    <string name="tools_split_drag_hint">拖动图片可调整位置。</string>
 </resources>

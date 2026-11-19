@@ -40,7 +40,7 @@
     <string name="files_action_merge">Juntar</string>
 
     <!-- dialogs -->
-    <string name="files_delete_message">Excluir este ficheiro? Esta ação não pode ser anulada.</string>
+    <string name="files_delete_message">Tem a certeza de que quer excluir este ficheiro? Depois de excluído, não poderá ser recuperado.</string>
     <string name="files_save_message">Guardar as alterações a este ficheiro? Esta ação não pode ser anulada.</string>
 
     <!-- empty states -->

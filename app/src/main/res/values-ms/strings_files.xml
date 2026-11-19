@@ -40,7 +40,7 @@
     <string name="files_action_merge">Gabungkan</string>
 
     <!-- dialogs -->
-    <string name="files_delete_message">Padam fail ini? Tindakan ini tidak boleh dibatalkan.</string>
+    <string name="files_delete_message">Adakah anda pasti mahu memadam fail ini? Selepas dipadam, ia tidak boleh dipulihkan.</string>
     <string name="files_save_message">Simpan perubahan pada fail ini? Tindakan ini tidak boleh dibatalkan.</string>
 
     <!-- empty states -->

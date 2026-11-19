@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.RectF
 import com.peng.pdfreader.core.util.Logger
@@ -166,6 +167,47 @@ object PdfProcessor {
         return outputs
     }
 
+    /**
+     * Writes the given pages of [source] into a new document.
+     *
+     * The pages may be given in any order and a page may appear more than
+     * once, so the user is free to arrange the result the way the design
+     * shows it - the tiles of the second step of the split flow are dragged
+     * into the order of the new document.
+     *
+     * @param pages the 1 based page numbers of [source]
+     */
+    fun extractPages(
+        source: File,
+        out: File,
+        pages: List<Int>,
+        onProgress: (PdfProgress) -> Unit = {},
+        onResult: (Result<Long>) -> Unit,
+    ): PdfJob = submit(
+        onProgress = onProgress,
+        onResult = onResult,
+    ) { report ->
+        extractPagesBlocking(source, out, pages, report)
+    }
+
+    private fun extractPagesBlocking(
+        source: File,
+        out: File,
+        pages: List<Int>,
+        report: (PdfProgress) -> Unit,
+    ): Long {
+        if (!source.isFile) throw PdfError.UnreadableSource(source.absolutePath)
+        val total = PdfEngine.pageCount(source)
+        if (total <= 0) throw PdfError.UnreadableSource(source.absolutePath)
+        if (pages.isEmpty()) throw PdfError.Unsupported(PdfError.CODE_NO_PAGES)
+        val sources = ArrayList<PdfPictureWriter.Source>()
+        pages.forEach { page ->
+            val number = page.coerceIn(1, total)
+            sources += PdfPictureWriter.Source.ofPage(source, number - 1)
+        }
+        return writeDocument(out, sources, report, PdfStage.SPLIT)
+    }
+
     // ------------------------------------------------------------------ compress
 
     /**
@@ -194,6 +236,7 @@ object PdfProcessor {
      * @param layout grid used when several images share one page
      * @param marginMm page margin in millimetres
      * @param landscape writes landscape pages
+     * @param rotations the rotation of every image in degrees (0, 90, 180, 270)
      */
     fun imagesToPdf(
         images: List<File>,
@@ -201,13 +244,14 @@ object PdfProcessor {
         layout: ImageLayout = ImageLayout.Single,
         marginMm: Int = 10,
         landscape: Boolean = false,
+        rotations: List<Int> = emptyList(),
         onProgress: (PdfProgress) -> Unit = {},
         onResult: (Result<Long>) -> Unit,
     ): PdfJob = submit(
         onProgress = onProgress,
         onResult = onResult,
     ) { report ->
-        imagesToPdfBlocking(images, out, layout, marginMm, landscape, report)
+        imagesToPdfBlocking(images, out, layout, marginMm, landscape, rotations, report)
     }
 
     private fun imagesToPdfBlocking(
@@ -216,6 +260,7 @@ object PdfProcessor {
         layout: ImageLayout,
         marginMm: Int,
         landscape: Boolean,
+        rotations: List<Int>,
         report: (PdfProgress) -> Unit,
     ): Long {
         if (images.isEmpty()) throw PdfError.Unsupported(PdfError.CODE_NO_IMAGES)
@@ -237,26 +282,46 @@ object PdfProcessor {
             val scale = PAGE_PIXEL_WIDTH.toFloat() / pageWidth.toFloat()
             chunk.forEachIndexed { slot, item ->
                 val bitmap = decodeImage(item) ?: return@forEachIndexed
+                // The rotation belongs to the picture, the page keeps its own
+                // direction.
+                val rotation = rotations.getOrNull(pageIndex * layout.perPage + slot) ?: 0
+                val turned = turn(bitmap, rotation)
                 val column = slot % layout.columns
                 val row = slot / layout.columns
                 val left = margin + column * cellWidth
                 val top = margin + row * cellHeight
-                val fit = min(cellWidth / bitmap.width, cellHeight / bitmap.height)
-                val drawWidth = bitmap.width * fit
-                val drawHeight = bitmap.height * fit
+                val fit = min(cellWidth / turned.width, cellHeight / turned.height)
+                val drawWidth = turned.width * fit
+                val drawHeight = turned.height * fit
                 val dest = RectF(
                     (left + (cellWidth - drawWidth) / 2) * scale,
                     (top + (cellHeight - drawHeight) / 2) * scale,
                     (left + (cellWidth + drawWidth) / 2) * scale,
                     (top + (cellHeight + drawHeight) / 2) * scale,
                 )
-                canvas.drawBitmap(bitmap, null, dest, Paint(Paint.FILTER_BITMAP_FLAG))
+                canvas.drawBitmap(turned, null, dest, Paint(Paint.FILTER_BITMAP_FLAG))
+                if (turned !== bitmap) turned.recycle()
                 bitmap.recycle()
             }
             pages += PdfPictureWriter.Source.ofPicture(picture, pageWidth, pageHeight)
             report(PdfProgress(PdfStage.IMAGES, pageIndex + 1, images.size))
         }
         return writeDocument(out, pages, report, PdfStage.IMAGES)
+    }
+
+    /**
+     * Turns a picture by a multiple of 90 degrees.
+     *
+     * The picture is only turned in the memory, the file of the picture stays
+     * as it is, so the original keeps its full resolution.
+     */
+    private fun turn(bitmap: Bitmap, degrees: Int): Bitmap {
+        val angle = ((degrees % 360) + 360) % 360
+        if (angle == 0) return bitmap
+        val matrix = Matrix().apply { postRotate(angle.toFloat()) }
+        return runCatching {
+            Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+        }.getOrElse { bitmap }
     }
 
     /** The height of the picture of a page, in pixels. */

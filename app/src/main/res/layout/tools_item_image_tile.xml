@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   An image tile of the "image to PDF" screen (design "Image to PDF").
-  104x104, radius 4, with the index badge in the top left corner.
+
+  The three tiles of a row share the width of the screen, the tile is square
+  in the design (104x104 on a 360 wide screen), so the height follows the
+  width. The index badge sits in the top left corner.
 -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="104dp"
-    android:layout_height="104dp"
+<com.peng.pdfreader.core.widget.RatioFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:clickable="true"
-    android:focusable="true">
+    android:focusable="true"
+    app:ratio="1">
 
     <ImageView
         android:id="@+id/ivImage"
@@ -27,6 +32,20 @@
         android:contentDescription="@string/tools_image_add"
         android:visibility="gone" />
 
+    <!-- the badge of the design opens the picture in the processing page -->
+    <ImageView
+        android:id="@+id/ivExpand"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="4dp"
+        android:layout_marginBottom="4dp"
+        android:clickable="true"
+        android:contentDescription="@string/tools_image_expand"
+        android:focusable="true"
+        android:src="@mipmap/ic_scale_large"
+        android:visibility="gone" />
+
     <TextView
         android:id="@+id/tvIndex"
         android:layout_width="18dp"
@@ -42,4 +61,4 @@
         android:maxLines="1"
         android:textColor="@color/white" />
 
-</FrameLayout>
+</com.peng.pdfreader.core.widget.RatioFrameLayout>

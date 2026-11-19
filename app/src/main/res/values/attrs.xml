@@ -56,4 +56,13 @@
         <attr name="filterIndicatorColor" format="color" />
     </declare-styleable>
 
+    <!--
+      The tiles of the image and page grids. The width of a tile follows the
+      width of the screen, the ratio keeps the height of the design.
+    -->
+    <declare-styleable name="RatioFrameLayout">
+        <!-- 高度与宽度的比例，例如 124 / 104 -->
+        <attr name="ratio" format="float" />
+    </declare-styleable>
+
 </resources>

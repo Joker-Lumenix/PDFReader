@@ -6,18 +6,17 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 /**
- * Places the cells of a grid on a fixed pitch.
+ * Places the cells of a grid so that they fill the whole width of the screen.
  *
- * The grids of the design are not centred inside their container: the split
- * pages and the image tiles sit at x = 12 / 128 / 244, so the gap between two
- * cells is 12 and the outer gap is 12 as well. A plain "centre the slack"
- * decoration would put the third column at 252 instead of 244.
+ * The grids of the design put three tiles side by side, the gap between two
+ * tiles is 12 and the outer gap is 12 as well. The tiles share the width of
+ * the screen, so their width changes with the screen - a fixed cell width
+ * would leave a gap on the right of a wide screen.
+ *
+ * @param gapPx the gap between two tiles and the gap at the border
  */
-class PitchGridDecoration(
-    private val cellWidthPx: Int,
-    private val pitchPx: Int,
-    private val startMarginPx: Int,
-    private val rowSpacingPx: Int,
+class UniformGridDecoration(
+    private val gapPx: Int,
 ) : RecyclerView.ItemDecoration() {
 
     override fun getItemOffsets(
@@ -27,13 +26,18 @@ class PitchGridDecoration(
         state: RecyclerView.State,
     ) {
         val spanCount = (parent.layoutManager as? GridLayoutManager)?.spanCount ?: 1
-        val slot = if (parent.width > 0) parent.width / spanCount else cellWidthPx
+        val width = parent.width
+        if (width <= 0) return
         val position = parent.getChildAdapterPosition(view)
         if (position == RecyclerView.NO_POSITION) return
+
+        val slot = width / spanCount
+        val cell = (width - gapPx * (spanCount + 1)) / spanCount
         val column = position % spanCount
-        outRect.left = startMarginPx + column * (pitchPx - slot)
-        outRect.right = slot - cellWidthPx - outRect.left
-        outRect.bottom = rowSpacingPx
+        // The tile of a column starts at gap + column * (cell + gap).
+        outRect.left = gapPx + column * (cell + gapPx) - column * slot
+        outRect.right = slot - cell - outRect.left
+        outRect.bottom = gapPx
     }
 }
 

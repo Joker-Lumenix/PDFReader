@@ -73,4 +73,16 @@
     <string name="tools_image_albums">Альбомы</string>
     <string name="tools_image_all_albums">Все фото</string>
     <string name="tools_image_album_other">Другие альбомы</string>
+    <string name="tools_image_expand">Открыть крупно</string>
+    <string name="tools_image_view">Просмотр изображения</string>
+    <string name="tools_image_rotate_left">Слева</string>
+    <string name="tools_image_rotate_right">Справа</string>
+    <string name="tools_image_previous">Назад</string>
+    <string name="tools_image_next">Вперёд</string>
+    <string name="tools_image_counter">%1$d/%2$d</string>
+    <string name="tools_merge_search">Поиск</string>
+    <string name="tools_merge_search_hint">Поиск</string>
+    <string name="tools_merge_drag">Перетащите, чтобы изменить порядок</string>
+    <string name="tools_split_select_hint">Выберите нужную страницу.</string>
+    <string name="tools_split_drag_hint">Перетащите изображение, чтобы изменить его положение.</string>
 </resources>

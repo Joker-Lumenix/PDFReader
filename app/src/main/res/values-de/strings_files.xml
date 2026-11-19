@@ -40,7 +40,7 @@
     <string name="files_action_merge">Zusammenführen</string>
 
     <!-- dialogs -->
-    <string name="files_delete_message">Diese Datei löschen? Das lässt sich nicht rückgängig machen.</string>
+    <string name="files_delete_message">Möchten Sie diese Datei wirklich löschen? Einmal gelöscht kann sie nicht wiederhergestellt werden.</string>
     <string name="files_save_message">Änderungen an dieser Datei speichern? Das lässt sich nicht rückgängig machen.</string>
 
     <!-- empty states -->

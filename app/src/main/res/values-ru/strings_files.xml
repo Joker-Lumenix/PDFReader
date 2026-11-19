@@ -40,7 +40,7 @@
     <string name="files_action_merge">Объединить</string>
 
     <!-- dialogs -->
-    <string name="files_delete_message">Удалить этот файл? Отменить будет нельзя.</string>
+    <string name="files_delete_message">Вы уверены, что хотите удалить этот файл? После удаления его нельзя будет восстановить.</string>
     <string name="files_save_message">Сохранить изменения в этом файле? Отменить будет нельзя.</string>
 
     <!-- empty states -->

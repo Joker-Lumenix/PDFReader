@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
@@ -31,7 +32,6 @@ class FileListItemView @JvmOverloads constructor(
     private val typeChip: TextView
     private val meta: TextView
     private val more: ImageView
-    private val lockCorner: FrameLayout
 
     /** Raised when the row itself is tapped. */
     var onClick: (() -> Unit)? = null
@@ -41,6 +41,15 @@ class FileListItemView @JvmOverloads constructor(
     var onCheckedChange: ((Boolean) -> Unit)? = null
     /** Raised when the inline action button is tapped. */
     var onInlineActionClick: (() -> Unit)? = null
+
+    /** The room at the end of the row that the last affordance needs. */
+    private var endInset: Int = 0
+
+    /** The padding of the row without the room of the affordance. */
+    private var baseEndPadding: Int = 0
+
+    /** The card of the row, the background of the design belongs to it. */
+    private val card: View get() = getChildAt(0)
 
     init {
         LayoutInflater.from(context).inflate(R.layout.item_file_list, this, true)
@@ -53,7 +62,6 @@ class FileListItemView @JvmOverloads constructor(
         typeChip = findViewById(R.id.tvType)
         meta = findViewById(R.id.tvMeta)
         more = findViewById(R.id.ivMore)
-        lockCorner = findViewById(R.id.ivLockCorner)
 
         setOnClickListener { onClick?.invoke() }
         more.setOnClickListener { onMoreClick?.invoke() }
@@ -63,6 +71,8 @@ class FileListItemView @JvmOverloads constructor(
             onCheckedChange?.invoke(next)
         }
         inlineAction.setOnClickListener { onInlineActionClick?.invoke() }
+
+        baseEndPadding = innerRow().paddingEnd
     }
 
     /** Current selection state of the checkbox. */
@@ -88,6 +98,10 @@ class FileListItemView @JvmOverloads constructor(
         thumbnail.visibility = if (state.showThumbnail) VISIBLE else INVISIBLE
         state.thumbnail?.let { thumbnail.setImageDrawable(it) }
 
+        // The card of the design is a white surface, some rows carry another
+        // one.
+        state.cardBackground?.let { card.background = it }
+
         checkbox.visibility = if (state.showCheckbox) VISIBLE else GONE
         // The design puts the selection mark on the right of the row in the
         // multi select mode, it sits on the left otherwise. The checkbox lives
@@ -101,14 +115,33 @@ class FileListItemView @JvmOverloads constructor(
 
         more.visibility = if (state.showMore) VISIBLE else GONE
 
-        // The corner badge marks a file that carries the vault container.
-        lockCorner.visibility = if (state.encrypted) VISIBLE else GONE
+        // A row that carries an affordance of its own (the handle of the merge
+        // design) needs the room at its end, so the text stops in front of it.
+        applyEndInset(state.endInsetDp)
 
         badge.visibility = if (state.badge.isNullOrEmpty()) GONE else VISIBLE
         state.badge?.let { badge.text = it }
 
         inlineAction.visibility = if (state.inlineActionText.isNullOrEmpty()) GONE else VISIBLE
         state.inlineActionText?.let { inlineAction.text = it }
+    }
+
+    /**
+     * Shows another picture in the row.
+     *
+     * The rows of the merge flow show the first page of the document, the
+     * picture is rendered in the background and arrives later.
+     */
+    fun setThumbnail(drawable: Drawable?) {
+        drawable?.let { thumbnail.setImageDrawable(it) }
+    }
+
+    /** Keeps the room at the end of the row that the affordance needs. */
+    private fun applyEndInset(insetDp: Int) {        val row = innerRow()
+        val inset = (insetDp * resources.displayMetrics.density).toInt()
+        if (inset == endInset) return
+        endInset = inset
+        row.setPadding(row.paddingLeft, row.paddingTop, baseEndPadding + inset, row.paddingBottom)
     }
 
     /** Moves the selection mark to the end of the row, in front of the "more" button. */
@@ -149,8 +182,12 @@ class FileListItemView @JvmOverloads constructor(
  * @param checkboxAtEnd whether the selection mark sits on the right of the row
  * @param squareCheckbox whether the selection mark is a square, the files tab
  *   marks the selection with a circle
- * @param encrypted the file carries the vault container, the row shows the
- *   corner badge of the design
+ * @param encrypted the file carries the vault container, the thumbnail shows
+ *   the blurred page of the design with the lock badge
+ * @param cardBackground the background of the card of the row, null keeps the
+ *   one of the template
+ * @param endInsetDp the room at the end of the row that an affordance of the
+ *   row needs, the handle of the merge design for example
  */
 data class FileItemUiState(
     val name: String,
@@ -168,6 +205,8 @@ data class FileItemUiState(
     val checkboxAtEnd: Boolean = false,
     val squareCheckbox: Boolean = false,
     val encrypted: Boolean = false,
+    val cardBackground: Drawable? = null,
+    val endInsetDp: Int = 0,
 )
 
 /** Height of a document row, measured from the design. */

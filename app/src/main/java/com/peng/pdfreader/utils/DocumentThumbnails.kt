@@ -7,13 +7,15 @@ import com.peng.pdfreader.core.util.Thumbnails
 import com.peng.pdfreader.data.DocType
 import com.peng.pdfreader.data.Document
 import com.peng.pdfreader.data.DocumentRepository
+import com.peng.pdfreader.ui.widget.LockThumbnailDrawable
 
 /**
  * The thumbnails of the document lists.
  *
  * A raster document shows its own picture, every other type shows the logo of
- * the type with the number of the pages on top of it. The result is cached, so
- * the list is not rebuilt on every scroll.
+ * the type with the number of the pages on top of it. An encrypted document
+ * shows its blurred page with the red lock badge of the design. The result is
+ * cached, so the list is not rebuilt on every scroll.
  */
 class DocumentThumbnails(
     private val repository: DocumentRepository,
@@ -32,6 +34,21 @@ class DocumentThumbnails(
                 cache[key] = picture
                 return picture
             }
+        }
+        // An encrypted document shows its blurred page with the lock badge.
+        if (document.isEncrypted) {
+            val key = "locked_${document.id}"
+            val cached = cache[key]
+            if (cached != null) return cached
+            val logo = ContextCompat.getDrawable(context, document.type.logoRes)
+            val drawable = LockThumbnailDrawable(
+                context = context,
+                base = logo,
+                pageCount = document.pageCount,
+                locked = true,
+            )
+            cache[key] = drawable
+            return drawable
         }
         val key = "${document.type.name}_${document.pageCount}"
         val cached = cache[key]

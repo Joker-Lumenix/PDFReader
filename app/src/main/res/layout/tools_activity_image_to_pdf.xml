@@ -206,39 +206,4 @@
 
     </LinearLayout>
 
-    <!-- the running job of the design "Image to PDF-loading", it dims the whole
-         screen and carries the running card in its centre -->
-    <FrameLayout
-        android:id="@+id/loadingState"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/scrim_75"
-        android:visibility="gone">
-
-        <LinearLayout
-            android:id="@+id/loadingCard"
-            android:layout_width="152dp"
-            android:layout_height="122dp"
-            android:layout_gravity="top|center_horizontal"
-            android:layout_marginTop="268dp"
-            android:gravity="center_horizontal"
-            android:orientation="vertical"
-            android:paddingTop="24dp">
-
-            <ProgressBar
-                android:layout_width="36dp"
-                android:layout_height="36dp" />
-
-            <TextView
-                android:id="@+id/tvLoading"
-                style="@style/TextAppearance.AppCore.ItemTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="@string/tools_working" />
-
-        </LinearLayout>
-
-    </FrameLayout>
-
 </FrameLayout>

@@ -19,6 +19,7 @@ import com.peng.pdfreader.feature.tools.print.ToolPrintRunner
 import com.peng.pdfreader.feature.tools.progress.ToolJobResult
 import com.peng.pdfreader.feature.tools.view.ToolsResultActions
 import com.peng.pdfreader.feature.tools.view.ToolsResultBinder
+import com.peng.pdfreader.ui.widget.LockThumbnailDrawable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -39,6 +40,10 @@ class ResultActivity : BaseActivity() {
 
     private val repository by lazy { DocumentRepository.get(this) }
 
+    /** True when the page shows the document only - the lock flow of the design. */
+    private val simple: Boolean
+        get() = intent.getBooleanExtra(EXTRA_SIMPLE, false)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityToolsResultBinding.inflate(layoutInflater)
@@ -55,9 +60,20 @@ class ResultActivity : BaseActivity() {
         }
 
         bindMode()
-        ToolsResultBinder.bindDocument(this, binding.resultBody, document)
-        ToolsResultBinder.bindActions(this, binding.resultBody, actions(document))
+        ToolsResultBinder.bindDocument(this, binding, document)
+        ToolsResultBinder.bindActions(this, binding, actions(document))
         loadPreview(document)
+        if (simple) hideFollowUps()
+    }
+
+    /**
+     * The page of the lock flow shows the document and nothing else.
+     *
+     * The design of the lock has no more card and no feedback card.
+     */
+    private fun hideFollowUps() {
+        binding.moreCard.visibility = View.GONE
+        binding.feedbackCard.visibility = View.GONE
     }
 
     /** Shows the hero of the design - the success title or the sizes. */
@@ -65,14 +81,14 @@ class ResultActivity : BaseActivity() {
         when (intent.getStringExtra(EXTRA_MODE)) {
             MODE_SIZES -> ToolsResultBinder.bindSizes(
                 this,
-                binding.resultBody,
+                binding,
                 intent.getLongExtra(EXTRA_SIZE_BEFORE, 0L),
                 intent.getLongExtra(EXTRA_SIZE_AFTER, 0L),
             )
 
             else -> ToolsResultBinder.bindSuccess(
                 this,
-                binding.resultBody,
+                binding,
                 intent.getStringExtra(EXTRA_TITLE).orEmpty(),
             )
         }
@@ -96,16 +112,29 @@ class ResultActivity : BaseActivity() {
         onShare = { shareDocument(document) },
         onView = { PreviewActivity.start(this, document.id) },
         onRename = { rename(document) },
-        onFeedback = { binding.resultBody.feedbackCard.visibility = View.GONE },
+        onFeedback = { binding.feedbackCard.visibility = View.GONE },
     )
 
     /** The preview of the produced document. */
     private fun loadPreview(document: Document) {
+        // The page of an encrypted document cannot be rendered, the design
+        // shows it blurred with the lock badge.
+        if (document.isEncrypted) {
+            binding.ivPreview.setImageDrawable(
+                LockThumbnailDrawable(
+                    context = this,
+                    base = null,
+                    pageCount = document.pageCount,
+                    locked = true,
+                ),
+            )
+            return
+        }
         lifecycleScope.launch {
             val thumbnail = withContext(Dispatchers.IO) {
                 PdfEngine.renderThumbnail(repository.fileOf(document), 0, 240)
             }
-            binding.resultBody.ivPreview.setImageBitmap(thumbnail)
+            binding.ivPreview.setImageBitmap(thumbnail)
         }
     }
 
@@ -116,7 +145,7 @@ class ResultActivity : BaseActivity() {
             initial = document.name,
         ) { newName ->
             repository.rename(document, newName)
-            ToolsResultBinder.bindDocument(this, binding.resultBody, document)
+            ToolsResultBinder.bindDocument(this, binding, document)
         }
     }
 
@@ -166,6 +195,9 @@ class ResultActivity : BaseActivity() {
         /** The size of the document after the tool ran. */
         const val EXTRA_SIZE_AFTER = "com.peng.pdfreader.extra.SIZE_AFTER"
 
+        /** The page shows the document only, without the follow up cards. */
+        const val EXTRA_SIMPLE = "com.peng.pdfreader.extra.SIMPLE"
+
         /** The hero shows the success title. */
         const val MODE_SUCCESS = "success"
 
@@ -179,6 +211,22 @@ class ResultActivity : BaseActivity() {
                     .putExtra(EXTRA_DOC_ID, documentId)
                     .putExtra(EXTRA_MODE, MODE_SUCCESS)
                     .putExtra(EXTRA_TITLE, title),
+            )
+        }
+
+        /**
+         * Opens the page for a document that a tool has changed.
+         *
+         * The page shows the document only - the lock flow of the design has no
+         * more card and no feedback card.
+         */
+        fun startSimple(context: Context, documentId: String, title: String) {
+            context.startActivity(
+                Intent(context, ResultActivity::class.java)
+                    .putExtra(EXTRA_DOC_ID, documentId)
+                    .putExtra(EXTRA_MODE, MODE_SUCCESS)
+                    .putExtra(EXTRA_TITLE, title)
+                    .putExtra(EXTRA_SIMPLE, true),
             )
         }
 

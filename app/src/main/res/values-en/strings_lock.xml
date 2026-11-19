@@ -36,8 +36,8 @@
 
     <!-- result -->
     <string name="lock_result_path">Path: %1$s</string>
-    <string name="lock_result_locked">PDF encrypted</string>
-    <string name="lock_result_unlocked">PDF decrypted</string>
+    <string name="lock_result_locked">PDF locked</string>
+    <string name="lock_result_unlocked">PDF Unlocked</string>
     <string name="lock_open_failed">No app found that can open this file</string>
 
 </resources>

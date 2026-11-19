@@ -40,7 +40,7 @@
     <string name="files_action_merge">Fusionar</string>
 
     <!-- dialogs -->
-    <string name="files_delete_message">¿Eliminar este archivo? No se puede deshacer.</string>
+    <string name="files_delete_message">¿Seguro que quieres eliminar este archivo? Una vez eliminado, no se podrá recuperar.</string>
     <string name="files_save_message">¿Guardar los cambios en este archivo? No se puede deshacer.</string>
 
     <!-- empty states -->

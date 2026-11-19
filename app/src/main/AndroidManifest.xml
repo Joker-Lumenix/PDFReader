@@ -138,6 +138,14 @@
             android:exported="false" />
 
         <activity
+            android:name=".ui.activities.ImageProcessActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ui.activities.ImageViewerActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".ui.activities.ImageAlbumActivity"
             android:exported="false" />
 

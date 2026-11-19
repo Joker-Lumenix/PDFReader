@@ -9,7 +9,10 @@ import com.peng.pdfreader.core.widget.FileItemUiState
 import com.peng.pdfreader.core.widget.FileListItemView
 import com.peng.pdfreader.core.widget.createForList
 import com.peng.pdfreader.data.Document
+import com.peng.pdfreader.feature.tools.util.ToolShapes
+import com.peng.pdfreader.utils.ToolRowThumbnails
 import com.peng.pdfreader.utils.PageCountDrawable
+import com.peng.pdfreader.ui.widget.LockThumbnailDrawable
 import com.peng.pdfreader.feature.tools.util.ToolFormatters
 
 /**
@@ -21,8 +24,12 @@ import com.peng.pdfreader.feature.tools.util.ToolFormatters
  * @param multiSelect the rows carry a selection mark
  * @param selectionAtEnd the selection mark sits on the right of the row, the
  *   design of the merge flow puts it there
- * @param showMore the rows carry the "more" affordance, it replaces the
- *   selection mark on the rows that are not selected
+ * @param showMore the rows carry the "more" affordance, it is only used when
+ *   the row has no selection mark
+ * @param designCard the rows carry the white card of the merge design instead
+ *   of the card of the template
+ * @param thumbnails the pictures of the rows, the design of the merge shows
+ *   the first page of the document
  */
 class DocumentPickAdapter(
     private val multiSelect: Boolean,
@@ -30,6 +37,8 @@ class DocumentPickAdapter(
     private val onCheckedChange: ((Document, Boolean) -> Unit)? = null,
     private val selectionAtEnd: Boolean = false,
     private val showMore: Boolean = false,
+    private val designCard: Boolean = false,
+    private val thumbnails: ToolRowThumbnails? = null,
 ) : RecyclerView.Adapter<DocumentPickAdapter.Holder>() {
 
     private val documents = mutableListOf<Document>()
@@ -45,6 +54,13 @@ class DocumentPickAdapter(
     /** Marks a document as selected. */
     fun setChecked(id: String, value: Boolean) {
         if (value) checked.add(id) else checked.remove(id)
+        notifyDataSetChanged()
+    }
+
+    /** Marks a list of documents as selected. */
+    fun setCheckedIds(ids: Set<String>) {
+        checked.clear()
+        checked.addAll(ids)
         notifyDataSetChanged()
     }
 
@@ -78,20 +94,31 @@ class DocumentPickAdapter(
             item.bind(
                 FileItemUiState(
                     name = doc.name,
-                    meta = ToolFormatters.meta(context, doc),
+                    // the design shows the date and the size, the number of
+                    // the pages sits on the thumbnail
+                    meta = ToolFormatters.metaShort(doc),
                     typeLabel = context.getString(doc.type.labelRes),
                     typeColor = context.getColor(R.color.brand_primary_light),
                     thumbnail = thumbnailOf(doc),
                     showType = true,
-                    // the design shows the "more" affordance on the rows that
-                    // are not selected, the selection mark takes its place
-                    showMore = showMore && !isChecked,
-                    showCheckbox = multiSelect && isChecked,
+                    // The design of the selection step carries the selection
+                    // mark on the right of every row - the "more" affordance
+                    // has no place next to it.
+                    showMore = showMore && !multiSelect,
+                    showCheckbox = multiSelect,
                     checkboxAtEnd = selectionAtEnd,
                     checked = isChecked,
+                    // the card of the design is a white surface
+                    cardBackground = if (designCard) {
+                        ToolShapes.roundRect(context, SURFACE_CARD, 12f)
+                    } else {
+                        null
+                    },
                     encrypted = doc.isEncrypted,
                 ),
             )
+            // the picture of the first page arrives in the background
+            thumbnails?.load(doc, item)
             item.onClick = { document?.let(onClick) }
             item.onCheckedChange = { value ->
                 document?.let { current ->
@@ -102,10 +129,25 @@ class DocumentPickAdapter(
         }
 
         private fun thumbnailOf(doc: Document): Drawable? {
-            val logo = ContextCompat.getDrawable(item.context, doc.type.logoRes) ?: return null
+            val context = item.context
+            val logo = ContextCompat.getDrawable(context, doc.type.logoRes) ?: return null
+            if (doc.isEncrypted) {
+                // An encrypted document shows its blurred page with the lock badge.
+                return LockThumbnailDrawable(
+                    context = context,
+                    base = logo,
+                    pageCount = doc.pageCount,
+                    locked = true,
+                )
+            }
             // the rows of the design carry the page count chip on the thumbnail
             if (doc.pageCount <= 0) return logo
-            return PageCountDrawable(logo, doc.pageCount, item.context)
+            return PageCountDrawable(logo, doc.pageCount, context)
         }
+    }
+
+    private companion object {
+        /** The colour of the card of the design. */
+        const val SURFACE_CARD = 0xFFFFFFFF.toInt()
     }
 }

@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  File picker of the lock / unlock flow.
+  File picker of the lock / unlock flow (design "lock PDF").
+
+  The page shows the PDF files of the sandbox. The button in the top right
+  corner searches in the list, the field of the search takes the place of the
+  title. The rows carry no action of their own - the whole row picks the file.
 
   Layout per design: app bar 87dp (#fafafa), the file cards are 336x72 with a
   12dp gutter (x=12), the first card starts 12dp below the app bar.
@@ -11,7 +15,7 @@
     android:background="@color/surface_muted"
     android:orientation="vertical">
 
-    <!-- 顶部标题栏：返回按钮 + 标题 + 右侧的分享 -->
+    <!-- 顶部标题栏：返回按钮 + 标题 + 右侧的搜索 -->
     <LinearLayout android:id="@+id/topBar"
         android:layout_width="match_parent"
         android:layout_height="63dp"
@@ -38,12 +42,49 @@
             android:ellipsize="end"
             android:maxLines="1" />
 
+        <!-- 搜索状态：搜索框占住标题的位置，取消按钮在它的右边 -->
+        <EditText
+            android:id="@+id/etSearch"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="12dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_white_r36"
+            android:backgroundTint="@null"
+            android:hint="@string/tools_merge_search_hint"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:maxLines="1"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:textColor="@color/text_secondary"
+            android:textColorHint="@color/text_placeholder"
+            android:textSize="16sp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tvSearchCancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:text="@string/cancel"
+            android:textColor="@color/text_secondary"
+            android:textSize="16sp"
+            android:visibility="gone" />
+
+        <!-- the search button of the design -->
         <ImageView
-            android:id="@+id/ivShare"
+            android:id="@+id/ivSearch"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:contentDescription="@string/share"
-            android:src="@mipmap/ic_share_app" />
+            android:layout_marginStart="12dp"
+            android:clickable="true"
+            android:contentDescription="@string/tools_merge_search"
+            android:focusable="true"
+            android:src="@mipmap/ic_search_black" />
+
     </LinearLayout>
 
     <!-- 标题栏下方的细线 -->
@@ -74,13 +115,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="top|center_horizontal"
             android:layout_marginTop="138dp"
-            android:visibility="gone" />
-
-        <include
-            android:id="@+id/resultPanel"
-            layout="@layout/lock_result_panel"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
             android:visibility="gone" />
 
     </FrameLayout>

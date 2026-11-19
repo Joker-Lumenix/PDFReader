@@ -1,18 +1,18 @@
 package com.peng.pdfreader.base
 
+import android.content.Context
 import android.content.Intent
-import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.PopupMenu
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.peng.pdfreader.R
@@ -22,13 +22,12 @@ import com.peng.pdfreader.data.DocumentRepository
 import com.peng.pdfreader.databinding.LockActivityFilePickerBinding
 import com.peng.pdfreader.feature.lock.VaultCipher
 import com.peng.pdfreader.ui.adapter.listAdapter.LockFileAdapter
+import com.peng.pdfreader.ui.activities.ResultActivity
 import com.peng.pdfreader.ui.dialogs.BottomSheetPassword
-import com.peng.pdfreader.ui.widget.LockThumbnailDrawable
-import com.peng.pdfreader.ui.activities.PreviewActivity
+import com.peng.pdfreader.utils.ToolRowThumbnails
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
 
 /**
  * Shared behaviour of the lock and the unlock page.
@@ -36,6 +35,9 @@ import java.io.File
  * The page shows the PDF files of the sandbox, asks for a password and reports
  * the result. The two pages only differ in the mode and in which documents
  * they accept, everything else is identical.
+ *
+ * The button in the top right corner searches in the list, the field of the
+ * search takes the place of the title. The rows carry no action of their own.
  */
 abstract class BaseLockActivity : BaseActivity() {
 
@@ -45,6 +47,9 @@ abstract class BaseLockActivity : BaseActivity() {
     private val repository by lazy { DocumentRepository.get(this) }
     private var pending: Document? = null
 
+    /** The documents the page shows, the search filters them. */
+    private var documents: List<Document> = emptyList()
+
     /** Lock or unlock - decides the sheet copy and the operation. */
     protected abstract val mode: BottomSheetPassword.Mode
 
@@ -53,6 +58,11 @@ abstract class BaseLockActivity : BaseActivity() {
 
     /** Documents the page offers for the operation. */
     protected abstract fun accepts(document: Document): Boolean
+
+    /** The pictures of the rows, the first page of every document. */
+    private val rowThumbnails by lazy {
+        ToolRowThumbnails(this, repository, lifecycleScope)
+    }
 
     private val importLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) importDocument(uri)
@@ -69,18 +79,33 @@ abstract class BaseLockActivity : BaseActivity() {
         binding.ivBack.setOnClickListener {
             if (!handleBackPressed()) finish()
         }
-        binding.ivShare.setOnClickListener { sharePendingDocument() }
+        binding.ivSearch.setOnClickListener { openSearch() }
+        binding.tvSearchCancel.setOnClickListener { closeSearch() }
 
         adapter = LockFileAdapter(
             onFileClick = ::onDocumentPicked,
-            onMoreClick = ::onMoreClicked,
+            thumbnails = rowThumbnails,
         )
         binding.recycler.layoutManager = LinearLayoutManager(this)
         binding.recycler.adapter = adapter
 
+        binding.etSearch.doAfterTextChanged { text ->
+            val query = text?.toString().orEmpty()
+            val hits = if (query.isBlank()) {
+                documents
+            } else {
+                documents.filter { it.name.contains(query, ignoreCase = true) }
+            }
+            adapter.submit(hits)
+        }
+
         binding.emptyState.illustrationDrawable = ContextCompat.getDrawable(this, R.mipmap.bg_empty)
         binding.emptyState.title = getString(R.string.no_items)
         binding.emptyState.hint = null
+        // The design carries no action on the rows, the import lives in the
+        // empty state.
+        binding.emptyState.actionText = getString(R.string.lock_import)
+        binding.emptyState.onActionClick = { importLauncher.launch(arrayOf(PDF_MIME)) }
         tuneEmptyState()
 
         supportFragmentManager.setFragmentResultListener(
@@ -104,52 +129,53 @@ abstract class BaseLockActivity : BaseActivity() {
         supportFragmentManager.findFragmentByTag(BottomSheetPassword.TAG) as? BottomSheetPassword
 
     override fun handleBackPressed(): Boolean {
-        if (binding.resultPanel.root.visibility == View.VISIBLE) {
-            binding.resultPanel.root.visibility = View.GONE
-            binding.recycler.visibility = View.VISIBLE
-            binding.tvTitle.text = getString(titleRes)
-            binding.ivShare.visibility = View.VISIBLE
-            reload()
+        // The back key leaves the search before it leaves the page.
+        if (binding.etSearch.visibility == View.VISIBLE) {
+            closeSearch()
             return true
         }
         return false
     }
 
+    // ------------------------------------------------------------------ search
+
+    /** The search state of the design. */
+    private fun openSearch() {
+        binding.tvTitle.visibility = View.GONE
+        binding.ivSearch.visibility = View.GONE
+        binding.etSearch.visibility = View.VISIBLE
+        binding.tvSearchCancel.visibility = View.VISIBLE
+        binding.etSearch.requestFocus()
+    }
+
+    /** Leaves the search, the list of every document is shown again. */
+    private fun closeSearch() {
+        binding.etSearch.setText("")
+        binding.etSearch.clearFocus()
+        // the keyboard of the search field goes away with the field
+        val keyboard = getSystemService(Context.INPUT_METHOD_SERVICE)
+            as? android.view.inputmethod.InputMethodManager
+        keyboard?.hideSoftInputFromWindow(binding.etSearch.windowToken, 0)
+        binding.etSearch.visibility = View.GONE
+        binding.tvSearchCancel.visibility = View.GONE
+        binding.tvTitle.visibility = View.VISIBLE
+        binding.ivSearch.visibility = View.VISIBLE
+    }
+
     // ------------------------------------------------------------------ list
 
     private fun reload() {
-        val documents = repository.all()
+        documents = repository.all()
             .filter { it.type == DocType.PDF }
             .filter { accepts(it) }
         adapter.submit(documents)
         binding.recycler.visibility = if (documents.isEmpty()) View.GONE else View.VISIBLE
         binding.emptyState.visibility = if (documents.isEmpty()) View.VISIBLE else View.GONE
-        binding.ivShare.visibility = if (documents.isEmpty()) View.GONE else View.VISIBLE
     }
 
     private fun onDocumentPicked(document: Document) {
         pending = document
         BottomSheetPassword.newInstance(mode).show(supportFragmentManager, BottomSheetPassword.TAG)
-    }
-
-    private fun onMoreClicked(document: Document, anchor: View) {
-        val popup = PopupMenu(this, anchor)
-        popup.menu.add(0, MENU_SHARE, 0, R.string.share)
-        popup.menu.add(0, MENU_IMPORT, 1, R.string.lock_import)
-        popup.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                MENU_SHARE -> {
-                    shareDocument(document)
-                    true
-                }
-                MENU_IMPORT -> {
-                    importLauncher.launch(arrayOf(PDF_MIME))
-                    true
-                }
-                else -> false
-            }
-        }
-        popup.show()
     }
 
     // ------------------------------------------------------------------ operation
@@ -191,79 +217,23 @@ abstract class BaseLockActivity : BaseActivity() {
 
     // ------------------------------------------------------------------ result
 
+    /**
+     * The result of the operation.
+     *
+     * The design of the lock has its own result page: the shared one without
+     * the more card and without the feedback card.
+     */
     private fun showResult(document: Document) {
-        binding.recycler.visibility = View.GONE
-        binding.emptyState.visibility = View.GONE
-        val panel = binding.resultPanel
-        panel.root.visibility = View.VISIBLE
-        panel.tvName.text = document.name
-        panel.tvPath.text = getString(
-            R.string.lock_result_path,
-            File(document.path).parent ?: document.path,
+        val title = getString(
+            if (mode == BottomSheetPassword.Mode.LOCK) {
+                R.string.lock_result_locked
+            } else {
+                R.string.lock_result_unlocked
+            },
         )
-        panel.tvStatus.setText(
-            if (mode == BottomSheetPassword.Mode.LOCK) R.string.lock_result_locked
-            else R.string.lock_result_unlocked,
-        )
-        panel.ivThumbnail.setImageDrawable(
-            LockThumbnailDrawable(
-                context = this,
-                base = ContextCompat.getDrawable(this, document.type.logoRes)!!,
-                pageCount = document.pageCount,
-                locked = mode == BottomSheetPassword.Mode.LOCK,
-            ),
-        )
-        panel.ivThumbnail.contentDescription = document.name
-        panel.btnView.setOnClickListener { PreviewActivity.start(this, document.id) }
-        panel.btnShare.setOnClickListener { shareDocument(document) }
-        panel.ivDocAction.setOnClickListener { openDocument(document) }
-        panel.resultCard.background = GradientDrawable().apply {
-            shape = GradientDrawable.RECTANGLE
-            // the radii need eight values - two per corner
-            val top = dp(16).toFloat()
-            val bottom = dp(8).toFloat()
-            cornerRadii = floatArrayOf(
-                top,
-                top,
-                top,
-                top,
-                bottom,
-                bottom,
-                bottom,
-                bottom,
-            )
-            setColor(ContextCompat.getColor(this@BaseLockActivity, R.color.surface_card))
-        }
-
-        // The result is a page of its own, it shows the title of the design.
-        binding.tvTitle.text = getString(R.string.result)
-        binding.ivShare.visibility = View.GONE
-        pending = document
-    }
-
-    private fun openDocument(document: Document) {
-        val uri = ShareFileProvider.uriFor(this, repository.fileOf(document))
-        val intent = Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(uri, PDF_MIME)
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
-        runCatching { startActivity(intent) }.onFailure {
-            Toast.makeText(this, R.string.lock_open_failed, Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun shareDocument(document: Document) {
-        val uri = ShareFileProvider.uriFor(this, repository.fileOf(document))
-        val intent = Intent(Intent.ACTION_SEND).apply {
-            type = PDF_MIME
-            putExtra(Intent.EXTRA_STREAM, uri)
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
-        runCatching {
-            startActivity(Intent.createChooser(intent, getString(R.string.share)))
-        }.onFailure {
-            Toast.makeText(this, R.string.lock_open_failed, Toast.LENGTH_SHORT).show()
-        }
+        ResultActivity.startSimple(this, document.id, title)
+        // The result page is the end of the flow, the picker leaves the stack.
+        finish()
     }
 
     // ------------------------------------------------------------------ helpers
@@ -273,16 +243,6 @@ abstract class BaseLockActivity : BaseActivity() {
             repository.importFromUri(this@BaseLockActivity, uri)
             reload()
         }
-    }
-
-    /** Shares the document the page is about. */
-    private fun sharePendingDocument() {
-        val document = pending
-        if (document == null) {
-            Toast.makeText(this, R.string.lock_no_document, Toast.LENGTH_SHORT).show()
-            return
-        }
-        shareDocument(document)
     }
 
     /**
@@ -309,8 +269,6 @@ abstract class BaseLockActivity : BaseActivity() {
 
     private companion object {
         const val PDF_MIME = "application/pdf"
-        const val MENU_SHARE = 1
-        const val MENU_IMPORT = 2
         const val STATE_PENDING = "lock_pending_document"
     }
 }

@@ -422,6 +422,20 @@ object PdfEngine {
         onResult: (Result<List<File>>) -> Unit,
     ): PdfJob = PdfProcessor.splitEveryPage(source, outDir, onProgress, onResult)
 
+    /**
+     * Writes the given pages of [source] into a new document.
+     *
+     * The pages may be given in any order, the user arranges the result with
+     * the tiles of the second step of the split flow.
+     */
+    fun extractPages(
+        source: File,
+        out: File,
+        pages: List<Int>,
+        onProgress: (PdfProgress) -> Unit = {},
+        onResult: (Result<Long>) -> Unit,
+    ): PdfJob = PdfProcessor.extractPages(source, out, pages, onProgress, onResult)
+
     /** Recompresses the streams of a document. */
     fun compress(
         source: File,
@@ -438,9 +452,19 @@ object PdfEngine {
         layout: ImageLayout = ImageLayout.Single,
         marginMm: Int = 10,
         landscape: Boolean = false,
+        rotations: List<Int> = emptyList(),
         onProgress: (PdfProgress) -> Unit = {},
         onResult: (Result<Long>) -> Unit,
-    ): PdfJob = PdfProcessor.imagesToPdf(images, out, layout, marginMm, landscape, onProgress, onResult)
+    ): PdfJob = PdfProcessor.imagesToPdf(
+        images = images,
+        out = out,
+        layout = layout,
+        marginMm = marginMm,
+        landscape = landscape,
+        rotations = rotations,
+        onProgress = onProgress,
+        onResult = onResult,
+    )
 
     // ------------------------------------------------------------------ text / outline
 

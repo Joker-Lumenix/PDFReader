@@ -73,4 +73,16 @@
     <string name="tools_image_albums">相簿</string>
     <string name="tools_image_all_albums">全部照片</string>
     <string name="tools_image_album_other">其他相簿</string>
+    <string name="tools_image_expand">放大檢視</string>
+    <string name="tools_image_view">檢視圖片</string>
+    <string name="tools_image_rotate_left">左轉</string>
+    <string name="tools_image_rotate_right">右轉</string>
+    <string name="tools_image_previous">上一張</string>
+    <string name="tools_image_next">下一張</string>
+    <string name="tools_image_counter">%1$d/%2$d</string>
+    <string name="tools_merge_search">搜尋</string>
+    <string name="tools_merge_search_hint">搜尋</string>
+    <string name="tools_merge_drag">拖曳以重新排序</string>
+    <string name="tools_split_select_hint">選擇需要的頁面。</string>
+    <string name="tools_split_drag_hint">拖曳圖片以變更位置。</string>
 </resources>

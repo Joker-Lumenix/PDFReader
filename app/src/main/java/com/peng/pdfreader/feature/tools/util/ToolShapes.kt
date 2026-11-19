@@ -113,6 +113,16 @@ object ToolShapes {
     fun infoDot(context: Context): GradientDrawable = roundRect(context, Color.WHITE, 7f)
 
     /**
+     * The mark that removes a picture of the strip.
+     *
+     * The design draws it as a dark circle with a cross in it.
+     */
+    fun closeMark(context: Context): GradientDrawable = GradientDrawable().apply {
+        shape = GradientDrawable.OVAL
+        setColor(0x99000000.toInt())
+    }
+
+    /**
      * The handle that rides on the progress track of the design.
      *
      * The design paints it as a yellow disc (#fec43c), so the handle is a

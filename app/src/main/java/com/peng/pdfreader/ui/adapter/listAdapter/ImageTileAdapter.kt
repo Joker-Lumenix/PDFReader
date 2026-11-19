@@ -20,6 +20,7 @@ import com.peng.pdfreader.feature.tools.util.ToolShapes
 class ImageTileAdapter(
     private val onAddClick: () -> Unit,
     private val onImageClick: (Int) -> Unit,
+    private val onImageExpand: (Int) -> Unit = {},
 ) : RecyclerView.Adapter<ImageTileAdapter.Holder>() {
 
     /** One image of the grid. */
@@ -66,6 +67,7 @@ class ImageTileAdapter(
             binding.ivCamera.setImageResource(R.mipmap.ic_camera)
             binding.ivCamera.setColorFilter(Color.WHITE)
             binding.tvIndex.visibility = View.GONE
+            binding.ivExpand.visibility = View.GONE
             binding.root.setOnClickListener { onAddClick() }
         }
 
@@ -75,6 +77,9 @@ class ImageTileAdapter(
             binding.ivImage.setBackgroundResource(R.drawable.bg_card_r4)
             binding.ivImage.clearColorFilter()
             binding.ivImage.setImageBitmap(item.thumbnail)
+            // the badge of the design opens the picture in the processing page
+            binding.ivExpand.visibility = View.VISIBLE
+            binding.ivExpand.setOnClickListener { onImageExpand(index) }
             // 只有选中的图片带编号
             binding.tvIndex.visibility = if (item.index > 0) View.VISIBLE else View.GONE
             binding.tvIndex.text = item.index.toString()

@@ -91,7 +91,7 @@ class ImageAlbumActivity : BaseActivity() {
                         name = album.name,
                         meta = album.count.toString(),
                         thumbnail = album.cover?.let {
-                            MediaImages.thumbnail(this@ImageAlbumActivity, it, COVER_SIZE)
+                            MediaImages.thumbnail(this@ImageAlbumActivity, it, dp(64))
                         },
                     )
                 }
@@ -106,9 +106,6 @@ class ImageAlbumActivity : BaseActivity() {
 
         /** 相册的名字。 */
         const val EXTRA_ALBUM_NAME = "albumName"
-
-        /** 相册封面的边长，单位像素。 */
-        private const val COVER_SIZE = 128
 
         /** Opens the page of the albums. */
         fun start(context: Context) {

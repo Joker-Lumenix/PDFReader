@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   A document of the ordered merge list (design "merge-2").
-  The card is 306x72 at x=42, the red minus of the design sits at x=12.
+
+  The card is 304x72 at x=42, the red minus of the design sits at x=15 and
+  the handle that starts the drag sits at the end of the card.
 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="84dp">
 
-    <!-- the remove button of the design, a red minus in a 24x24 slot -->
-    <FrameLayout
+    <!-- the remove button of the design, a red minus in a circle -->
+    <ImageView
         android:id="@+id/btnRemove"
         android:layout_width="24dp"
         android:layout_height="24dp"
@@ -16,21 +18,33 @@
         android:layout_marginTop="24dp"
         android:clickable="true"
         android:contentDescription="@string/tools_merge_remove"
-        android:focusable="true">
+        android:focusable="true"
+        android:src="@mipmap/ic_minus" />
 
-        <View
-            android:layout_width="14dp"
-            android:layout_height="2dp"
-            android:layout_gravity="center"
-            android:background="@color/status_error_red2" />
-
-    </FrameLayout>
-
-    <com.peng.pdfreader.core.widget.FileListItemView
-        android:id="@+id/item"
-        android:layout_width="306dp"
+    <FrameLayout
+        android:id="@+id/card"
+        android:layout_width="304dp"
         android:layout_height="72dp"
         android:layout_gravity="top|end"
-        android:layout_marginEnd="12dp" />
+        android:layout_marginEnd="14dp">
+
+        <com.peng.pdfreader.core.widget.FileListItemView
+            android:id="@+id/item"
+            android:layout_width="match_parent"
+            android:layout_height="72dp" />
+
+        <!-- the handle of the design, it starts the drag of the row -->
+        <ImageView
+            android:id="@+id/ivDrag"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginEnd="10dp"
+            android:clickable="true"
+            android:contentDescription="@string/tools_merge_drag"
+            android:focusable="true"
+            android:src="@mipmap/ic_menu" />
+
+    </FrameLayout>
 
 </FrameLayout>

@@ -16,6 +16,7 @@ import com.peng.pdfreader.data.Document
 import com.peng.pdfreader.data.DocumentRepository
 import com.peng.pdfreader.utils.PageCountDrawable
 import com.peng.pdfreader.ui.uiData.chipColorRes
+import com.peng.pdfreader.ui.widget.LockThumbnailDrawable
 import com.peng.pdfreader.utils.DocumentMetaFormatter
 
 /**
@@ -70,13 +71,23 @@ class HomeDocumentAdapter(
      * The thumbnail of a row.
      *
      * The design draws the type logo with the number of pages on a dark chip
-     * in its lower right corner, raster documents show their own picture.
+     * in its lower right corner, raster documents show their own picture and an
+     * encrypted document shows its blurred page with the lock badge.
      */
     private fun thumbnail(context: Context, document: Document): Drawable? {
         if (document.type == DocType.IMAGE) {
             val file = DocumentRepository.get(context).fileOf(document)
             val picture = Thumbnails.load(context, file)
             if (picture != null) return picture
+        }
+        if (document.isEncrypted) {
+            val logo = ContextCompat.getDrawable(context, document.type.logoRes)
+            return LockThumbnailDrawable(
+                context = context,
+                base = logo,
+                pageCount = document.pageCount,
+                locked = true,
+            )
         }
         val logo = ContextCompat.getDrawable(context, document.type.logoRes) ?: return null
         if (document.pageCount <= 0) return logo

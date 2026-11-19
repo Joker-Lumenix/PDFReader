@@ -73,4 +73,16 @@
     <string name="tools_image_albums">Alben</string>
     <string name="tools_image_all_albums">Alle Fotos</string>
     <string name="tools_image_album_other">Andere Alben</string>
+    <string name="tools_image_expand">Größer ansehen</string>
+    <string name="tools_image_view">Bild ansehen</string>
+    <string name="tools_image_rotate_left">Links</string>
+    <string name="tools_image_rotate_right">Rechts</string>
+    <string name="tools_image_previous">Zurück</string>
+    <string name="tools_image_next">Weiter</string>
+    <string name="tools_image_counter">%1$d/%2$d</string>
+    <string name="tools_merge_search">Suchen</string>
+    <string name="tools_merge_search_hint">Suchen</string>
+    <string name="tools_merge_drag">Zum Umsortieren ziehen</string>
+    <string name="tools_split_select_hint">Wähle die benötigte Seite.</string>
+    <string name="tools_split_drag_hint">Ziehe das Bild, um seine Position zu ändern.</string>
 </resources>

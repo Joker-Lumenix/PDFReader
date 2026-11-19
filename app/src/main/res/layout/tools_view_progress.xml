@@ -73,6 +73,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_gravity="start|center_vertical"
+            android:src="@mipmap/emoji_normal"
             android:contentDescription="@null" />
 
     </FrameLayout>

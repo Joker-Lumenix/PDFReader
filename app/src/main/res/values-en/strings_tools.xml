@@ -54,12 +54,12 @@
     <string name="tools_unlock_done">Document decrypted</string>
     <string name="tools_unlock_failed">Decryption failed, check the password</string>
     <string name="tools_result_more">More</string>
-    <string name="tools_result_open_with">Open with another app</string>
+    <string name="tools_result_open_with">Open With</string>
     <string name="tools_result_compress">Compress</string>
     <string name="tools_result_print">Print</string>
     <string name="tools_result_sign">Sign</string>
     <string name="tools_result_draw">Draw</string>
-    <string name="tools_result_lock">Encrypt</string>
+    <string name="tools_result_lock">Lock</string>
     <string name="tools_result_share">Share</string>
     <string name="tools_result_view">View</string>
     <string name="tools_result_feedback">Does Image to PDF meet your needs?</string>
@@ -73,4 +73,16 @@
     <string name="tools_image_albums">Albums</string>
     <string name="tools_image_all_albums">All photos</string>
     <string name="tools_image_album_other">Other albums</string>
+    <string name="tools_image_expand">View bigger</string>
+    <string name="tools_image_view">View the picture</string>
+    <string name="tools_image_rotate_left">Left</string>
+    <string name="tools_image_rotate_right">Right</string>
+    <string name="tools_image_previous">Previous</string>
+    <string name="tools_image_next">Next</string>
+    <string name="tools_image_counter">%1$d/%2$d</string>
+    <string name="tools_merge_search">Search</string>
+    <string name="tools_merge_search_hint">Search</string>
+    <string name="tools_merge_drag">Drag to reorder</string>
+    <string name="tools_split_select_hint">Select The Page You Need.</string>
+    <string name="tools_split_drag_hint">Drag The Image To Change Its Position.</string>
 </resources>

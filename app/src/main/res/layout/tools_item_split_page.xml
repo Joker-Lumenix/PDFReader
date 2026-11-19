@@ -1,15 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   A page tile of the split screen (design "Split PDF").
-  The tile is 104x124 with radius 4 and carries the page number badge in its
-  top left corner (18x18, radius 4). The badge colour is applied in code -
-  green when the page is selected, translucent black when it is not.
+
+  The tile is 104x124 on a 360 wide screen, the three tiles of a row share the
+  width of the screen, so the height follows the width (124 / 104). The tile
+  carries the page number badge in its top left corner (18x18, radius 4). The
+  badge colour is applied in code - green when the page is selected,
+  translucent black when it is not.
 -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.peng.pdfreader.core.widget.RatioFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="124dp"
+    android:layout_height="wrap_content"
     android:clickable="true"
-    android:focusable="true">
+    android:focusable="true"
+    app:ratio="1.1923">
 
     <ImageView
         android:id="@+id/ivPage"
@@ -35,4 +40,4 @@
         android:maxLines="1"
         android:textColor="@color/white" />
 
-</FrameLayout>
+</com.peng.pdfreader.core.widget.RatioFrameLayout>

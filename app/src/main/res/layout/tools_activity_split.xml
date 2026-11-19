@@ -5,6 +5,11 @@
   The blue banner sits right below the app bar, the page grid fills the rest
   of the screen and the primary action stays at the bottom.
 
+  The screen carries two steps:
+  stepSelect - every page of the document, the user marks the pages
+  stepOrder  - the marked pages only, they can be dragged into the order of
+               the new document (design "Split PDF2")
+
   Geometry of the design (360x760):
   - banner 336x30 at (12, 92), radius 8, #6d99f9
   - page tiles 104x124 at x = 12 / 128 / 244, rows at y = 134 / 270
@@ -92,6 +97,7 @@
 
             </LinearLayout>
 
+            <!-- the pages of the document -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvPages"
                 android:layout_width="match_parent"
@@ -101,6 +107,18 @@
                 android:overScrollMode="never"
                 android:paddingTop="12dp"
                 android:scrollbars="none" />
+
+            <!-- the marked pages, they can be dragged into the new order -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvOrder"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:clipToPadding="false"
+                android:overScrollMode="never"
+                android:paddingTop="12dp"
+                android:scrollbars="none"
+                android:visibility="gone" />
 
         </LinearLayout>
 

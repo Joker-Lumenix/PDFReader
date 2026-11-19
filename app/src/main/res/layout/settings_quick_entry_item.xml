@@ -42,7 +42,7 @@
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:contentDescription="@null"
-        android:src="@drawable/ic_drag_handle"
+        android:src="@mipmap/ic_menu"
         app:tint="@color/surface_neutral_warm" />
 
 </LinearLayout>

@@ -40,7 +40,7 @@
     <string name="files_action_merge">Fusionner</string>
 
     <!-- dialogs -->
-    <string name="files_delete_message">Supprimer ce fichier ? Cette action est irréversible.</string>
+    <string name="files_delete_message">Voulez-vous vraiment supprimer ce fichier ? Une fois supprimé, il ne sera pas récupérable.</string>
     <string name="files_save_message">Enregistrer les modifications de ce fichier ? Cette action est irréversible.</string>
 
     <!-- empty states -->

@@ -26,4 +26,13 @@ object ToolOutput {
         val stamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         return "${prefix}_$stamp$suffix"
     }
+
+    /**
+     * A name that is unique for the current moment, without an extension.
+     *
+     * The dialog that asks for the name of a new document shows the name
+     * without the extension - the tool knows the type of the document it
+     * writes and adds the extension itself.
+     */
+    fun uniqueBaseName(prefix: String): String = uniqueName(prefix, "")
 }

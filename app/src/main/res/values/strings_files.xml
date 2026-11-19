@@ -40,7 +40,7 @@
     <string name="files_action_merge">合并</string>
 
     <!-- dialogs -->
-    <string name="files_delete_message">确定要删除该文件吗？删除后无法恢复。</string>
+    <string name="files_delete_message">确定要删除该文件吗？删除后将无法恢复。</string>
     <string name="files_save_message">确定要保存对该文件的修改吗？保存后无法撤销。</string>
 
     <!-- empty states -->

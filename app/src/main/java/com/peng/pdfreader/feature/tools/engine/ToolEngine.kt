@@ -51,6 +51,19 @@ interface ToolEngine {
     ): Result<List<File>>
 
     /**
+     * Writes the given pages of [source] into a new document.
+     *
+     * The pages are 1 based and they may be given in any order - the user
+     * arranges the result with the tiles of the second step of the split flow.
+     */
+    suspend fun extractPages(
+        source: File,
+        out: File,
+        pages: List<Int>,
+        onProgress: (Int, Int) -> Unit = { _, _ -> },
+    ): Result<Long>
+
+    /**
      * Compresses [source] into [out].
      *
      * @param quality JPEG quality of the re-encoded images, 1 .. 100.
@@ -67,6 +80,7 @@ interface ToolEngine {
         images: List<File>,
         out: File,
         layout: ImageLayout = ImageLayout.Single,
+        rotations: List<Int> = emptyList(),
         onProgress: (Int, Int) -> Unit = { _, _ -> },
     ): Result<Long>
 
@@ -127,6 +141,21 @@ class PdfToolEngine : ToolEngine {
         )
     }
 
+    override suspend fun extractPages(
+        source: File,
+        out: File,
+        pages: List<Int>,
+        onProgress: (Int, Int) -> Unit,
+    ): Result<Long> = await { done ->
+        PdfProcessor.extractPages(
+            source = source,
+            out = out,
+            pages = pages,
+            onProgress = { progress -> onProgress(progress.current, progress.total) },
+            onResult = done,
+        )
+    }
+
     override suspend fun compress(
         source: File,
         out: File,
@@ -146,12 +175,14 @@ class PdfToolEngine : ToolEngine {
         images: List<File>,
         out: File,
         layout: ImageLayout,
+        rotations: List<Int>,
         onProgress: (Int, Int) -> Unit,
     ): Result<Long> = await { done ->
         PdfProcessor.imagesToPdf(
             images = images,
             out = out,
             layout = layout,
+            rotations = rotations,
             onProgress = { progress -> onProgress(progress.current, progress.total) },
             onResult = done,
         )

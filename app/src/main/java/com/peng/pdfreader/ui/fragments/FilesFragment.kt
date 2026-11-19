@@ -22,7 +22,6 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.peng.pdfreader.R
 import com.peng.pdfreader.core.util.Logger
-import com.peng.pdfreader.core.util.Thumbnails
 import com.peng.pdfreader.core.widget.EmptyStateView
 import com.peng.pdfreader.core.widget.FileItemUiState
 import com.peng.pdfreader.core.widget.FileListItemDecoration
@@ -42,11 +41,11 @@ import com.peng.pdfreader.ui.dialogs.DocumentActionSheet
 import com.peng.pdfreader.ui.dialogs.PopWindowFileFilter
 import com.peng.pdfreader.ui.dialogs.BottomSheetSort
 import com.peng.pdfreader.ui.dialogs.DocumentCipher
+import com.peng.pdfreader.utils.DocumentThumbnails
 import com.peng.pdfreader.utils.FileScope
 import com.peng.pdfreader.utils.FileSortOption
 import com.peng.pdfreader.utils.FileUi
 import com.peng.pdfreader.utils.FilesPrefs
-import com.peng.pdfreader.utils.PageCountDrawable
 import com.peng.pdfreader.ui.activities.PreviewActivity
 import com.peng.pdfreader.ui.uiData.AdSamples
 import com.peng.pdfreader.ui.activities.CompressActivity
@@ -124,7 +123,7 @@ class FilesFragment : BaseFragment() {
     private var sortAction: View? = null
 
     /** The thumbnails are cached so the diff of the list stays stable. */
-    private val thumbnails = mutableMapOf<String, Drawable>()
+    private val documentThumbnails by lazy { DocumentThumbnails(repository) }
 
     /** Serialises the access to the repository. */
     private val repositoryLock = Mutex()
@@ -408,30 +407,8 @@ class FilesFragment : BaseFragment() {
         renderEmptyState(emptyState)
     }
 
-    private fun thumbnail(document: Document): Drawable? {
-        // Raster documents show their own picture, the rest use the type logo.
-        if (document.type == DocType.IMAGE) {
-            val key = "image_${document.path}"
-            val cached = thumbnails[key]
-            if (cached != null) return cached
-            val picture = Thumbnails.load(requireContext(), repository.fileOf(document))
-            if (picture != null) {
-                thumbnails[key] = picture
-                return picture
-            }
-        }
-        val key = "${document.type.name}_${document.pageCount}"
-        val cached = thumbnails[key]
-        if (cached != null) return cached
-        val logo = ContextCompat.getDrawable(requireContext(), document.type.logoRes) ?: return null
-        val drawable = if (document.pageCount > 0) {
-            PageCountDrawable(logo, document.pageCount, requireContext())
-        } else {
-            logo
-        }
-        thumbnails[key] = drawable
-        return drawable
-    }
+    private fun thumbnail(document: Document): Drawable? =
+        documentThumbnails.of(requireContext(), document)
 
     // ------------------------------------------------------------------ scope
 

@@ -40,7 +40,7 @@
     <string name="files_action_merge">دمج</string>
 
     <!-- dialogs -->
-    <string name="files_delete_message">هل تريد حذف هذا الملف؟ لا يمكن التراجع عن ذلك.</string>
+    <string name="files_delete_message">هل أنت متأكد من حذف هذا الملف؟ بمجرد حذفه لا يمكن استرجاعه.</string>
     <string name="files_save_message">هل تريد حفظ التغييرات على هذا الملف؟ لا يمكن التراجع عن ذلك.</string>
 
     <!-- empty states -->

@@ -41,22 +41,6 @@
                 android:layout_height="48dp"
                 android:contentDescription="@string/label_file_icon" />
 
-            <FrameLayout
-                android:id="@+id/ivLockCorner"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:background="#60000000"
-                >
-
-                <ImageView
-                    android:layout_width="18dp"
-                    android:layout_height="18dp"
-                    android:layout_gravity="top|start"
-                    android:contentDescription="@string/encrypted"
-                    android:src="@mipmap/ic_lock_corner"
-                    />
-
-            </FrameLayout>
         </FrameLayout>
 
 
@@ -90,7 +74,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="6dp"
-                    android:background="@drawable/bg_badge_purple"
+                    android:background="@drawable/bg_ad_badge"
                     android:textColor="@color/white"
                     android:visibility="gone" />
 

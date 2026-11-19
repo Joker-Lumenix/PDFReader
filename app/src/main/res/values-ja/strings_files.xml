@@ -40,7 +40,7 @@
     <string name="files_action_merge">結合</string>
 
     <!-- dialogs -->
-    <string name="files_delete_message">このファイルを削除しますか？元に戻せません。</string>
+    <string name="files_delete_message">このファイルを削除してもよろしいですか？削除すると元に戻せません。</string>
     <string name="files_save_message">このファイルへの変更を保存しますか？元に戻せません。</string>
 
     <!-- empty states -->

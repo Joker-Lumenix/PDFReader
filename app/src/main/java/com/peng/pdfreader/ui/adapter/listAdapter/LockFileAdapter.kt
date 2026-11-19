@@ -10,7 +10,9 @@ import com.peng.pdfreader.R
 import com.peng.pdfreader.core.widget.FileItemUiState
 import com.peng.pdfreader.data.Document
 import com.peng.pdfreader.databinding.LockItemFileBinding
+import com.peng.pdfreader.feature.tools.util.ToolFormatters
 import com.peng.pdfreader.ui.widget.LockThumbnailDrawable
+import com.peng.pdfreader.utils.ToolRowThumbnails
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -20,10 +22,13 @@ import java.util.Locale
  *
  * The rows are the shared [com.peng.pdfreader.core.widget.FileListItemView]
  * of the core package, the adapter only maps a document onto its state.
+ *
+ * The design shows the page of the document with the number of the pages on
+ * it and no action of its own - the whole row picks the file.
  */
 class LockFileAdapter(
     private val onFileClick: (Document) -> Unit,
-    private val onMoreClick: (Document, View) -> Unit,
+    private val thumbnails: ToolRowThumbnails? = null,
 ) : RecyclerView.Adapter<LockFileAdapter.Holder>() {
 
     private val documents = mutableListOf<Document>()
@@ -39,7 +44,7 @@ class LockFileAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
         val binding = LockItemFileBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return Holder(binding, onFileClick, onMoreClick)
+        return Holder(binding, onFileClick, thumbnails)
     }
 
     override fun onBindViewHolder(holder: Holder, position: Int) {
@@ -50,14 +55,13 @@ class LockFileAdapter(
     class Holder(
         private val binding: LockItemFileBinding,
         private val onFileClick: (Document) -> Unit,
-        private val onMoreClick: (Document, View) -> Unit,
+        private val thumbnails: ToolRowThumbnails?,
     ) : RecyclerView.ViewHolder(binding.root) {
 
         private var document: Document? = null
 
         init {
             binding.root.onClick = { document?.let(onFileClick) }
-            binding.root.onMoreClick = { document?.let { item -> onMoreClick(item, binding.root) } }
         }
 
         fun bind(item: Document) {
@@ -71,26 +75,23 @@ class LockFileAdapter(
                     typeColor = ContextCompat.getColor(context, R.color.brand_primary_light),
                     thumbnail = LockThumbnailDrawable(
                         context = context,
-                        base = ContextCompat.getDrawable(context, item.type.logoRes)!!,
+                        base = ContextCompat.getDrawable(context, item.type.logoRes),
                         pageCount = item.pageCount,
                         locked = item.isEncrypted,
                     ),
                     showType = true,
-                    showMore = true,
+                    // the design carries no action on the right of the row
+                    showMore = false,
                     encrypted = item.isEncrypted,
                 ),
             )
+            // the picture of the first page arrives in the background
+            thumbnails?.load(item, binding.root)
         }
 
         private fun metaOf(context: Context, item: Document): String {
             val date = SimpleDateFormat("MM-dd HH:mm", Locale.getDefault()).format(Date(item.modifiedAt))
-            return "$date · ${formatSize(item.sizeBytes)}"
-        }
-
-        private fun formatSize(bytes: Long): String = when {
-            bytes < 1024 -> "$bytes B"
-            bytes < 1024 * 1024 -> "${bytes / 1024} KB"
-            else -> String.format(Locale.getDefault(), "%.1f MB", bytes / 1024.0 / 1024.0)
+            return "$date · ${ToolFormatters.size(item.sizeBytes)}"
         }
     }
 }

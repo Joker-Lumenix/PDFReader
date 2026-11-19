@@ -21,48 +21,95 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <!-- 顶部标题栏：返回按钮 + 标题 + 右侧的两个操作 -->
-        <LinearLayout android:id="@+id/topBar"
+        <!-- 顶部标题栏：返回按钮 + 标题 + 右侧的搜索 / 添加按钮 -->
+        <FrameLayout
+            android:id="@+id/topBar"
             android:layout_width="match_parent"
             android:layout_height="63dp"
-            android:background="@color/surface_card"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp">
+            android:background="@color/surface_card">
 
-            <ImageView
-                android:id="@+id/ivBack"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginEnd="8dp"
-                android:contentDescription="@string/label_back"
-                android:src="@drawable/ic_arrow_back" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp">
 
-            <TextView
-                android:id="@+id/tvTitle"
-                style="@style/TextAppearance.AppCore.PageTitle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ellipsize="end"
-                android:maxLines="1" />
+                <ImageView
+                    android:id="@+id/ivBack"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="8dp"
+                    android:contentDescription="@string/label_back"
+                    android:src="@drawable/ic_arrow_back" />
 
-            <ImageView
-                android:id="@+id/ivShare"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginEnd="16dp"
-                android:contentDescription="@string/share"
-                android:src="@mipmap/ic_share_app" />
+                <TextView
+                    android:id="@+id/tvTitle"
+                    style="@style/TextAppearance.AppCore.PageTitle"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:maxLines="1" />
 
-            <ImageView
-                android:id="@+id/ivAdd"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:contentDescription="@string/tools_merge_add"
-                android:src="@mipmap/ic_add_circle" />
-        </LinearLayout>
+                <!-- 搜索状态：搜索框盖在标题的位置上，取消按钮在它的右边 -->
+                <EditText
+                    android:id="@+id/etSearch"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_marginEnd="12dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_white_r36"
+                    android:backgroundTint="@null"
+                    android:hint="@string/tools_merge_search_hint"
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:textColor="@color/text_secondary"
+                    android:textColorHint="@color/text_placeholder"
+                    android:textSize="16sp"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/tvSearchCancel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:text="@string/cancel"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="16sp"
+                    android:visibility="gone" />
+
+                <!-- the search button of the design, it opens the search state -->
+                <ImageView
+                    android:id="@+id/ivSearch"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginStart="12dp"
+                    android:clickable="true"
+                    android:contentDescription="@string/tools_merge_search"
+                    android:focusable="true"
+                    android:src="@mipmap/ic_search_black" />
+
+                <!-- the button of the design that adds more documents -->
+                <ImageView
+                    android:id="@+id/ivAdd"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginStart="12dp"
+                    android:clickable="true"
+                    android:contentDescription="@string/tools_merge_add"
+                    android:focusable="true"
+                    android:src="@mipmap/ic_add_circle"
+                    android:visibility="gone" />
+
+            </LinearLayout>
+
+        </FrameLayout>
 
         <!-- 标题栏下方的细线 -->
         <View
@@ -84,7 +131,7 @@
                 android:clipToPadding="false"
                 android:overScrollMode="never"
                 android:paddingStart="12dp"
-                android:paddingTop="10dp"
+                android:paddingTop="12dp"
                 android:paddingEnd="12dp"
                 android:paddingBottom="96dp"
                 android:scrollbars="none" />
@@ -97,8 +144,7 @@
                 android:clipToPadding="false"
                 android:overScrollMode="never"
                 android:paddingStart="12dp"
-                android:paddingTop="10dp"
-                android:paddingEnd="12dp"
+                android:paddingTop="12dp"
                 android:paddingBottom="96dp"
                 android:scrollbars="none" />
 

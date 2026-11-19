@@ -2,17 +2,17 @@ package com.peng.pdfreader.ui.activities
 
 import android.content.Context
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.core.content.ContextCompat
+import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.peng.pdfreader.R
 import com.peng.pdfreader.core.widget.FileListItemDecoration
 import com.peng.pdfreader.base.BaseActivity
-import com.peng.pdfreader.base.ShareFileProvider
 import com.peng.pdfreader.data.DocType
 
 import com.peng.pdfreader.data.Document
@@ -24,6 +24,7 @@ import com.peng.pdfreader.ui.dialogs.BottomSheetToolTextInput
 import com.peng.pdfreader.feature.tools.engine.ToolEngines
 import com.peng.pdfreader.feature.tools.util.ToolFlow
 import com.peng.pdfreader.feature.tools.util.ToolOutput
+import com.peng.pdfreader.utils.ToolRowThumbnails
 import kotlinx.coroutines.launch
 
 /**
@@ -31,6 +32,10 @@ import kotlinx.coroutines.launch
  *
  * Step one picks the documents, step two fixes their order and the last step
  * shows the produced document.
+ *
+ * The search button of the design turns the selection step into its search
+ * state: the field covers the title, the hits carry the same selection mark
+ * as the other rows and the cancel button brings the selection step back.
  */
 class MergeActivity : BaseActivity() {
 
@@ -42,6 +47,12 @@ class MergeActivity : BaseActivity() {
     private val selection = linkedSetOf<String>()
     private var documents: List<Document> = emptyList()
 
+    /** The documents that the search state shows. */
+    private var visible: List<Document> = emptyList()
+
+    /** The handle that drags the rows of the ordered list. */
+    private lateinit var dragHelper: ItemTouchHelper
+
     private val pickAdapter by lazy {
         DocumentPickAdapter(
             multiSelect = true,
@@ -51,17 +62,29 @@ class MergeActivity : BaseActivity() {
                 refreshSelectStep()
             },
             // the design of the selection step puts the selection mark on the
-            // right of the row, the "more" affordance sits there as well
+            // right of every row
             selectionAtEnd = true,
-            showMore = true,
+            // the card of the design is a white surface
+            designCard = true,
+            // the design shows the first page of the document
+            thumbnails = rowThumbnails,
         )
     }
 
     private val orderAdapter by lazy {
-        MergeOrderAdapter { document ->
-            selection.remove(document.id)
-            refreshOrderStep()
-        }
+        MergeOrderAdapter(
+            onRemove = { document ->
+                selection.remove(document.id)
+                refreshOrderStep()
+            },
+            onDragStart = { holder -> dragHelper.startDrag(holder) },
+            thumbnails = rowThumbnails,
+        )
+    }
+
+    /** The pictures of the rows, the first page of every document. */
+    private val rowThumbnails by lazy {
+        ToolRowThumbnails(this, repository, lifecycleScope)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,15 +93,8 @@ class MergeActivity : BaseActivity() {
         setContentView(binding.root)
 
         binding.ivBack.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
-        binding.ivShare.setImageResource(R.mipmap.ic_share_app)
-        binding.ivShare.imageTintList = ColorStateList.valueOf(
-            ContextCompat.getColor(this, R.color.text_secondary),
-        )
-        binding.ivShare.setOnClickListener { shareSelection() }
-        binding.ivAdd.setImageResource(R.mipmap.ic_add_circle)
-        binding.ivAdd.imageTintList = ColorStateList.valueOf(
-            ContextCompat.getColor(this, R.color.text_secondary),
-        )
+        binding.ivSearch.setOnClickListener { openSearch() }
+        binding.tvSearchCancel.setOnClickListener { closeSearch() }
         binding.ivAdd.setOnClickListener { showStep(Step.SELECT) }
 
         binding.rvFiles.layoutManager = LinearLayoutManager(this)
@@ -89,7 +105,18 @@ class MergeActivity : BaseActivity() {
         binding.rvOrder.adapter = orderAdapter
         binding.btnAction.setOnClickListener { onPrimaryAction() }
 
+        binding.etSearch.doAfterTextChanged { text ->
+            val query = text?.toString().orEmpty()
+            visible = if (query.isBlank()) {
+                documents
+            } else {
+                documents.filter { it.name.contains(query, ignoreCase = true) }
+            }
+            pickAdapter.submit(visible)
+            pickAdapter.setCheckedIds(selection)
+        }
 
+        attachDragReorder()
 
         loadDocuments()
         showStep(Step.SELECT)
@@ -97,7 +124,8 @@ class MergeActivity : BaseActivity() {
 
     private fun loadDocuments() {
         documents = repository.all().filter { it.type == DocType.PDF }
-        pickAdapter.submit(documents)
+        visible = documents
+        pickAdapter.submit(visible)
     }
 
     // ------------------------------------------------------------------ steps
@@ -108,7 +136,7 @@ class MergeActivity : BaseActivity() {
         binding.rvFiles.visibility = if (step == Step.SELECT) View.VISIBLE else View.GONE
         binding.rvOrder.visibility = if (step == Step.ORDER) View.VISIBLE else View.GONE
         binding.bottomBar.visibility = View.VISIBLE
-        binding.ivShare.visibility = if (step == Step.SELECT) View.VISIBLE else View.GONE
+        binding.ivSearch.visibility = if (step == Step.SELECT) View.VISIBLE else View.GONE
         binding.ivAdd.visibility = if (step == Step.ORDER) View.VISIBLE else View.GONE
 
         when (step) {
@@ -117,14 +145,43 @@ class MergeActivity : BaseActivity() {
         }
     }
 
+    /**
+     * The search state of the design.
+     *
+     * The field takes the place of the title, the button of the design is
+     * hidden while the search runs.
+     */
+    private fun openSearch() {
+        binding.tvTitle.visibility = View.GONE
+        binding.ivSearch.visibility = View.GONE
+        binding.etSearch.visibility = View.VISIBLE
+        binding.tvSearchCancel.visibility = View.VISIBLE
+        binding.etSearch.requestFocus()
+    }
+
+    /** Brings the selection step back, the search is left. */
+    private fun closeSearch() {
+        binding.etSearch.setText("")
+        binding.etSearch.clearFocus()
+        // the keyboard of the search field goes away with the field
+        val keyboard = getSystemService(Context.INPUT_METHOD_SERVICE)
+            as? android.view.inputmethod.InputMethodManager
+        keyboard?.hideSoftInputFromWindow(binding.etSearch.windowToken, 0)
+        binding.etSearch.visibility = View.GONE
+        binding.tvSearchCancel.visibility = View.GONE
+        binding.tvTitle.visibility = View.VISIBLE
+        binding.ivSearch.visibility = View.VISIBLE
+    }
 
     private fun refreshSelectStep() {
         binding.tvTitle.text = getString(R.string.selected_count, selection.size)
         binding.btnAction.setText(R.string.next)
-        binding.btnAction.isEnabled = selection.isNotEmpty()
-        binding.btnAction.alpha = if (selection.isNotEmpty()) 1f else 0.5f
-        pickAdapter.submit(documents)
-        selection.forEach { pickAdapter.setChecked(it, true) }
+        // the merge needs at least two documents
+        val ready = selection.size >= 2
+        binding.btnAction.isEnabled = ready
+        binding.btnAction.alpha = if (ready) 1f else 0.5f
+        pickAdapter.submit(visible)
+        pickAdapter.setCheckedIds(selection)
     }
 
     private fun refreshOrderStep() {
@@ -140,15 +197,13 @@ class MergeActivity : BaseActivity() {
 
     private fun toggle(document: Document) {
         if (selection.contains(document.id)) selection.remove(document.id) else selection.add(document.id)
-        pickAdapter.setChecked(document.id, selection.contains(document.id))
         refreshSelectStep()
     }
 
     private fun onPrimaryAction() {
         when (currentStep()) {
-            Step.SELECT -> if (selection.isNotEmpty()) showStep(Step.ORDER)
+            Step.SELECT -> if (selection.size >= 2) showStep(Step.ORDER)
             Step.ORDER -> askForName()
-            else -> Unit
         }
     }
 
@@ -157,27 +212,65 @@ class MergeActivity : BaseActivity() {
         else -> Step.ORDER
     }
 
+    // ------------------------------------------------------------------ drag
+
+    /**
+     * Lets the user drag the rows of the ordered list.
+     *
+     * The drag starts at the handle of the design, the order of the list is
+     * the order of the merged document.
+     */
+    private fun attachDragReorder() {
+        dragHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
+            ItemTouchHelper.UP or ItemTouchHelper.DOWN,
+            0,
+        ) {
+            override fun isLongPressDragEnabled(): Boolean = false
+
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder,
+            ): Boolean {
+                val from = viewHolder.bindingAdapterPosition
+                val to = target.bindingAdapterPosition
+                if (from == RecyclerView.NO_POSITION || to == RecyclerView.NO_POSITION) return false
+                orderAdapter.move(from, to)
+                // the selection keeps the order of the list
+                selection.clear()
+                selection.addAll(orderAdapter.items().map { it.id })
+                return true
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) = Unit
+        })
+        dragHelper.attachToRecyclerView(binding.rvOrder)
+    }
+
     // ------------------------------------------------------------------ merge
 
     /**
      * Asks for the name of the document.
      *
      * The name is asked before the job starts, so the dialog of the design is
-     * in the front - the progress page covers the tool while it runs.
+     * in the front - the progress page covers the tool while it runs. The
+     * merge always writes a PDF, so the name carries no extension.
      */
     private fun askForName() {
         BottomSheetToolTextInput.show(
             manager = supportFragmentManager,
             title = getString(R.string.save),
-            initial = ToolOutput.uniqueName("merged", ".pdf"),
-            onConfirmed = { name -> startMerge(name) },
+            initial = ToolOutput.uniqueBaseName("merged"),
+            onConfirmed = { name -> startMerge(name + PDF_EXTENSION) },
         )
     }
 
     /**
      * Runs the merge behind the shared progress page.
      *
-     * The progress page opens the result page as soon as the job is done.
+     * The progress page opens the result page as soon as the job is done. The
+     * merge page leaves the stack with it, so the back key of the result page
+     * returns to the page the flow was started from.
      */
     private fun startMerge(name: String) {
         val files = selectedDocuments().map { repository.fileOf(it) }
@@ -200,59 +293,32 @@ class MergeActivity : BaseActivity() {
         }
     }
 
-    /** The share action of the design shares every picked document at once. */
-
-    private fun shareSelection() {
-        val files = selectedDocuments()
-            .map { repository.fileOf(it) }
-            .filter { it.exists() }
-        if (files.isEmpty()) {
-            toast(R.string.tools_result_share_unavailable)
-            return
-        }
-        val uris = files.map { ShareFileProvider.uriFor(this, it) }
-        val intent = if (uris.size == 1) {
-            Intent(Intent.ACTION_SEND)
-                .setType("application/pdf")
-                .putExtra(Intent.EXTRA_STREAM, uris.first())
-        } else {
-            Intent(Intent.ACTION_SEND_MULTIPLE)
-                .setType("application/pdf")
-                .putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(uris))
-        }
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        runCatching {
-            startActivity(Intent.createChooser(intent, getString(R.string.share)))
-        }.onFailure { toast(R.string.tools_not_available) }
-    }
-
     private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
-
-    private fun toast(messageRes: Int, detail: String? = null) {
-        val message = if (detail.isNullOrBlank()) {
-            getString(messageRes)
-        } else {
-            getString(R.string.tools_failed, detail)
-        }
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-    }
 
     override fun handleBackPressed(): Boolean {
         // The back key walks the flow backwards before it leaves the screen.
-        return when (currentStep()) {
-            Step.ORDER -> {
+        return when {
+            binding.etSearch.visibility == View.VISIBLE -> {
+                closeSearch()
+                true
+            }
+
+            currentStep() == Step.ORDER -> {
                 showStep(Step.SELECT)
                 true
             }
+
             else -> false
         }
     }
 
     companion object {
+        /** The merge always writes a PDF. */
+        private const val PDF_EXTENSION = ".pdf"
+
         /** Opens the merge flow. */
         fun start(context: Context) {
             context.startActivity(Intent(context, MergeActivity::class.java))
         }
     }
 }
-

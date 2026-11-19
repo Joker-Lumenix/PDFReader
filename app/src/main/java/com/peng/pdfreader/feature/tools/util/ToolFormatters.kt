@@ -33,4 +33,12 @@ object ToolFormatters {
         val pages = context.getString(R.string.pages)
         return "${doc.pageCount} $pages · ${date(doc.modifiedAt)} · ${size(doc.sizeBytes)}"
     }
+
+    /**
+     * The meta line of a file row without the number of the pages.
+     *
+     * The design of the merge shows the date and the size, the number of the
+     * pages sits on the thumbnail of the row.
+     */
+    fun metaShort(doc: Document): String = "${date(doc.modifiedAt)} · ${size(doc.sizeBytes)}"
 }
