@@ -6,6 +6,7 @@ import android.database.Cursor
 import android.net.Uri
 import android.os.ParcelFileDescriptor
 import android.provider.OpenableColumns
+import com.peng.pdfreader.data.DocType
 import java.io.File
 
 /**
@@ -35,7 +36,7 @@ class ShareFileProvider : ContentProvider() {
         val columns = projection ?: arrayOf(OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE)
         val values = columns.map { column ->
             when (column) {
-                OpenableColumns.DISPLAY_NAME -> file.name
+                OpenableColumns.DISPLAY_NAME -> displayName(file)
                 OpenableColumns.SIZE -> file.length().toString()
                 else -> null
             }
@@ -45,7 +46,37 @@ class ShareFileProvider : ContentProvider() {
         return cursor
     }
 
-    override fun getType(uri: Uri): String = "application/octet-stream"
+    /**
+     * The name of the document as the other apps see it.
+     *
+     * A document of the device is copied into the sandbox before it is
+     * shared - the copy carries a prefix that the other apps must not see.
+     */
+    private fun displayName(file: File): String {
+        val name = file.name
+        if (name.startsWith(SHARE_PREFIX)) {
+            // The copy of a share: the prefix and the time are not part of
+            // the name of the document.
+            return name.substringAfter('_').substringAfter('_', name)
+        }
+        // The documents of the sandbox carry the id of the library in front of
+        // their name.
+        if (name.length > ID_LENGTH && name[ID_LENGTH] == '_') {
+            return name.substring(ID_LENGTH + 1)
+        }
+        return name
+    }
+
+    /**
+     * The type of the shared file.
+     *
+     * The system reads it when it builds the preview of a share - with the
+     * generic type of a stream the preview of the system stays empty.
+     */
+    override fun getType(uri: Uri): String {
+        val file = resolve(uri) ?: return "application/octet-stream"
+        return DocType.mimeTypeOf(file.name) ?: "application/octet-stream"
+    }
 
     override fun insert(uri: Uri, values: ContentValues?): Uri? = null
 
@@ -73,8 +104,21 @@ class ShareFileProvider : ContentProvider() {
         /** Authority declared in the manifest. */
         const val AUTHORITY = "com.peng.pdfreader.fileprovider"
 
+        /**
+         * The prefix of the copies that are made for a share.
+         *
+         * The copies are removed when the app starts again.
+         */
+        const val SHARE_PREFIX = "share_"
+
+        /** The length of the id that the library puts in front of a name. */
+        private const val ID_LENGTH = 36
+
         /** Builds a shareable uri for a sandbox file. */
-        fun uriFor(context: android.content.Context, file: File): Uri =
-            Uri.parse("content://$AUTHORITY/${file.name}")
+        fun uriFor(context: android.content.Context, file: File): Uri = Uri.Builder()
+            .scheme("content")
+            .authority(AUTHORITY)
+            .appendPath(file.name)
+            .build()
     }
 }

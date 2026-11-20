@@ -45,6 +45,7 @@ import com.peng.pdfreader.ui.dialogs.BottomSheetSort
 import com.peng.pdfreader.ui.dialogs.DocumentCipher
 import com.peng.pdfreader.utils.DocumentThumbnails
 import com.peng.pdfreader.utils.FileScope
+import com.peng.pdfreader.utils.FileSharing
 import com.peng.pdfreader.utils.FileSortOption
 import com.peng.pdfreader.utils.FileUi
 import com.peng.pdfreader.utils.FilesPrefs
@@ -628,31 +629,21 @@ class FilesFragment : BaseFragment() {
 
     private fun openWith(docId: String) {
         val document = repository.byId(docId) ?: return
-        val intent = Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(contentUri(document), mimeType(document))
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
-        try {
-            startActivity(intent)
-        } catch (error: Exception) {
-            Logger.e(TAG, "no application can open $docId", error)
-            toast(getString(R.string.files_feature_unavailable))
-        }
+        val opened = FileSharing.openWith(
+            requireContext(),
+            repository.fileOf(document),
+            mimeType(document),
+        )
+        if (!opened) toast(getString(R.string.files_feature_unavailable))
     }
 
     private fun share(docId: String) {
         val document = repository.byId(docId) ?: return
-        val intent = Intent(Intent.ACTION_SEND).apply {
-            type = mimeType(document)
-            putExtra(Intent.EXTRA_STREAM, contentUri(document))
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
-        try {
-            startActivity(Intent.createChooser(intent, getString(R.string.files_share)))
-        } catch (error: Exception) {
-            Logger.e(TAG, "share of $docId failed", error)
-            toast(getString(R.string.files_feature_unavailable))
-        }
+        FileSharing.share(
+            requireContext(),
+            listOf(FileSharing.DocumentFile(repository.fileOf(document), mimeType(document))),
+            getString(R.string.files_share),
+        )
     }
 
     private fun printDocument(docId: String) {
@@ -689,22 +680,13 @@ class FilesFragment : BaseFragment() {
     }
 
     private fun shareDocuments(docs: List<Document>) {
-        val uris = docs.map { contentUri(it) }
-        val intent = Intent(Intent.ACTION_SEND).apply {
-            type = if (docs.size == 1) mimeType(docs.first()) else "*/*"
-            if (uris.size == 1) {
-                putExtra(Intent.EXTRA_STREAM, uris.first())
-            } else {
-                putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(uris))
-            }
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        val documents = docs.map { document ->
+            FileSharing.DocumentFile(
+                file = repository.fileOf(document),
+                mimeType = mimeType(document),
+            )
         }
-        try {
-            startActivity(Intent.createChooser(intent, getString(R.string.files_share)))
-        } catch (error: Exception) {
-            Logger.e(TAG, "share of ${docs.size} documents failed", error)
-            toast(getString(R.string.files_feature_unavailable))
-        }
+        FileSharing.share(requireContext(), documents, getString(R.string.files_share))
     }
 
     private fun renameSelected() {
@@ -713,7 +695,12 @@ class FilesFragment : BaseFragment() {
     }
 
     private fun mergeSelected() {
-        MergeActivity.start(requireContext())
+        if (selectedIds.size < 2) {
+            toast(getString(R.string.files_feature_unavailable))
+            return
+        }
+        // The files are picked already, the merge starts at the order step.
+        MergeActivity.start(requireContext(), selectedIds.toList())
     }
 
     private fun editSelected() {

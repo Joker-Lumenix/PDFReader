@@ -51,7 +51,8 @@
         android:id="@+id/progressView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" >
+        android:layout_weight="1"
+        android:clipChildren="false" >
 
         <View
             android:id="@+id/progressCard"
@@ -98,7 +99,8 @@
             android:layout_width="240dp"
             android:layout_height="24dp"
             android:layout_gravity="top|center_horizontal"
-            android:layout_marginTop="354dp">
+            android:layout_marginTop="354dp"
+            android:clipChildren="false">
 
             <View
                 android:id="@+id/progressTrack"

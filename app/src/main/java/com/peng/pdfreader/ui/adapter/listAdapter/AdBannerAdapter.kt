@@ -27,14 +27,28 @@ class AdBannerAdapter(
         return BannerHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: BannerHolder, position: Int) {
-        holder.binding.adSlot.style = AdSlotView.Style.BANNER
-        holder.binding.adSlot.content = content
-        Ads.loadBanner(holder.binding.adSlot)
+    override fun onBindViewHolder(holder: AdBannerAdapter.BannerHolder, position: Int) {
+        val slot = holder.binding.adSlot
+        slot.style = AdSlotView.Style.BANNER
+        // The banner of the design is a card with round corners in the list:
+        // the icon sits 12dp from the left, the button 8dp from the right.
+        slot.cornerRadiusDp = CORNER_RADIUS_DP
+        slot.setPadding(dp(holder, 12), 0, dp(holder, 8), 0)
+        slot.content = content
+        Ads.loadBanner(slot)
     }
 
     override fun getItemCount(): Int = 1
 
     class BannerHolder(val binding: FilesItemAdBannerBinding) :
         RecyclerView.ViewHolder(binding.root)
+
+    companion object {
+        /** The round corners of the card of the design. */
+        private const val CORNER_RADIUS_DP = 8
+    }
+
+    /** The dp of the screen of the holder. */
+    private fun dp(holder: BannerHolder, value: Int): Int =
+        (value * holder.itemView.resources.displayMetrics.density).toInt()
 }

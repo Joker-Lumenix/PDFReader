@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.ads.AdError
@@ -57,6 +58,9 @@ class SplashActivity : BaseActivity() {
 
     /** Whether the ad of the start up is here. */
     private var adLoaded = false
+
+    /** When the ad of the start up was asked for. */
+    private var adRequestedAt = 0L
 
     /** Whether the flow already continues. */
     private var leaving = false
@@ -127,12 +131,20 @@ class SplashActivity : BaseActivity() {
      * The progress is over.
      *
      * The page leaves the flow - unless the ad of the start up is still on its
-     * way, then the ad is shown first.
+     * way, then the page waits a moment for it and shows it first.
      */
     private fun onProgressComplete() {
-        if (adLoaded && !adShown) {
-            showSplashAd()
-            return
+        if (!adShown) {
+            if (adLoaded) {
+                showSplashAd(Ads.pendingAppOpen())
+                return
+            }
+            // The ad is still on its way - the page waits for it a moment, so
+            // the start up of the app shows it.
+            if (SystemClock.elapsedRealtime() - adRequestedAt < AD_WAIT_MS) {
+                handler.postDelayed({ onProgressComplete() }, AD_CHECK_MS)
+                return
+            }
         }
         leave()
     }
@@ -188,8 +200,18 @@ class SplashActivity : BaseActivity() {
      *
      * It is loaded while the progress runs and it is shown as soon as it
      * arrives. When the user closes it, the progress runs to the end.
+     *
+     * An ad that was loaded at the end of the last start of the app is shown
+     * right away - it does not have to be loaded again.
      */
     private fun loadSplashAd() {
+        val pending = Ads.pendingAppOpen()
+        if (pending != null) {
+            adLoaded = true
+            showSplashAd(pending)
+            return
+        }
+        adRequestedAt = SystemClock.elapsedRealtime()
         Ads.loadAppOpen(
             context = this,
             onLoaded = { ad ->
@@ -213,6 +235,7 @@ class SplashActivity : BaseActivity() {
             leave()
             return
         }
+        Ads.releaseAppOpen()
         ad.fullScreenContentCallback = object : FullScreenContentCallback() {
             override fun onAdDismissedFullScreenContent() {
                 onSplashAdClosed()
@@ -356,6 +379,12 @@ class SplashActivity : BaseActivity() {
 
         /** The progress runs at most twenty seconds. */
         const val MAX_CYCLE_MS = 20_000L
+
+        /** How long the page waits for the ad of the start up. */
+        const val AD_WAIT_MS = 5_000L
+
+        /** How often the page looks for the ad of the start up. */
+        const val AD_CHECK_MS = 250L
 
         /** How often the progress is drawn, in milliseconds. */
         const val TICK_MS = 100L

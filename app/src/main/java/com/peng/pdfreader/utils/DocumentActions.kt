@@ -73,18 +73,14 @@ class DocumentActions(private val host: Fragment) {
     }
 
     private fun share(context: Context, docId: String) {
-        val document = repository(context).byId(docId) ?: return
-        val intent = Intent(Intent.ACTION_SEND).apply {
-            type = mimeType(document)
-            putExtra(Intent.EXTRA_STREAM, contentUri(context, document))
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
-        try {
-            context.startActivity(Intent.createChooser(intent, context.getString(R.string.files_share)))
-        } catch (error: Exception) {
-            Logger.e(TAG, "share of $docId failed", error)
-            toast(context)
-        }
+        val repo = repository(context)
+        val document = repo.byId(docId) ?: return
+        val file = repo.fileOf(document)
+        FileSharing.share(
+            context,
+            listOf(FileSharing.DocumentFile(file, mimeType(document))),
+            context.getString(R.string.files_share),
+        )
     }
 
     private fun printDocument(context: Context, docId: String) {

@@ -13,8 +13,10 @@ import com.peng.pdfreader.core.util.Logger
 import com.peng.pdfreader.core.widget.AdSlotView
 import com.peng.pdfreader.base.BaseActivity
 import com.peng.pdfreader.base.ShareFileProvider
+import com.peng.pdfreader.data.DocType
 import com.peng.pdfreader.data.Document
 import com.peng.pdfreader.data.DocumentRepository
+import com.peng.pdfreader.utils.FileSharing
 import com.peng.pdfreader.databinding.ActivityToolsResultBinding
 import com.peng.pdfreader.ui.dialogs.BottomSheetToolTextInput
 import com.peng.pdfreader.ui.uiData.AdSamples
@@ -159,16 +161,16 @@ class ResultActivity : BaseActivity() {
 
     /** Hands the document to another app through the file provider. */
     private fun shareDocument(document: Document) {
-        val intent = Intent(Intent.ACTION_SEND)
-            .setType("application/pdf")
-            .putExtra(
-                Intent.EXTRA_STREAM,
-                ShareFileProvider.uriFor(this, repository.fileOf(document)),
-            )
-            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        runCatching {
-            startActivity(Intent.createChooser(intent, getString(R.string.share)))
-        }.onFailure { toast(R.string.tools_not_available) }
+        FileSharing.share(
+            this,
+            listOf(
+                FileSharing.DocumentFile(
+                    repository.fileOf(document),
+                    DocType.mimeTypeOf(document.name) ?: "application/pdf",
+                ),
+            ),
+            getString(R.string.share),
+        )
     }
 
     private fun openWith(document: Document) {

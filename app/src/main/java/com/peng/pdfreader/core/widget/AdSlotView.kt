@@ -1,11 +1,13 @@
 package com.peng.pdfreader.core.widget
 
 import android.content.Context
+import android.graphics.drawable.GradientDrawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import com.peng.pdfreader.R
 
 /**
@@ -47,6 +49,19 @@ class AdSlotView @JvmOverloads constructor(
         set(value) {
             field = value
             inflateStyle()
+            applyBackground()
+        }
+
+    /**
+     * The radius of the card of the slot, in dp.
+     *
+     * The banner of the design is a card with round corners when it sits in a
+     * list of files, the banner at the bottom of the tools page is plain.
+     */
+    var cornerRadiusDp: Int = 0
+        set(value) {
+            field = value
+            applyBackground()
         }
 
     /** The sample that is rendered inside the slot. */
@@ -63,7 +78,31 @@ class AdSlotView @JvmOverloads constructor(
         )
         addView(adHost, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
         adHost.visibility = GONE
+        // The banner of the design: the icon sits 24dp from the left, the
+        // button of the install 20dp from the right.
+        setPadding(dp(24), 0, dp(20), 0)
         inflateStyle()
+        applyBackground()
+    }
+
+    /** The dp of the screen. */
+    private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
+
+    /**
+     * The card of the slot.
+     *
+     * The banner of the design is painted by the slot itself, so the round
+     * corners of the card of a list are visible. The card layout brings its
+     * own background.
+     */
+    private fun applyBackground() {
+        background = when (style) {
+            Style.BANNER -> GradientDrawable().apply {
+                cornerRadius = cornerRadiusDp * resources.displayMetrics.density
+                setColor(ContextCompat.getColor(context, R.color.surface_card))
+            }
+            Style.CARD -> null
+        }
     }
 
     private fun inflateStyle() {

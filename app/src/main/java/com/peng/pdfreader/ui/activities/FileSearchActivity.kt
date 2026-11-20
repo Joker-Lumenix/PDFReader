@@ -3,14 +3,19 @@ package com.peng.pdfreader.ui.activities
 import android.content.Intent
 import android.content.Context
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.print.PrintAttributes
 import android.print.PrintManager
 import android.view.inputmethod.InputMethodManager
+import android.view.WindowManager
 import android.widget.Toast
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -39,6 +44,7 @@ import com.peng.pdfreader.ui.dialogs.DocumentActionSheet
 import com.peng.pdfreader.ui.dialogs.DocumentCipher
 import com.peng.pdfreader.ui.uiData.FileActions
 import com.peng.pdfreader.utils.DocumentThumbnails
+import com.peng.pdfreader.utils.FileSharing
 import com.peng.pdfreader.utils.FileUi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -56,6 +62,9 @@ class FileSearchActivity : BaseActivity() {
 
     /** The keyword of the last query. */
     private var keyword: String? = null
+
+    /** Whether the list of the page was put in place already. */
+    private var listPlaced = false
 
     /** True while the more sheet of a row is open. */
     private var actionSheetOpen = false
@@ -140,14 +149,35 @@ class FileSearchActivity : BaseActivity() {
             },
         )
         binding.recycler.layoutManager = LinearLayoutManager(this)
-        // The ad slot of the design sits at the end of the results, it is the
-        // same one the home page shows.
+        // The ad slot of the design is the first entry of the results, it is
+        // the same one the home page shows.
         binding.recycler.adapter = ConcatAdapter(
-            adapter,
             AdBannerAdapter(AdSamples.banner(this)),
+            adapter,
         )
-        binding.recycler.setHasFixedSize(true)
         binding.recycler.addItemDecoration(FileListItemDecoration(dp(ROW_GAP)))
+        keepTheListInPlace()
+    }
+
+    /**
+     * Keeps the list of the page where it is.
+     *
+     * The keyboard of the search field resizes the window of the page. The
+     * list must not jump while that happens - it takes the inset of the
+     * keyboard as its lower padding instead, so the rows keep their place.
+     */
+    private fun keepTheListInPlace() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            // The window draws behind the system bars from Android 15 on, the
+            // page handles the keyboard itself - the window keeps its size
+            // and the list does not jump.
+            window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING)
+        }
+        ViewCompat.setOnApplyWindowInsetsListener(binding.recycler) { view, insets ->
+            val keyboard = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
+            view.updatePadding(bottom = dp(LIST_PADDING_DP) + keyboard)
+            insets
+        }
     }
 
     /**
@@ -255,13 +285,11 @@ class FileSearchActivity : BaseActivity() {
     /** Shares the document with another application. */
     private fun share(docId: String) {
         val document = repository.byId(docId) ?: return
-        val intent = Intent(Intent.ACTION_SEND).apply {
-            type = mimeType(document)
-            putExtra(Intent.EXTRA_STREAM, contentUri(document))
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
-        runCatching { startActivity(Intent.createChooser(intent, getString(R.string.files_share))) }
-            .onFailure { toast(getString(R.string.files_feature_unavailable)) }
+        FileSharing.share(
+            this,
+            listOf(FileSharing.DocumentFile(repository.fileOf(document), mimeType(document))),
+            getString(R.string.files_share),
+        )
     }
 
     /** Sends the document to the printer of the system. */
@@ -311,6 +339,12 @@ class FileSearchActivity : BaseActivity() {
 
 
     private fun render(documents: List<Document>) {
+        // The list of the page starts at the top, also after the keyboard of
+        // the search field came up.
+        if (!listPlaced) {
+            listPlaced = true
+            binding.recycler.scrollToPosition(0)
+        }
         // A search hit paints the keyword in the brand colour, the rest of the
         // name keeps the colour of the design.
         val hit = keyword?.trim()?.takeIf { it.isNotEmpty() }
@@ -346,6 +380,9 @@ class FileSearchActivity : BaseActivity() {
     companion object {
         private const val TAG = "FileSearchActivity"
         private const val ROW_GAP = 12
+
+        /** The lower padding of the list of the page. */
+        private const val LIST_PADDING_DP = 12
 
         /** How long the search field waits for the keyboard of the page. */
         private const val FOCUS_BACK_DELAY_MS = 200L

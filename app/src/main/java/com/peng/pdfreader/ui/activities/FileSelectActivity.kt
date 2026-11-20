@@ -28,6 +28,7 @@ import com.peng.pdfreader.ui.dialogs.DocumentActionSheet
 import com.peng.pdfreader.ui.dialogs.PopWindowFileFilter
 import com.peng.pdfreader.ui.uiData.FileActions
 import com.peng.pdfreader.utils.DocumentThumbnails
+import com.peng.pdfreader.utils.FileSharing
 import com.peng.pdfreader.utils.FileUi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -166,25 +167,22 @@ class FileSelectActivity : BaseActivity() {
     /** Hands the document to another application. */
     private fun openWith(docId: String) {
         val document = repository.byId(docId) ?: return
-        val intent = Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(ShareFileProvider.uriFor(this@FileSelectActivity, repository.fileOf(document)), mimeType(document))
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
-        runCatching { startActivity(intent) }
-            .onFailure { toast(getString(R.string.files_feature_unavailable)) }
+        val opened = FileSharing.openWith(
+            this,
+            repository.fileOf(document),
+            mimeType(document),
+        )
+        if (!opened) toast(getString(R.string.files_feature_unavailable))
     }
 
     /** Shares the document with another application. */
     private fun shareDocument(docId: String) {
         val document = repository.byId(docId) ?: return
-        val uri = ShareFileProvider.uriFor(this, repository.fileOf(document))
-        val intent = Intent(Intent.ACTION_SEND).apply {
-            type = mimeType(document)
-            putExtra(Intent.EXTRA_STREAM, uri)
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
-        runCatching { startActivity(Intent.createChooser(intent, getString(R.string.files_share))) }
-            .onFailure { toast(getString(R.string.files_feature_unavailable)) }
+        FileSharing.share(
+            this,
+            listOf(FileSharing.DocumentFile(repository.fileOf(document), mimeType(document))),
+            getString(R.string.files_share),
+        )
     }
 
     // ------------------------------------------------------------------ data
@@ -348,7 +346,8 @@ class FileSelectActivity : BaseActivity() {
             toast(getString(R.string.files_feature_unavailable))
             return
         }
-        MergeActivity.start(this)
+        // The files are picked already, the merge starts at the order step.
+        MergeActivity.start(this, selectedIds.toList())
     }
 
     private fun editSelected() {
@@ -362,18 +361,13 @@ class FileSelectActivity : BaseActivity() {
             toast(getString(R.string.files_feature_unavailable))
             return
         }
-        val uris = docs.map { ShareFileProvider.uriFor(this, repository.fileOf(it)) }
-        val intent = Intent(Intent.ACTION_SEND).apply {
-            type = if (docs.size == 1) mimeType(docs.first()) else "*/*"
-            if (uris.size == 1) {
-                putExtra(Intent.EXTRA_STREAM, uris.first())
-            } else {
-                putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(uris))
-            }
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        val documents = docs.map { document ->
+            FileSharing.DocumentFile(
+                file = repository.fileOf(document),
+                mimeType = mimeType(document),
+            )
         }
-        runCatching { startActivity(Intent.createChooser(intent, getString(R.string.files_share))) }
-            .onFailure { toast(getString(R.string.files_feature_unavailable)) }
+        FileSharing.share(this, documents, getString(R.string.files_share))
     }
 
     private fun mimeType(document: Document): String =

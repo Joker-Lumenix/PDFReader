@@ -117,7 +117,15 @@ class MergeActivity : BaseActivity() {
         attachDragReorder()
 
         loadDocuments()
-        showStep(Step.SELECT)
+        // The files that were picked on the page of the files are already
+        // there - the merge starts at the order step then.
+        val picked = intent?.getStringArrayExtra(EXTRA_PICKED_IDS)?.toList().orEmpty()
+        if (picked.isNotEmpty()) {
+            selection.addAll(picked)
+            showStep(Step.ORDER)
+        } else {
+            showStep(Step.SELECT)
+        }
     }
 
     private fun loadDocuments() {
@@ -314,9 +322,25 @@ class MergeActivity : BaseActivity() {
         /** The merge always writes a PDF. */
         private const val PDF_EXTENSION = ".pdf"
 
+        /** The ids of the files that were picked before the merge started. */
+        private const val EXTRA_PICKED_IDS = "com.peng.pdfreader.extra.PICKED_IDS"
+
         /** Opens the merge flow. */
         fun start(context: Context) {
             context.startActivity(Intent(context, MergeActivity::class.java))
+        }
+
+        /**
+         * Opens the merge flow with the files that are already picked.
+         *
+         * The merge starts at the step that fixes the order then - the files
+         * do not have to be picked again.
+         */
+        fun start(context: Context, pickedIds: List<String>) {
+            val intent = Intent(context, MergeActivity::class.java).apply {
+                putExtra(EXTRA_PICKED_IDS, pickedIds.toTypedArray())
+            }
+            context.startActivity(intent)
         }
     }
 }

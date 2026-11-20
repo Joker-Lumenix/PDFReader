@@ -3,6 +3,7 @@ package com.peng.pdfreader.data
 import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
+import com.peng.pdfreader.base.ShareFileProvider
 import com.peng.pdfreader.core.util.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -79,9 +80,16 @@ class DocumentRepository private constructor(private val appContext: Context) {
             documents.removeAll { it.id in ids }
         }
         // Files that no document points to any more are leftovers of an older
-        // version, they have no place in the sandbox either.
+        // version, they have no place in the sandbox either. The copies that
+        // were made for a share are leftovers as well.
         sandboxDir.listFiles()?.forEach { file ->
-            if (file.isFile && DocType.of(file.name) == null) {
+            if (!file.isFile) return@forEach
+            if (file.name.startsWith(ShareFileProvider.SHARE_PREFIX)) {
+                Logger.i(TAG, "the copy of a share is removed from the sandbox")
+                file.delete()
+                return@forEach
+            }
+            if (DocType.of(file.name) == null) {
                 Logger.i(TAG, "the unsupported file ${file.name} is removed from the sandbox")
                 file.delete()
             }

@@ -92,10 +92,27 @@ object Ads {
     }
 
     /**
+     * The ad of the start up that is loaded and not shown yet.
+     *
+     * The ad is kept here, so it is not lost when the page of the start up
+     * leaves before the ad arrives - the next start of the app shows it.
+     */
+    private var appOpenAd: AppOpenAd? = null
+
+    /** The ad of the start up that is ready to be shown, null when there is none. */
+    fun pendingAppOpen(): AppOpenAd? = appOpenAd
+
+    /** Gives the ad of the start up back - it was shown. */
+    fun releaseAppOpen() {
+        appOpenAd = null
+    }
+
+    /**
      * Loads the ad of the start up screen.
      *
      * The ad of the start up screen is shown as soon as it arrives, the start
-     * up page waits for it.
+     * up page waits for it. An ad that arrives too late is kept for the next
+     * start of the app.
      *
      * @param onLoaded called with the ad that can be shown now.
      * @param onFailed called when the ad could not be loaded.
@@ -114,6 +131,7 @@ object Ads {
                 AdRequest.Builder().build(),
                 object : AppOpenAd.AppOpenAdLoadCallback() {
                     override fun onAdLoaded(ad: AppOpenAd) {
+                        appOpenAd = ad
                         onLoaded(ad)
                     }
 
