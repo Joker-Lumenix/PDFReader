@@ -56,7 +56,37 @@ class DocumentRepository private constructor(private val appContext: Context) {
         cacheDir = File(context.cacheDir, "thumbs").apply { mkdirs() }
         stateFile = File(context.filesDir, "library.json")
         loadState()
+        removeUnsupportedFiles()
         installSamples(context)
+    }
+
+    /**
+     * Removes the files of the sandbox that the app does not support.
+     *
+     * The library only holds the documents of the four supported formats. A
+     * picture or a text file of an earlier version must not stay in the app,
+     * so it is deleted with the sandbox.
+     */
+    private fun removeUnsupportedFiles() {
+        val unsupported = documents.filter { DocType.of(it.name) == null }
+        if (unsupported.isNotEmpty()) {
+            unsupported.forEach { doc ->
+                if (isInSandbox(doc.path)) File(doc.path).delete()
+                annotations.remove(doc.id)
+                bookmarks.remove(doc.id)
+            }
+            val ids = unsupported.mapTo(mutableSetOf()) { it.id }
+            documents.removeAll { it.id in ids }
+        }
+        // Files that no document points to any more are leftovers of an older
+        // version, they have no place in the sandbox either.
+        sandboxDir.listFiles()?.forEach { file ->
+            if (file.isFile && DocType.of(file.name) == null) {
+                Logger.i(TAG, "the unsupported file ${file.name} is removed from the sandbox")
+                file.delete()
+            }
+        }
+        if (unsupported.isNotEmpty()) persist()
     }
 
     /**
@@ -69,12 +99,14 @@ class DocumentRepository private constructor(private val appContext: Context) {
         if (added.isEmpty()) return
         added.forEach { file ->
             if (documents.any { it.name == file.name }) return@forEach
+            // A sample of a format the app does not support is not installed.
+            val type = SampleDocuments.typeOf(file.name) ?: return@forEach
             val now = System.currentTimeMillis()
             documents.add(
                 Document(
                     id = UUID.randomUUID().toString(),
                     name = file.name,
-                    type = SampleDocuments.typeOf(file.name),
+                    type = type,
                     path = file.absolutePath,
                     sizeBytes = file.length(),
                     createdAt = now,
@@ -97,12 +129,24 @@ class DocumentRepository private constructor(private val appContext: Context) {
     /**
      * Copies a document picked with the system file picker into the sandbox.
      *
-     * @return the stored document, or null when the source cannot be read.
+     * Only the formats the app supports are copied - a text file, a picture or
+     * an archive is refused, so it never reaches the library.
+     *
+     * @return the stored document, or null when the source cannot be read or
+     * its format is not supported.
      */
     suspend fun importFromUri(context: Context, uri: Uri): Document? = withContext(Dispatchers.IO) {
         runCatching {
-            val name = displayName(context, uri) ?: "document"
-            val type = DocType.of(name)
+            val display = displayName(context, uri) ?: "document"
+            val mime = runCatching { context.contentResolver.getType(uri) }.getOrNull()
+            val type = typeOf(display, mime) ?: return@runCatching null
+            // A provider that does not name its files gives a name without an
+            // extension - the format of the file is written to it.
+            val name = if (DocType.of(display) == null) {
+                "$display.${DocType.extensionOf(mime)}"
+            } else {
+                display
+            }
             val id = UUID.randomUUID().toString()
             val target = File(sandboxDir, "${id}_$name")
             context.contentResolver.openInputStream(uri)?.use { input ->
@@ -122,6 +166,23 @@ class DocumentRepository private constructor(private val appContext: Context) {
             persist()
             doc
         }.getOrNull()
+    }
+
+    /**
+     * The type of a file that is handed over by another app.
+     *
+     * The name of the file and the mime type of the provider are both looked
+     * at: a known mime type has to be a supported one and it has to match the
+     * name of the file. A provider that does not name its type (or that names
+     * it as a generic stream) is trusted as far as the name goes.
+     *
+     * @return the type, or null when the format is not supported.
+     */
+    private fun typeOf(name: String, mime: String?): DocType? {
+        val byName = DocType.of(name)
+        if (mime.isNullOrBlank() || mime.equals(GENERIC_MIME, ignoreCase = true)) return byName
+        val byMime = DocType.ofMime(mime) ?: return null
+        return if (byName == null) byMime else if (byName == byMime) byName else null
     }
 
     /** Registers an already existing file (used by the generators of the tools). */
@@ -417,12 +478,16 @@ class DocumentRepository private constructor(private val appContext: Context) {
             val root = JSONObject(stateFile.readText())
             val docs = root.optJSONArray("documents") ?: JSONArray()
             for (i in 0 until docs.length()) {
-                val o = docs.getJSONObject(i)
+                val o = runCatching { docs.getJSONObject(i) }.getOrNull() ?: continue
+                // A record of an older version may hold a format the app does
+                // not support any more. Such a document is skipped, it must
+                // not take the whole library down with it.
+                val type = DocType.entries.firstOrNull { it.name == o.optString("type") } ?: continue
                 documents.add(
                     Document(
                         id = o.getString("id"),
                         name = o.getString("name"),
-                        type = DocType.valueOf(o.getString("type")),
+                        type = type,
                         path = o.getString("path"),
                         sizeBytes = o.optLong("size"),
                         createdAt = o.optLong("created"),
@@ -479,6 +544,12 @@ class DocumentRepository private constructor(private val appContext: Context) {
     companion object {
         /** The tag of the log of the repository. */
         private const val TAG = "DocumentRepository"
+
+        /**
+         * The mime type of a provider that does not name the format of its
+         * files - the name of the file is the only hint then.
+         */
+        private const val GENERIC_MIME = "application/octet-stream"
 
         /**
          * The shortest time between two scans of the shared storage.

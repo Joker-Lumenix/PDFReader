@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="tools_scan_to_pdf">掃描成 PDF</string>
-    <string name="tools_zip_file">壓縮檔</string>
     <string name="tools_label_lock">鎖定 PDF</string>
     <string name="tools_label_unlock">解鎖 PDF</string>
-    <string name="tools_label_zip">Zip 檔案</string>
     <string name="tools_not_available">此功能尚未上線</string>
     <string name="tools_failed">操作失敗：%1$s</string>
     <string name="tools_working">處理中…</string>
@@ -69,7 +67,6 @@
     <string name="tools_result_path">路徑：%1$s</string>
     <string name="tools_result_pages">%1$d 頁</string>
     <string name="tools_result_share_unavailable">分享功能尚未開放</string>
-    <string name="tools_zip_done">已產生壓縮檔：%1$s</string>
     <string name="tools_image_albums">相簿</string>
     <string name="tools_image_all_albums">全部照片</string>
     <string name="tools_image_album_other">其他相簿</string>

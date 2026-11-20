@@ -22,12 +22,13 @@
 - Kotlin + Android View 体系（XML 布局 + ViewBinding + RecyclerView）。**不使用 Jetpack Compose**。
 - 只有一个 `:app` 模块。预览内核（PDF 引擎、OOXML 解析、预览自定义 View、通用弹窗基类）在 `com.peng.pdfreader.core` 包内，业务层在 `com.peng.pdfreader.ui` / `feature` 等包内。
 - 所有自定义 View 统一放在 `com.peng.pdfreader.core.widget` 一个包内。
+- 应用只支持 PDF / Word(.doc, .docx) / Excel(.xls, .xlsx) / PowerPoint(.ppt, .pptx) 四种文档格式：其他格式（txt、图片、压缩包等）不进入文件列表，`DocType` 里也不得为此新增枚举值。
 - 代码中不得出现全路径类名，一律使用 `import`。
 - 依赖必须来自海外仓库（`google()` / `mavenCentral()` / `gradlePluginPortal()`），不得引入国内镜像。
 
 ## 国际化约定
 
-- App 名称与文件类型名（PDF / Word / Excel / PPT / TXT）标记 `translatable="false"`，且不得出现在任何 `values-XX` 语言包中。
+- App 名称与文件类型名（PDF / Word / Excel / PPT）标记 `translatable="false"`，且不得出现在任何 `values-XX` 语言包中。
 - 业务文案一律走 `res/values*/strings*.xml`，禁止把面向用户的文案写死在 Kotlin 或 XML 布局中。
 - PDF 引擎只抛稳定错误码（如 `PDF_ENCRYPTED`），由 app 层映射为本地化文案。
 

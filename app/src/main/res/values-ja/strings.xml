@@ -67,7 +67,6 @@
     <string name="grid_view">グリッド表示</string>
     <string name="highlight">Highlight</string>
     <string name="home">ホーム</string>
-    <string name="image">画像</string>
     <string name="image_to_pdf">Image to PDF</string>
     <string name="import_count">インポート(%1$d)</string>
     <string name="import_success">インポート完了</string>
@@ -79,7 +78,6 @@
     <string name="language">言語</string>
     <string name="language_selection">言語選択</string>
     <string name="list_view">リスト表示</string>
-    <string name="long_image">ロング画像</string>
     <string name="md5">MD5 checksum</string>
     <string name="merge">PDF を結合</string>
     <string name="merge_count">結合(%1$d)</string>
@@ -185,7 +183,6 @@
     <string name="various_pdf_tools">豊富な PDF ツール</string>
     <string name="version">Version</string>
     <string name="view">表示</string>
-    <string name="zip_package">ページ ZIP</string>
     <string name="nav_home">ホーム</string>
     <string name="nav_files">ファイル</string>
     <string name="nav_tools">ツール</string>

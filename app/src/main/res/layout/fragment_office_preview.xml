@@ -168,6 +168,8 @@
                 android:layout_marginTop="4dp"
                 android:gravity="center_horizontal"
                 android:text="@string/files_open_with"
+                android:maxLines="1"
+                android:ellipsize="end"
                 android:textColor="@color/text_secondary"
                 android:textSize="12sp" />
 

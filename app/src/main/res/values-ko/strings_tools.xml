@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="tools_scan_to_pdf">스캔해서 PDF 만들기</string>
-    <string name="tools_zip_file">ZIP 압축 파일</string>
     <string name="tools_label_lock">PDF 잠금</string>
     <string name="tools_label_unlock">PDF 잠금 해제</string>
-    <string name="tools_label_zip">Zip 파일</string>
     <string name="tools_not_available">이 기능은 아직 사용할 수 없습니다</string>
     <string name="tools_failed">작업에 실패했습니다: %1$s</string>
     <string name="tools_working">처리 중…</string>
@@ -69,7 +67,6 @@
     <string name="tools_result_path">경로: %1$s</string>
     <string name="tools_result_pages">%1$d페이지</string>
     <string name="tools_result_share_unavailable">공유 기능은 아직 사용할 수 없습니다</string>
-    <string name="tools_zip_done">ZIP 파일을 만들었습니다: %1$s</string>
     <string name="tools_image_albums">앨범</string>
     <string name="tools_image_all_albums">모든 사진</string>
     <string name="tools_image_album_other">기타 앨범</string>

@@ -16,7 +16,4 @@ fun DocType.chipColorRes(): Int = when (this) {
     DocType.WORD -> R.color.text_link
     DocType.EXCEL -> R.color.text_success
     DocType.PPT -> R.color.text_warning
-    DocType.IMAGE -> R.color.brand_primary_light
-    DocType.TXT -> R.color.text_secondary
-    DocType.OTHER -> R.color.text_secondary
 }

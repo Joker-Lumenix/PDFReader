@@ -20,6 +20,10 @@ object SampleDocuments {
     /**
      * Copies the bundled samples into the sandbox.
      *
+     * Only the formats the app supports are copied - the samples are the
+     * documents of the four formats, a picture of an older version stays out
+     * of the sandbox.
+     *
      * @return the files that were added.
      */
     fun install(context: Context, sandbox: File): List<File> {
@@ -27,6 +31,7 @@ object SampleDocuments {
             ?: return emptyList()
         val installed = mutableListOf<File>()
         names.forEach { name ->
+            if (typeOf(name) == null) return@forEach
             val target = File(sandbox, name)
             if (target.exists()) return@forEach
             val copied = runCatching {
@@ -74,6 +79,10 @@ object SampleDocuments {
         target
     }.getOrNull()
 
-    /** The type of a sample file, derived from its name. */
-    fun typeOf(name: String): DocType = DocType.of(name)
+    /**
+     * The type of a sample file, derived from its name.
+     *
+     * @return the type, or null when the format is not supported.
+     */
+    fun typeOf(name: String): DocType? = DocType.of(name)
 }

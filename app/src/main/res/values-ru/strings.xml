@@ -67,7 +67,6 @@
     <string name="grid_view">Сетка</string>
     <string name="highlight">Highlight</string>
     <string name="home">Главная</string>
-    <string name="image">Изображение</string>
     <string name="image_to_pdf">Image to PDF</string>
     <string name="import_count">Импорт(%1$d)</string>
     <string name="import_success">Импортировано</string>
@@ -79,7 +78,6 @@
     <string name="language">Язык</string>
     <string name="language_selection">Выбор языка</string>
     <string name="list_view">Список</string>
-    <string name="long_image">Длинное изображение</string>
     <string name="md5">MD5 checksum</string>
     <string name="merge">Объединить PDF</string>
     <string name="merge_count">Объединить(%1$d)</string>
@@ -185,7 +183,6 @@
     <string name="various_pdf_tools">Различные инструменты для PDF</string>
     <string name="version">Version</string>
     <string name="view">Просмотр</string>
-    <string name="zip_package">ZIP страниц</string>
     <string name="nav_home">Главная</string>
     <string name="nav_files">Файлы</string>
     <string name="nav_tools">Инструменты</string>

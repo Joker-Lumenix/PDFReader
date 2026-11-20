@@ -82,13 +82,13 @@ object SharedStorage {
     /**
      * Adds a file to the result when the app can work with its type.
      *
-     * The pictures are not part of the document list of the app - they belong
-     * to the image to pdf tool, which picks them on its own.
+     * Only the documents of the app - PDF, Word, Excel and PowerPoint - belong
+     * to the list. Every other file of the device (a text file, a picture, an
+     * archive) is not supported and is left alone.
      */
     private fun addFile(file: File, found: MutableList<SharedFile>) {
         if (file.length() <= 0L) return
-        val type = DocType.of(file.name)
-        if (type == DocType.OTHER || type == DocType.IMAGE) return
+        val type = DocType.of(file.name) ?: return
         found += SharedFile(file, type)
     }
 

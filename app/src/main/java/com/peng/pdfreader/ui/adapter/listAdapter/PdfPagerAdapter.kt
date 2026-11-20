@@ -22,7 +22,6 @@ class PdfPagerAdapter(
     private val file: File,
     private val pageCount: Int,
     private val readingMode: ReadingMode,
-    private val image: Boolean = false,
 ) : RecyclerView.Adapter<PdfPagerAdapter.Holder>() {
 
     private val views = HashMap<Int, PdfPageView>()
@@ -91,11 +90,7 @@ class PdfPagerAdapter(
         view.onRenderFailed = { onRenderFailed?.invoke() }
         applySelectionTo(view, position)
         applyInkTo(view, position)
-        if (image) {
-            view.setImage(file)
-        } else {
-            view.setPage(file, position)
-        }
+        view.setPage(file, position)
     }
 
     override fun onViewRecycled(holder: Holder) {

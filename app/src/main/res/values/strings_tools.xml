@@ -11,11 +11,9 @@
     <!-- ==================== tools tab ==================== -->
 
     <string name="tools_scan_to_pdf">扫描成 PDF</string>
-    <string name="tools_zip_file">压缩包</string>
     <!-- the labels of the tool cards follow the design "tools" -->
     <string name="tools_label_lock">锁定 PDF</string>
     <string name="tools_label_unlock">解锁 PDF</string>
-    <string name="tools_label_zip">Zip 文件</string>
     <string name="tools_not_available">该功能尚未上线</string>
     <string name="tools_failed">操作失败：%1$s</string>
     <string name="tools_working">处理中…</string>
@@ -104,7 +102,6 @@
     <string name="tools_result_path">路径：%1$s</string>
     <string name="tools_result_pages">%1$d 页</string>
     <string name="tools_result_share_unavailable">分享功能尚未开放</string>
-    <string name="tools_zip_done">已生成压缩包：%1$s</string>
 
     <string name="tools_image_albums">相册</string>
     <string name="tools_image_all_albums">所有照片</string>

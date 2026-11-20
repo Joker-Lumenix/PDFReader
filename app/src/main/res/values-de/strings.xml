@@ -67,7 +67,6 @@
     <string name="grid_view">Rasteransicht</string>
     <string name="highlight">Highlight</string>
     <string name="home">Start</string>
-    <string name="image">Bild</string>
     <string name="image_to_pdf">Image to PDF</string>
     <string name="import_count">Importieren(%1$d)</string>
     <string name="import_success">Importiert</string>
@@ -79,7 +78,6 @@
     <string name="language">Sprache</string>
     <string name="language_selection">Sprachauswahl</string>
     <string name="list_view">Listenansicht</string>
-    <string name="long_image">Langes Bild</string>
     <string name="md5">MD5 checksum</string>
     <string name="merge">PDFs zusammenführen</string>
     <string name="merge_count">Zusammenführen(%1$d)</string>
@@ -185,7 +183,6 @@
     <string name="various_pdf_tools">Vielfältige PDF-Werkzeuge</string>
     <string name="version">Version</string>
     <string name="view">Ansehen</string>
-    <string name="zip_package">Seiten-ZIP</string>
     <string name="nav_home">Start</string>
     <string name="nav_files">Dateien</string>
     <string name="nav_tools">Werkzeuge</string>

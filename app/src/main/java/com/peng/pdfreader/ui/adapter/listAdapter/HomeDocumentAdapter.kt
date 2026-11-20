@@ -7,13 +7,11 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.peng.pdfreader.core.util.Thumbnails
 import com.peng.pdfreader.core.widget.FileItemUiState
 import com.peng.pdfreader.core.widget.FileListItemView
 import com.peng.pdfreader.core.widget.createForList
 import com.peng.pdfreader.data.DocType
 import com.peng.pdfreader.data.Document
-import com.peng.pdfreader.data.DocumentRepository
 import com.peng.pdfreader.utils.PageCountDrawable
 import com.peng.pdfreader.ui.uiData.chipColorRes
 import com.peng.pdfreader.ui.widget.LockThumbnailDrawable
@@ -71,15 +69,10 @@ class HomeDocumentAdapter(
      * The thumbnail of a row.
      *
      * The design draws the type logo with the number of pages on a dark chip
-     * in its lower right corner, raster documents show their own picture and an
-     * encrypted document shows its blurred page with the lock badge.
+     * in its lower right corner, an encrypted document shows its blurred page
+     * with the lock badge.
      */
     private fun thumbnail(context: Context, document: Document): Drawable? {
-        if (document.type == DocType.IMAGE) {
-            val file = DocumentRepository.get(context).fileOf(document)
-            val picture = Thumbnails.load(context, file)
-            if (picture != null) return picture
-        }
         if (document.isEncrypted) {
             val logo = ContextCompat.getDrawable(context, document.type.logoRes)
             return LockThumbnailDrawable(

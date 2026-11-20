@@ -47,16 +47,4 @@ class FileUiTest {
             .map { FileUi.typeColor(it) }
         assertEquals("every type needs its own colour", colours.size, colours.toSet().size)
     }
-
-    @Test
-    fun `the remaining types share the fallback colour`() {
-        assertEquals(
-            FileUi.typeColor(DocType.OTHER),
-            FileUi.typeColor(DocType.IMAGE),
-        )
-        assertEquals(
-            FileUi.typeColor(DocType.OTHER),
-            FileUi.typeColor(DocType.TXT),
-        )
-    }
 }

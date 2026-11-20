@@ -67,7 +67,6 @@
     <string name="grid_view">Paparan grid</string>
     <string name="highlight">Sorotan</string>
     <string name="home">Laman utama</string>
-    <string name="image">Imej</string>
     <string name="image_to_pdf">Imej ke PDF</string>
     <string name="import_count">Import(%1$d)</string>
     <string name="import_success">Berjaya diimport</string>
@@ -79,7 +78,6 @@
     <string name="language">Bahasa</string>
     <string name="language_selection">Pilihan bahasa</string>
     <string name="list_view">Paparan senarai</string>
-    <string name="long_image">Imej panjang</string>
     <string name="md5">Semakan MD5</string>
     <string name="merge">Gabung PDF</string>
     <string name="merge_count">Gabungkan(%1$d)</string>
@@ -185,7 +183,6 @@
     <string name="various_pdf_tools">Pelbagai alat PDF</string>
     <string name="version">Versi</string>
     <string name="view">Lihat</string>
-    <string name="zip_package">ZIP halaman</string>
     <string name="nav_home">Laman utama</string>
     <string name="nav_files">Fail</string>
     <string name="nav_tools">Alat</string>

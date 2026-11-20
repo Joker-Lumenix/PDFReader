@@ -19,8 +19,8 @@ import com.peng.pdfreader.ui.fragments.PdfPreviewFragment
 /**
  * Preview host.
  *
- * One activity serves every format: PDF and images go to the PDF reader,
- * Word / Excel / PowerPoint go to the offline Office preview.
+ * One activity serves every format: the PDF goes to the PDF reader, the Word /
+ * Excel / PowerPoint documents go to the offline Office preview.
  */
 class PreviewActivity : BaseActivity() {
 
@@ -67,8 +67,9 @@ class PreviewActivity : BaseActivity() {
     }
 
     private fun createFragment(document: Document): Fragment = when (document.type) {
-        DocType.PDF, DocType.IMAGE -> PdfPreviewFragment.newInstance(document.id)
-        else -> OfficePreviewFragment.newInstance(document.id)
+        DocType.PDF -> PdfPreviewFragment.newInstance(document.id)
+        DocType.WORD, DocType.EXCEL, DocType.PPT ->
+            OfficePreviewFragment.newInstance(document.id)
     }
 
     companion object {

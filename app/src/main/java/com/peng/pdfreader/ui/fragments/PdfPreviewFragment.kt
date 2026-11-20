@@ -263,7 +263,7 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
     private fun openDocument(doc: Document, file: File, startPage: Int = -1) {
         viewLifecycleOwner.lifecycleScope.launch {
             val outcome = withContext(Dispatchers.IO) {
-                if (doc.type == DocType.IMAGE) PdfOpen.Opened(1) else PdfEngine.open(file)
+                PdfEngine.open(file)
             }
             if (_binding == null) return@launch
             if (outcome is PdfOpen.Failed) {
@@ -277,7 +277,6 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
                 file,
                 pageCount,
                 readingMode(),
-                doc.type == DocType.IMAGE,
             )
             adapter.marksProvider = { page ->
                 AnnotationMarks.marksOf(repository.annotationsOf(doc.id), page)
@@ -418,7 +417,8 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
     private fun share() {
         val doc = document ?: return
         val file = repository.fileOf(doc)
-        FileSharing.share(requireContext(), file, FileSharing.mimeTypeOf(doc.name))
+        val mime = FileSharing.mimeTypeOf(doc.name) ?: return
+        FileSharing.share(requireContext(), file, mime)
     }
 
     /**

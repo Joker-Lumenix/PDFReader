@@ -67,7 +67,6 @@
     <string name="grid_view">格狀檢視</string>
     <string name="highlight">螢光筆</string>
     <string name="home">首頁</string>
-    <string name="image">圖片</string>
     <string name="image_to_pdf">圖片轉 PDF</string>
     <string name="import_count">匯入(%1$d)</string>
     <string name="import_success">匯入成功</string>
@@ -79,7 +78,6 @@
     <string name="language">語言</string>
     <string name="language_selection">語言選擇</string>
     <string name="list_view">清單檢視</string>
-    <string name="long_image">長圖</string>
     <string name="md5">MD5 完整性雜湊校驗碼</string>
     <string name="merge">合併 PDF</string>
     <string name="merge_count">合併(%1$d)</string>
@@ -185,7 +183,6 @@
     <string name="various_pdf_tools">多種 PDF ツール</string>
     <string name="version">版本資訊</string>
     <string name="view">查看</string>
-    <string name="zip_package">逐頁圖包</string>
     <string name="nav_home">首頁</string>
     <string name="nav_files">檔案</string>
     <string name="nav_tools">工具</string>

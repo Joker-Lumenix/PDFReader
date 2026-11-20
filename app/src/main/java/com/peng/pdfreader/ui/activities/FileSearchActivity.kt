@@ -267,7 +267,7 @@ class FileSearchActivity : BaseActivity() {
     /** Sends the document to the printer of the system. */
     private fun printDocument(docId: String) {
         val document = repository.byId(docId) ?: return
-        if (document.type != DocType.PDF && document.type != DocType.IMAGE) {
+        if (document.type != DocType.PDF) {
             toast(getString(R.string.files_feature_unavailable))
             return
         }
@@ -287,18 +287,8 @@ class FileSearchActivity : BaseActivity() {
     private fun contentUri(document: Document): Uri =
         ShareFileProvider.uriFor(this, repository.fileOf(document))
 
-    private fun mimeType(document: Document): String = when (document.type) {
-        DocType.PDF -> "application/pdf"
-        DocType.WORD ->
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        DocType.EXCEL ->
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        DocType.PPT ->
-            "application/vnd.openxmlformats-officedocument.presentationml.presentation"
-        DocType.IMAGE -> "image/*"
-        DocType.TXT -> "text/plain"
-        DocType.OTHER -> "*/*"
-    }
+    private fun mimeType(document: Document): String =
+        DocType.mimeTypeOf(document.name) ?: document.type.mimeType
 
     private fun toast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()

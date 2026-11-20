@@ -17,7 +17,7 @@ import com.peng.pdfreader.notification.trigger.NotificationAppState
 
 /**
  * Tools tab: the yellow panel with the 2 x 4 grid of the PDF tools (merge,
- * split, image to PDF, scan, lock, unlock, print, zip).
+ * split, image to PDF, scan, lock, unlock, print).
  */
 class ToolsFragment : BaseFragment() {
 

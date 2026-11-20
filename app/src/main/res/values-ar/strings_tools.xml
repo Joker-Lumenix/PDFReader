@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="tools_scan_to_pdf">مسح إلى PDF</string>
-    <string name="tools_zip_file">ملف ZIP</string>
     <string name="tools_label_lock">قفل ملف PDF</string>
     <string name="tools_label_unlock">إلغاء قفل ملف PDF</string>
-    <string name="tools_label_zip">ملف Zip</string>
     <string name="tools_not_available">هذه الميزة غير متاحة بعد</string>
     <string name="tools_failed">فشلت العملية: %1$s</string>
     <string name="tools_working">جارٍ المعالجة…</string>
@@ -69,7 +67,6 @@
     <string name="tools_result_path">المسار: %1$s</string>
     <string name="tools_result_pages">%1$d صفحة</string>
     <string name="tools_result_share_unavailable">ميزة المشاركة غير متاحة بعد</string>
-    <string name="tools_zip_done">تم إنشاء ملف ZIP: %1$s</string>
     <string name="tools_image_albums">الألبومات</string>
     <string name="tools_image_all_albums">كل الصور</string>
     <string name="tools_image_album_other">ألبومات أخرى</string>

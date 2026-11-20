@@ -67,7 +67,6 @@
     <string name="grid_view">격자 보기</string>
     <string name="highlight">Highlight</string>
     <string name="home">홈</string>
-    <string name="image">이미지</string>
     <string name="image_to_pdf">Image to PDF</string>
     <string name="import_count">가져오기(%1$d)</string>
     <string name="import_success">가져오기 완료</string>
@@ -79,7 +78,6 @@
     <string name="language">언어</string>
     <string name="language_selection">언어 선택</string>
     <string name="list_view">목록 보기</string>
-    <string name="long_image">긴 이미지</string>
     <string name="md5">MD5 checksum</string>
     <string name="merge">PDF 병합</string>
     <string name="merge_count">병합(%1$d)</string>
@@ -185,7 +183,6 @@
     <string name="various_pdf_tools">다양한 PDF 도구</string>
     <string name="version">Version</string>
     <string name="view">보기</string>
-    <string name="zip_package">페이지 ZIP</string>
     <string name="nav_home">홈</string>
     <string name="nav_files">파일</string>
     <string name="nav_tools">도구</string>

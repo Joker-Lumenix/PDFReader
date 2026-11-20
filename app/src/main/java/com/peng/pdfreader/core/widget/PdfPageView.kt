@@ -158,7 +158,6 @@ class PdfPageView @JvmOverloads constructor(
 
     private var source: File? = null
     private var pageIndex = 0
-    private var imageDocument = false
     private var renderToken = 0
     private var bitmap: Bitmap? = null
 
@@ -311,15 +310,6 @@ class PdfPageView @JvmOverloads constructor(
     fun setPage(file: File, index: Int) {
         source = file
         pageIndex = index
-        imageDocument = false
-        requestRender(resetViewport = true)
-    }
-
-    /** Renders a raster image as a single page. */
-    fun setImage(file: File) {
-        source = file
-        pageIndex = 0
-        imageDocument = true
         requestRender(resetViewport = true)
     }
 
@@ -454,18 +444,13 @@ class PdfPageView @JvmOverloads constructor(
     private fun requestRender(resetViewport: Boolean) {
         val file = source ?: return
         val index = pageIndex
-        val isImage = imageDocument
         val token = ++renderToken
         if (resetViewport) releaseBitmap()
         invalidate()
         val targetWidth = renderWidth()
         try {
             PdfEngine.workers.execute {
-                val rendered = if (isImage) {
-                    PdfEngine.renderImage(file, targetWidth)
-                } else {
-                    PdfEngine.renderPage(file, index, targetWidth)
-                }
+                val rendered = PdfEngine.renderPage(file, index, targetWidth)
                 mainHandler.post {
                     if (token != renderToken) {
                         // The page was replaced while the render was running.

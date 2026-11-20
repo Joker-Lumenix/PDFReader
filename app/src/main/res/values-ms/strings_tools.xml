@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="tools_scan_to_pdf">Imbas ke PDF</string>
-    <string name="tools_zip_file">Fail ZIP</string>
     <string name="tools_label_lock">Kunci PDF</string>
     <string name="tools_label_unlock">Buka kunci PDF</string>
-    <string name="tools_label_zip">Fail zip</string>
     <string name="tools_not_available">Ciri ini belum tersedia</string>
     <string name="tools_failed">Operasi gagal: %1$s</string>
     <string name="tools_working">Memproses…</string>
@@ -69,7 +67,6 @@
     <string name="tools_result_path">Laluan: %1$s</string>
     <string name="tools_result_pages">%1$d halaman</string>
     <string name="tools_result_share_unavailable">Fungsi kongsi belum tersedia</string>
-    <string name="tools_zip_done">Fail ZIP dicipta: %1$s</string>
     <string name="tools_image_albums">Album</string>
     <string name="tools_image_all_albums">Semua gambar</string>
     <string name="tools_image_album_other">Album lain</string>

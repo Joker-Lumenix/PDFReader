@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="tools_scan_to_pdf">Digitalizar para PDF</string>
-    <string name="tools_zip_file">Arquivo ZIP</string>
     <string name="tools_label_lock">Bloquear PDF</string>
     <string name="tools_label_unlock">Desbloquear PDF</string>
-    <string name="tools_label_zip">Ficheiro zip</string>
     <string name="tools_not_available">Esta funcionalidade ainda não está disponível</string>
     <string name="tools_failed">Falhou a operação: %1$s</string>
     <string name="tools_working">A processar…</string>
@@ -69,7 +67,6 @@
     <string name="tools_result_path">Caminho: %1$s</string>
     <string name="tools_result_pages">%1$d páginas</string>
     <string name="tools_result_share_unavailable">A partilha ainda não está disponível</string>
-    <string name="tools_zip_done">ZIP criado: %1$s</string>
     <string name="tools_image_albums">Álbuns</string>
     <string name="tools_image_all_albums">Todas as fotos</string>
     <string name="tools_image_album_other">Outros álbuns</string>

@@ -61,7 +61,7 @@ class DocumentActions(private val host: Fragment) {
     private fun openWith(context: Context, docId: String) {
         val document = repository(context).byId(docId) ?: return
         val intent = Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(contentUri(context, document), mimeType(document.type))
+            setDataAndType(contentUri(context, document), mimeType(document))
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
         try {
@@ -75,7 +75,7 @@ class DocumentActions(private val host: Fragment) {
     private fun share(context: Context, docId: String) {
         val document = repository(context).byId(docId) ?: return
         val intent = Intent(Intent.ACTION_SEND).apply {
-            type = mimeType(document.type)
+            type = mimeType(document)
             putExtra(Intent.EXTRA_STREAM, contentUri(context, document))
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
@@ -98,7 +98,7 @@ class DocumentActions(private val host: Fragment) {
             if (!printed) toast(context)
             return
         }
-        if (document.type != DocType.PDF && document.type != DocType.IMAGE) {
+        if (document.type != DocType.PDF) {
             toast(context)
             return
         }
@@ -132,15 +132,8 @@ class DocumentActions(private val host: Fragment) {
         Toast.makeText(context, R.string.files_feature_unavailable, Toast.LENGTH_SHORT).show()
     }
 
-    private fun mimeType(type: DocType): String = when (type) {
-        DocType.PDF -> "application/pdf"
-        DocType.WORD -> "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        DocType.EXCEL -> "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        DocType.PPT -> "application/vnd.openxmlformats-officedocument.presentationml.presentation"
-        DocType.IMAGE -> "image/*"
-        DocType.TXT -> "text/plain"
-        DocType.OTHER -> "*/*"
-    }
+    private fun mimeType(document: Document): String =
+        DocType.mimeTypeOf(document.name) ?: document.type.mimeType
 
     private companion object {
         const val TAG = "DocumentActions"

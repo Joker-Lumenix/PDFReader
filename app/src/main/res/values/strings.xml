@@ -69,7 +69,6 @@
     <string name="grid_view">宫格视图</string>
     <string name="highlight">高亮笔</string>
     <string name="home">首页</string>
-    <string name="image">图片</string>
     <string name="image_to_pdf">图片转 PDF</string>
     <string name="import_count">导入(%1$d)</string>
     <string name="import_success">导入成功</string>
@@ -81,7 +80,6 @@
     <string name="language">语言</string>
     <string name="language_selection">语言选择</string>
     <string name="list_view">列表视图</string>
-    <string name="long_image">长图</string>
     <string name="md5">MD5 完整性哈希校验码</string>
     <string name="merge">合并 PDF</string>
     <string name="merge_count">合并(%1$d)</string>
@@ -190,9 +188,6 @@
     <string name="version">版本信息</string>
     <string name="view">查看</string>
     <string name="file_type_word" translatable="false">Word</string>
-    <string name="zip_package">逐页图包</string>
-    <string name="file_type_txt" translatable="false">TXT</string>
-    <string name="file_type_other" translatable="false">Other</string>
     <string name="nav_home">首页</string>
     <string name="nav_files">文件</string>
     <string name="nav_tools">工具</string>

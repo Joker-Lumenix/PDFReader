@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="tools_scan_to_pdf">Escanear a PDF</string>
-    <string name="tools_zip_file">Archivo ZIP</string>
     <string name="tools_label_lock">Bloquear PDF</string>
     <string name="tools_label_unlock">Desbloquear PDF</string>
-    <string name="tools_label_zip">Archivo zip</string>
     <string name="tools_not_available">Esta función todavía no está disponible</string>
     <string name="tools_failed">Error en la operación: %1$s</string>
     <string name="tools_working">Procesando…</string>
@@ -69,7 +67,6 @@
     <string name="tools_result_path">Ruta: %1$s</string>
     <string name="tools_result_pages">%1$d páginas</string>
     <string name="tools_result_share_unavailable">Compartir todavía no está disponible</string>
-    <string name="tools_zip_done">ZIP creado: %1$s</string>
     <string name="tools_image_albums">Álbumes</string>
     <string name="tools_image_all_albums">Todas las fotos</string>
     <string name="tools_image_album_other">Otros álbumes</string>

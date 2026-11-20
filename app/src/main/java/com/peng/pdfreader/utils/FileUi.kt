@@ -42,6 +42,5 @@ object FileUi {
         DocType.WORD -> R.color.text_link
         DocType.EXCEL -> R.color.text_success
         DocType.PPT -> R.color.text_warning
-        else -> R.color.text_secondary
     }
 }

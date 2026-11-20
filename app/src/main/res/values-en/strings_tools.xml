@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="tools_scan_to_pdf">Scan to PDF</string>
-    <string name="tools_zip_file">ZIP archive</string>
     <string name="tools_label_lock">Lock PDF</string>
     <string name="tools_label_unlock">Unlock PDF</string>
-    <string name="tools_label_zip">Zip file</string>
     <string name="tools_not_available">This feature is not available yet</string>
     <string name="tools_failed">Operation failed: %1$s</string>
     <string name="tools_working">Working…</string>
@@ -69,7 +67,6 @@
     <string name="tools_result_path">Path: %1$s</string>
     <string name="tools_result_pages">%1$d pages</string>
     <string name="tools_result_share_unavailable">Sharing is not available yet</string>
-    <string name="tools_zip_done">ZIP created: %1$s</string>
     <string name="tools_image_albums">Albums</string>
     <string name="tools_image_all_albums">All photos</string>
     <string name="tools_image_album_other">Other albums</string>

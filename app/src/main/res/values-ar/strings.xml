@@ -67,7 +67,6 @@
     <string name="grid_view">عرض شبكي</string>
     <string name="highlight">تظليل</string>
     <string name="home">الرئيسية</string>
-    <string name="image">صورة</string>
     <string name="image_to_pdf">صورة إلى PDF</string>
     <string name="import_count">استيراد(%1$d)</string>
     <string name="import_success">تم الاستيراد</string>
@@ -79,7 +78,6 @@
     <string name="language">اللغة</string>
     <string name="language_selection">اختيار اللغة</string>
     <string name="list_view">عرض قائمة</string>
-    <string name="long_image">صورة طويلة</string>
     <string name="md5">مجموع تحقق MD5</string>
     <string name="merge">دمج PDF</string>
     <string name="merge_count">دمج(%1$d)</string>
@@ -185,7 +183,6 @@
     <string name="various_pdf_tools">أدوات PDF متنوعة</string>
     <string name="version">الإصدار</string>
     <string name="view">عرض</string>
-    <string name="zip_package">حزمة الصفحات ZIP</string>
     <string name="nav_home">الرئيسية</string>
     <string name="nav_files">الملفات</string>
     <string name="nav_tools">الأدوات</string>

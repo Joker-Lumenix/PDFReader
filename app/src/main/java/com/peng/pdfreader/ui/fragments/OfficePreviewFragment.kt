@@ -128,15 +128,17 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
 
     private fun share() {
         val doc = document ?: return
-        FileSharing.share(requireContext(), repository.fileOf(doc), FileSharing.mimeTypeOf(doc.name))
+        val mime = FileSharing.mimeTypeOf(doc.name) ?: return
+        FileSharing.share(requireContext(), repository.fileOf(doc), mime)
     }
 
     private fun openWith() {
         val doc = document ?: return
+        val mime = FileSharing.mimeTypeOf(doc.name) ?: return
         val opened = FileSharing.openWith(
             requireContext(),
             repository.fileOf(doc),
-            FileSharing.mimeTypeOf(doc.name),
+            mime,
         )
         if (!opened) {
             Toast.makeText(requireContext(), R.string.no_permissions, Toast.LENGTH_SHORT).show()
@@ -248,7 +250,7 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
             }
             return
         }
-        if (doc.type != DocType.PDF && doc.type != DocType.IMAGE) {
+        if (doc.type != DocType.PDF) {
             Toast.makeText(
                 requireContext(),
                 R.string.preview_feature_unavailable,
@@ -306,8 +308,7 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
                 DocType.WORD -> loadWord(doc)
                 DocType.PPT -> loadPresentation(doc)
                 DocType.EXCEL -> loadWorkbook(doc)
-                DocType.TXT -> loadText(doc)
-                else -> showError()
+                DocType.PDF -> showError()
             }
         }
     }
@@ -410,51 +411,6 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
         }
     }
 
-    /**
-     * Reads a text document.
-     *
-     * Only the beginning of a big file is read, the rest of it would not fit
-     * into the memory of the phone.
-     */
-    private suspend fun loadText(doc: Document) {
-        val file = repository.fileOf(doc)
-        if (!file.exists()) {
-            showError()
-            return
-        }
-        val content = withContext(Dispatchers.IO) { readText(file) }
-        if (_binding == null) return
-        if (content == null) {
-            showError()
-            return
-        }
-        showText(content)
-    }
-
-    /**
-     * The text of a text document.
-     *
-     * The file is read line by line, so a big file does not fill the memory
-     * of the phone at once.
-     */
-    private fun readText(file: File): String? {
-        return try {
-            val builder = StringBuilder()
-            file.bufferedReader().use { reader ->
-                var line = reader.readLine() ?: return null
-                while (true) {
-                    builder.append(line).append('\n')
-                    if (builder.length > MAX_TEXT_LENGTH) break
-                    line = reader.readLine() ?: break
-                }
-            }
-            builder.toString()
-        } catch (error: Exception) {
-            Logger.e(TAG, "the text file could not be read", error)
-            null
-        }
-    }
-
     private fun parseWord(doc: Document): WordContent? {
         val file = repository.fileOf(doc)
         if (!file.exists()) return null
@@ -541,14 +497,6 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
 
     companion object {
         private const val ARG_DOC_ID = "com.peng.pdfreader.extra.DOC_ID"
-
-        /**
-         * The number of the characters of a text document that are read.
-         *
-         * A text document can be very big, the preview shows the beginning
-         * of it.
-         */
-        private const val MAX_TEXT_LENGTH = 2 * 1024 * 1024
 
         private const val ACTION_RENAME = "rename"
         private const val ACTION_OPEN_WITH = "open_with"

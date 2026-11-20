@@ -376,15 +376,8 @@ class FileSelectActivity : BaseActivity() {
             .onFailure { toast(getString(R.string.files_feature_unavailable)) }
     }
 
-    private fun mimeType(document: Document): String = when (document.type) {
-        DocType.PDF -> "application/pdf"
-        DocType.WORD -> "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        DocType.EXCEL -> "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        DocType.PPT -> "application/vnd.openxmlformats-officedocument.presentationml.presentation"
-        DocType.IMAGE -> "image/*"
-        DocType.TXT -> "text/plain"
-        DocType.OTHER -> "*/*"
-    }
+    private fun mimeType(document: Document): String =
+        DocType.mimeTypeOf(document.name) ?: document.type.mimeType
 
     /** Hands the picked files back to the caller and closes the page. */
     private fun finishWithSelection() {

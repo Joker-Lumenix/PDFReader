@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="tools_scan_to_pdf">スキャンして PDF を作成</string>
-    <string name="tools_zip_file">ZIP 圧縮ファイル</string>
     <string name="tools_label_lock">PDF をロック</string>
     <string name="tools_label_unlock">PDF のロックを解除</string>
-    <string name="tools_label_zip">Zip ファイル</string>
     <string name="tools_not_available">この機能はまだ利用できません</string>
     <string name="tools_failed">操作に失敗しました: %1$s</string>
     <string name="tools_working">処理中…</string>
@@ -69,7 +67,6 @@
     <string name="tools_result_path">パス: %1$s</string>
     <string name="tools_result_pages">%1$d ページ</string>
     <string name="tools_result_share_unavailable">共有機能はまだ利用できません</string>
-    <string name="tools_zip_done">ZIP ファイルを作成しました: %1$s</string>
     <string name="tools_image_albums">アルバム</string>
     <string name="tools_image_all_albums">すべての写真</string>
     <string name="tools_image_album_other">その他のアルバム</string>
