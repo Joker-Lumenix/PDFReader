@@ -1,11 +1,7 @@
 package com.peng.pdfreader.permission
 
-import android.content.ActivityNotFoundException
 import android.content.DialogInterface
-import android.content.Intent
 import android.graphics.drawable.GradientDrawable
-import android.net.Uri
-import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,31 +12,45 @@ import com.peng.pdfreader.base.BaseBottomSheetDialog
 import com.peng.pdfreader.databinding.SettingsSetDefaultSheetBinding
 
 /**
- * Explains how to make the app the default reader of PDF files and opens the
- * system screen where the default app is picked.
+ * Asks the user to make the app the default reader of the documents.
  *
- * The illustration of the design is a picture, so the sheet only carries the
- * title, the subtitle and the button.
+ * The wording does not say "set as default" - the user knows the word too
+ * well. It asks a question and offers the way out. The sheet only shows up
+ * after an effective read (see [DefaultAppPrompt]), the settings tab always
+ * carries the entry for the users who want to do it by hand.
  */
 class SetDefaultReaderSheet : BaseBottomSheetDialog() {
 
     private var _binding: SettingsSetDefaultSheetBinding? = null
     private val binding get() = _binding!!
 
-    /** Raised once the sheet is gone, used by the start up flow to continue. */
+    /** The kind of document the prompt is about, such as "PDF". */
+    var documentLabel: String = ""
+
+    /** Raised once the sheet is gone. */
     var onDismissed: (() -> Unit)? = null
 
     /** Raised when the user asked for the default app settings of the system. */
     var onAction: (() -> Unit)? = null
 
+    /** Raised when the user pushed the prompt away. */
+    var onLater: (() -> Unit)? = null
+
     override fun createContentView(inflater: LayoutInflater, container: ViewGroup?): View {
         _binding = SettingsSetDefaultSheetBinding.inflate(inflater, container, false)
         applyIllustrationSurface()
-        binding.tvTitle.setText(R.string.set_default_title)
-        binding.tvSubtitle.setText(R.string.set_default_subtitle)
+        val appName = getString(R.string.app_name)
+        binding.tvTitle.text = getString(R.string.default_prompt_title, documentLabel, appName)
+        binding.tvSubtitle.text = getString(R.string.default_prompt_subtitle, documentLabel)
+        binding.btnOk.setText(R.string.default_prompt_go)
         binding.btnOk.setOnClickListener {
             openDefaultAppSettings()
             onAction?.invoke()
+            dismiss()
+        }
+        binding.btnLater.visibility = View.VISIBLE
+        binding.btnLater.setOnClickListener {
+            onLater?.invoke()
             dismiss()
         }
         return binding.root
@@ -61,17 +71,8 @@ class SetDefaultReaderSheet : BaseBottomSheetDialog() {
     }
 
     private fun openDefaultAppSettings() {
-        try {
-            startActivity(Intent(Settings.ACTION_MANAGE_DEFAULT_APPS_SETTINGS))
-        } catch (error: ActivityNotFoundException) {
-            Logger.w(TAG, "default apps screen is not available")
-            startActivity(
-                Intent(
-                    Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                    Uri.parse("package:${requireContext().packageName}"),
-                ),
-            )
-        }
+        DefaultReader.openDefaultAppSettings(requireContext())
+        Logger.d(TAG, "the default app settings are opened")
     }
 
     companion object {

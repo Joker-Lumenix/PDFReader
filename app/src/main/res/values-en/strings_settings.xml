@@ -35,10 +35,13 @@
     <string name="onboarding_skip">Skip</string>
     <string name="onboarding_start">Get started</string>
     <string name="permission_allow_all_files">Allow access to all files</string>
-    <string name="set_default_title">Set as default PDF reader</string>
-    <string name="set_default_subtitle">Choose “Let\'s PDF: View &amp; Sign”, then tap “Always”</string>
-    <string name="set_default_mock_once">Just once</string>
-    <string name="set_default_mock_always">Always</string>
+    <string name="default_prompt_title">Open %1$s with %2$s from now on?</string>
+    <string name="default_prompt_subtitle">As the default app every %1$s opens right here, no picker any more.</string>
+    <string name="default_prompt_go">Go to settings</string>
+    <string name="default_prompt_later">Not now</string>
+    <string name="settings_default_app_title">Set as the default document handler</string>
+    <string name="settings_default_app_on">Already the default handler</string>
+    <string name="settings_default_app_off">Not set yet</string>
     <string name="quick_entry_scan">Scan PDF</string>
     <string name="quick_entry_merge">Merge PDF</string>
     <string name="quick_entry_print">Print PDF</string>

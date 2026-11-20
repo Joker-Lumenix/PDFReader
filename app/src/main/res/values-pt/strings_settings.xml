@@ -35,10 +35,13 @@
     <string name="onboarding_skip">Saltar</string>
     <string name="onboarding_start">Começar</string>
     <string name="permission_allow_all_files">Permitir acesso a todos os ficheiros</string>
-    <string name="set_default_title">Definir como leitor de PDF predefinido</string>
-    <string name="set_default_subtitle">Escolha «Let\'s PDF: View &amp; Sign» e toque em «Sempre»</string>
-    <string name="set_default_mock_once">Apenas uma vez</string>
-    <string name="set_default_mock_always">Sempre</string>
+    <string name="default_prompt_title">Abrir %1$s com %2$s a partir de agora?</string>
+    <string name="default_prompt_subtitle">Como aplicativo padrão, cada %1$s abre aqui, sem precisar escolher.</string>
+    <string name="default_prompt_go">Ir para as configurações</string>
+    <string name="default_prompt_later">Agora não</string>
+    <string name="settings_default_app_title">Definir como manipulador padrão de documentos</string>
+    <string name="settings_default_app_on">Já é o manipulador padrão</string>
+    <string name="settings_default_app_off">Ainda não definido</string>
     <string name="quick_entry_scan">Digitalizar PDF</string>
     <string name="quick_entry_merge">Juntar PDF</string>
     <string name="quick_entry_print">Imprimir PDF</string>

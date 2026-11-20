@@ -42,16 +42,15 @@ class ToolProgressActivity : BaseActivity() {
         binding.ivBack.visibility = View.GONE
 
         // the progress track of the design: a 240x6 track with a handle
-        binding.progressView.progressTrack.background =
+        binding.progressTrack.background =
             ToolShapes.roundRect(this, TRACK_COLOR, 3f)
-        binding.progressView.progressFill.background =
+        binding.progressFill.background =
             ToolShapes.gradientPill(this, R.drawable.gradient_red, 16f)
-        binding.progressView.progressKnob.setImageDrawable(ToolShapes.progressKnob(this))
 
         // the ad slot of the design, below the progress of the job
-        binding.progressView.adSlot.style = AdSlotView.Style.CARD
-        binding.progressView.adSlot.content = AdSamples.card(this)
-        Ads.loadCard(binding.progressView.adSlot)
+        binding.adSlot.style = AdSlotView.Style.CARD
+        binding.adSlot.content = AdSamples.card(this)
+        Ads.loadCard(binding.adSlot)
 
         observeJob()
     }
@@ -71,15 +70,15 @@ class ToolProgressActivity : BaseActivity() {
     }
 
     private fun render(state: ToolProgressState) {
-        binding.progressView.tvProgressPercent.text = "${state.percent}%"
-        state.label?.let { binding.progressView.tvProgressLabel.text = it }
+        binding.tvProgressPercent.text = "${state.percent}%"
+        state.label?.let { binding.tvProgressLabel.text = it }
 
         val percent = state.percent
         val track = dp(TRACK_WIDTH_DP)
         val filled = (track * percent / 100).coerceAtLeast(if (percent > 0) dp(8) else 0)
-        binding.progressView.progressFill.layoutParams =
-            binding.progressView.progressFill.layoutParams.apply { width = filled }
-        binding.progressView.progressKnob.translationX =
+        binding.progressFill.layoutParams =
+            binding.progressFill.layoutParams.apply { width = filled }
+        binding.progressKnob.translationX =
             (filled - dp(KNOB_SIZE_DP / 2)).toFloat()
 
         if (state.running) return

@@ -20,7 +20,6 @@ import com.peng.pdfreader.data.DocumentRepository
 import com.peng.pdfreader.data.SharedStorage
 import com.peng.pdfreader.databinding.ActivityPermissionBinding
 import com.peng.pdfreader.notification.PersistentNotificationHelper
-import com.peng.pdfreader.permission.SetDefaultReaderSheet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -41,9 +40,6 @@ import kotlinx.coroutines.withContext
 class PermissionActivity : BaseActivity() {
 
     private lateinit var binding: ActivityPermissionBinding
-
-    /** Whether the "set as default reader" hint has been shown already. */
-    private var defaultReaderAsked = false
 
     /** Whether the flow was continued already, the page leaves only once. */
     private var flowContinued = false
@@ -282,29 +278,15 @@ class PermissionActivity : BaseActivity() {
     /**
      * Continues the start up flow.
      *
-     * The hint about the default reader comes first. It is a hint only:
-     * closing it - by tapping outside or with the back button - keeps the user
-     * on this page, the flow continues with the button of the sheet (the
-     * system screen of the default apps) or with the close button of the page.
+     * The app does not ask for the default app here: the question comes after
+     * an effective read (see [com.peng.pdfreader.permission.DefaultAppPrompt])
+     * and the settings tab always carries the entry.
      *
      * The notification permission is asked for on the home screen - two seconds
      * after the app is opened there.
      */
     private fun goHome() {
-        if (homeStarted) return
-        if (defaultReaderAsked) {
-            openHome()
-            return
-        }
-        defaultReaderAsked = true
-        val sheet = SetDefaultReaderSheet()
-        sheet.onAction = { Logger.d(TAG, "the default app settings are opened") }
-        sheet.onDismissed = {
-            Logger.d(TAG, "the default reader hint was closed")
-            // The hint is gone, the home screen takes over.
-            openHome()
-        }
-        sheet.show(supportFragmentManager, SetDefaultReaderSheet.TAG)
+        openHome()
     }
 
     private fun openHome() {

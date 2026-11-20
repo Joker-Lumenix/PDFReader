@@ -35,10 +35,13 @@
     <string name="onboarding_skip">Langkau</string>
     <string name="onboarding_start">Mula</string>
     <string name="permission_allow_all_files">Benarkan akses kepada semua fail</string>
-    <string name="set_default_title">Tetapkan sebagai pembaca PDF lalai</string>
-    <string name="set_default_subtitle">Pilih &quot;Let\'s PDF: View &amp; Sign&quot;, kemudian ketik &quot;Sentiasa&quot;</string>
-    <string name="set_default_mock_once">Sekali sahaja</string>
-    <string name="set_default_mock_always">Sentiasa</string>
+    <string name="default_prompt_title">Buka %1$s dengan %2$s mulai sekarang?</string>
+    <string name="default_prompt_subtitle">Sebagai aplikasi lalai, setiap %1$s dibuka terus di sini tanpa perlu memilih.</string>
+    <string name="default_prompt_go">Pergi ke tetapan</string>
+    <string name="default_prompt_later">Bukan sekarang</string>
+    <string name="settings_default_app_title">Tetapkan sebagai pemproses lalai dokumen</string>
+    <string name="settings_default_app_on">Sudah menjadi pemproses lalai</string>
+    <string name="settings_default_app_off">Belum ditetapkan</string>
     <string name="quick_entry_scan">Imbas PDF</string>
     <string name="quick_entry_merge">Gabungkan PDF</string>
     <string name="quick_entry_print">Cetak PDF</string>

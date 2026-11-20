@@ -35,10 +35,13 @@
     <string name="onboarding_skip">تخطٍّ</string>
     <string name="onboarding_start">ابدأ</string>
     <string name="permission_allow_all_files">السماح بالوصول إلى جميع الملفات</string>
-    <string name="set_default_title">تعيينه كقارئ PDF الافتراضي</string>
-    <string name="set_default_subtitle">اختر «Let\'s PDF: View &amp; Sign» ثم اضغط «دائمًا»</string>
-    <string name="set_default_mock_once">مرة واحدة فقط</string>
-    <string name="set_default_mock_always">دائمًا</string>
+    <string name="default_prompt_title">هل تريد فتح %1$s عبر %2$s من الآن فصاعدًا؟</string>
+    <string name="default_prompt_subtitle">عند تعيين التطبيق افتراضيًا، يُفتح كل %1$s هنا مباشرة دون اختيار.</string>
+    <string name="default_prompt_go">الذهاب إلى الإعدادات</string>
+    <string name="default_prompt_later">ليس الآن</string>
+    <string name="settings_default_app_title">تعيينه معالج المستندات الافتراضي</string>
+    <string name="settings_default_app_on">هو المعالج الافتراضي بالفعل</string>
+    <string name="settings_default_app_off">لم يتم التعيين بعد</string>
     <string name="quick_entry_scan">مسح PDF</string>
     <string name="quick_entry_merge">دمج PDF</string>
     <string name="quick_entry_print">طباعة PDF</string>

@@ -44,6 +44,31 @@ class AppPrefs private constructor(context: Context) {
             .getOrDefault(FileSort.MODIFIED)
         set(value) = prefs.edit { putString(KEY_FILE_SORT, value.name) }
 
+    /**
+     * The number of effective reads of the documents.
+     *
+     * A read is effective when the user stays with a document for half a
+     * minute or turns three pages.
+     */
+    var effectiveReadCount: Int
+        get() = prefs.getInt(KEY_EFFECTIVE_READS, 0)
+        set(value) = prefs.edit { putInt(KEY_EFFECTIVE_READS, value) }
+
+    /** The number of effective reads when the default prompt was shown. */
+    var defaultPromptReadCount: Int
+        get() = prefs.getInt(KEY_DEFAULT_PROMPT_READS, 0)
+        set(value) = prefs.edit { putInt(KEY_DEFAULT_PROMPT_READS, value) }
+
+    /** When the default prompt was shown the last time. */
+    var defaultPromptShownAt: Long
+        get() = prefs.getLong(KEY_DEFAULT_PROMPT_SHOWN_AT, 0L)
+        set(value) = prefs.edit { putLong(KEY_DEFAULT_PROMPT_SHOWN_AT, value) }
+
+    /** How often the user pushed the default prompt away. */
+    var defaultPromptRefusals: Int
+        get() = prefs.getInt(KEY_DEFAULT_PROMPT_REFUSALS, 0)
+        set(value) = prefs.edit { putInt(KEY_DEFAULT_PROMPT_REFUSALS, value) }
+
     /** Whether the guide has already been shown. */
     var guideShown: Boolean
         get() = prefs.getBoolean(KEY_GUIDE_SHOWN, false)
@@ -113,6 +138,10 @@ class AppPrefs private constructor(context: Context) {
         private const val KEY_FILE_FILTER = "file_filter"
         private const val KEY_FILE_SORT = "file_sort"
         private const val KEY_GUIDE_SHOWN = "guide_shown"
+        private const val KEY_EFFECTIVE_READS = "effective_reads"
+        private const val KEY_DEFAULT_PROMPT_READS = "default_prompt_reads"
+        private const val KEY_DEFAULT_PROMPT_SHOWN_AT = "default_prompt_shown_at"
+        private const val KEY_DEFAULT_PROMPT_REFUSALS = "default_prompt_refusals"
         private const val KEY_NOTIFICATION_ASKED = "notification_permission_asked"
         private const val KEY_NOTIFICATION_DELAY = "notification_delay_"
         private const val KEY_NOTIFICATION_CAMPAIGN = "notification_campaign_"

@@ -35,10 +35,13 @@
     <string name="onboarding_skip">スキップ</string>
     <string name="onboarding_start">はじめる</string>
     <string name="permission_allow_all_files">すべてのファイルへのアクセスを許可</string>
-    <string name="set_default_title">既定の PDF リーダーに設定</string>
-    <string name="set_default_subtitle">「Let\'s PDF: View &amp; Sign」を選択し、「常に」をタップしてください</string>
-    <string name="set_default_mock_once">一度だけ</string>
-    <string name="set_default_mock_always">常に</string>
+    <string name="default_prompt_title">今後 %1$s は %2$s で開きますか？</string>
+    <string name="default_prompt_subtitle">既定のアプリにすると、%1$s は毎回ここで開きます。</string>
+    <string name="default_prompt_go">設定へ</string>
+    <string name="default_prompt_later">あとで</string>
+    <string name="settings_default_app_title">既定のドキュメントハンドラーに設定</string>
+    <string name="settings_default_app_on">既定のハンドラーになっています</string>
+    <string name="settings_default_app_off">未設定</string>
     <string name="quick_entry_scan">PDF をスキャン</string>
     <string name="quick_entry_merge">PDF を結合</string>
     <string name="quick_entry_print">PDF を印刷</string>

@@ -35,10 +35,13 @@
     <string name="onboarding_skip">Пропустить</string>
     <string name="onboarding_start">Начать</string>
     <string name="permission_allow_all_files">Разрешить доступ ко всем файлам</string>
-    <string name="set_default_title">Сделать приложением для чтения PDF по умолчанию</string>
-    <string name="set_default_subtitle">Выберите «Let\'s PDF: View &amp; Sign», затем нажмите «Всегда»</string>
-    <string name="set_default_mock_once">Только один раз</string>
-    <string name="set_default_mock_always">Всегда</string>
+    <string name="default_prompt_title">Открывать %1$s через %2$s?</string>
+    <string name="default_prompt_subtitle">Если выбрать приложение по умолчанию, каждый %1$s будет открываться здесь.</string>
+    <string name="default_prompt_go">Перейти в настройки</string>
+    <string name="default_prompt_later">Не сейчас</string>
+    <string name="settings_default_app_title">Сделать приложение обработчиком документов по умолчанию</string>
+    <string name="settings_default_app_on">Уже обработчик по умолчанию</string>
+    <string name="settings_default_app_off">Ещё не настроено</string>
     <string name="quick_entry_scan">Сканировать PDF</string>
     <string name="quick_entry_merge">Объединить PDF</string>
     <string name="quick_entry_print">Печать PDF</string>

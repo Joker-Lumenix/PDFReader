@@ -57,10 +57,13 @@
     <string name="permission_allow_all_files">允许访问全部文件</string>
 
     <!-- ==================== default reader sheet ==================== -->
-    <string name="set_default_title">设为默认 PDF 阅读器</string>
-    <string name="set_default_subtitle">选择“Let\'s PDF: View &amp; Sign”，然后点击“始终”</string>
-    <string name="set_default_mock_once">仅一次</string>
-    <string name="set_default_mock_always">始终</string>
+    <string name="default_prompt_title">以后打开 %1$s 都用 %2$s？</string>
+    <string name="default_prompt_subtitle">设为默认后，点开 %1$s 就直接用这个应用，不用再选一次。</string>
+    <string name="default_prompt_go">去设置</string>
+    <string name="default_prompt_later">下次再说</string>
+    <string name="settings_default_app_title">设为默认的文档处理器</string>
+    <string name="settings_default_app_on">已是默认处理器</string>
+    <string name="settings_default_app_off">尚未设置</string>
 
     <!-- ==================== quick entry popup ==================== -->
     <string name="quick_entry_scan">扫描 PDF</string>

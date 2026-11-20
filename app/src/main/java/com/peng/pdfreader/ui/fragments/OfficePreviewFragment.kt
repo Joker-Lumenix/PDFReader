@@ -29,6 +29,8 @@ import com.peng.pdfreader.base.BaseFragment
 import com.peng.pdfreader.data.DocType
 import com.peng.pdfreader.data.Document
 import com.peng.pdfreader.data.DocumentRepository
+import com.peng.pdfreader.permission.DefaultAppPrompt
+import com.peng.pdfreader.permission.EffectiveReadTracker
 import com.peng.pdfreader.databinding.FragmentOfficePreviewBinding
 import com.peng.pdfreader.ui.adapter.listAdapter.DocumentPrintAdapter
 import com.peng.pdfreader.ui.dialogs.BottomSheetMoreActionNoPdf
@@ -41,6 +43,8 @@ import java.io.File
 import com.peng.pdfreader.ui.activities.CompressActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
@@ -62,6 +66,13 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
 
     /** The sheet, slide or page that is on screen. */
     private var currentIndex = 0
+
+    /**
+     * Counts the reading of the document.
+     *
+     * The prompt of the default reader shows up after an effective read.
+     */
+    private val readTracker = EffectiveReadTracker(onEffectiveRead = { onEffectiveRead() })
 
     /** The content of a Word document: the document itself or its text. */
     private sealed interface WordContent {
@@ -114,6 +125,15 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
 
         showLoading()
         loadDocument()
+        // The reading is checked every few seconds: the prompt of the default
+        // reader shows up while the user reads, not only when the document is
+        // closed.
+        viewLifecycleOwner.lifecycleScope.launch {
+            while (isActive) {
+                delay(EffectiveReadTracker.CHECK_INTERVAL_MS)
+                readTracker.check()
+            }
+        }
     }
 
     private fun toggleFavorite() {
@@ -294,9 +314,30 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
         return "$date · $size"
     }
 
+    override fun onResume() {
+        super.onResume()
+        readTracker.onResumed()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        readTracker.onPaused()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
+        readTracker.onClosed()
         _binding = null
+    }
+
+    /**
+     * The user read the document long enough for the prompt of the default
+     * reader to be due.
+     */
+    private fun onEffectiveRead() {
+        val doc = document ?: return
+        if (!isAdded) return
+        DefaultAppPrompt.onEffectiveRead(requireContext(), childFragmentManager, doc.type)
     }
 
     override fun onBackHandled(): Boolean = handleBackPressed()
@@ -361,7 +402,10 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
         val preview = PptxPreviewView(requireContext())
         preview.setDeckSize(reader.widthDp, reader.heightDp)
         preview.slideCount = reader.slideCount
-        preview.onSlideChanged = { slide -> currentIndex = slide }
+        preview.onSlideChanged = { slide ->
+            currentIndex = slide
+            readTracker.onPage(slide)
+        }
         showContent(preview)
         try {
             for (index in 0 until reader.slideCount) {
@@ -398,7 +442,10 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
         for (index in 0 until reader.sheetCount) {
             preview.setSheetName(index, reader.sheetName(index))
         }
-        preview.onSheetChanged = { sheet -> currentIndex = sheet }
+        preview.onSheetChanged = { sheet ->
+            currentIndex = sheet
+            readTracker.onPage(sheet)
+        }
         showContent(preview)
         try {
             for (index in 0 until reader.sheetCount) {
@@ -470,6 +517,7 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
         preview.document = document
         preview.onPageChanged = { page ->
             currentIndex = page
+            readTracker.onPage(page)
         }
         showContent(preview)
     }
@@ -486,6 +534,8 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
     }
 
     private fun showContent(view: View) {
+        // The document is on the screen, the reading of the user starts now.
+        readTracker.onOpened(0)
         binding.llLoading.visibility = View.GONE
         binding.flEmpty.visibility = View.GONE
         binding.content.visibility = View.VISIBLE

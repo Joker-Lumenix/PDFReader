@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Bottom sheet that explains how to make the app the default PDF reader.
+  Bottom sheet that asks the user to make the app the default reader of the
+  documents.
 
   Geometry of the design: 28dp above the title, 12dp to the subtitle, 20dp to
-  the 312x206dp illustration and 20dp to the 312x48dp button, which leaves a
-  32dp margin at the bottom (407dp sheet in total).
+  the 312x206dp illustration, 20dp to the 312x48dp button of the design and
+  12dp to the second button of the prompt.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -23,7 +24,7 @@
         android:gravity="start"
         android:includeFontPadding="false"
         android:textAppearance="@style/TextAppearance.AppCore.SheetTitle"
-        tools:text="Set as default reader of PDF files" />
+        tools:text="Open PDF with Let's PDF from now on?" />
 
     <TextView
         android:id="@+id/tvSubtitle"
@@ -46,18 +47,44 @@
         android:scaleType="fitCenter"
         android:src="@mipmap/bg_set_default" />
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/btnOk"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_marginTop="20dp"
-        android:background="@drawable/gradient_red"
-        android:backgroundTint="@null"
-        android:fontFamily="sans-serif-medium"
-        android:letterSpacing="0"
-        android:stateListAnimator="@null"
-        android:text="@string/ok"
-        android:textColor="@color/text_on_tint"
-        android:textSize="16sp" />
+   <LinearLayout
+       android:layout_width="match_parent"
+       android:layout_height="48dp"
+       android:layout_marginTop="20dp"
+       android:orientation="horizontal">
+
+       <!-- The way out of the prompt: the user pushes it away for now. -->
+       <androidx.appcompat.widget.AppCompatButton
+           android:id="@+id/btnLater"
+           android:layout_width="0dp"
+           android:layout_weight="1"
+           android:layout_height="48dp"
+           android:background="@drawable/bg_button_outline_r16"
+           android:backgroundTint="@null"
+           android:fontFamily="sans-serif-medium"
+           android:letterSpacing="0"
+           android:stateListAnimator="@null"
+           android:text="@string/default_prompt_later"
+           android:gravity="center"
+           android:textColor="@color/brand_primary"
+           android:textSize="16sp" />
+
+       <androidx.appcompat.widget.AppCompatButton
+           android:id="@+id/btnOk"
+           android:layout_width="0dp"
+           android:layout_weight="1"
+           android:layout_height="48dp"
+           android:background="@drawable/gradient_red"
+           android:backgroundTint="@null"
+           android:fontFamily="sans-serif-medium"
+           android:letterSpacing="0"
+           android:stateListAnimator="@null"
+           android:gravity="center"
+           android:text="@string/default_prompt_go"
+           android:layout_marginLeft="20dp"
+           android:textColor="@color/text_on_tint"
+           android:textSize="16sp" />
+
+   </LinearLayout>
 
 </LinearLayout>

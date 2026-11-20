@@ -14,6 +14,7 @@ import com.peng.pdfreader.R
 import com.peng.pdfreader.base.BaseFragment
 import com.peng.pdfreader.databinding.SettingsFragmentBinding
 import com.peng.pdfreader.databinding.SettingsRowBinding
+import com.peng.pdfreader.permission.DefaultReader
 import com.peng.pdfreader.ui.activities.FeedbackActivity
 import com.peng.pdfreader.ui.activities.LanguageActivity
 import com.peng.pdfreader.ui.uiData.language.LanguageCatalog
@@ -60,6 +61,7 @@ class SettingsFragment : BaseFragment() {
     override fun onResume() {
         super.onResume()
         updateLanguageSubtitle()
+        updateDefaultAppSubtitle()
     }
 
     override fun onDestroyView() {
@@ -73,6 +75,12 @@ class SettingsFragment : BaseFragment() {
             iconRes = R.mipmap.ic_share_app,
             title = getString(R.string.settings_share_app),
         ) { shareApp() }
+
+        setupRow(
+            row = binding.rowDefaultApp,
+            iconRes = R.mipmap.ic_open_with,
+            title = getString(R.string.settings_default_app_title),
+        ) { openDefaultAppSettings() }
 
         setupRow(
             row = binding.rowLanguage,
@@ -122,6 +130,30 @@ class SettingsFragment : BaseFragment() {
         } else {
             getString(option.labelRes)
         }
+    }
+
+    /**
+     * The row of the default handler tells the user whether the app is the
+     * app that opens the documents of the device.
+     */
+    private fun updateDefaultAppSubtitle() {
+        val subtitle = binding.rowDefaultApp.tvRowSubtitle
+        subtitle.visibility = View.VISIBLE
+        val isDefault = DefaultReader.isDefaultHandler(requireContext())
+        subtitle.text = getString(
+            if (isDefault) R.string.settings_default_app_on else R.string.settings_default_app_off,
+        )
+        subtitle.setTextColor(
+            ContextCompat.getColor(
+                requireContext(),
+                if (isDefault) R.color.text_success else R.color.text_secondary,
+            ),
+        )
+    }
+
+    /** Opens the screen of the system where the default app is picked. */
+    private fun openDefaultAppSettings() {
+        DefaultReader.openDefaultAppSettings(requireContext())
     }
 
     private fun shareApp() {

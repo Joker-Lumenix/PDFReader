@@ -38,6 +38,8 @@ import com.peng.pdfreader.data.AppPrefs
 import com.peng.pdfreader.data.Annotation
 import com.peng.pdfreader.data.AnnotationType
 import com.peng.pdfreader.data.DocumentRepository
+import com.peng.pdfreader.permission.DefaultAppPrompt
+import com.peng.pdfreader.permission.EffectiveReadTracker
 import com.peng.pdfreader.databinding.FragmentPdfPreviewBinding
 import com.peng.pdfreader.ui.dialogs.BottomSheetPassword
 import com.peng.pdfreader.ui.activities.SignatureActivity
@@ -53,6 +55,8 @@ import com.peng.pdfreader.ui.dialogs.DialogNote
 import com.peng.pdfreader.utils.FileSharing
 import com.peng.pdfreader.utils.DocumentActions
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -100,6 +104,13 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
     private val signatureLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult(),
     ) { result -> handleSignatureResult(result.resultCode, result.data) }
+
+    /**
+     * Counts the reading of the document.
+     *
+     * The prompt of the default reader shows up after an effective read.
+     */
+    private val readTracker = EffectiveReadTracker(onEffectiveRead = { onEffectiveRead() })
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -174,6 +185,7 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
             object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
                     currentPage = position
+                    readTracker.onPage(position)
                     // The ink of the drawing belongs to the page, so the
                     // history follows the reader.
                     updateDrawButtons()
@@ -182,6 +194,15 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
         )
         registerResults()
         loadDocument()
+        // The reading is checked every few seconds: the prompt of the default
+        // reader shows up while the user reads, not only when the document is
+        // closed.
+        viewLifecycleOwner.lifecycleScope.launch {
+            while (isActive) {
+                delay(EffectiveReadTracker.CHECK_INTERVAL_MS)
+                readTracker.check()
+            }
+        }
     }
 
     /**
@@ -214,13 +235,20 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        readTracker.onResumed()
+    }
+
     override fun onPause() {
         super.onPause()
+        readTracker.onPaused()
         persistProgress()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        readTracker.onClosed()
         // The engine keeps the parsed document open while it is read, this
         // gives the memory of a big document back.
         pagerAdapter?.release()
@@ -295,7 +323,19 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
             }
             if (start > 0) binding.pager.setCurrentItem(start, false)
             currentPage = start
+            // The document is open, the reading of the user starts now.
+            readTracker.onOpened(start)
         }
+    }
+
+    /**
+     * The user read the document long enough for the prompt of the default
+     * reader to be due.
+     */
+    private fun onEffectiveRead() {
+        val doc = document ?: return
+        if (!isAdded) return
+        DefaultAppPrompt.onEffectiveRead(requireContext(), childFragmentManager, doc.type)
     }
 
     /**

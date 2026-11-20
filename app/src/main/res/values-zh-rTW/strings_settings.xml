@@ -35,10 +35,13 @@
     <string name="onboarding_skip">略過</string>
     <string name="onboarding_start">開始使用</string>
     <string name="permission_allow_all_files">允許存取全部檔案</string>
-    <string name="set_default_title">設為預設 PDF 閱讀器</string>
-    <string name="set_default_subtitle">選擇「Let\'s PDF: View &amp; Sign」，然後點選「始終」</string>
-    <string name="set_default_mock_once">僅一次</string>
-    <string name="set_default_mock_always">始終</string>
+    <string name="default_prompt_title">以後開啟 %1$s 都用 %2$s？</string>
+    <string name="default_prompt_subtitle">設為預設後，點開 %1$s 就直接用這個應用，不必再選一次。</string>
+    <string name="default_prompt_go">前往設定</string>
+    <string name="default_prompt_later">下次再說</string>
+    <string name="settings_default_app_title">設為預設的文件處理器</string>
+    <string name="settings_default_app_on">已是預設處理器</string>
+    <string name="settings_default_app_off">尚未設定</string>
     <string name="quick_entry_scan">掃描 PDF</string>
     <string name="quick_entry_merge">合併 PDF</string>
     <string name="quick_entry_print">列印 PDF</string>
