@@ -123,7 +123,25 @@ object Ads {
         onLoaded: (AppOpenAd) -> Unit,
         onFailed: (String) -> Unit = {},
     ) {
-        initialize(context)
+        // The sdk has to be ready before an ad is asked for. The request
+        // waits for it when the sdk is still starting.
+        initialize(context) { ready ->
+            if (!ready) {
+                onFailed("the ad sdk is not ready")
+                return@initialize
+            }
+            requestAppOpen(context, adUnitId, onLoaded, onFailed)
+        }
+    }
+
+    /** Asks the sdk for the ad of the start up screen. */
+    private fun requestAppOpen(
+        context: Context,
+        adUnitId: String,
+        onLoaded: (AppOpenAd) -> Unit,
+        onFailed: (String) -> Unit,
+    ) {
+        Logger.i(TAG, "the ad of the start up screen is asked for")
         runCatching {
             AppOpenAd.load(
                 context,
@@ -131,31 +149,38 @@ object Ads {
                 AdRequest.Builder().build(),
                 object : AppOpenAd.AppOpenAdLoadCallback() {
                     override fun onAdLoaded(ad: AppOpenAd) {
+                        Logger.i(TAG, "the ad of the start up screen is here")
                         appOpenAd = ad
                         onLoaded(ad)
                     }
 
                     override fun onAdFailedToLoad(error: LoadAdError) {
-                        Logger.w(TAG, "the ad of the start up screen could not be loaded: ${error.code}")
-                        onFailed("the ad could not be loaded: ${error.code}")
+                        Logger.w(
+                            TAG,
+                            "the ad of the start up screen could not be loaded: " +
+                                "${error.code} ${error.message}",
+                        )
+                        onFailed("the ad could not be loaded: ${error.code} ${error.message}")
                     }
                 },
             )
         }.onFailure {
             Logger.e(TAG, "the ad of the start up screen could not be requested", it)
-            onFailed("the request failed")
+            onFailed("the request failed: ${it.message}")
         }
     }
 
     /** Starts the ad sdk, it is called once with the application. */
-    fun initialize(context: Context) {
+    fun initialize(context: Context, onReady: (Boolean) -> Unit = {}) {
         runCatching {
             MobileAds.initialize(context) {
                 Logger.d(TAG, "the ad sdk is ready")
+                onReady(true)
             }
         }.onFailure {
             // A missing or placeholder app id must not stop the app.
             Logger.e(TAG, "the ad sdk could not be started", it)
+            onReady(false)
         }
     }
 

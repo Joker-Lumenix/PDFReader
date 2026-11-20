@@ -65,6 +65,13 @@
     <string name="settings_default_app_on">已是默认处理器</string>
     <string name="settings_default_app_off">尚未设置</string>
 
+    <!--
+      The developer sees why an ad is not shown. The messages only show up in
+      the debug build, they are not translated.
+    -->
+    <string name="ad_load_failed" translatable="false">开屏广告加载失败: %1$s</string>
+    <string name="ad_show_failed" translatable="false">开屏广告展示失败: %1$s</string>
+
     <!-- ==================== quick entry popup ==================== -->
     <string name="quick_entry_scan">扫描 PDF</string>
     <string name="quick_entry_merge">合并 PDF</string>

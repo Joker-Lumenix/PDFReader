@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.ads.AdError
@@ -14,6 +15,7 @@ import com.google.android.gms.ads.appopen.AppOpenAd
 import com.peng.pdfreader.R
 import com.peng.pdfreader.ads.Ads
 import com.peng.pdfreader.base.BaseActivity
+import com.peng.pdfreader.BuildConfig
 import com.peng.pdfreader.core.util.Logger
 import com.peng.pdfreader.data.SharedStorage
 import com.peng.pdfreader.databinding.ActivitySplashBinding
@@ -25,6 +27,7 @@ import com.peng.pdfreader.notification.trigger.NotificationScene
 import com.peng.pdfreader.notification.trigger.NotificationTarget
 import com.peng.pdfreader.notification.trigger.NotificationTrigger
 import com.peng.pdfreader.ui.flow.AppFlow
+import kotlinx.coroutines.launch
 
 /**
  * The start up screen.
@@ -34,8 +37,10 @@ import com.peng.pdfreader.ui.flow.AppFlow
  * for the notification permission - the user needs time for it.
  *
  * The start up screen is also the place of the ad of the start up: the ad is
- * loaded while the progress runs and it is shown as soon as it is there. When
- * the user closes the ad, the progress runs to the end and the flow continues.
+ * loaded as soon as the permission is answered and it is shown as soon as it
+ * is there. When the user closes the ad, the progress runs to the end and the
+ * flow continues. An ad that was loaded at the end of the last start of the
+ * app is shown right away, and a new one is loaded for the next start.
  */
 class SplashActivity : BaseActivity() {
 
@@ -59,22 +64,35 @@ class SplashActivity : BaseActivity() {
     /** Whether the ad of the start up is here. */
     private var adLoaded = false
 
-    /** When the ad of the start up was asked for. */
-    private var adRequestedAt = 0L
+    /** Whether the ad of the start up was asked for. */
+    private var adRequested = false
 
     /** Whether the flow already continues. */
     private var leaving = false
+
+    /** Whether the app is in the foreground. */
+    private var inForeground = false
+
+    /** When the ad of the start up arrived, zero when there is none. */
+    private var adLoadedAt = 0L
+
+    /** Whether the progress draws itself. */
+    private var ticking = false
 
     private val handler = Handler(Looper.getMainLooper())
 
     /** The progress of the design, it runs until the page leaves. */
     private val tick = object : Runnable {
         override fun run() {
-            if (leaving) return
+            if (leaving) {
+                ticking = false
+                return
+            }
             if (!paused) elapsed += TICK_MS
             val percent = (elapsed * 100 / MAX_CYCLE_MS).toInt().coerceIn(0, 100)
             binding.progress.progress = percent
             if (percent >= 100) {
+                ticking = false
                 onProgressComplete()
                 return
             }
@@ -86,7 +104,7 @@ class SplashActivity : BaseActivity() {
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
             Logger.i(TAG, "notification permission granted: $granted")
             permissionAnswered = true
-            resumeProgress()
+            onPermissionAnswered()
             if (granted) PersistentNotificationHelper.show(this)
         }
 
@@ -100,8 +118,10 @@ class SplashActivity : BaseActivity() {
         // The permission is asked for a moment after the page was opened, the
         // progress waits while the user decides.
         handler.postDelayed(permissionCheck, PERMISSION_CHECK_DELAY_MS)
-        // The ad of the start up is loaded while the progress runs.
-        loadSplashAd()
+        // The ad of the start up is asked for right away - it needs the time
+        // of the whole cycle to arrive. It is only shown when the app is in
+        // the foreground, the dialog of the permission must not be in the way.
+        requestAd()
     }
 
     override fun onDestroy() {
@@ -113,7 +133,7 @@ class SplashActivity : BaseActivity() {
     // ------------------------------------------------------------------ progress
 
     private fun startProgress() {
-        handler.post(tick)
+        ensureTicking()
     }
 
     /** The progress waits while the user deals with the permission. */
@@ -124,27 +144,27 @@ class SplashActivity : BaseActivity() {
     /** The progress continues after the user is done. */
     private fun resumeProgress() {
         paused = false
+        ensureTicking()
+    }
+
+    /** Starts the progress when it does not run already. */
+    private fun ensureTicking() {
+        if (ticking || leaving) return
+        ticking = true
         handler.post(tick)
     }
 
     /**
      * The progress is over.
      *
-     * The page leaves the flow - unless the ad of the start up is still on its
-     * way, then the page waits a moment for it and shows it first.
+     * The page leaves the flow - unless the ad of the start up is here, then
+     * the ad is shown first.
      */
     private fun onProgressComplete() {
-        if (!adShown) {
-            if (adLoaded) {
-                showSplashAd(Ads.pendingAppOpen())
-                return
-            }
-            // The ad is still on its way - the page waits for it a moment, so
-            // the start up of the app shows it.
-            if (SystemClock.elapsedRealtime() - adRequestedAt < AD_WAIT_MS) {
-                handler.postDelayed({ onProgressComplete() }, AD_CHECK_MS)
-                return
-            }
+        if (!adShown && adLoaded) {
+            // The ad is here, it is shown before the flow continues.
+            showAdWhenReady()
+            if (!adShown) return
         }
         leave()
     }
@@ -165,6 +185,7 @@ class SplashActivity : BaseActivity() {
         if (NotificationPermissionHelper.hasPermission(this)) {
             // The permission is already there, nothing is asked for.
             permissionAnswered = true
+            onPermissionAnswered()
             return@Runnable
         }
         pauseProgress()
@@ -174,23 +195,51 @@ class SplashActivity : BaseActivity() {
         } else {
             // The versions below Android 13 know no runtime permission: the
             // sheet of the design guides the user to the settings.
-            NotificationPermissionSheet.show(supportFragmentManager)
+            NotificationPermissionSheet.show(supportFragmentManager) { wentToSettings ->
+                if (wentToSettings) {
+                    // The user is on the way to the settings of the system -
+                    // the progress waits until they are back.
+                    return@show
+                }
+                // The sheet was closed without the settings.
+                permissionAnswered = true
+                onPermissionAnswered()
+            }
         }
     }
 
     /**
      * The user is back on the page.
      *
-     * The progress continues, the ad of the start up is shown as soon as it is
-     * there.
+     * The progress continues, the ad of the start up is shown as soon as it
+     * is there.
      */
     override fun onResume() {
         super.onResume()
+        inForeground = true
         if (permissionAsked && !permissionAnswered) {
             // The user was in the settings of the system and is back now.
             permissionAnswered = true
-            resumeProgress()
+            onPermissionAnswered()
         }
+        // The app is in the foreground again - the ad can be shown now.
+        showAdWhenReady()
+    }
+
+    override fun onPause() {
+        inForeground = false
+        super.onPause()
+    }
+
+    /**
+     * The permission is answered.
+     *
+     * The progress continues and the ad of the start up is shown as soon as
+     * it is there.
+     */
+    private fun onPermissionAnswered() {
+        resumeProgress()
+        showAdWhenReady()
     }
 
     // ------------------------------------------------------------------ ad
@@ -198,32 +247,67 @@ class SplashActivity : BaseActivity() {
     /**
      * The ad of the start up.
      *
-     * It is loaded while the progress runs and it is shown as soon as it
-     * arrives. When the user closes it, the progress runs to the end.
-     *
-     * An ad that was loaded at the end of the last start of the app is shown
-     * right away - it does not have to be loaded again.
+     * An ad that was loaded at the end of the last start of the app is used
+     * right away, otherwise a new one is loaded - it arrives after a few
+     * seconds and is shown as soon as the app is in the foreground. When the
+     * ad does not arrive before the progress is over, the page continues
+     * without it.
      */
-    private fun loadSplashAd() {
+    private fun requestAd() {
+        if (leaving) return
+        adRequested = true
+        adLoaded = false
         val pending = Ads.pendingAppOpen()
         if (pending != null) {
             adLoaded = true
-            showSplashAd(pending)
+            adLoadedAt = SystemClock.elapsedRealtime()
+            showAdWhenReady()
             return
         }
-        adRequestedAt = SystemClock.elapsedRealtime()
         Ads.loadAppOpen(
             context = this,
             onLoaded = { ad ->
                 adLoaded = true
+                adLoadedAt = SystemClock.elapsedRealtime()
                 // The ad is shown right away, as long as the page is still
                 // waiting.
-                if (!leaving && !adShown) showSplashAd(ad)
+                if (!leaving && !adShown) showAdWhenReady()
             },
             onFailed = { message ->
                 Logger.i(TAG, "the ad of the start up could not be loaded: $message")
+                if (BuildConfig.DEBUG) {
+                    Toast.makeText(
+                        this,
+                        getString(R.string.ad_load_failed, message),
+                        Toast.LENGTH_LONG,
+                    ).show()
+                }
             },
         )
+    }
+
+    /**
+     * Shows the ad as soon as the app is in the foreground.
+     *
+     * The question of the permission must be settled - the ad of the start up
+     * must not fight with the dialog of the system. An ad that waited too long
+     * (the user was long in the permission dialog) is stale: a new one is
+     * asked for then.
+     */
+    private fun showAdWhenReady() {
+        if (adShown || leaving || !adLoaded) return
+        // The question of the permission is not settled yet - the ad of the
+        // start up must not fight with the dialog of the system.
+        if (!permissionAnswered) return
+        if (!inForeground) return
+        if (SystemClock.elapsedRealtime() - adLoadedAt > AD_MAX_AGE_MS) {
+            // The ad is stale, the user was long in the dialog of the
+            // permission. A fresh one is asked for.
+            Logger.i(TAG, "the ad of the start up is stale, a new one is asked for")
+            requestAd()
+            return
+        }
+        showSplashAd(Ads.pendingAppOpen())
     }
 
     /** Shows the ad of the start up. */
@@ -231,11 +315,13 @@ class SplashActivity : BaseActivity() {
         if (adShown || leaving) return
         adShown = true
         if (ad == null) {
-            // The ad was already shown, the flow continues.
+            // The ad is not there, the flow continues.
+            Logger.i(TAG, "the ad of the start up is not there, the flow continues")
             leave()
             return
         }
         Ads.releaseAppOpen()
+        Logger.i(TAG, "the ad of the start up is shown")
         ad.fullScreenContentCallback = object : FullScreenContentCallback() {
             override fun onAdDismissedFullScreenContent() {
                 onSplashAdClosed()
@@ -243,6 +329,13 @@ class SplashActivity : BaseActivity() {
 
             override fun onAdFailedToShowFullScreenContent(error: AdError) {
                 Logger.w(TAG, "the ad of the start up could not be shown: ${error.message}")
+                if (BuildConfig.DEBUG) {
+                    Toast.makeText(
+                        this@SplashActivity,
+                        getString(R.string.ad_show_failed, error.message),
+                        Toast.LENGTH_LONG,
+                    ).show()
+                }
                 onSplashAdClosed()
             }
         }
@@ -250,6 +343,13 @@ class SplashActivity : BaseActivity() {
             ad.show(this)
         }.onFailure {
             Logger.w(TAG, "the ad of the start up could not be shown: ${it.message}")
+            if (BuildConfig.DEBUG) {
+                Toast.makeText(
+                    this,
+                    getString(R.string.ad_show_failed, it.message),
+                    Toast.LENGTH_LONG,
+                ).show()
+            }
             onSplashAdClosed()
         }
     }
@@ -269,7 +369,7 @@ class SplashActivity : BaseActivity() {
         // The progress runs to the end and the flow continues.
         elapsed = MAX_CYCLE_MS
         binding.progress.progress = 100
-        handler.post(tick)
+        ensureTicking()
     }
 
     // ------------------------------------------------------------------ flow
@@ -278,6 +378,7 @@ class SplashActivity : BaseActivity() {
     private fun leave() {
         if (leaving) return
         leaving = true
+        ticking = false
         handler.removeCallbacks(tick)
         launchNextStep()
     }
@@ -380,16 +481,18 @@ class SplashActivity : BaseActivity() {
         /** The progress runs at most twenty seconds. */
         const val MAX_CYCLE_MS = 20_000L
 
-        /** How long the page waits for the ad of the start up. */
-        const val AD_WAIT_MS = 5_000L
-
-        /** How often the page looks for the ad of the start up. */
-        const val AD_CHECK_MS = 250L
-
         /** How often the progress is drawn, in milliseconds. */
         const val TICK_MS = 100L
 
         /** The permission is asked for a moment after the page was opened. */
         const val PERMISSION_CHECK_DELAY_MS = 1_500L
+
+        /**
+         * How long the ad of the start up stays fresh.
+         *
+         * The ad of the start up is only valid for a while - a user that was
+         * long in the dialog of the permission gets a new one.
+         */
+        const val AD_MAX_AGE_MS = 30_000L
     }
 }

@@ -10,7 +10,7 @@ plugins {
 val admobAppId = "ca-app-pub-3940256099942544~3347511713"
 val adUnitBanner = "ca-app-pub-3940256099942544/6300978111"
 val adUnitCard = "ca-app-pub-3940256099942544/6300978111"
-val adUnitAppOpen = "ca-app-pub-3940256099942544/9293671026"
+    val adUnitAppOpen = "ca-app-pub-3940256099942544/9257395921"
 
 /**
  * Whether the app carries a real firebase configuration.

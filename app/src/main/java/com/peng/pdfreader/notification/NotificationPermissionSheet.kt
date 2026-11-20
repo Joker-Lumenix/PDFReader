@@ -26,8 +26,17 @@ class NotificationPermissionSheet : BaseBottomSheetDialog() {
     private var _binding: SettingsNotificationSheetBinding? = null
     private val binding get() = _binding!!
 
-    /** Raised once the sheet is gone, used by the start up flow to continue. */
-    var onDismissed: (() -> Unit)? = null
+    /**
+     * Raised once the sheet is gone, used by the start up flow to continue.
+     *
+     * The flag tells whether the sheet opened the notification settings of the
+     * system - then the user is on the way to the settings and comes back
+     * later.
+     */
+    var onDismissed: ((openedSettings: Boolean) -> Unit)? = null
+
+    /** Whether the sheet opened the notification settings of the system. */
+    private var openedSettings = false
 
     private val permissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
@@ -45,7 +54,7 @@ class NotificationPermissionSheet : BaseBottomSheetDialog() {
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
-        onDismissed?.invoke()
+        onDismissed?.invoke(openedSettings)
     }
 
     /**
@@ -70,15 +79,27 @@ class NotificationPermissionSheet : BaseBottomSheetDialog() {
             return
         }
         NotificationPermissionHelper.openNotificationSettings(context)
+        openedSettings = true
         dismiss()
     }
 
     companion object {
         const val TAG = "NotificationPermissionSheet"
 
-        /** Shows the sheet. */
-        fun show(manager: FragmentManager) {
-            NotificationPermissionSheet().show(manager, TAG)
+        /**
+         * Shows the sheet.
+         *
+         * @param manager the manager that carries the sheet
+         * @param onDismissed raised once the sheet is gone, with the flag that
+         * tells whether the user is on the way to the settings of the system
+         */
+        fun show(
+            manager: FragmentManager,
+            onDismissed: ((openedSettings: Boolean) -> Unit)? = null,
+        ) {
+            val sheet = NotificationPermissionSheet()
+            sheet.onDismissed = { opened -> onDismissed?.invoke(opened) }
+            sheet.show(manager, TAG)
         }
     }
 }
