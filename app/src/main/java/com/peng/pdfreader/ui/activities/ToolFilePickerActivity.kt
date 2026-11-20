@@ -311,7 +311,9 @@ class ToolFilePickerActivity : BaseActivity() {
     private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
 
     companion object {
-        private const val EXTRA_MODE = "com.peng.pdfreader.extra.TOOL_MODE"
+        /** The tool the page serves, it is put into the intent. */
+        const val EXTRA_MODE = "com.peng.pdfreader.extra.TOOL_MODE"
+
         private const val PDF_MIME = "application/pdf"
         private const val STATE_PENDING = "tool_picker_pending_document"
 

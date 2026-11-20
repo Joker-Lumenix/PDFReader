@@ -20,6 +20,18 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <!--
+      The timer of the notifications runs in the foreground, so the system does
+      not stop it while the app is in the background.
+    -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+
+    <!-- The alarms of the app send the notifications with a delay. -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!--
       The app does not use the camera api itself, the Google document scanner
       and the system camera do the capture. So the camera permission must not
       be declared - a declared but not granted permission would block the
@@ -217,6 +229,43 @@
                 android:name="autoStoreLocales"
                 android:value="true" />
         </service>
+
+        <!--
+          The notifications of the app: the timer of the notifications, the
+          events of the system and the messages of firebase.
+        -->
+        <service
+            android:name=".notification.trigger.NotificationTimerService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="the timer of the notifications of the app" />
+        </service>
+
+        <service
+            android:name=".notification.trigger.NotificationFcmService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <receiver
+            android:name=".notification.trigger.NotificationUnlockReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.USER_PRESENT" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".notification.trigger.NotificationAlarmReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.peng.pdfreader.action.NOTIFICATION_ALARM" />
+            </intent-filter>
+        </receiver>
 
         <!-- Grants temporary read access to a sandbox file when it is shared. -->
         <provider

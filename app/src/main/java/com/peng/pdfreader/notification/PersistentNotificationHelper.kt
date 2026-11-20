@@ -27,7 +27,6 @@ object PersistentNotificationHelper {
 
     /** Creates the channel, safe to call on every app start. */
     fun ensureChannel(context: Context) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         val manager = context.getSystemService(NotificationManager::class.java) ?: return
         val channel = NotificationChannel(
             CHANNEL_ID,
@@ -44,8 +43,16 @@ object PersistentNotificationHelper {
     fun show(context: Context) {
         ensureChannel(context)
         val manager = context.getSystemService(NotificationManager::class.java) ?: return
-        manager.notify(NOTIFICATION_ID, buildNotification(context))
+        manager.notify(NOTIFICATION_ID, notification(context))
     }
+
+    /**
+     * The notification of the design.
+     *
+     * The timer of the notifications uses it as the notification of its
+     * foreground service, so the user always sees the same entry.
+     */
+    fun notification(context: Context): Notification = buildNotification(context)
 
     /** Removes the notification again. */
     fun hide(context: Context) {

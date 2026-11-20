@@ -365,10 +365,21 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
             BottomSheetPassword.RESULT_KEY,
             viewLifecycleOwner,
         ) { _, bundle ->
+            if (bundle.getBoolean(BottomSheetPassword.KEY_CANCELLED)) {
+                // The user gave up: the document stays locked, the page of the
+                // reader is left.
+                leavePage()
+                return@setFragmentResultListener
+            }
             val password = bundle.getString(BottomSheetPassword.KEY_PASSWORD).orEmpty()
             unlockAndOpen(doc, file, password)
         }
         sheet.show(childFragmentManager, BottomSheetPassword.TAG)
+    }
+
+    /** Leaves the page of the reader. */
+    private fun leavePage() {
+        activity?.finish()
     }
 
     private fun unlockAndOpen(doc: Document, file: File, password: String) {

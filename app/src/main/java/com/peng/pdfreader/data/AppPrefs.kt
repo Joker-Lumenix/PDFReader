@@ -54,6 +54,58 @@ class AppPrefs private constructor(context: Context) {
         get() = prefs.getBoolean(KEY_NOTIFICATION_ASKED, false)
         set(value) = prefs.edit { putBoolean(KEY_NOTIFICATION_ASKED, value) }
 
+    /**
+     * The delay of a notification scene, in milliseconds.
+     *
+     * Null means the default of the scene is used.
+     */
+    fun notificationDelay(scene: com.peng.pdfreader.notification.trigger.NotificationScene): Long? =
+        prefs.getLong(KEY_NOTIFICATION_DELAY + scene.key, -1L).takeIf { it >= 0L }
+
+    /**
+     * The campaign of a notification scene.
+     *
+     * The campaign decides the icon, the picture and the page the
+     * notification leads to. Null means the default of the scene is used.
+     */
+    fun notificationCampaign(
+        scene: com.peng.pdfreader.notification.trigger.NotificationScene,
+    ): com.peng.pdfreader.notification.trigger.NotificationTarget? {
+        val key = KEY_NOTIFICATION_CAMPAIGN + scene.key
+        val name = prefs.getString(key, null) ?: return null
+        return com.peng.pdfreader.notification.trigger.NotificationTarget.of(name)
+    }
+
+    /** How long the app has to be installed before the first notification. */
+    var notificationMinMinutesSinceInstall: Int
+        get() = prefs.getInt(KEY_NOTIFICATION_MIN_INSTALL, DEFAULT_MIN_MINUTES_SINCE_INSTALL)
+        set(value) = prefs.edit { putInt(KEY_NOTIFICATION_MIN_INSTALL, value) }
+
+    /** How long the app waits between two notifications of the same scene. */
+    var notificationMinMinutesBetweenScenes: Int
+        get() = prefs.getInt(KEY_NOTIFICATION_MIN_SCENE, DEFAULT_MIN_MINUTES_BETWEEN_SCENES)
+        set(value) = prefs.edit { putInt(KEY_NOTIFICATION_MIN_SCENE, value) }
+
+    /** How long the app waits between two notifications of any scene. */
+    var notificationMinSecondsBetweenScenes: Int
+        get() = prefs.getInt(KEY_NOTIFICATION_MIN_ANY, DEFAULT_MIN_SECONDS_BETWEEN_SCENES)
+        set(value) = prefs.edit { putInt(KEY_NOTIFICATION_MIN_ANY, value) }
+
+    /** How many notifications one scene may send per day. */
+    var notificationDailyLimit: Int
+        get() = prefs.getInt(KEY_NOTIFICATION_DAILY_LIMIT, DEFAULT_DAILY_LIMIT)
+        set(value) = prefs.edit { putInt(KEY_NOTIFICATION_DAILY_LIMIT, value) }
+
+    /**
+     * Whether a notification may be shown without the permission.
+     *
+     * The media notification of the design is the one that may be shown
+     * anyway - the user has to see it to be able to switch the permission on.
+     */
+    var notificationAllowedWithoutPermission: Boolean
+        get() = prefs.getBoolean(KEY_NOTIFICATION_WITHOUT_PERMISSION, false)
+        set(value) = prefs.edit { putBoolean(KEY_NOTIFICATION_WITHOUT_PERMISSION, value) }
+
     companion object {
         private const val KEY_LANGUAGE = "language"
         private const val KEY_KEEP_SCREEN_ON = "keep_screen_on"
@@ -62,8 +114,21 @@ class AppPrefs private constructor(context: Context) {
         private const val KEY_FILE_SORT = "file_sort"
         private const val KEY_GUIDE_SHOWN = "guide_shown"
         private const val KEY_NOTIFICATION_ASKED = "notification_permission_asked"
+        private const val KEY_NOTIFICATION_DELAY = "notification_delay_"
+        private const val KEY_NOTIFICATION_CAMPAIGN = "notification_campaign_"
+        private const val KEY_NOTIFICATION_MIN_INSTALL = "notification_min_install_minutes"
+        private const val KEY_NOTIFICATION_MIN_SCENE = "notification_min_scene_minutes"
+        private const val KEY_NOTIFICATION_MIN_ANY = "notification_min_any_seconds"
+        private const val KEY_NOTIFICATION_DAILY_LIMIT = "notification_daily_limit"
+        private const val KEY_NOTIFICATION_WITHOUT_PERMISSION = "notification_without_permission"
 
         const val DEFAULT_LANGUAGE = "zh-CN"
+
+        /** The default limits of the notifications. */
+        const val DEFAULT_MIN_MINUTES_SINCE_INSTALL = 10
+        const val DEFAULT_MIN_MINUTES_BETWEEN_SCENES = 60
+        const val DEFAULT_MIN_SECONDS_BETWEEN_SCENES = 15
+        const val DEFAULT_DAILY_LIMIT = 3
 
         @Volatile
         private var instance: AppPrefs? = null

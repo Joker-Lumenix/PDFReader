@@ -1,0 +1,14 @@
+{
+  "order": [
+    "MERGE_PDF",
+    "SPLIT_PDF",
+    "LOCK",
+    "UNLOCK",
+    "COMPRESS",
+    "PRINT",
+    "SCAN",
+    "IMAGE_TO_PDF"
+  ],
+  "stepIntervalMs": 1000,
+  "repeatCount": 20
+}

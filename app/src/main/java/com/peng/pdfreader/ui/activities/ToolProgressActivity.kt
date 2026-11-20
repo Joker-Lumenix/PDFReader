@@ -8,11 +8,14 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.peng.pdfreader.R
+import com.peng.pdfreader.ads.Ads
 import com.peng.pdfreader.base.BaseActivity
+import com.peng.pdfreader.core.widget.AdSlotView
 import com.peng.pdfreader.databinding.ActivityToolsProgressBinding
 import com.peng.pdfreader.feature.tools.progress.ToolProgressBus
 import com.peng.pdfreader.feature.tools.progress.ToolProgressState
 import com.peng.pdfreader.feature.tools.util.ToolShapes
+import com.peng.pdfreader.ui.uiData.AdSamples
 import kotlinx.coroutines.launch
 
 /**
@@ -44,6 +47,11 @@ class ToolProgressActivity : BaseActivity() {
         binding.progressView.progressFill.background =
             ToolShapes.gradientPill(this, R.drawable.gradient_red, 16f)
         binding.progressView.progressKnob.setImageDrawable(ToolShapes.progressKnob(this))
+
+        // the ad slot of the design, below the progress of the job
+        binding.progressView.adSlot.style = AdSlotView.Style.CARD
+        binding.progressView.adSlot.content = AdSamples.card(this)
+        Ads.loadCard(binding.progressView.adSlot)
 
         observeJob()
     }

@@ -41,6 +41,9 @@ object ToolsResultBinder {
         binding.ivPreview.background = ToolShapes.roundRect(context, PREVIEW_TILE, 4f)
         binding.tvFileName.text = document.name
         binding.tvFilePath.text = context.getString(R.string.tools_result_path, document.path)
+        // The number of the pages is only known for a document that could be
+        // read - an encrypted document has no counter.
+        binding.tvPageBadge.visibility = if (document.pageCount > 0) View.VISIBLE else View.GONE
         binding.tvPageBadge.text = document.pageCount.toString()
         binding.tvPageBadge.background = ToolShapes.pageCountBadge(context)
     }

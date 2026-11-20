@@ -8,13 +8,16 @@ import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.peng.pdfreader.R
 import com.peng.pdfreader.core.pdf.PdfEngine
+import com.peng.pdfreader.ads.Ads
 import com.peng.pdfreader.core.util.Logger
+import com.peng.pdfreader.core.widget.AdSlotView
 import com.peng.pdfreader.base.BaseActivity
 import com.peng.pdfreader.base.ShareFileProvider
 import com.peng.pdfreader.data.Document
 import com.peng.pdfreader.data.DocumentRepository
 import com.peng.pdfreader.databinding.ActivityToolsResultBinding
 import com.peng.pdfreader.ui.dialogs.BottomSheetToolTextInput
+import com.peng.pdfreader.ui.uiData.AdSamples
 import com.peng.pdfreader.feature.tools.print.ToolPrintRunner
 import com.peng.pdfreader.feature.tools.progress.ToolJobResult
 import com.peng.pdfreader.feature.tools.view.ToolsResultActions
@@ -64,6 +67,11 @@ class ResultActivity : BaseActivity() {
         ToolsResultBinder.bindActions(this, binding, actions(document))
         loadPreview(document)
         if (simple) hideFollowUps()
+
+        // the ad slot of the design, between the document and the more card
+        binding.adBanner.style = AdSlotView.Style.BANNER
+        binding.adBanner.content = AdSamples.banner(this)
+        Ads.loadBanner(binding.adBanner)
     }
 
     /**

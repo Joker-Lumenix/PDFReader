@@ -10,6 +10,7 @@ plugins {
 val admobAppId = "ca-app-pub-3940256099942544~3347511713"
 val adUnitBanner = "ca-app-pub-3940256099942544/6300978111"
 val adUnitCard = "ca-app-pub-3940256099942544/6300978111"
+val adUnitAppOpen = "ca-app-pub-3940256099942544/9293671026"
 
 /**
  * Whether the app carries a real firebase configuration.
@@ -53,6 +54,7 @@ android {
         buildConfigField("String", "ADMOB_APP_ID", "\"$admobAppId\"")
         buildConfigField("String", "AD_UNIT_ID_BANNER", "\"$adUnitBanner\"")
         buildConfigField("String", "AD_UNIT_ID_CARD", "\"$adUnitCard\"")
+buildConfigField("String", "AD_UNIT_ID_APP_OPEN", "\"$adUnitAppOpen\"")
         // The firebase sdk is only started with a real configuration.
         buildConfigField("boolean", "FIREBASE_CONFIGURED", firebaseConfigured.toString())
     }
@@ -108,6 +110,7 @@ dependencies {
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.androidx.viewpager2)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+implementation(libs.androidx.lifecycle.process)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
 
     // The advertising and the analytics of the design.
@@ -115,6 +118,7 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.crashlytics)
+implementation(libs.firebase.messaging)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

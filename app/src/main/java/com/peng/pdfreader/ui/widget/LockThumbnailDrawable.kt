@@ -32,7 +32,6 @@ class LockThumbnailDrawable(
     private val badge: Drawable? = ContextCompat.getDrawable(context, R.mipmap.ic_lock_corner)
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val chip = RectF()
-
     override fun draw(canvas: Canvas) {
         val bounds = bounds
         if (bounds.isEmpty) return

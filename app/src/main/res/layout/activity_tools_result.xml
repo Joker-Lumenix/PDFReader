@@ -290,6 +290,15 @@
 
                 </FrameLayout>
 
+                <!-- the ad slot of the design, between the document and the more card -->
+                <com.peng.pdfreader.core.widget.AdSlotView
+                    android:id="@+id/adBanner"
+                    android:layout_width="match_parent"
+                    android:layout_height="72dp"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="12dp" />
+
                 <!-- ==================== more actions ==================== -->
 
                 <LinearLayout

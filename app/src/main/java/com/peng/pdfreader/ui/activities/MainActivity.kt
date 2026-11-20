@@ -28,6 +28,7 @@ import com.peng.pdfreader.ui.fragments.SettingsFragment
 import com.peng.pdfreader.notification.NotificationPermissionHelper
 import com.peng.pdfreader.notification.NotificationPermissionSheet
 import com.peng.pdfreader.notification.PersistentNotificationHelper
+import com.peng.pdfreader.notification.trigger.NotificationAppState
 import com.peng.pdfreader.ui.fragments.ToolsFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -58,26 +59,11 @@ class MainActivity : BaseActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    /** Whether the custom notification sheet was shown already. */
-    private var notificationSheetShown = false
-
     /** Whether the exit retention sheet is on the screen. */
     private var exitRetentionShown = false
 
     /** The tab that is on the screen. */
     private var currentTab = TAB_HOME
-
-    private val notificationPermissionLauncher =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-            Logger.i(TAG, "notification permission granted: $granted")
-            if (granted) {
-                PersistentNotificationHelper.show(this)
-            } else {
-                // The system refuses to show its dialog again, the custom sheet
-                // of the design guides the user to the settings.
-                showNotificationPermissionSheet()
-            }
-        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -97,9 +83,9 @@ class MainActivity : BaseActivity() {
         // The documents of the device are collected right away, so the list is
         // complete when the home screen is opened.
         syncSharedDocuments()
-        // The notification permission is asked for a moment after the home
-        // screen was opened, see the notification permission handling.
-        scheduleNotificationPermission()
+        // The start up screen asked for the notification permission, the
+        // notification of the design shows up when it was granted.
+        showPersistentNotification()
     }
 
     /** Brings the documents of the shared storage into the library. */
@@ -116,6 +102,18 @@ class MainActivity : BaseActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         handleIntent(intent)
+    }
+
+    /**
+     * The user left the app with the home button.
+     *
+     * The app is still in the foreground at this moment, so only the fact is
+     * remembered here: the scene "home key" runs when the app went to the
+     * background, the same moment the scene "app background" would run.
+     */
+    override fun onUserLeaveHint() {
+        super.onUserLeaveHint()
+        NotificationAppState.markHomeButtonUsed()
     }
 
     /**
@@ -248,46 +246,16 @@ class MainActivity : BaseActivity() {
 
 
     /**
-     * Asks for the notification permission two seconds after the home screen
-     * was opened.
+     * The notification of the design is shown when the user allowed the
+     * notifications.
      *
-     * The start up screen already asked for it - when the user denied it there,
-     * the request is repeated here. As long as the system still shows its own
-     * dialog the system dialog is used, otherwise the custom sheet of the
-     * design takes over.
+     * The start up screen asks for the permission - it waits for the answer
+     * before it continues, so the home screen never asks on its own.
      */
-    private fun scheduleNotificationPermission() {
-        lifecycleScope.launch {
-            delay(NOTIFICATION_PERMISSION_DELAY_MS)
-            requestNotificationPermission()
-        }
-    }
-
-    private fun requestNotificationPermission() {
+    private fun showPersistentNotification() {
         if (isFinishing || isDestroyed) return
-        if (NotificationPermissionHelper.hasPermission(this)) {
-            PersistentNotificationHelper.show(this)
-            return
-        }
-        if (NotificationPermissionHelper.requiresRuntimeRequest() &&
-            NotificationPermissionHelper.canAskSystem(
-                this,
-                NotificationPermissionHelper.wasAsked(this),
-            )
-        ) {
-            NotificationPermissionHelper.markAsked(this)
-            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-            return
-        }
-        // The system does not show its dialog anymore - the custom sheet of the
-        // design guides the user to the settings of the system.
-        showNotificationPermissionSheet()
-    }
-
-    private fun showNotificationPermissionSheet() {
-        if (notificationSheetShown || isFinishing || isDestroyed) return
-        notificationSheetShown = true
-        NotificationPermissionSheet.show(supportFragmentManager)
+        if (!NotificationPermissionHelper.hasPermission(this)) return
+        PersistentNotificationHelper.show(this)
     }
 
     private fun openStoragePermission() {

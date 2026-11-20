@@ -15,6 +15,7 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.peng.pdfreader.R
 import com.peng.pdfreader.base.ShareFileProvider
@@ -28,9 +29,11 @@ import com.peng.pdfreader.data.AppPrefs
 import com.peng.pdfreader.data.DocType
 import com.peng.pdfreader.data.DocumentRepository
 import com.peng.pdfreader.databinding.ActivityFileSearchBinding
+import com.peng.pdfreader.ui.adapter.listAdapter.AdBannerAdapter
 import com.peng.pdfreader.ui.adapter.listAdapter.DocumentPrintAdapter
 import com.peng.pdfreader.ui.adapter.listAdapter.FileListAdapter
 import com.peng.pdfreader.ui.dialogs.BottomSheetRename
+import com.peng.pdfreader.ui.uiData.AdSamples
 import com.peng.pdfreader.ui.dialogs.DialogDeleteConfirm
 import com.peng.pdfreader.ui.dialogs.DocumentActionSheet
 import com.peng.pdfreader.ui.dialogs.DocumentCipher
@@ -137,7 +140,12 @@ class FileSearchActivity : BaseActivity() {
             },
         )
         binding.recycler.layoutManager = LinearLayoutManager(this)
-        binding.recycler.adapter = adapter
+        // The ad slot of the design sits at the end of the results, it is the
+        // same one the home page shows.
+        binding.recycler.adapter = ConcatAdapter(
+            adapter,
+            AdBannerAdapter(AdSamples.banner(this)),
+        )
         binding.recycler.setHasFixedSize(true)
         binding.recycler.addItemDecoration(FileListItemDecoration(dp(ROW_GAP)))
     }

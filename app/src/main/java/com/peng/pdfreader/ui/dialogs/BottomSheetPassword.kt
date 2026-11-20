@@ -24,8 +24,12 @@ import com.peng.pdfreader.feature.lock.sheet.LockPasswordMask
  * password, the work itself happens in the host page. The sheet stays open
  * until the host confirms the operation, that way the error state of the
  * design can be rendered inside the sheet.
+ *
+ * The sheet of a locked document is a door: tapping outside does not close it,
+ * only the button of the design and the back key do - and both of them leave
+ * the page, a document that cannot be opened is of no use to the user.
  */
-class BottomSheetPassword : BaseBottomSheetDialog() {
+class BottomSheetPassword : BaseBottomSheetDialog(dismissOnClickOutside = false) {
 
     /** What the sheet is used for. */
     enum class Mode { LOCK, UNLOCK, ENTER }
@@ -33,6 +37,12 @@ class BottomSheetPassword : BaseBottomSheetDialog() {
     private var binding: LockSheetPasswordBinding? = null
     private var pendingError: String? = null
     private var passwordVisible = false
+
+    /** Whether the password was sent to the host already. */
+    private var submitted = false
+
+    /** Whether the user gave up already. */
+    private var cancelReported = false
 
     /**
      * The message of the error state.
@@ -64,7 +74,7 @@ class BottomSheetPassword : BaseBottomSheetDialog() {
 
         views.etPassword.transformationMethod = LockPasswordMask()
         views.ivToggle.setOnClickListener { toggleVisibility() }
-        views.btnCancel.setOnClickListener { dismiss() }
+        views.btnCancel.setOnClickListener { cancel() }
         views.btnOk.setOnClickListener { submit() }
         // The keyboard of the design carries the confirm button, so the enter
         // key of the keyboard confirms the password as well.
@@ -92,6 +102,32 @@ class BottomSheetPassword : BaseBottomSheetDialog() {
     override fun onDestroyView() {
         binding = null
         super.onDestroyView()
+    }
+
+    /**
+     * The sheet was closed.
+     *
+     * The back key closes the sheet - the user gave up, the page of the host
+     * has to be left as well.
+     */
+    override fun onDismiss(dialog: android.content.DialogInterface) {
+        super.onDismiss(dialog)
+        if (!submitted) cancel()
+    }
+
+    /**
+     * The user gave up.
+     *
+     * The host is told that the sheet was closed without a password, so it can
+     * leave its page.
+     */
+    private fun cancel() {
+        if (cancelReported) return
+        cancelReported = true
+        parentFragmentManager.setFragmentResult(
+            RESULT_KEY,
+            bundleOf(KEY_PASSWORD to "", KEY_MODE to mode.name, KEY_CANCELLED to true),
+        )
     }
 
     /**
@@ -192,6 +228,7 @@ class BottomSheetPassword : BaseBottomSheetDialog() {
             showError(getString(R.string.lock_password_too_short))
             return
         }
+        submitted = true
         setBusy(true)
         parentFragmentManager.setFragmentResult(
             RESULT_KEY,
@@ -215,6 +252,9 @@ class BottomSheetPassword : BaseBottomSheetDialog() {
 
         /** Key of the mode inside the result bundle. */
         const val KEY_MODE = "mode"
+
+        /** Key of the flag that tells the host the user gave up. */
+        const val KEY_CANCELLED = "cancelled"
 
         private const val ARG_MODE = "lock_mode"
 

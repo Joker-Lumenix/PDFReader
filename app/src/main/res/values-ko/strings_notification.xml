@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The campaign of the notification of the design. -->
+    <string name="notification_promo_text">✨ 사진을 몇 초 만에 PDF로. 지금 바로 사용해 보세요 ✨</string>
+</resources>

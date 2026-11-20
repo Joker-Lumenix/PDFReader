@@ -12,13 +12,16 @@ import android.widget.Toast
 import androidx.core.view.doOnLayout
 import androidx.lifecycle.lifecycleScope
 import com.peng.pdfreader.R
+import com.peng.pdfreader.ads.Ads
 import com.peng.pdfreader.base.BaseActivity
+import com.peng.pdfreader.core.widget.AdSlotView
 import com.peng.pdfreader.data.DocType
 import com.peng.pdfreader.data.DocumentRepository
 import com.peng.pdfreader.databinding.ActivityImageProcessBinding
 import com.peng.pdfreader.feature.tools.engine.ToolEngines
 import com.peng.pdfreader.feature.tools.util.ToolFlow
 import com.peng.pdfreader.feature.tools.util.ToolOutput
+import com.peng.pdfreader.ui.uiData.AdSamples
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -79,6 +82,12 @@ class ImageProcessActivity : BaseActivity() {
         binding.colDelete.setOnClickListener { delete() }
 
         binding.content.doOnLayout { applyImageHeight() }
+
+        // the ad slot of the design, between the pager and the bottom bar
+        binding.adBanner.style = AdSlotView.Style.BANNER
+        binding.adBanner.content = AdSamples.banner(this)
+        Ads.loadBanner(binding.adBanner)
+
         show()
     }
 

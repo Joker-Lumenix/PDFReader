@@ -13,6 +13,7 @@ import com.peng.pdfreader.ui.uiData.AdSamples
 import com.peng.pdfreader.ui.activities.ImageToPdfActivity
 import com.peng.pdfreader.ui.activities.MergeActivity
 import com.peng.pdfreader.feature.tools.scanner.ToolScanner
+import com.peng.pdfreader.notification.trigger.NotificationAppState
 
 /**
  * Tools tab: the yellow panel with the 2 x 4 grid of the PDF tools (merge,
@@ -45,7 +46,12 @@ class ToolsFragment : BaseFragment() {
         // slot shows the sample artwork until the ad arrives.
         binding.adBanner.style = AdSlotView.Style.BANNER
         binding.adBanner.content = AdSamples.banner(requireContext())
-        Ads.loadBanner(binding.adBanner)
+        Ads.loadBanner(binding.adBanner) {
+            // The ad was clicked: it opens its own page and the app goes to
+            // the background - that is the moment the scene "ad click" of the
+            // notifications waits for.
+            NotificationAppState.markAdClicked()
+        }
 
         initToolSelected()
     }

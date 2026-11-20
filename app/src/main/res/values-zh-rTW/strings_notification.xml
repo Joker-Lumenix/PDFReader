@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The campaign of the notification of the design. -->
+    <string name="notification_promo_text">✨ 圖片秒轉 PDF，現在就試試 ✨</string>
+</resources>
