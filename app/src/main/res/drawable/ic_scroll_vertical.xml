@@ -1,0 +1,13 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- The icon of the vertical scroll of the reader: a page with an arrow. -->
+    <path
+        android:fillColor="#FF060606"
+        android:pathData="M6,2h9l5,5v15h-14zM15,3.5V7h3.5L15,3.5zM8,10h8v1.5h-8zM8,13h8v1.5h-8zM8,16h5v1.5h-5z" />
+    <path
+        android:fillColor="#FF060606"
+        android:pathData="M16.5,20.5l3,3l3,-3z" />
+</vector>

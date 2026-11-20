@@ -1,4 +1,4 @@
-package com.peng.pdfreader.ui.fragments
+﻿package com.peng.pdfreader.ui.fragments
 
 import android.app.Activity
 import android.content.Intent
@@ -81,6 +81,9 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
     private var pagerAdapter: PdfPagerAdapter? = null
     private var pageCount = 0
     private var currentPage = 0
+
+    /** Whether the pages are scrolled vertically instead of turned. */
+    private var verticalScroll = false
     private var activeTool: AnnotationType? = null
     private var bottomSheetPassword: BottomSheetPassword? = null
     private var renderFailureReported = false
@@ -143,6 +146,10 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
         }
         binding.ivMore.setOnClickListener {
             showMoreActions()
+        }
+
+        binding.ivScroll.setOnClickListener {
+            toggleScrollMode()
         }
 
         binding.llShare.setOnClickListener {
@@ -325,6 +332,22 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
             currentPage = start
             // The document is open, the reading of the user starts now.
             readTracker.onOpened(start)
+        }
+    }
+
+    /**
+     * The reader shows the pages one after the other, or it scrolls them
+     * vertically.
+     *
+     * The button of the title bar switches between the two: the pages are
+     * turned in the first mode and scrolled in the second one.
+     */
+    private fun toggleScrollMode() {
+        verticalScroll = !verticalScroll
+        binding.pager.orientation = if (verticalScroll) {
+            ViewPager2.ORIENTATION_VERTICAL
+        } else {
+            ViewPager2.ORIENTATION_HORIZONTAL
         }
     }
 

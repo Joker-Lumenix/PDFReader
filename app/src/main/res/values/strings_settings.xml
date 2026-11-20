@@ -72,6 +72,9 @@
     <string name="ad_load_failed" translatable="false">开屏广告加载失败: %1$s</string>
     <string name="ad_show_failed" translatable="false">开屏广告展示失败: %1$s</string>
 
+    <!-- The button of the reader that switches between the page turn and the vertical scroll. -->
+    <string name="pdf_scroll_mode" translatable="false">纵向滑动</string>
+
     <!-- ==================== quick entry popup ==================== -->
     <string name="quick_entry_scan">扫描 PDF</string>
     <string name="quick_entry_merge">合并 PDF</string>

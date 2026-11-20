@@ -20,7 +20,10 @@ import javax.xml.parsers.DocumentBuilderFactory
 class OoxmlPackage private constructor(private val zip: ZipFile) : AutoCloseable {
 
     private val builder: DocumentBuilderFactory = DocumentBuilderFactory.newInstance().apply {
-        isNamespaceAware = true
+        // The readers compare the local names only, so the parser does not
+        // have to resolve the namespaces of the elements - that is the
+        // expensive part of the parsing of a big part.
+        isNamespaceAware = false
         // Some Android releases do not know every hardening switch - ignore the ones they reject.
         runCatching { setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false) }
         runCatching { setFeature("http://xml.org/sax/features/external-general-entities", false) }

@@ -44,6 +44,9 @@ class PptxPreviewView @JvmOverloads constructor(
     private val pager = ViewPager2(context)
     private val adapter = SlideAdapter()
 
+    /** The pinch zoom of the slides. */
+    private val zoom = ZoomController(pager)
+
     /** The slides that are read so far. */
     private val slides = ArrayList<PptxSlide?>()
 
@@ -115,6 +118,11 @@ class PptxPreviewView @JvmOverloads constructor(
             LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT),
         )
         pager.adapter = adapter
+        // The pinch zoom of the slides.
+        pager.setOnTouchListener { _, event ->
+            zoom.onTouch(event)
+            false
+        }
         pager.registerOnPageChangeCallback(
             object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {

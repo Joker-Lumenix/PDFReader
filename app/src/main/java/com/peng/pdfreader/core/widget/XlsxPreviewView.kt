@@ -172,8 +172,16 @@ class XlsxPreviewView @JvmOverloads constructor(
     private val tabStripHeight get() = dp(36f)
     private val headerHeight get() = dp(26f)
 
+    /** The pinch zoom of the sheet. */
+    private val zoom = ZoomController(this)
+
     init {
         isClickable = true
+        // The pinch zoom of the sheet.
+        setOnTouchListener { _, event ->
+            zoom.onTouch(event)
+            false
+        }
     }
 
     private fun currentSheet(): XlsxSheet? = sheets.getOrNull(sheetIndex)

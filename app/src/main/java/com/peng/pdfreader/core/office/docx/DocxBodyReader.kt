@@ -111,7 +111,7 @@ internal class DocxBodyReader(
 
     /** Walks over a tree and delivers the events of the parser. */
     private fun walk(node: XmlNode) {
-        onStart(node.localName, attributesOf(node))
+        onStart(node.localName) { attributesOf(node) }
         if (node.localName == "t") onText(node.text)
         node.nodes().forEach { walk(it) }
         onEnd(node.localName)
@@ -134,11 +134,9 @@ internal class DocxBodyReader(
         qName: String?,
         attributes: Attributes?,
     ) {
-        onStart(
-            localName?.takeIf { it.isNotEmpty() }
-                ?: qName?.substringAfterLast(':').orEmpty(),
-            attributes?.toMap() ?: emptyMap(),
-        )
+        val name = localName?.takeIf { it.isNotEmpty() }
+            ?: qName?.substringAfterLast(':').orEmpty()
+        onStart(name) { attributes?.toMap() ?: emptyMap() }
     }
 
     override fun endElement(uri: String?, localName: String?, qName: String?) {
@@ -153,34 +151,40 @@ internal class DocxBodyReader(
         onText(String(ch, start, length))
     }
 
-    /** Opens an element of the document. */
-    private fun onStart(name: String, attributes: Map<String, String>) {
+    /**
+     * Opens an element of the document.
+     *
+     * The attributes are only read for the elements that need them - a big
+     * document has hundreds of thousands of elements, and the map of the
+     * attributes of each of them would cost more time than the reading.
+     */
+    private fun onStart(name: String, attributes: () -> Map<String, String>) {
         val current = collector
         if (current != null) {
-            current.start(name, attributes)
+            current.start(name, attributes())
             return
         }
         // Inside a drawing only the picture itself is of interest, the text
         // boxes of a drawing are not part of the paragraph.
         if (picture != null) {
             when (name) {
-                "extent" -> picture?.readExtent(attributes)
-                "blip" -> picture?.readBlip(attributes)
-                "imagedata" -> picture?.readImageData(attributes)
+                "extent" -> picture?.readExtent(attributes())
+                "blip" -> picture?.readBlip(attributes())
+                "imagedata" -> picture?.readImageData(attributes())
             }
             return
         }
         when (name) {
-            "pPr" -> collect("pPr", attributes)
-            "rPr" -> collect("rPr", attributes)
-            "sectPr" -> collect("sectPr", attributes)
-            "tcPr" -> collect("tcPr", attributes)
-            "tblGrid" -> collect("tblGrid", attributes)
+            "pPr" -> collect("pPr", attributes())
+            "rPr" -> collect("rPr", attributes())
+            "sectPr" -> collect("sectPr", attributes())
+            "tcPr" -> collect("tcPr", attributes())
+            "tblGrid" -> collect("tblGrid", attributes())
             "p" -> startParagraph()
             "r" -> startRun()
             "t" -> inText = true
             "tab" -> run?.appendText("\t")
-            "br" -> run?.appendBreak(attributes)
+            "br" -> run?.appendBreak(attributes())
             "cr" -> run?.appendText("\n")
             "noBreakHyphen" -> run?.appendText("-")
             "drawing", "pict" -> picture = PictureBuilder()

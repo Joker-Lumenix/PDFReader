@@ -115,6 +115,8 @@ implementation(libs.androidx.lifecycle.process)
 
     // The advertising and the analytics of the design.
     implementation(libs.play.services.ads)
+    implementation(libs.poi)
+    implementation(libs.poi.scratchpad)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.crashlytics)

@@ -38,6 +38,9 @@ class DocxPreviewView @JvmOverloads constructor(
     private val adapter = PageAdapter()
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
+    /** The pinch zoom of the document. */
+    private val zoom = ZoomController(recycler)
+
     /**
      * The request to build the pages.
      *
@@ -96,6 +99,11 @@ class DocxPreviewView @JvmOverloads constructor(
             },
         )
         addView(recycler, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
+        // The pinch zoom of the document.
+        recycler.setOnTouchListener { _, event ->
+            zoom.onTouch(event)
+            false
+        }
     }
 
     override fun onDetachedFromWindow() {

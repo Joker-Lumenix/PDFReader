@@ -16,6 +16,9 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.peng.pdfreader.R
 import com.peng.pdfreader.core.office.OoxmlPackage
+import com.peng.pdfreader.core.office.legacy.LegacyDocument
+import com.peng.pdfreader.core.office.legacy.LegacyPresentation
+import com.peng.pdfreader.core.office.legacy.LegacyWorkbook
 import com.peng.pdfreader.core.office.docx.DocxDocument
 import com.peng.pdfreader.core.office.docx.DocxParser
 import com.peng.pdfreader.core.office.pptx.PptxParser
@@ -361,6 +364,12 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
      * document are laid out afterwards, page by page.
      */
     private suspend fun loadWord(doc: Document) {
+        val file = repository.fileOf(doc)
+        if (file.exists() && !file.name.endsWith(".docx", true)) {
+            // The legacy binary format of the documents.
+            showLegacyDocument(doc, file)
+            return
+        }
         val parsed = withContext(Dispatchers.IO) {
             try {
                 parseWord(doc)
@@ -391,6 +400,11 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
         val file = repository.fileOf(doc)
         if (!file.exists()) {
             showError()
+            return
+        }
+        if (!file.name.endsWith(".pptx", true)) {
+            // The legacy binary format of the presentations.
+            showLegacyPresentation(doc, file)
             return
         }
         val pkg = withContext(Dispatchers.IO) { OoxmlPackage.open(file) }
@@ -430,6 +444,11 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
             showError()
             return
         }
+        if (!file.name.endsWith(".xlsx", true)) {
+            // The legacy binary format of the spreadsheets.
+            showLegacyWorkbook(doc, file)
+            return
+        }
         val pkg = withContext(Dispatchers.IO) { OoxmlPackage.open(file) }
         if (pkg == null) {
             showError()
@@ -455,6 +474,74 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
             }
         } finally {
             withContext(NonCancellable + Dispatchers.IO) { pkg.close() }
+        }
+    }
+
+    /**
+     * Shows a document in the legacy binary format of Word.
+     *
+     * The format is the compound file of Office 97, the reader of Apache POI
+     * opens it.
+     */
+    private suspend fun showLegacyDocument(doc: Document, file: File) {
+        val parsed = withContext(Dispatchers.IO) { LegacyDocument.read(file) }
+        if (parsed == null) {
+            showError()
+            return
+        }
+        val preview = DocxPreviewView(requireContext())
+        preview.document = parsed
+        preview.onPageChanged = { page ->
+            currentIndex = page
+            readTracker.onPage(page)
+        }
+        showContent(preview)
+    }
+
+    /**
+     * Shows a spreadsheet in the legacy binary format of Excel.
+     */
+    private suspend fun showLegacyWorkbook(doc: Document, file: File) {
+        val workbook = withContext(Dispatchers.IO) { LegacyWorkbook.read(file) }
+        if (workbook == null) {
+            showError()
+            return
+        }
+        val preview = XlsxPreviewView(requireContext())
+        preview.sheetCount = workbook.sheets.size
+        preview.sheetIndex = workbook.activeSheetIndex
+        for (index in workbook.sheets.indices) {
+            preview.setSheetName(index, workbook.sheets[index].name)
+        }
+        preview.onSheetChanged = { sheet ->
+            currentIndex = sheet
+            readTracker.onPage(sheet)
+        }
+        showContent(preview)
+        for (index in workbook.sheets.indices) {
+            preview.setSheet(index, workbook.sheets[index])
+        }
+    }
+
+    /**
+     * Shows a presentation in the legacy binary format of PowerPoint.
+     */
+    private suspend fun showLegacyPresentation(doc: Document, file: File) {
+        val deck = withContext(Dispatchers.IO) { LegacyPresentation.read(file) }
+        if (deck == null) {
+            showError()
+            return
+        }
+        val preview = PptxPreviewView(requireContext())
+        preview.setDeckSize(deck.widthDp, deck.heightDp)
+        preview.slideCount = deck.slides.size
+        preview.onSlideChanged = { slide ->
+            currentIndex = slide
+            readTracker.onPage(slide)
+        }
+        showContent(preview)
+        for (slide in deck.slides) {
+            preview.appendSlide(slide)
         }
     }
 
