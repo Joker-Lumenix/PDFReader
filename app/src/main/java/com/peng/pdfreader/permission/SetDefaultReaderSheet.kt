@@ -2,6 +2,7 @@ package com.peng.pdfreader.permission
 
 import android.content.DialogInterface
 import android.graphics.drawable.GradientDrawable
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,13 +20,22 @@ import com.peng.pdfreader.databinding.SettingsSetDefaultSheetBinding
  * after an effective read (see [DefaultAppPrompt]), the settings tab always
  * carries the entry for the users who want to do it by hand.
  */
-class SetDefaultReaderSheet : BaseBottomSheetDialog() {
+class SetDefaultReaderSheet : BaseBottomSheetDialog(dismissOnClickOutside = false) {
 
     private var _binding: SettingsSetDefaultSheetBinding? = null
     private val binding get() = _binding!!
 
-    /** The kind of document the prompt is about, such as "PDF". */
-    var documentLabel: String = ""
+    /**
+     * The kind of document the prompt is about, such as "PDF".
+     *
+     * It lives in the arguments of the sheet, so it survives a recreation of
+     * the page.
+     */
+    var documentLabel: String
+        get() = arguments?.getString(ARG_DOCUMENT_LABEL).orEmpty()
+        set(value) {
+            arguments = (arguments ?: Bundle()).apply { putString(ARG_DOCUMENT_LABEL, value) }
+        }
 
     /** Raised once the sheet is gone. */
     var onDismissed: (() -> Unit)? = null
@@ -35,6 +45,14 @@ class SetDefaultReaderSheet : BaseBottomSheetDialog() {
 
     /** Raised when the user pushed the prompt away. */
     var onLater: (() -> Unit)? = null
+
+    init {
+        // The prompt stays on the screen until the user picks one of its two
+        // buttons: the back button does not close it either.
+        arguments = Bundle().apply {
+            putBoolean(ARG_DISMISS_ON_BACK, false)
+        }
+    }
 
     override fun createContentView(inflater: LayoutInflater, container: ViewGroup?): View {
         _binding = SettingsSetDefaultSheetBinding.inflate(inflater, container, false)
@@ -77,5 +95,8 @@ class SetDefaultReaderSheet : BaseBottomSheetDialog() {
 
     companion object {
         const val TAG = "SetDefaultReaderSheet"
+
+        /** The key of the kind of document in the arguments of the sheet. */
+        private const val ARG_DOCUMENT_LABEL = "com.peng.pdfreader.core.DOCUMENT_LABEL"
     }
 }
