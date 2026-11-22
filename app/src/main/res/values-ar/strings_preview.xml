@@ -38,6 +38,7 @@
     <string name="preview_search_page">صفحة %1$d</string>
     <string name="preview_annotations_saved">تم حفظ التعليقات التوضيحية في المستند</string>
     <string name="preview_document_truncated">المستند طويل جدًا، يتم عرض جزء منه فقط</string>
+    <string name="preview_loading_more">جارٍ تحميل الصفحات التالية…</string>
     <string name="preview_color">اللون</string>
     <string name="preview_add_signature">إضافة</string>
     <string name="preview_save_to_document">حفظ في المستند</string>

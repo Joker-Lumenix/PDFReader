@@ -3,12 +3,15 @@ package com.peng.pdfreader.core.widget
 import android.content.Context
 import android.util.AttributeSet
 import android.view.GestureDetector
+import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.peng.pdfreader.R
 import com.peng.pdfreader.core.office.docx.DocxBlock
 import com.peng.pdfreader.core.office.docx.DocxDocument
 import com.peng.pdfreader.core.util.Logger
@@ -94,6 +97,14 @@ class DocxPreviewView @JvmOverloads constructor(
      * only has to tell which paragraph of the document was touched.
      */
     var onParagraphLongPressed: ((DocxBlock.Paragraph) -> Unit)? = null
+
+    /**
+     * Raised when the pages of the document cannot be built.
+     *
+     * A document that is too big for the phone does not fit into its memory,
+     * the reader tells the user that the document is not complete.
+     */
+    var onLayoutFailed: (() -> Unit)? = null
 
     /**
      * The gesture of the reader.
@@ -189,11 +200,26 @@ class DocxPreviewView @JvmOverloads constructor(
         buildJob = scope.launch {
             for (signal in requests) {
                 val current = engine ?: continue
-                current.buildUntil(wantedPages)
+                try {
+                    current.buildUntil(wantedPages)
+                } catch (error: OutOfMemoryError) {
+                    // The document does not fit into the memory of the phone,
+                    // the reader shows the pages that are ready.
+                    Logger.e(TAG, "the document does not fit into the memory of the phone", error)
+                    withContext(Dispatchers.Main) { onLayoutFailed?.invoke() }
+                    break
+                } catch (error: Exception) {
+                    Logger.e(TAG, "the pages of the document could not be built", error)
+                    withContext(Dispatchers.Main) { onLayoutFailed?.invoke() }
+                    break
+                }
                 withContext(Dispatchers.Main) {
                     if (engine !== current) return@withContext
                     val pages = current.pageCount
                     adapter.setCount(pages)
+                    // The marker at the end of the list shows that the pages
+                    // behind it are still built.
+                    adapter.loading = !current.isComplete
                     pageCount = max(pages, 1)
                     updateCurrentPage()
                     // The pages behind the one the reader shows are built
@@ -233,28 +259,58 @@ class DocxPreviewView @JvmOverloads constructor(
         onPageChanged?.invoke(page)
     }
 
-    private inner class PageAdapter : RecyclerView.Adapter<PageHolder>() {
+    private inner class PageAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         var engine: DocxLayoutEngine? = null
 
         /** The number of the pages that are on the screen. */
         private var count = 0
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PageHolder =
-            PageHolder(DocxPageView(parent.context))
-
-        override fun onBindViewHolder(holder: PageHolder, position: Int) {
-            val current = engine
-            val height = current?.pageHeight ?: 0
-            val params = holder.view.layoutParams
-            if (params != null && params.height != height) {
-                params.height = height
-                holder.view.layoutParams = params
+        /**
+         * Whether the document is still being laid out.
+         *
+         * The reader shows a marker at the end of the list while the pages
+         * behind it are built, so the user knows that the document is not
+         * complete yet.
+         */
+        var loading: Boolean = false
+            set(value) {
+                if (field == value) return
+                field = value
+                notifyDataSetChanged()
             }
-            holder.view.bind(current?.page(position))
+
+        override fun getItemViewType(position: Int): Int =
+            if (position >= count) TYPE_FOOTER else TYPE_PAGE
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+            if (viewType == TYPE_FOOTER) {
+                return FooterHolder(
+                    LayoutInflater.from(parent.context)
+                        .inflate(R.layout.preview_docx_footer, parent, false),
+                )
+            }
+            return PageHolder(DocxPageView(parent.context))
         }
 
-        override fun getItemCount(): Int = count
+        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+            if (holder is FooterHolder) {
+                holder.view.findViewById<TextView>(R.id.tvLoading).setText(
+                    R.string.preview_loading_more,
+                )
+                return
+            }
+            val current = engine
+            val height = current?.pageHeight ?: 0
+            val params = holder.itemView.layoutParams
+            if (params != null && params.height != height) {
+                params.height = height
+                holder.itemView.layoutParams = params
+            }
+            (holder as PageHolder).view.bind(current?.page(position))
+        }
+
+        override fun getItemCount(): Int = count + if (loading) 1 else 0
 
         /** Sets the number of the pages that are on the screen. */
         fun setCount(value: Int) {
@@ -265,6 +321,9 @@ class DocxPreviewView @JvmOverloads constructor(
     }
 
     private class PageHolder(val view: DocxPageView) : RecyclerView.ViewHolder(view)
+
+    /** The marker at the end of the list, it shows that more pages follow. */
+    private class FooterHolder(val view: View) : RecyclerView.ViewHolder(view)
 
     /** The gap between two pages of the document. */
     private class PageDecoration(private val density: Float) : RecyclerView.ItemDecoration() {
@@ -282,10 +341,16 @@ class DocxPreviewView @JvmOverloads constructor(
 
     private companion object {
         /** The number of the pages that are built behind the visible one. */
-        const val PAGES_AHEAD = 2
+        const val PAGES_AHEAD = 4
 
         /** The gap between two pages in dp. */
         const val PAGE_GAP_DP = 12f
+
+        /** The kind of the item that shows a page. */
+        const val TYPE_PAGE = 0
+
+        /** The kind of the item that shows the marker at the end. */
+        const val TYPE_FOOTER = 1
 
         const val TAG = "DocxLayout"
     }

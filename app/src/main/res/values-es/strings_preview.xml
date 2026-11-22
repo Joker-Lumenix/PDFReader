@@ -38,6 +38,7 @@
     <string name="preview_search_page">Página %1$d</string>
     <string name="preview_annotations_saved">Las anotaciones se han guardado en el documento</string>
     <string name="preview_document_truncated">El documento es demasiado largo, solo se muestra una parte</string>
+    <string name="preview_loading_more">Cargando las páginas siguientes…</string>
     <string name="preview_color">Color</string>
     <string name="preview_add_signature">Añadir</string>
     <string name="preview_save_to_document">Guardar en el documento</string>

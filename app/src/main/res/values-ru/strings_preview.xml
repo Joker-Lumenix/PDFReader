@@ -38,6 +38,7 @@
     <string name="preview_search_page">Страница %1$d</string>
     <string name="preview_annotations_saved">Заметки сохранены в документ</string>
     <string name="preview_document_truncated">Документ слишком длинный, показана только часть</string>
+    <string name="preview_loading_more">Загрузка следующих страниц…</string>
     <string name="preview_color">Цвет</string>
     <string name="preview_add_signature">Добавить</string>
     <string name="preview_save_to_document">Сохранить в документ</string>

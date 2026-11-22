@@ -38,6 +38,7 @@
     <string name="preview_search_page">Page %1$d</string>
     <string name="preview_annotations_saved">The annotations were saved into the document</string>
     <string name="preview_document_truncated">The document is too long, only a part of it is shown</string>
+    <string name="preview_loading_more">Loading the following pages…</string>
     <string name="preview_color">Color</string>
     <string name="preview_add_signature">Add</string>
     <string name="preview_save_to_document">Save to document</string>

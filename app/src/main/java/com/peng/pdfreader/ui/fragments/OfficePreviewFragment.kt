@@ -531,6 +531,7 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
             currentIndex = page
             readTracker.onPage(page)
         }
+        preview.onLayoutFailed = { toast(R.string.preview_document_truncated) }
         showContent(preview)
         // A document that is too big for the phone is cut off.
         if (parsed.truncated) toast(R.string.preview_document_truncated)
@@ -645,6 +646,7 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
             readTracker.onPage(page)
         }
         preview.onParagraphLongPressed = { paragraph -> editParagraph(paragraph) }
+        preview.onLayoutFailed = { toast(R.string.preview_document_truncated) }
         showContent(preview)
         preview.scrollToPage(restoreIndex)
         // A document that is too big for the phone is cut off, the reader

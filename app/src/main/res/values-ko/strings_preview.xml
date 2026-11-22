@@ -38,6 +38,7 @@
     <string name="preview_search_page">%1$d 페이지</string>
     <string name="preview_annotations_saved">주석을 문서에 저장했습니다</string>
     <string name="preview_document_truncated">문서가 너무 길어 일부만 표시됩니다</string>
+    <string name="preview_loading_more">뒤의 페이지를 불러오는 중…</string>
     <string name="preview_color">색상</string>
     <string name="preview_add_signature">추가</string>
     <string name="preview_save_to_document">문서에 저장</string>

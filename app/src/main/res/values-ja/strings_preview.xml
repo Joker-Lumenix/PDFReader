@@ -38,6 +38,7 @@
     <string name="preview_search_page">%1$d ページ</string>
     <string name="preview_annotations_saved">注釈を文書に保存しました</string>
     <string name="preview_document_truncated">文書が長すぎるため、一部のみ表示しています</string>
+    <string name="preview_loading_more">後ろのページを読み込んでいます…</string>
     <string name="preview_color">色</string>
     <string name="preview_add_signature">追加</string>
     <string name="preview_save_to_document">ドキュメントに保存</string>

@@ -53,6 +53,8 @@
     <string name="preview_annotations_saved">批注已保存到文档</string>
     <!-- truncated document -->
     <string name="preview_document_truncated">文档内容过多，仅显示部分内容</string>
+    <!-- loading more -->
+    <string name="preview_loading_more">正在加载后面的内容…</string>
 
     <!-- editors -->
     <string name="preview_color">颜色</string>

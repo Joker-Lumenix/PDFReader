@@ -18,6 +18,7 @@ import android.text.style.UnderlineSpan
 import com.peng.pdfreader.R
 import com.peng.pdfreader.core.office.OfficeColors
 import com.peng.pdfreader.core.office.docx.DocxBlock
+import com.peng.pdfreader.core.office.docx.DocxCell
 import com.peng.pdfreader.core.office.docx.DocxDocument
 import com.peng.pdfreader.core.util.Logger
 import kotlin.math.ceil
@@ -95,6 +96,23 @@ internal class DocxLayoutEngine(
         val vertical: String,
     )
 
+    /**
+     * A cell of a row of a table, with the height it needs.
+     *
+     * The height is only known after the text of the cell is measured.
+     */
+    private class MeasuredCell(
+        val left: Float,
+        val width: Float,
+        val background: Int?,
+        val layouts: List<StaticLayout>,
+        val vertical: String,
+        val height: Float,
+    ) {
+        /** The cell of the page that is drawn. */
+        fun toCell(): Cell = Cell(left, width, background, layouts, vertical)
+    }
+
     /** The part of a block that did not fit on the page before. */
     private sealed interface Carry {
 
@@ -110,7 +128,13 @@ internal class DocxLayoutEngine(
         ) : Carry
 
         class TablePart(
-            val rows: List<Row>,
+            /**
+             * The rows of the table that are not placed yet.
+             *
+             * The rows keep their measurements, so a table that is broken
+             * over two pages is not measured twice.
+             */
+            val rows: TableRows,
             val spaceAfterPt: Float,
             /**
              * The number of the table in the document.
@@ -238,6 +262,14 @@ internal class DocxLayoutEngine(
         val items = ArrayList<Item>()
         var y = 0f
 
+        /**
+         * The rows of the table that is laid out at the moment.
+         *
+         * The rows are measured when the page needs them, so a table with
+         * thousands of rows does not hold the reader back.
+         */
+        var tableRows: TableRows? = null
+
         val pending = carry
         if (pending != null) {
             when (pending) {
@@ -252,7 +284,6 @@ internal class DocxLayoutEngine(
                 }
             }
         }
-
         while (blockIndex < document.blocks.size) {
             val block = document.blocks[blockIndex]
             when (block) {
@@ -342,24 +373,25 @@ internal class DocxLayoutEngine(
                 }
 
                 is DocxBlock.Table -> {
-                    val rows = buildRows(block)
+                    // The rows of a table are measured when the page needs
+                    // them, a big table has thousands of rows and the reader
+                    // would wait a long time for the first one.
+                    val rows = tableRows ?: TableRows(block, widthsOf(block)).also { tableRows = it }
                     val available = textHeight - y
-                    val placed = splitRows(rows, available)
+                    val placed = rows.take(available)
                     if (placed.isEmpty()) {
-                        if (y > 0f) break
-                        // The first row does not fit on an empty page: it is
-                        // placed anyway, a table is never lost.
-                        items += Item.Table(marginTop + y, marginLeft, listOf(rows.first()))
-                        carry = Carry.TablePart(rows.drop(1), 0f, blockIndex)
-                        y = textHeight
-                        break
+                        // A table without rows has no content, it is skipped.
+                        tableRows = null
+                        blockIndex++
+                        continue
                     }
                     items += Item.Table(marginTop + y, marginLeft, placed)
                     y += placed.sumOf { it.height.toDouble() }.toFloat()
-                    if (placed.size < rows.size) {
-                        carry = Carry.TablePart(rows.drop(placed.size), 0f, blockIndex)
+                    if (rows.hasMore) {
+                        carry = Carry.TablePart(rows, 0f, blockIndex)
                         break
                     }
+                    tableRows = null
                     blockIndex++
                 }
 
@@ -460,20 +492,18 @@ internal class DocxLayoutEngine(
      * @return the height the table takes on the page
      */
     private fun placeTablePart(items: ArrayList<Item>, part: Carry.TablePart, y: Float): Float {
-        if (part.rows.isEmpty()) {
-            carry = null
-            return part.spaceAfterPt * scale
-        }
         val available = textHeight - y
-        var placed = splitRows(part.rows, available)
+        val placed = part.rows.take(available)
         if (placed.isEmpty()) {
-            if (y > 0f) return 0f
-            placed = listOf(part.rows.first())
+            // A table without rows has no content, it is skipped.
+            carry = null
+            blockIndex = part.blockIndex + 1
+            return 0f
         }
         items += Item.Table(marginTop + y, marginLeft, placed)
         val used = placed.sumOf { it.height.toDouble() }.toFloat()
-        if (placed.size < part.rows.size) {
-            carry = Carry.TablePart(part.rows.drop(placed.size), part.spaceAfterPt, part.blockIndex)
+        if (part.rows.hasMore) {
+            carry = Carry.TablePart(part.rows, part.spaceAfterPt, part.blockIndex)
             return used
         }
         carry = null
@@ -506,23 +536,95 @@ internal class DocxLayoutEngine(
 
     // ----------------------------------------------------------------- tables
 
-    /** The rows of a table, their top is relative to the table. */
-    private fun buildRows(table: DocxBlock.Table): List<Row> {
-        val columnCount = table.rows.maxOfOrNull { row -> row.sumOf { it.columnSpan } } ?: 0
-        var widths = table.columnWidthsPt.map { it * scale }.filter { it > 0f }
-        if (widths.isEmpty()) {
-            val count = columnCount.coerceAtLeast(1)
-            widths = List(count) { textWidth / count }
-        }
-        val total = widths.sum().takeIf { it > 0f } ?: textWidth
-        widths = widths.map { it * textWidth / total }
+    /**
+     * The rows of a table.
+     *
+     * A big table has thousands of rows and every cell of it needs a
+     * measurement of its own. The rows are therefore measured one after the
+     * other: the reader only waits for the rows that fit onto the page it
+     * shows.
+     */
+    private inner class TableRows(
+        private val table: DocxBlock.Table,
+        private val widths: List<Float>,
+    ) {
 
-        val rows = ArrayList<Row>()
-        var y = 0f
-        for (rowCells in table.rows) {
-            val cells = ArrayList<Cell>()
+        /** The rows that were measured and are not placed yet. */
+        private val measured = ArrayDeque<Row>()
+
+        /** The number of the row that is measured next. */
+        private var next = 0
+
+        /** The place of the next row, relative to the table. */
+        private var top = 0f
+
+        /** True when the table has rows that are not placed yet. */
+        val hasMore: Boolean get() = next < table.rows.size || measured.isNotEmpty()
+
+        /**
+         * The rows that fit into the given height.
+         *
+         * At least one row is returned when the table has one, a table is
+         * never lost.
+         */
+        fun take(available: Float): List<Row> {
+            val result = ArrayList<Row>()
+            var used = 0f
+            while (true) {
+                val row = measured.firstOrNull() ?: measureNext() ?: break
+                if (result.isNotEmpty() && used + row.height > available) break
+                measured.removeFirst()
+                result += row
+                used += row.height
+            }
+            if (result.isEmpty()) return emptyList()
+            // The rows start at the top of the table again, the part of a
+            // table that moved to the next page is drawn at the right place.
+            val offset = result.first().top
+            return result.map { Row(it.top - offset, it.height, it.cells) }
+        }
+
+        /**
+         * The first row of the table.
+         *
+         * It is used when the row is taller than the page: it is placed
+         * anyway, so that the table is not lost.
+         */
+        fun firstRow(): Row {
+            val row = measured.firstOrNull() ?: measureNext()
+            return row ?: Row(0f, 0f, emptyList())
+        }
+
+        /** Measures the next row of the table. */
+        private fun measureNext(): Row? {
+            if (next >= table.rows.size) return null
+            val row = measureRow(table.rows[next], top)
+            next++
+            top += row.height
+            measured.addLast(row)
+            return row
+        }
+
+        /** Measures one row of the table. */
+        private fun measureRow(rowCells: List<DocxCell>, rowTop: Float): Row {
+            var cells = measureCells(rowCells, 1f)
+            var height = cells.maxOfOrNull { cell -> cell.height } ?: 0f
+            // A row that is taller than the page would be cut off, its text
+            // would be lost. The text of the row is made smaller until it
+            // fits onto the page.
+            var factor = 1f
+            while (height > textHeight && factor > MIN_ROW_FACTOR) {
+                factor *= ROW_SHRINK_FACTOR
+                cells = measureCells(rowCells, factor)
+                height = cells.maxOfOrNull { cell -> cell.height } ?: 0f
+            }
+            return Row(rowTop, height, cells.map { it.toCell() })
+        }
+
+        /** Measures the cells of one row of the table. */
+        private fun measureCells(rowCells: List<DocxCell>, factor: Float): List<MeasuredCell> {
+            val cells = ArrayList<MeasuredCell>()
             var column = 0
-            var rowHeight = 0f
             for (cell in rowCells) {
                 val span = cell.columnSpan.coerceAtLeast(1)
                 var width = 0f
@@ -534,22 +636,32 @@ internal class DocxLayoutEngine(
                 val inner = (width - padding * 2).toInt().coerceAtLeast(dp(24f).toInt())
                 val layouts = cell.blocks
                     .filterIsInstance<DocxBlock.Paragraph>()
-                    .map { layoutOf(it, inner, baseSizeFor(it)) }
+                    .map { layoutOf(it, inner, baseSizeFor(it) * factor) }
                 val cellHeight = layouts.sumOf { it.height.toDouble() }.toFloat() + padding * 2
-                rowHeight = max(rowHeight, cellHeight)
-                cells += Cell(
+                cells += MeasuredCell(
                     left = columnOffset(column, widths),
                     width = width,
                     background = cell.background?.let { OfficeColors.toAndroid(it) },
                     layouts = layouts,
                     vertical = cell.verticalAlignment,
+                    height = cellHeight,
                 )
                 column += span
             }
-            rows += Row(y, rowHeight, cells)
-            y += rowHeight
+            return cells
         }
-        return rows
+    }
+
+    /** The widths of the columns of a table, in pixels. */
+    private fun widthsOf(table: DocxBlock.Table): List<Float> {
+        val columnCount = table.rows.maxOfOrNull { row -> row.sumOf { it.columnSpan } } ?: 0
+        var widths = table.columnWidthsPt.map { it * scale }.filter { it > 0f }
+        if (widths.isEmpty()) {
+            val count = columnCount.coerceAtLeast(1)
+            widths = List(count) { textWidth / count }
+        }
+        val total = widths.sum().takeIf { it > 0f } ?: textWidth
+        return widths.map { it * textWidth / total }
     }
 
     private fun columnOffset(column: Int, widths: List<Float>): Float {
@@ -675,5 +787,16 @@ internal class DocxLayoutEngine(
 
     private companion object {
         const val TAG = "DocxLayout"
+
+        /**
+         * The step the text of a row that is too tall is shrunk by.
+         *
+         * A row that does not fit onto the page would be cut off, its text
+         * would be lost.
+         */
+        const val ROW_SHRINK_FACTOR = 0.85f
+
+        /** The smallest factor the text of a row is shrunk by. */
+        const val MIN_ROW_FACTOR = 0.4f
     }
 }
