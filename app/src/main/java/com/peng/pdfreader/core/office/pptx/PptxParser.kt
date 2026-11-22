@@ -23,6 +23,12 @@ data class PptxSlide(
     val shapes: List<PptxShape>,
     val background: OfficeColor?,
     val notes: String?,
+    /**
+     * The picture that fills the background of the slide.
+     *
+     * A slide with a picture as its background shows it behind the shapes.
+     */
+    val backgroundImage: ByteArray? = null,
 )
 
 sealed interface PptxShape {
@@ -39,6 +45,45 @@ sealed interface PptxShape {
         override val heightDp: Float,
         val anchor: String,
         val fill: OfficeColor?,
+        /**
+         * The number of the shape in the slide.
+         *
+         * The editor needs it to write a changed text back into the file: the
+         * number is the same one the editor counts the shapes of the slide
+         * with.
+         */
+        val sourceIndex: Int = -1,
+        /**
+         * The space between the text and the border of the box, in deck dp.
+         *
+         * The office software keeps the text away from the border, the file
+         * only names the space when it differs from the usual one.
+         */
+        val insetLeftDp: Float = DEFAULT_INSET_LEFT_DP,
+        val insetTopDp: Float = DEFAULT_INSET_TOP_DP,
+        val insetRightDp: Float = DEFAULT_INSET_RIGHT_DP,
+        val insetBottomDp: Float = DEFAULT_INSET_BOTTOM_DP,
+        /**
+         * How the text follows the size of the box.
+         *
+         * "none" keeps the text as it is, "shape" lets the box grow with the
+         * text and "text" shrinks the text into the box.
+         */
+        val autoFit: String = "none",
+        /**
+         * The factor the text is scaled by, when the file names it.
+         *
+         * A file that shrinks the text into its box writes the factor down,
+         * the reader uses it instead of guessing.
+         */
+        val fontScale: Float = 1f,
+        /**
+         * Whether the text of the box breaks into more lines.
+         *
+         * A box that does not wrap lets its text run over its border, the way
+         * a title of a slide often does.
+         */
+        val wrap: Boolean = true,
     ) : PptxShape
 
     data class Picture(
@@ -47,6 +92,16 @@ sealed interface PptxShape {
         override val topDp: Float,
         override val widthDp: Float,
         override val heightDp: Float,
+        /**
+         * The part of the picture that is cut away, the fractions of the
+         * picture on every side.
+         */
+        val cropLeft: Float = 0f,
+        val cropTop: Float = 0f,
+        val cropRight: Float = 0f,
+        val cropBottom: Float = 0f,
+        /** The turn of the picture, in degree. */
+        val rotation: Float = 0f,
     ) : PptxShape
 
     data class Rectangle(
@@ -59,6 +114,8 @@ sealed interface PptxShape {
         val lineWidthDp: Float,
         val preset: String,
         val rotation: Float,
+        /** The gradient of the shape, when it has one. */
+        val gradient: PptxGradient? = null,
     ) : PptxShape
 
     data class Table(
@@ -69,14 +126,106 @@ sealed interface PptxShape {
         override val topDp: Float,
         override val widthDp: Float,
         override val heightDp: Float,
+        /** The style of the table, the colours of its rows. */
+        val style: PptxTableStyle? = null,
+    ) : PptxShape
+
+    data class Chart(
+        val chart: PptxChart,
+        override val leftDp: Float,
+        override val topDp: Float,
+        override val widthDp: Float,
+        override val heightDp: Float,
     ) : PptxShape
 }
 
+/**
+ * The style of a table.
+ *
+ * A table names its style by a number, the style paints the header row, the
+ * rows that are banded and the lines between the cells. A cell that has a
+ * colour of its own keeps it.
+ */
+data class PptxTableStyle(
+    /** The colour of the first row. */
+    val firstRowFill: OfficeColor?,
+    /** The colour of the text of the first row. */
+    val firstRowText: OfficeColor?,
+    /** Whether the text of the first row is bold. */
+    val firstRowBold: Boolean = false,
+    /** The colour of the banded rows. */
+    val bandFill: OfficeColor?,
+    /** The colour of the rows between the banded ones. */
+    val bandAltFill: OfficeColor?,
+    /** The colour of the text of the rows. */
+    val text: OfficeColor?,
+    /** The colour of the lines between the cells. */
+    val border: OfficeColor?,
+    /** The width of the lines between the cells, in deck dp. */
+    val borderWidthDp: Float = 1f,
+)
+
+/**
+ * One part of the text of a paragraph.
+ */
+data class PptxRun(
+    /** The text of the part. */
+    val text: String,
+    /** The style of the part. */
+    val style: PptxTextStyle,
+)
+
+/**
+ * One stop of a gradient fill.
+ */
+data class PptxGradientStop(
+    /** The place of the stop, 0 is the start and 1 the end. */
+    val position: Float,
+    val color: OfficeColor,
+)
+
+/**
+ * A gradient fill of a shape.
+ */
+data class PptxGradient(
+    val stops: List<PptxGradientStop>,
+    /** The direction of the gradient in degrees. */
+    val angleDeg: Float,
+)
+
 data class PptxParagraph(
     val text: String,
+    /**
+     * The parts of the text, every part has its own style.
+     *
+     * A paragraph often holds a word that is bold or that has another
+     * colour, the parts keep the style of the file.
+     */
+    val runs: List<PptxRun> = emptyList(),
     val bullet: String?,
     val level: Int,
     val style: PptxTextStyle,
+    /**
+     * The distance between the lines of the paragraph.
+     *
+     * One is the normal distance, a value of 0.9 is the ninety per cent that
+     * many templates use.
+     */
+    val lineSpacing: Float = 1f,
+    /**
+     * The exact distance between the lines, in point.
+     *
+     * A file that names the distance in point uses it instead of the factor.
+     */
+    val lineSpacingPt: Float? = null,
+    /** The space above the paragraph, in point. */
+    val spaceBeforePt: Float = 0f,
+    /** The space below the paragraph, in point. */
+    val spaceAfterPt: Float = 0f,
+    /** The left margin of the paragraph, in deck dp. */
+    val marginLeftDp: Float = 0f,
+    /** The indent of the first line of the paragraph, in deck dp. */
+    val indentDp: Float = 0f,
 )
 
 data class PptxTextStyle(
@@ -168,6 +317,13 @@ object PptxParser {
         /** The number of the slides of the deck. */
         val slideCount: Int get() = parts.size
 
+        /**
+         * The part of the slide with the given index.
+         *
+         * The editor needs it to write a changed text back into the file.
+         */
+        fun slidePart(index: Int): String? = parts.getOrNull(index)
+
         /** Reads one slide of the deck. */
         fun readSlide(index: Int): PptxSlide? {
             val part = parts.getOrNull(index) ?: return null
@@ -218,6 +374,16 @@ object PptxParser {
     ): PptxSlide {
         val context = SlideContext(pkg, part, theme, fonts)
         val shapes = ArrayList<PptxShape>()
+        // The decoration of the master and of the layout lies behind the
+        // shapes of the slide. The number of the shapes of the slide does not
+        // change, the editor counts them in the file of the slide.
+        val slideStart = context.shapeIndex
+        // A slide can hide the shapes of the master.
+        if (node.attrBool("showMasterSp") != false) {
+            shapes += parseDecoration(context.masterNode, context)
+        }
+        shapes += parseDecoration(context.layoutNode, context)
+        context.shapeIndex = slideStart
         cSld(node)?.child("spTree")?.nodes()?.forEach { child ->
             parseNode(child, context, shapes, Transform.IDENTITY)
         }
@@ -226,7 +392,24 @@ object PptxParser {
             shapes = shapes,
             background = resolveBackground(cSld(node), context),
             notes = parseNotes(context),
+            backgroundImage = resolveBackgroundImage(cSld(node), context),
         )
+    }
+
+    /**
+     * The decoration of the master or of the layout of a slide.
+     *
+     * The placeholders of the master and of the layout are only a hint for
+     * the author, the office software does not draw them - the slide carries
+     * its own text in them.
+     */
+    private fun parseDecoration(node: OoxmlNode?, context: SlideContext): List<PptxShape> {
+        val spTree = node?.child("cSld")?.child("spTree") ?: return emptyList()
+        val shapes = ArrayList<PptxShape>()
+        spTree.nodes()?.forEach { child ->
+            parseNode(child, context, shapes, Transform.IDENTITY, skipPlaceholders = true)
+        }
+        return shapes
     }
 
     private fun cSld(node: OoxmlNode): OoxmlNode? = node.child("cSld")
@@ -242,11 +425,23 @@ object PptxParser {
         context: SlideContext,
         shapes: MutableList<PptxShape>,
         transform: Transform,
+        skipPlaceholders: Boolean = false,
     ) {
         when (node.localName) {
-            "sp" -> shapes += parseShape(node, context, transform)
+            "sp" -> {
+                // A placeholder of the master or of the layout is only a hint
+                // for the author, the office software does not draw it.
+                if (skipPlaceholders && isPlaceholder(node)) return
+                val index = context.shapeIndex++
+                shapes += parseShape(node, context, transform, index)
+            }
             "pic" -> parsePicture(node, context, transform)?.let { shapes += it }
-            "graphicFrame" -> parseTable(node, context, transform)?.let { shapes += it }
+            "graphicFrame" -> {
+                // A frame holds a table or a chart, the slide names the part
+                // of it.
+                parseTable(node, context, transform)?.let { shapes += it }
+                    ?: parseChart(node, context, transform)?.let { shapes += it }
+            }
             "grpSp" -> {
                 // The group carries its own coordinate space in the group
                 // properties: the offset, the extent and the child space.
@@ -256,11 +451,15 @@ object PptxParser {
                 node.nodes().filter { it.localName == "sp" || it.localName == "pic" ||
                     it.localName == "graphicFrame" || it.localName == "grpSp"
                 }.forEach { child ->
-                    parseNode(child, context, shapes, transform.then(group))
+                    parseNode(child, context, shapes, transform.then(group), skipPlaceholders)
                 }
             }
         }
     }
+
+    /** Whether a shape is a placeholder. */
+    private fun isPlaceholder(shape: OoxmlNode): Boolean =
+        shape.child("nvSpPr")?.child("nvPr")?.child("ph") != null
 
     /**
      * The mapping of the children of a group into the space of the slide.
@@ -293,6 +492,28 @@ object PptxParser {
     }
 
     // ------------------------------------------------------------ background
+
+    /**
+     * The picture that fills the background of the slide.
+     *
+     * A slide can have a picture as its background, the slide itself or the
+     * layout of it can name it.
+     */
+    private fun resolveBackgroundImage(cSld: OoxmlNode?, context: SlideContext): ByteArray? {
+        val own = backgroundImageOf(cSld?.child("bg"), context)
+        if (own != null) return own
+        return backgroundImageOf(context.layoutNode?.child("cSld")?.child("bg"), context)
+            ?: backgroundImageOf(context.masterNode?.child("cSld")?.child("bg"), context)
+    }
+
+    /** The picture of a background, null when the background has none. */
+    private fun backgroundImageOf(bg: OoxmlNode?, context: SlideContext): ByteArray? {
+        val props = bg?.child("bgPr") ?: return null
+        val blip = props.child("blipFill")?.child("blip") ?: return null
+        val embed = blip.relAttr("embed") ?: blip.relAttr("link") ?: return null
+        val part = context.pkg.resolveRelationship(context.slidePart, embed) ?: return null
+        return context.pkg.bytes(part)
+    }
 
     private fun resolveBackground(cSld: OoxmlNode?, context: SlideContext): OfficeColor? {
         val own = backgroundColor(cSld?.child("bg"), context.theme)
@@ -329,6 +550,7 @@ object PptxParser {
         sp: OoxmlNode,
         context: SlideContext,
         transform: Transform,
+        sourceIndex: Int,
     ): List<PptxShape> {
         val spPr = sp.child("spPr")
         val ph = sp.child("nvSpPr")?.child("nvPr")?.child("ph")
@@ -373,10 +595,13 @@ object PptxParser {
                 lineWidthDp = lineWidth,
                 preset = preset,
                 rotation = rotation,
+                gradient = gradientOf(spPr, context.theme),
             )
         }
         if (paragraphs.isNotEmpty()) {
-            val anchor = anchorName(txBody?.child("bodyPr")?.attr("anchor"))
+            val bodyPr = txBody?.child("bodyPr")
+            val anchor = anchorName(bodyPr?.attr("anchor"))
+            val insets = insetsOf(bodyPr)
             result += PptxShape.TextBox(
                 paragraphs = paragraphs,
                 leftDp = left,
@@ -385,6 +610,14 @@ object PptxParser {
                 heightDp = height,
                 anchor = anchor,
                 fill = if (hasGeometry) null else fill,
+                sourceIndex = sourceIndex,
+                insetLeftDp = insets[0],
+                insetTopDp = insets[1],
+                insetRightDp = insets[2],
+                insetBottomDp = insets[3],
+                autoFit = autoFitOf(bodyPr),
+                fontScale = fontScaleOf(bodyPr),
+                wrap = bodyPr?.attr("wrap") != "none",
             )
         }
         return result
@@ -398,18 +631,31 @@ object PptxParser {
         val xfrm = pic.child("spPr")?.child("xfrm") ?: return null
         val off = xfrm.child("off")
         val ext = xfrm.child("ext")
-        val blip = pic.child("blipFill")?.child("blip")
+        val blipFill = pic.child("blipFill")
+        val blip = blipFill?.child("blip")
         val embed = blip?.relAttr("embed") ?: blip?.relAttr("link") ?: return null
         val part = context.pkg.resolveRelationship(context.slidePart, embed) ?: return null
         val bytes = context.pkg.bytes(part) ?: return null
+        // The picture can be cut away on every side, the file writes the cut
+        // down in hundred thousandths of a percent.
+        val srcRect = blipFill?.child("srcRect")
         return PptxShape.Picture(
             bytes = bytes,
             leftDp = transform.mapX((off?.attrLong("x") ?: 0L).toDp()),
             topDp = transform.mapY((off?.attrLong("y") ?: 0L).toDp()),
             widthDp = transform.mapWidth((ext?.attrLong("cx") ?: 0L).toDp()),
             heightDp = transform.mapHeight((ext?.attrLong("cy") ?: 0L).toDp()),
+            cropLeft = cropOf(srcRect?.attrInt("l")),
+            cropTop = cropOf(srcRect?.attrInt("t")),
+            cropRight = cropOf(srcRect?.attrInt("r")),
+            cropBottom = cropOf(srcRect?.attrInt("b")),
+            rotation = (xfrm.attrFloat("rot") ?: 0f) / 60000f,
         )
     }
+
+    /** The part of a picture that is cut away, as a fraction of the picture. */
+    private fun cropOf(value: Int?): Float =
+        ((value ?: 0) / 100000f).coerceIn(0f, 0.9f)
 
     private fun parseTable(
         frame: OoxmlNode,
@@ -449,8 +695,119 @@ object PptxParser {
             topDp = transform.mapY((off?.attrLong("y") ?: 0L).toDp()),
             widthDp = width,
             heightDp = height,
+            style = tableStyle(context, tbl.child("tblPr")?.child("tableStyleId")?.text?.trim()),
         )
     }
+
+    // ---------------------------------------------------------------- charts
+
+    /**
+     * The chart of a frame.
+     *
+     * The frame names the part of the chart with a relationship, the chart
+     * lives in `ppt/charts/chart1.xml`.
+     */
+    private fun parseChart(
+        frame: OoxmlNode,
+        context: SlideContext,
+        transform: Transform,
+    ): PptxShape.Chart? {
+        val data = frame.child("graphic")?.child("graphicData") ?: return null
+        val reference = data.child("chart")?.relAttr("id") ?: return null
+        val part = context.pkg.resolveRelationship(context.slidePart, reference) ?: return null
+        val chart = PptxChartParser.parse(context.pkg, part, context.theme) ?: return null
+        val xfrm = frame.child("xfrm")
+        val off = xfrm?.child("off")
+        val ext = xfrm?.child("ext")
+        return PptxShape.Chart(
+            chart = chart,
+            leftDp = transform.mapX((off?.attrLong("x") ?: 0L).toDp()),
+            topDp = transform.mapY((off?.attrLong("y") ?: 0L).toDp()),
+            widthDp = transform.mapWidth((ext?.attrLong("cx") ?: 0L).toDp()),
+            heightDp = transform.mapHeight((ext?.attrLong("cy") ?: 0L).toDp()),
+        )
+    }
+
+    // ----------------------------------------------------------- table style
+    /**
+     * The style of a table.
+     *
+     * The file names the style by its number. A file that carries the style
+     * uses it, a file that does not carry it uses the style of the office
+     * software, which is built from the accent colour of the theme.
+     */
+    private fun tableStyle(context: SlideContext, styleId: String?): PptxTableStyle {
+        val accent = context.theme["accent1"] ?: DEFAULT_ACCENT
+        val defined = styleId?.let { definedTableStyle(context, it) }
+        if (defined != null) return defined
+        return defaultTableStyle(accent)
+    }
+
+    /**
+     * The style of the table that the file carries.
+     *
+     * The styles of the files live in `ppt/tableStyles.xml`, most of the
+     * files do not carry them at all.
+     */
+    private fun definedTableStyle(context: SlideContext, styleId: String): PptxTableStyle? {
+        val root = context.pkg.node(TABLE_STYLES_PART) ?: return null
+        val style = root.children("tblStyle").firstOrNull { it.attr("styleId") == styleId }
+            ?: return null
+        val parts = style.children("tblStylePr").associateBy { it.attr("type") }
+        val whole = parts["wholeTable"]
+        val first = parts["firstRow"]
+        val band1 = parts["band1Horz"]
+        val band2 = parts["band2Horz"]
+        return PptxTableStyle(
+            firstRowFill = fillOfStylePart(first, context.theme) ?: fillOfStylePart(whole, context.theme),
+            firstRowText = textOfStylePart(first, context.theme),
+            firstRowBold = first?.child("rPr")?.attrBool("b") == true,
+            bandFill = fillOfStylePart(band1, context.theme),
+            bandAltFill = fillOfStylePart(band2, context.theme),
+            text = textOfStylePart(whole, context.theme),
+            border = borderOfStylePart(whole ?: first, context.theme),
+            borderWidthDp = 1f,
+        )
+    }
+
+    /** The colour that a part of a style paints the cells with. */
+    private fun fillOfStylePart(part: OoxmlNode?, theme: Map<String, OfficeColor>): OfficeColor? {
+        val fill = part?.child("tcPr")?.child("fillRef") ?: return null
+        return OfficeColors.colorOf(fill, theme)
+    }
+
+    /** The colour that a part of a style paints the text with. */
+    private fun textOfStylePart(part: OoxmlNode?, theme: Map<String, OfficeColor>): OfficeColor? {
+        val fill = part?.child("rPr")?.child("solidFill") ?: return null
+        return OfficeColors.colorOf(fill, theme)
+    }
+
+    /** The colour of the lines between the cells. */
+    private fun borderOfStylePart(part: OoxmlNode?, theme: Map<String, OfficeColor>): OfficeColor? {
+        val border = part?.child("tcPr")?.child("tcBdr") ?: return null
+        border.nodes().forEach { side ->
+            val fill = side.child("solidFill") ?: return@forEach
+            OfficeColors.colorOf(fill, theme)?.let { return it }
+        }
+        return null
+    }
+
+    /**
+     * The style of the office software.
+     *
+     * The header row is painted with the accent colour of the theme, the rows
+     * of the body are banded with a light tone of it.
+     */
+    private fun defaultTableStyle(accent: OfficeColor): PptxTableStyle = PptxTableStyle(
+        firstRowFill = accent,
+        firstRowText = OfficeColor.White,
+        firstRowBold = true,
+        bandFill = accent.lighten(0.2f, 0.8f),
+        bandAltFill = accent.lighten(0.2f, 0.9f),
+        text = null,
+        border = OfficeColor.White,
+        borderWidthDp = 1f,
+    )
 
     private fun parseCell(tc: OoxmlNode, context: SlideContext): PptxTableCell {
         val txBody = tc.child("txBody")
@@ -520,24 +877,118 @@ object PptxParser {
         val level = (pPr?.attrInt("lvl") ?: 0).coerceIn(0, 8)
         val chain = context.levelChain(level)
         val builder = StringBuilder()
-        var style: PptxTextStyle? = null
+        val runs = ArrayList<PptxRun>()
         p.nodes().forEach { node ->
             when (node.localName) {
                 "r", "fld" -> {
-                    builder.append(node.child("t")?.text ?: "")
-                    if (style == null) style = styleOf(node.child("rPr"), pPr, chain, context)
+                    val text = node.child("t")?.text ?: ""
+                    builder.append(text)
+                    runs += PptxRun(text, styleOf(node.child("rPr"), pPr, chain, context))
                 }
-                "br" -> builder.append('\n')
+                "br" -> {
+                    builder.append('\n')
+                    runs += PptxRun(
+                        "\n",
+                        runs.lastOrNull()?.style ?: styleOf(null, pPr, chain, context),
+                    )
+                }
             }
         }
         val alignment = resolveAlignment(pPr, chain)
-        val resolved = style ?: styleOf(null, pPr, chain, context)
+        val resolved = runs.firstOrNull()?.style ?: styleOf(null, pPr, chain, context)
+        val spacing = lineSpacingOf(pPr, chain)
         return PptxParagraph(
             text = builder.toString(),
+            runs = runs,
             bullet = resolveBullet(pPr, chain),
             level = level,
             style = resolved.copy(alignment = alignment),
+            lineSpacing = spacing.first,
+            lineSpacingPt = spacing.second,
+            spaceBeforePt = spaceOf(pPr, chain, "spcBef"),
+            spaceAfterPt = spaceOf(pPr, chain, "spcAft"),
+            marginLeftDp = marginOf(pPr, chain, "marL"),
+            indentDp = marginOf(pPr, chain, "indent"),
         )
+    }
+
+    /**
+     * The distance between the lines of a paragraph.
+     *
+     * A file that names the distance in percent gives a factor, a file that
+     * names it in point gives the exact distance.
+     */
+    private fun lineSpacingOf(pPr: OoxmlNode?, chain: List<OoxmlNode>): Pair<Float, Float?> {
+        val spacing = pPr?.child("lnSpc")
+            ?: chain.firstNotNullOfOrNull { it.child("lnSpc") }
+            ?: return 1f to null
+        spacing.child("spcPct")?.attrInt("val")?.let { return it / 100000f to null }
+        spacing.child("spcPts")?.attrInt("val")?.let { return 1f to it / 100f }
+        return 1f to null
+    }
+
+    /**
+     * The space above or below a paragraph, in point.
+     */
+    private fun spaceOf(pPr: OoxmlNode?, chain: List<OoxmlNode>, name: String): Float {
+        val space = pPr?.child(name)
+            ?: chain.firstNotNullOfOrNull { it.child(name) }
+            ?: return 0f
+        space.child("spcPts")?.attrInt("val")?.let { return it / 100f }
+        return 0f
+    }
+
+    /**
+     * The margin or the indent of a paragraph, in deck dp.
+     */
+    private fun marginOf(pPr: OoxmlNode?, chain: List<OoxmlNode>, name: String): Float {
+        val raw = pPr?.attrLong(name)
+            ?: chain.firstNotNullOfOrNull { it.attrLong(name) }
+            ?: return 0f
+        return raw.toDp()
+    }
+
+    /**
+     * The space between the text of a box and its border, in deck dp.
+     *
+     * The file only names the space when it differs from the usual one: a
+     * tenth of an inch on the sides and a twentieth on top and bottom.
+     */
+    private fun insetsOf(bodyPr: OoxmlNode?): FloatArray {
+        if (bodyPr == null) {
+            return floatArrayOf(
+                DEFAULT_INSET_LEFT_DP,
+                DEFAULT_INSET_TOP_DP,
+                DEFAULT_INSET_RIGHT_DP,
+                DEFAULT_INSET_BOTTOM_DP,
+            )
+        }
+        return floatArrayOf(
+            (bodyPr.attrLong("lIns") ?: DEFAULT_INSET_LEFT_EMU).toDp(),
+            (bodyPr.attrLong("tIns") ?: DEFAULT_INSET_TOP_EMU).toDp(),
+            (bodyPr.attrLong("rIns") ?: DEFAULT_INSET_RIGHT_EMU).toDp(),
+            (bodyPr.attrLong("bIns") ?: DEFAULT_INSET_BOTTOM_EMU).toDp(),
+        )
+    }
+
+    /**
+     * How the text of a box follows its size.
+     */
+    private fun autoFitOf(bodyPr: OoxmlNode?): String = when {
+        bodyPr == null -> "none"
+        bodyPr.child("spAutoFit") != null -> "shape"
+        bodyPr.child("normAutofit") != null -> "text"
+        else -> "none"
+    }
+
+    /**
+     * The factor the text of a box is scaled by.
+     *
+     * A file that shrinks the text into its box writes the factor down.
+     */
+    private fun fontScaleOf(bodyPr: OoxmlNode?): Float {
+        val scale = bodyPr?.child("normAutofit")?.attrInt("fontScale") ?: return 1f
+        return (scale / 100000f).coerceIn(0.1f, 1f)
     }
 
     private fun styleOf(
@@ -681,6 +1132,27 @@ object PptxParser {
         return null
     }
 
+    /**
+     * The gradient of a shape.
+     *
+     * The stops of the gradient are read with their place and their colour,
+     * so the fill looks like the one of the presentation.
+     */
+    private fun gradientOf(spPr: OoxmlNode?, theme: Map<String, OfficeColor>): PptxGradient? {
+        if (spPr == null) return null
+        val gradient = spPr.child("gradFill") ?: return null
+        val list = gradient.child("gsLst") ?: gradient
+        val stops = ArrayList<PptxGradientStop>()
+        list.children("gs").forEach { stop ->
+            val color = OfficeColors.colorOf(stop, theme) ?: return@forEach
+            val position = (stop.attrInt("pos") ?: 0) / 100000f
+            stops += PptxGradientStop(position.coerceIn(0f, 1f), color)
+        }
+        if (stops.size < 2) return null
+        val angle = gradient.child("lin")?.attrInt("ang")?.div(60000f) ?: 0f
+        return PptxGradient(stops = stops, angleDeg = angle)
+    }
+
     private fun lineOf(spPr: OoxmlNode?, theme: Map<String, OfficeColor>): OfficeColor? {
         val ln = spPr?.child("ln") ?: return null
         val solid = ln.child("solidFill") ?: return null
@@ -775,6 +1247,43 @@ private fun Long.toDp(): Float =
         this / 9525f
     }
 
+/**
+ * The space between the text of a box and its border, in deck dp.
+ *
+ * The office software keeps a tenth of an inch away from the sides and a
+ * twentieth away from the top and the bottom, a file only names the space
+ * when it differs from it.
+ */
+private const val DEFAULT_INSET_LEFT_EMU = 91440L
+private const val DEFAULT_INSET_TOP_EMU = 45720L
+private const val DEFAULT_INSET_RIGHT_EMU = 91440L
+private const val DEFAULT_INSET_BOTTOM_EMU = 45720L
+
+/** The same space, in deck dp. */
+private const val DEFAULT_INSET_LEFT_DP = 9.6f
+private const val DEFAULT_INSET_TOP_DP = 4.8f
+private const val DEFAULT_INSET_RIGHT_DP = 9.6f
+private const val DEFAULT_INSET_BOTTOM_DP = 4.8f
+
+/** The part that carries the styles of the tables. */
+private const val TABLE_STYLES_PART = "ppt/tableStyles.xml"
+
+/** The accent colour of the theme, used when the theme does not name one. */
+private val DEFAULT_ACCENT = OfficeColor(0.31f, 0.53f, 0.87f, 1f)
+
+/**
+ * A lighter tone of a colour.
+ *
+ * The colour is first darkened and then mixed with white, the way the theme
+ * of a deck paints the banded rows of a table.
+ */
+private fun OfficeColor.lighten(modifier: Float, offset: Float): OfficeColor = OfficeColor(
+    ((red * modifier + (1f - red) * offset).coerceIn(0f, 1f)),
+    ((green * modifier + (1f - green) * offset).coerceIn(0f, 1f)),
+    ((blue * modifier + (1f - blue) * offset).coerceIn(0f, 1f)),
+    alpha,
+)
+
 // -------------------------------------------------------------- internals
 
 /**
@@ -861,6 +1370,14 @@ private class SlideContext(
     val masterPlaceholders: List<PhInfo> = placeholdersOf(masterNode)
     val masterStyles: OoxmlNode? = masterNode?.child("txStyles")
     val defaultTextColor: OfficeColor? = resolveDefaultTextColor()
+
+    /**
+     * The number of the shapes that were read.
+     *
+     * The number is the place of the shape in the shape tree of the slide, it
+     * is used to write a changed text back into the file.
+     */
+    var shapeIndex = 0
 
     private fun resolveDefaultTextColor(): OfficeColor? {
         val slot = masterNode?.child("clrMap")?.attr("tx1") ?: "dk1"

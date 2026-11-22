@@ -61,6 +61,13 @@ internal class DocxLayoutEngine(
             val lastLine: Int,
             val bullet: String?,
             val bulletLeft: Float,
+            /**
+             * The number of the block of the document the paragraph belongs to.
+             *
+             * The reader needs it to know which paragraph of the document the
+             * user touches.
+             */
+            val blockIndex: Int,
         ) : Item
 
         class Picture(
@@ -99,11 +106,19 @@ internal class DocxLayoutEngine(
             val bullet: String?,
             val bulletLeft: Float,
             val spaceAfterPt: Float,
+            val blockIndex: Int,
         ) : Carry
 
         class TablePart(
             val rows: List<Row>,
             val spaceAfterPt: Float,
+            /**
+             * The number of the table in the document.
+             *
+             * The engine needs it to go on with the document when the table
+             * is completely placed.
+             */
+            val blockIndex: Int,
         ) : Carry
     }
 
@@ -262,6 +277,7 @@ internal class DocxLayoutEngine(
                             lastLine = layout.lineCount,
                             bullet = bullet,
                             bulletLeft = bulletLeft,
+                            blockIndex = blockIndex,
                         )
                         y = top + layout.height + block.spaceAfterPt * scale
                         blockIndex++
@@ -286,8 +302,18 @@ internal class DocxLayoutEngine(
                             lastLine = forced,
                             bullet = bullet,
                             bulletLeft = bulletLeft,
+                            blockIndex = blockIndex,
                         )
-                        carry = Carry.ParagraphPart(block, layout, forced, left, bullet, bulletLeft, block.spaceAfterPt)
+                        carry = Carry.ParagraphPart(
+                            block,
+                            layout,
+                            forced,
+                            left,
+                            bullet,
+                            bulletLeft,
+                            block.spaceAfterPt,
+                            blockIndex,
+                        )
                         y = textHeight
                         break
                     }
@@ -299,8 +325,18 @@ internal class DocxLayoutEngine(
                         lastLine = lastLine,
                         bullet = bullet,
                         bulletLeft = bulletLeft,
+                        blockIndex = blockIndex,
                     )
-                    carry = Carry.ParagraphPart(block, layout, lastLine, left, bullet, bulletLeft, block.spaceAfterPt)
+                    carry = Carry.ParagraphPart(
+                        block,
+                        layout,
+                        lastLine,
+                        left,
+                        bullet,
+                        bulletLeft,
+                        block.spaceAfterPt,
+                        blockIndex,
+                    )
                     y = textHeight
                     break
                 }
@@ -314,14 +350,14 @@ internal class DocxLayoutEngine(
                         // The first row does not fit on an empty page: it is
                         // placed anyway, a table is never lost.
                         items += Item.Table(marginTop + y, marginLeft, listOf(rows.first()))
-                        carry = Carry.TablePart(rows.drop(1), 0f)
+                        carry = Carry.TablePart(rows.drop(1), 0f, blockIndex)
                         y = textHeight
                         break
                     }
                     items += Item.Table(marginTop + y, marginLeft, placed)
                     y += placed.sumOf { it.height.toDouble() }.toFloat()
                     if (placed.size < rows.size) {
-                        carry = Carry.TablePart(rows.drop(placed.size), 0f)
+                        carry = Carry.TablePart(rows.drop(placed.size), 0f, blockIndex)
                         break
                     }
                     blockIndex++
@@ -395,10 +431,14 @@ internal class DocxLayoutEngine(
             // The bullet belongs to the first part of the paragraph.
             bullet = null,
             bulletLeft = part.bulletLeft,
+            blockIndex = part.blockIndex,
         )
         val used = heightOf(layout, start, lastLine)
         if (lastLine >= layout.lineCount) {
             carry = null
+            // The paragraph is completely placed, the engine goes on with the
+            // next block of the document.
+            blockIndex = part.blockIndex + 1
             return used + part.spaceAfterPt * scale
         }
         carry = Carry.ParagraphPart(
@@ -409,6 +449,7 @@ internal class DocxLayoutEngine(
             part.bullet,
             part.bulletLeft,
             part.spaceAfterPt,
+            part.blockIndex,
         )
         return textHeight - y
     }
@@ -432,10 +473,13 @@ internal class DocxLayoutEngine(
         items += Item.Table(marginTop + y, marginLeft, placed)
         val used = placed.sumOf { it.height.toDouble() }.toFloat()
         if (placed.size < part.rows.size) {
-            carry = Carry.TablePart(part.rows.drop(placed.size), part.spaceAfterPt)
+            carry = Carry.TablePart(part.rows.drop(placed.size), part.spaceAfterPt, part.blockIndex)
             return used
         }
         carry = null
+        // The table is completely placed, the engine goes on with the next
+        // block of the document.
+        blockIndex = part.blockIndex + 1
         return used + part.spaceAfterPt * scale
     }
 

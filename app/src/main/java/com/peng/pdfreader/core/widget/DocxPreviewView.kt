@@ -2,11 +2,14 @@ package com.peng.pdfreader.core.widget
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.GestureDetector
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.peng.pdfreader.core.office.docx.DocxBlock
 import com.peng.pdfreader.core.office.docx.DocxDocument
 import com.peng.pdfreader.core.util.Logger
 import kotlinx.coroutines.CoroutineScope
@@ -39,7 +42,7 @@ class DocxPreviewView @JvmOverloads constructor(
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
     /** The pinch zoom of the document. */
-    private val zoom = ZoomController(recycler)
+    private val zoom = DocumentZoom(this)
 
     /**
      * The request to build the pages.
@@ -73,6 +76,43 @@ class DocxPreviewView @JvmOverloads constructor(
     /** Raised with the index of the page the viewport shows. */
     var onPageChanged: ((Int) -> Unit)? = null
 
+    /**
+     * Shows the page with the given number.
+     *
+     * The reader uses it to go back to the page the user was on when the
+     * document was read again after a change.
+     */
+    fun scrollToPage(page: Int) {
+        val index = page.coerceIn(0, max(pageCount - 1, 0))
+        recycler.scrollToPosition(index)
+    }
+
+    /**
+     * Raised with the paragraph the user holds a finger on.
+     *
+     * The editor of the app opens the text of the paragraph, so the reader
+     * only has to tell which paragraph of the document was touched.
+     */
+    var onParagraphLongPressed: ((DocxBlock.Paragraph) -> Unit)? = null
+
+    /**
+     * The gesture of the reader.
+     *
+     * The detector only watches the events, the reader keeps its own
+     * handling of them.
+     */
+    private val longPressDetector = GestureDetector(
+        context,
+        object : GestureDetector.SimpleOnGestureListener() {
+            override fun onLongPress(event: MotionEvent) {
+                val child = recycler.findChildViewUnder(event.x, event.y) as? DocxPageView ?: return
+                val block = child.blockAt(event.x - child.left, event.y - child.top) ?: return
+                val paragraph = document?.blocks?.getOrNull(block) as? DocxBlock.Paragraph ?: return
+                onParagraphLongPressed?.invoke(paragraph)
+            }
+        },
+    )
+
     /** The number of the pages the document has. */
     var pageCount: Int = 1
         private set
@@ -99,11 +139,23 @@ class DocxPreviewView @JvmOverloads constructor(
             },
         )
         addView(recycler, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT))
-        // The pinch zoom of the document.
-        recycler.setOnTouchListener { _, event ->
-            zoom.onTouch(event)
-            false
-        }
+        // The zoomed pages may be bigger than the reader, the reader of the
+        // app clips them at the border of the preview.
+        clipChildren = false
+    }
+
+    override fun dispatchTouchEvent(event: MotionEvent): Boolean {
+        // The zoom sees every event of the gesture, the reader keeps its own.
+        zoom.onTouchEvent(event)
+        // The gesture that opens the editor is watched here, the reader of the
+        // pages would swallow it.
+        longPressDetector.onTouchEvent(event)
+        return super.dispatchTouchEvent(event)
+    }
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        zoom.setContentSize(w.toFloat(), h.toFloat())
     }
 
     override fun onDetachedFromWindow() {

@@ -53,7 +53,8 @@ object Analytics {
     /** An error that the user should know about. */
     fun error(context: Context, code: String) {
         Logger.w(TAG, "reported error: $code")
-        analytics(context)?.logEvent("error", bundleOf("code" to code))
+        // The name of an event cannot be "error", the sdk reserves it.
+        analytics(context)?.logEvent("app_error", bundleOf("code" to code))
     }
 
     private fun bundleOf(vararg pairs: Pair<String, String>) =

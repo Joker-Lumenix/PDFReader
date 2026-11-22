@@ -285,12 +285,24 @@ class PdfPageView @JvmOverloads constructor(
                 return true
             }
 
+            override fun onDoubleTap(e: MotionEvent): Boolean {
+                // A double tap zooms the page in and out again.
+                val target = if (zoom > 1f + ZOOM_EPSILON) 1f else DOUBLE_TAP_ZOOM
+                applyScale(target / zoom, e.x, e.y)
+                requestSharperPage()
+                return true
+            }
+
             override fun onScroll(
                 e1: MotionEvent?,
                 e2: MotionEvent,
                 distanceX: Float,
                 distanceY: Float,
             ): Boolean {
+                // The page is only moved when it is zoomed. Otherwise the
+                // gesture belongs to the reader, it scrolls the document
+                // (vertically, when the reader scrolls the pages down).
+                if (zoom <= 1f) return false
                 offsetX -= distanceX
                 offsetY -= distanceY
                 clampOffset()
@@ -1108,6 +1120,16 @@ class PdfPageView @JvmOverloads constructor(
         private const val TAG = "PdfPageView"
 
         private const val MAX_ZOOM = 5f
+
+        /**
+         * The zoom of a double tap.
+         *
+         * A second tap on the page brings it back to the normal size.
+         */
+        private const val DOUBLE_TAP_ZOOM = 2.5f
+
+        /** The difference below which the zoom counts as the normal size. */
+        private const val ZOOM_EPSILON = 0.01f
 
         /**
          * How much detail a page is rendered with.

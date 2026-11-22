@@ -42,6 +42,8 @@ import com.peng.pdfreader.permission.DefaultAppPrompt
 import com.peng.pdfreader.permission.EffectiveReadTracker
 import com.peng.pdfreader.databinding.FragmentPdfPreviewBinding
 import com.peng.pdfreader.ui.dialogs.BottomSheetPassword
+import com.peng.pdfreader.ui.dialogs.BottomSheetOutline
+import com.peng.pdfreader.ui.dialogs.BottomSheetSearch
 import com.peng.pdfreader.ui.activities.SignatureActivity
 import com.peng.pdfreader.ui.adapter.listAdapter.PdfPagerAdapter
 import com.peng.pdfreader.ui.uiData.AnnotationMarks
@@ -527,8 +529,108 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
         toolbar.toolDraw.setOnClickListener { selectTool(AnnotationType.DRAW) }
         toolbar.toolNote.setOnClickListener { selectTool(AnnotationType.NOTE) }
         toolbar.toolSignature.setOnClickListener { selectTool(AnnotationType.SIGNATURE) }
+        toolbar.toolOutline.setOnClickListener { showOutline() }
+        toolbar.toolSearch.setOnClickListener { showSearch() }
+        toolbar.toolSave.setOnClickListener { saveAnnotationsIntoDocument() }
         toolbar.root.visibility =
             if (document?.type == DocType.PDF) View.VISIBLE else View.GONE
+    }
+
+    /**
+     * Shows the outline of the document.
+     *
+     * The outline is read on a background thread, the sheet lists the entries
+     * of it.
+     */
+    private fun showOutline() {
+        val doc = document ?: return
+        val file = repository.fileOf(doc)
+        viewLifecycleOwner.lifecycleScope.launch {
+            val outline = withContext(Dispatchers.IO) { PdfEngine.extractOutline(file) }
+            if (outline.isEmpty()) {
+                Toast.makeText(requireContext(), R.string.no_outline, Toast.LENGTH_SHORT).show()
+                return@launch
+            }
+            val sheet = BottomSheetOutline.create(
+                outline.map { it.title },
+                outline.map { it.page },
+            )
+            sheet.onEntrySelected = { index ->
+                outline.getOrNull(index)?.let { jumpToPage(it.page) }
+            }
+            sheet.show(parentFragmentManager, "preview_outline")
+        }
+    }
+
+    /**
+     * Searches the text of the document.
+     */
+    private fun showSearch() {
+        val sheet = BottomSheetSearch.create("")
+        sheet.onSearch = { word -> searchDocument(sheet, word) }
+        sheet.onPageSelected = { page -> jumpToPage(page) }
+        sheet.show(parentFragmentManager, "preview_search")
+    }
+
+    /** Reads the hits of a word and shows them in the sheet. */
+    private fun searchDocument(sheet: BottomSheetSearch, word: String) {
+        val doc = document ?: return
+        val file = repository.fileOf(doc)
+        viewLifecycleOwner.lifecycleScope.launch {
+            val hits = withContext(Dispatchers.IO) { PdfEngine.searchText(file, word) }
+            sheet.hits = hits.map { BottomSheetSearch.Hit(it.first, it.second) }
+        }
+    }
+
+    /**
+     * Writes the annotations of the document into the file.
+     *
+     * The annotations are written into the document, so it carries them when
+     * it is opened with another program.
+     */
+    private fun saveAnnotationsIntoDocument() {
+        val doc = document ?: return
+        val file = repository.fileOf(doc)
+        val annotations = repository.annotationsOf(doc.id)
+        if (annotations.isEmpty()) {
+            Toast.makeText(requireContext(), R.string.preview_feature_unavailable, Toast.LENGTH_SHORT).show()
+            return
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            val target = File(
+                File(requireContext().cacheDir, "annotated").apply { mkdirs() },
+                "${doc.id}.pdf",
+            )
+            val written = withContext(Dispatchers.IO) {
+                PdfEngine.writeAnnotations(
+                    file,
+                    target,
+                    AnnotationMarks.pdfAnnotationsOf(annotations),
+                )
+            }
+            if (!written) {
+                Toast.makeText(requireContext(), R.string.preview_edit_failed, Toast.LENGTH_SHORT).show()
+                return@launch
+            }
+            withContext(Dispatchers.IO) {
+                // The reader keeps the document open, the new file needs a
+                // fresh session of the engine.
+                PdfEngine.release(file)
+                target.copyTo(file, overwrite = true)
+            }
+            Toast.makeText(
+                requireContext(),
+                R.string.preview_annotations_saved,
+                Toast.LENGTH_SHORT,
+            ).show()
+        }
+    }
+
+    /** Shows the page with the given number, it starts at one. */
+    private fun jumpToPage(page: Int) {
+        val index = page - 1
+        if (index < 0 || index >= pageCount) return
+        binding.pager.setCurrentItem(index, true)
     }
 
     /** Highlights the tool that is active. */
@@ -923,8 +1025,9 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
     /**
      * Writes the placed signature into the document.
      *
-     * The signature is baked into the page of the file, so the document
-     * carries it from now on.
+     * The signature is drawn into the page of the file, so the document
+     * carries it from now on. The strokes are drawn as vectors, the text of
+     * the page stays readable and the signature stays sharp at every zoom.
      */
     private fun saveSignature() {
         val doc = document ?: return
@@ -932,31 +1035,19 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
         val placed = view.commitSignaturePlacement() ?: return
         val file = repository.fileOf(doc)
         val page = currentPage
-        val widthPt = view.pageWidthPt
-        val heightPt = view.pageHeightPt
         binding.flSignDone.isEnabled = false
         viewLifecycleOwner.lifecycleScope.launch {
-            val overlay = withContext(Dispatchers.IO) {
-                PageInk.overlayOf(placed, widthPt, heightPt)
-            }
-            if (overlay == null) {
-                binding.flSignDone.isEnabled = true
-                Toast.makeText(
-                    requireContext(),
-                    R.string.preview_signature_failed,
-                    Toast.LENGTH_SHORT,
-                ).show()
-                return@launch
-            }
             val target = File(
                 File(requireContext().cacheDir, "signed").apply { mkdirs() },
                 "${doc.id}.pdf",
             )
-            val result = withContext(Dispatchers.IO) {
-                PdfEngine.flattenOverlay(file, target, page, overlay.bitmap, overlay.bounds)
+            val strokes = placed.map { it.points }
+            val colour = placed.firstOrNull()?.color ?: Color.BLACK
+            val width = placed.firstOrNull()?.width ?: DEFAULT_SIGNATURE_WIDTH
+            val written = withContext(Dispatchers.IO) {
+                PdfEngine.writeStrokes(file, target, page + 1, strokes, colour, width)
             }
-            overlay.bitmap.recycle()
-            if (result.isFailure) {
+            if (!written) {
                 binding.flSignDone.isEnabled = true
                 Toast.makeText(
                     requireContext(),
@@ -991,6 +1082,14 @@ class PdfPreviewFragment : BaseFragment(), BaseBackHandler {
 
         /** The name of the file is smaller than a page title. */
         private const val TITLE_SIZE_SP = 15f
+
+        /**
+         * The width of a signature, as a fraction of the width of the page.
+         *
+         * It is only used when the placed signature does not carry a width of
+         * its own.
+         */
+        private const val DEFAULT_SIGNATURE_WIDTH = 0.01f
 
         /** The confirmation bar of the design: 80 % black. */
         private const val ADD_BAR_BACKGROUND = 0xCC313131.toInt()

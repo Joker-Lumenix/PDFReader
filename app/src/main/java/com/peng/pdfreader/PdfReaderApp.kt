@@ -4,6 +4,7 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import com.peng.pdfreader.ads.Ads
 import com.peng.pdfreader.ads.Analytics
 import com.peng.pdfreader.base.BaseApplication
+import com.peng.pdfreader.core.pdf.PdfContent
 import com.peng.pdfreader.core.util.Logger
 import com.peng.pdfreader.notification.trigger.NotificationAppState
 import com.peng.pdfreader.notification.trigger.NotificationScene
@@ -27,6 +28,9 @@ class PdfReaderApp : BaseApplication() {
             .onFailure { Logger.e(TAG, "the ad sdk could not be started", it) }
         runCatching { Analytics.appOpen(this) }
             .onFailure { Logger.e(TAG, "the analytics could not be started", it) }
+        // The fonts of the pdf engine: they are needed for the text and for
+        // the outline of a document.
+        PdfContent.init(this)
 
         // The scenes of the notifications that need the state of the app.
         NotificationAppState.observe(

@@ -132,6 +132,62 @@
             android:textColor="@color/text_secondary"
             android:textSize="12sp" />
 
+        <TextView
+            android:id="@+id/toolOutline"
+            style="@style/TextAppearance.AppCore.Meta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/bg_type_chip"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:minWidth="56dp"
+            android:paddingStart="12dp"
+            android:paddingTop="6dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="6dp"
+            android:text="@string/preview_outline"
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/toolSearch"
+            style="@style/TextAppearance.AppCore.Meta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/bg_type_chip"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:minWidth="56dp"
+            android:paddingStart="12dp"
+            android:paddingTop="6dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="6dp"
+            android:text="@string/preview_search"
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/toolSave"
+            style="@style/TextAppearance.AppCore.Meta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_type_chip"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:minWidth="56dp"
+            android:paddingStart="12dp"
+            android:paddingTop="6dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="6dp"
+            android:text="@string/preview_save_to_document"
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp" />
+
     </LinearLayout>
 
 </HorizontalScrollView>

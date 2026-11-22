@@ -16,12 +16,17 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.peng.pdfreader.R
 import com.peng.pdfreader.core.office.OoxmlPackage
+import com.peng.pdfreader.core.office.edit.DocxEditor
+import com.peng.pdfreader.core.office.edit.PptxEditor
+import com.peng.pdfreader.core.office.edit.XlsxEditor
 import com.peng.pdfreader.core.office.legacy.LegacyDocument
 import com.peng.pdfreader.core.office.legacy.LegacyPresentation
 import com.peng.pdfreader.core.office.legacy.LegacyWorkbook
+import com.peng.pdfreader.core.office.docx.DocxBlock
 import com.peng.pdfreader.core.office.docx.DocxDocument
 import com.peng.pdfreader.core.office.docx.DocxParser
 import com.peng.pdfreader.core.office.pptx.PptxParser
+import com.peng.pdfreader.core.office.pptx.PptxShape
 import com.peng.pdfreader.core.office.xlsx.XlsxParser
 import com.peng.pdfreader.core.util.Logger
 import com.peng.pdfreader.core.widget.DocxPreviewView
@@ -38,6 +43,7 @@ import com.peng.pdfreader.databinding.FragmentOfficePreviewBinding
 import com.peng.pdfreader.ui.adapter.listAdapter.DocumentPrintAdapter
 import com.peng.pdfreader.ui.dialogs.BottomSheetMoreActionNoPdf
 import com.peng.pdfreader.ui.dialogs.DialogRename
+import com.peng.pdfreader.ui.dialogs.DialogTextEdit
 import com.peng.pdfreader.core.office.OfficeText
 import com.peng.pdfreader.utils.FileSharing
 import com.peng.pdfreader.utils.OfficePrinting
@@ -69,6 +75,30 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
 
     /** The sheet, slide or page that is on screen. */
     private var currentIndex = 0
+
+    /**
+     * The sheet, slide or page that is shown again after a change.
+     *
+     * The document is read again when a change was written into it, the
+     * reader stays on the place the user was on.
+     */
+    private var restoreIndex = 0
+
+    /**
+     * The parts of the sheets of a workbook.
+     *
+     * The editor needs the part of the sheet to write a changed cell back
+     * into the file.
+     */
+    private var sheetParts: List<String> = emptyList()
+
+    /**
+     * The parts of the slides of a presentation.
+     *
+     * The editor needs the part of the slide to write a changed text back
+     * into the file.
+     */
+    private var slideParts: List<String> = emptyList()
 
     /**
      * Counts the reading of the document.
@@ -413,6 +443,7 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
             return
         }
         val reader = withContext(Dispatchers.IO) { PptxParser.Reader(pkg) }
+        slideParts = (0 until reader.slideCount).mapNotNull { reader.slidePart(it) }
         val preview = PptxPreviewView(requireContext())
         preview.setDeckSize(reader.widthDp, reader.heightDp)
         preview.slideCount = reader.slideCount
@@ -420,7 +451,9 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
             currentIndex = slide
             readTracker.onPage(slide)
         }
+        preview.onShapeLongPressed = { shape -> editShape(shape) }
         showContent(preview)
+        preview.scrollToSlide(restoreIndex)
         try {
             for (index in 0 until reader.slideCount) {
                 val slide = withContext(Dispatchers.IO) { reader.readSlide(index) } ?: continue
@@ -455,6 +488,7 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
             return
         }
         val reader = withContext(Dispatchers.IO) { XlsxParser.Reader(pkg) }
+        sheetParts = (0 until reader.sheetCount).mapNotNull { reader.sheetPart(it) }
         val preview = XlsxPreviewView(requireContext())
         preview.sheetCount = reader.sheetCount
         preview.sheetIndex = reader.activeSheetIndex
@@ -465,7 +499,9 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
             currentIndex = sheet
             readTracker.onPage(sheet)
         }
+        preview.onCellLongPressed = { row, column -> editCell(row, column) }
         showContent(preview)
+        preview.sheetIndex = restoreIndex.coerceIn(0, (reader.sheetCount - 1).coerceAtLeast(0))
         try {
             for (index in 0 until reader.sheetCount) {
                 val sheet = withContext(Dispatchers.IO) { reader.readSheet(index) } ?: continue
@@ -496,6 +532,8 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
             readTracker.onPage(page)
         }
         showContent(preview)
+        // A document that is too big for the phone is cut off.
+        if (parsed.truncated) toast(R.string.preview_document_truncated)
     }
 
     /**
@@ -606,7 +644,127 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
             currentIndex = page
             readTracker.onPage(page)
         }
+        preview.onParagraphLongPressed = { paragraph -> editParagraph(paragraph) }
         showContent(preview)
+        preview.scrollToPage(restoreIndex)
+        // A document that is too big for the phone is cut off, the reader
+        // tells the user that the document is not complete.
+        if (document.truncated) toast(R.string.preview_document_truncated)
+    }
+
+    // ------------------------------------------------------------------ edits
+
+    /**
+     * Edits the text of a paragraph of a Word document.
+     */
+    private fun editParagraph(paragraph: DocxBlock.Paragraph) {
+        if (paragraph.sourceIndex < 0) return
+        val text = paragraph.runs.joinToString("") { it.text }
+        openEditor(text) { value -> saveEdit { DocxEditor.setParagraphText(fileOfDocument(), paragraph.sourceIndex, value) } }
+    }
+
+    /**
+     * Edits the value of a cell of a spreadsheet.
+     */
+    private fun editCell(row: Int, column: Int) {
+        val part = sheetParts.getOrNull(currentIndex) ?: return
+        val value = currentCellValue(row, column) ?: return
+        openEditor(value) { text -> saveEdit { XlsxEditor.setCellValue(fileOfDocument(), part, row, column, text) } }
+    }
+
+    /**
+     * Edits the text of a text box of a slide.
+     */
+    private fun editShape(shape: PptxShape.TextBox) {
+        if (shape.sourceIndex < 0) return
+        val part = slideParts.getOrNull(currentIndex) ?: return
+        val text = shape.paragraphs.joinToString("\n") { it.text }
+        openEditor(text) { value -> saveEdit { PptxEditor.setShapeText(fileOfDocument(), part, shape.sourceIndex, value) } }
+    }
+
+    /**
+     * Opens the editor of a text.
+     *
+     * The editor is only used for the formats of the office software - a
+     * document of the legacy binary format cannot be written back.
+     */
+    private fun openEditor(text: String, onSave: (String) -> Unit) {
+        val doc = document ?: return
+        if (!doc.name.endsWith(".docx", true) &&
+            !doc.name.endsWith(".xlsx", true) &&
+            !doc.name.endsWith(".pptx", true)
+        ) {
+            toast(R.string.preview_feature_unavailable)
+            return
+        }
+        val file = repository.fileOf(doc)
+        if (!file.canWrite()) {
+            toast(R.string.preview_edit_readonly)
+            return
+        }
+        val dialog = DialogTextEdit.create(text)
+        dialog.onTextEntered = edited@{ value ->
+            if (value == null) return@edited
+            // A text that was not changed is not written back: the file of a
+            // cell with a number would carry the text of the number.
+            if (value == text) return@edited
+            onSave(value)
+        }
+        dialog.show(parentFragmentManager, "preview_edit_text")
+    }
+
+    /**
+     * Writes a change into the file of the document.
+     *
+     * The document is read again afterwards, so the screen shows the file and
+     * not the model of the reader.
+     */
+    private fun saveEdit(write: () -> Boolean) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val ok = withContext(Dispatchers.IO) {
+                runCatching { write() }.getOrDefault(false)
+            }
+            if (!ok) {
+                toast(R.string.preview_edit_failed)
+                return@launch
+            }
+            toast(R.string.preview_edit_saved)
+            refreshDocument()
+        }
+    }
+
+    /** The file of the document that is on the screen. */
+    private fun fileOfDocument(): File {
+        val doc = document ?: return File(".")
+        return repository.fileOf(doc)
+    }
+
+    /** The value of a cell of the sheet that is on the screen. */
+    private fun currentCellValue(row: Int, column: Int): String? {
+        val preview = binding.content.getChildAt(0) as? XlsxPreviewView ?: return null
+        return preview.valueOf(row, column)
+    }
+
+    /** Reads the document again, so the change is on the screen. */
+    private fun refreshDocument() {
+        val doc = document ?: return
+        restoreIndex = currentIndex
+        val file = repository.fileOf(doc)
+        repository.update(
+            doc.copy(
+                sizeBytes = file.length(),
+                modifiedAt = System.currentTimeMillis(),
+            ),
+        )
+        document = repository.byId(doc.id) ?: doc
+        showLoading()
+        loadDocument()
+    }
+
+    /** Shows a short message. */
+    private fun toast(message: Int) {
+        if (_binding == null) return
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
 
     private fun showText(content: String) {
@@ -628,12 +786,38 @@ class OfficePreviewFragment : BaseFragment(), BaseBackHandler {
         binding.content.visibility = View.VISIBLE
         binding.content.removeAllViews()
         binding.content.addView(view)
+        showEditHint()
+    }
+
+    /**
+     * Hints that the text of the document can be changed.
+     *
+     * The hint is shown once for the whole app, a document that cannot be
+     * edited never shows it.
+     */
+    private fun showEditHint() {
+        if (editHintShown) return
+        val doc = document ?: return
+        val editable = doc.name.endsWith(".docx", true) ||
+            doc.name.endsWith(".xlsx", true) ||
+            doc.name.endsWith(".pptx", true)
+        if (!editable) return
+        editHintShown = true
+        toast(R.string.preview_edit_longpress)
     }
 
     private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
 
     companion object {
         private const val ARG_DOC_ID = "com.peng.pdfreader.extra.DOC_ID"
+
+        /**
+         * Whether the hint of the editor was shown already.
+         *
+         * The hint is shown once for the whole app, a reader does not need it
+         * a second time.
+         */
+        private var editHintShown = false
 
         private const val ACTION_RENAME = "rename"
         private const val ACTION_OPEN_WITH = "open_with"

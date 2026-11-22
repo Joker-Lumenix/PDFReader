@@ -56,6 +56,33 @@ internal class DocxPageView(context: Context) : View(context) {
         invalidate()
     }
 
+    /**
+     * The block of the document at the given point of the page.
+     *
+     * The reader asks for it when the user holds a finger on the page, so it
+     * knows which paragraph of the document is going to be edited.
+     *
+     * @return the number of the block, null when the point is not on a text
+     */
+    fun blockAt(x: Float, y: Float): Int? {
+        val current = page ?: return null
+        var found: DocxLayoutEngine.Item.Paragraph? = null
+        for (item in current.items) {
+            if (item !is DocxLayoutEngine.Item.Paragraph) continue
+            val layout = item.text
+            if (layout.lineCount == 0) continue
+            val offset = layout.getLineTop(item.firstLine)
+            val bottom = layout.getLineBottom((item.lastLine - 1).coerceAtMost(layout.lineCount - 1))
+            val visible = bottom - offset
+            if (y < item.top || y > item.top + visible) continue
+            if (x < item.left - BULLET_GUTTER_DP * density) continue
+            if (x > item.left + layout.width) continue
+            val best = found
+            if (best == null || item.top >= best.top) found = item
+        }
+        return found?.blockIndex
+    }
+
     override fun onDraw(canvas: Canvas) {
         val current = page ?: return
         if (width == 0 || height == 0) return
@@ -177,5 +204,8 @@ internal class DocxPageView(context: Context) : View(context) {
     private companion object {
         /** The size of the cache of the decoded pictures in kilobyte. */
         const val BITMAP_CACHE_KB = 12 * 1024
+
+        /** The gutter a bullet of a list keeps, in dp. */
+        const val BULLET_GUTTER_DP = 24f
     }
 }

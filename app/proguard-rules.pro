@@ -26,3 +26,28 @@
 # ---------------------------------------------------------------------------
 -keepattributes Signature
 -keepattributes *Annotation*
+
+# ---------------------------------------------------------------------------
+# 第三方库里用不到的分支
+#
+# Apache POI 在 android 上没有 java.awt 和 javax.imageio，PDFBox 的 JPX
+# 过滤器需要 jcenter 上的 jp2-android，log4j 的注解和 osgi 也是用不到的。
+# 这些类只会让 R8 报错，打包时不会用到它们。
+# ---------------------------------------------------------------------------
+-dontwarn java.awt.**
+-dontwarn javax.imageio.**
+-dontwarn com.gemalto.jp2.**
+-dontwarn aQute.bnd.annotation.**
+-dontwarn edu.umd.cs.findbugs.annotations.**
+-dontwarn org.osgi.framework.**
+
+# ---------------------------------------------------------------------------
+# PDFBox
+#
+# AAR 自带的 consumer rules 已经保留了 SecurityHandler，这里再保留文档结构
+# 的入口，PDFBox 用反射读它们。
+# ---------------------------------------------------------------------------
+-keep class com.tom_roush.pdfbox.pdmodel.** { *; }
+-keep class com.tom_roush.harmony.** { *; }
+-keep class com.tom_roush.fontbox.** { *; }
+-dontwarn com.tom_roush.**

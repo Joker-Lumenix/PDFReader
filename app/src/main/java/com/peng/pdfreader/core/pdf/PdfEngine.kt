@@ -37,10 +37,10 @@ object PdfEngine {
      * the reader draws the page scaled anyway, so the extra pixels would only
      * cost memory.
      */
-    private const val MAX_PAGE_PIXELS = 4L * 1024L * 1024L
+    private const val MAX_PAGE_PIXELS = 8L * 1024L * 1024L
 
     /** The widest bitmap a page may be rendered into. */
-    private const val MAX_PAGE_WIDTH = 2048
+    private const val MAX_PAGE_WIDTH = 3072
 
     /** How many pages are rasterised at the same time. */
     private const val RENDER_WORKERS = 2
@@ -468,17 +468,91 @@ object PdfEngine {
 
     // ------------------------------------------------------------------ text / outline
 
-    fun extractOutline(file: File): List<OutlineNode> =
-        PdfMeta.outline(file)
+    /**
+     * The outline (the table of contents) of the document.
+     *
+     * The outline is read by PDFBox, it knows the destinations of the entries
+     * of every kind. The reader of the file is the fallback for a document
+     * that PDFBox cannot open.
+     */
+    fun extractOutline(file: File): List<OutlineNode> {
+        val outline = PdfContent.outline(file)
+        return if (outline.isNotEmpty()) outline else PdfMeta.outline(file)
+    }
 
-    fun extractTextByPage(file: File): List<String> = PdfMeta.textByPage(file)
+    /**
+     * The text of every page of the document.
+     *
+     * The text is read by PDFBox, it knows the fonts of the document and it
+     * can therefore read the text of a page that uses an unusual font. The
+     * reader of the file is the fallback for a document that PDFBox cannot
+     * open.
+     */
+    fun extractTextByPage(file: File): List<String> {
+        val text = PdfContent.textByPage(file)
+        return if (text.any { it.isNotBlank() }) text else PdfMeta.textByPage(file)
+    }
 
+    /**
+     * Searches the text of the document.
+     *
+     * @return the number of the page and the text around the hit
+     */
     fun searchText(file: File, keyword: String): List<Pair<Int, String>> {
         if (keyword.isBlank()) return emptyList()
+        val hits = PdfContent.search(file, keyword)
+        if (hits.isNotEmpty()) return hits.map { it.page to it.snippet }
+        // The fallback: the reader of the file knows the text of a document
+        // that PDFBox cannot open.
+        val needle = keyword.trim()
         return extractTextByPage(file).mapIndexedNotNull { index, text ->
-            if (text.contains(keyword, ignoreCase = true)) index + 1 to text else null
+            val position = text.indexOf(needle, ignoreCase = true)
+            if (position < 0) null else index + 1 to text
         }
     }
+
+    /**
+     * Writes the annotations of the pages into a copy of the document.
+     *
+     * The annotations of the reader are written into the file, so the
+     * document carries them when it is opened with another program.
+     *
+     * @param source the document that is read
+     * @param target the file the document is written into
+     * @param annotations the annotations of the pages, the key is the number
+     * of the page
+     * @return true when the document was written
+     */
+    fun writeAnnotations(
+        source: File,
+        target: File,
+        annotations: Map<Int, List<PdfAnnotation>>,
+    ): Boolean = PdfContent.writeAnnotations(source, target, annotations)
+
+    /**
+     * Writes strokes into a copy of the document.
+     *
+     * The strokes are drawn into the page itself, so the text of the page
+     * stays readable - a document that is written in this way keeps its text
+     * layer, unlike a document that is drawn again as a picture.
+     *
+     * @param source the document that is read
+     * @param target the file the document is written into
+     * @param pageNumber the number of the page, it starts at one
+     * @param strokes the strokes, x and y in the fractions of the page
+     * @param colour the colour of the strokes
+     * @param width the width of the strokes, as a fraction of the width of
+     * the page
+     * @return true when the document was written
+     */
+    fun writeStrokes(
+        source: File,
+        target: File,
+        pageNumber: Int,
+        strokes: List<FloatArray>,
+        colour: Int,
+        width: Float,
+    ): Boolean = PdfContent.writeStrokes(source, target, pageNumber, strokes, colour, width)
 
     /** The indirect reference of an /Encrypt entry. */
     private val ENCRYPT_ENTRY = Regex("/Encrypt\\s+\\d+\\s+\\d+\\s+R")

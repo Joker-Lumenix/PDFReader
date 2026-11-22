@@ -15,10 +15,11 @@ private const val MAX_LIST_LEVEL = 9
 /**
  * The number of blocks (paragraphs and tables) that are parsed.
  *
- * A big Word document would not fit into the memory of the phone, the
- * preview shows the first pages of it.
+ * The limit is the safety net for a document that does not fit into the
+ * memory of the phone. It is high enough for the documents of a normal
+ * report, so the content of a document is complete.
  */
-internal const val MAX_BLOCKS = 4000
+internal const val MAX_BLOCKS = 20000
 
 private fun bulletChar(level: Int): String = when (level) {
     0 -> "•"
@@ -62,6 +63,14 @@ sealed interface DocxBlock {
         val spaceAfterPt: Float,
         val lineSpacing: Float,
         val pageBreakBefore: Boolean,
+        /**
+         * The number of the paragraph in the document.
+         *
+         * The editor needs it to write a changed text back into the file: the
+         * number is the same one the editor counts the paragraphs of the
+         * document with.
+         */
+        val sourceIndex: Int = -1,
     ) : DocxBlock
 
     data class Table(

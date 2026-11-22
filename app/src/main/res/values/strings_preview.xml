@@ -35,6 +35,25 @@
     <string name="preview_note_hint">输入批注内容</string>
     <string name="preview_note_save">保存批注</string>
 
+    <!-- content editing -->
+    <string name="preview_edit_title">编辑内容</string>
+    <string name="preview_edit_hint">输入新的内容</string>
+    <string name="preview_edit_save">保存</string>
+    <string name="preview_edit_saved">修改已保存</string>
+    <string name="preview_edit_failed">修改未能保存</string>
+    <string name="preview_edit_readonly">该文档位于共享存储，无法直接修改</string>
+    <string name="preview_edit_longpress">长按文字可编辑</string>
+
+    <!-- search -->
+    <string name="preview_search">搜索文档</string>
+    <string name="preview_search_hint">输入要查找的内容</string>
+    <string name="preview_search_action">搜索</string>
+    <string name="preview_search_empty">没有找到相关内容</string>
+    <string name="preview_search_page">第 %1$d 页</string>
+    <string name="preview_annotations_saved">批注已保存到文档</string>
+    <!-- truncated document -->
+    <string name="preview_document_truncated">文档内容过多，仅显示部分内容</string>
+
     <!-- editors -->
     <string name="preview_color">颜色</string>
     <string name="preview_add_signature">添加</string>

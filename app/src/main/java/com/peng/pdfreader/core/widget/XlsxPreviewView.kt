@@ -15,9 +15,12 @@ import android.text.style.StyleSpan
 import android.text.style.UnderlineSpan
 import android.util.AttributeSet
 import android.view.MotionEvent
+import android.view.GestureDetector
+import android.view.ScaleGestureDetector
 import android.view.View
 import com.peng.pdfreader.R
 import com.peng.pdfreader.core.office.OfficeColors
+import com.peng.pdfreader.core.office.xlsx.CellNumberFormat
 import com.peng.pdfreader.core.office.xlsx.XlsxCell
 import com.peng.pdfreader.core.office.xlsx.XlsxSheet
 import com.peng.pdfreader.core.office.xlsx.XlsxWorkbook
@@ -169,19 +172,71 @@ class XlsxPreviewView @JvmOverloads constructor(
     /** Raised with the row and the column of the tapped cell. */
     var onCellTapped: ((Int, Int) -> Unit)? = null
 
+    /**
+     * Raised with the row and the column of the cell the user holds a finger on.
+     *
+     * The editor of the app opens the value of the cell, so the reader only
+     * has to tell which cell of the sheet was touched.
+     */
+    var onCellLongPressed: ((Int, Int) -> Unit)? = null
+
     private val tabStripHeight get() = dp(36f)
     private val headerHeight get() = dp(26f)
 
     /** The pinch zoom of the sheet. */
-    private val zoom = ZoomController(this)
+    private var zoom = 1f
+
+    /** The move of the zoomed sheet. */
+    private var zoomOffsetX = 0f
+    private var zoomOffsetY = 0f
+
+    /** Whether a zoom gesture is running. */
+    private var scaling = false
+
+    private val scaleDetector = ScaleGestureDetector(
+        context,
+        object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+            override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
+                scaling = true
+                return true
+            }
+
+            override fun onScale(detector: ScaleGestureDetector): Boolean {
+                applyZoom(detector.scaleFactor, detector.focusX, detector.focusY)
+                return true
+            }
+
+            override fun onScaleEnd(detector: ScaleGestureDetector) {
+                scaling = false
+            }
+        },
+    )
+
+    /**
+     * The gesture that opens the editor of a cell.
+     *
+     * The detector only watches the events, the sheet keeps its own handling
+     * of them.
+     */
+    private val longPressDetector = GestureDetector(
+        context,
+        object : GestureDetector.SimpleOnGestureListener() {
+            override fun onLongPress(event: MotionEvent) {
+                val cell = cellAt(event.x, event.y) ?: return
+                onCellLongPressed?.invoke(cell.row, cell.column)
+            }
+
+            override fun onDoubleTap(event: MotionEvent): Boolean {
+                // A double tap zooms the sheet in and out again.
+                val target = if (zoom > 1f + ZOOM_EPSILON) 1f else DOUBLE_TAP_ZOOM
+                applyZoom(target / zoom, event.x, event.y)
+                return true
+            }
+        },
+    )
 
     init {
         isClickable = true
-        // The pinch zoom of the sheet.
-        setOnTouchListener { _, event ->
-            zoom.onTouch(event)
-            false
-        }
     }
 
     private fun currentSheet(): XlsxSheet? = sheets.getOrNull(sheetIndex)
@@ -190,7 +245,45 @@ class XlsxPreviewView @JvmOverloads constructor(
         val sheet = currentSheet()
         drawTabs(canvas)
         if (sheet == null) return
+        // The grid of the sheet is zoomed, the tabs of the workbook stay.
+        canvas.save()
+        canvas.clipRect(0f, tabStripHeight, width.toFloat(), height.toFloat())
+        canvas.translate(zoomOffsetX, zoomOffsetY)
+        canvas.scale(zoom, zoom, 0f, tabStripHeight)
         drawGrid(canvas, sheet)
+        canvas.restore()
+    }
+
+    /** The zoom of the sheet is changed around the point under the fingers. */
+    private fun applyZoom(factor: Float, focusX: Float, focusY: Float) {
+        val previous = zoom
+        val next = (zoom * factor).coerceIn(MIN_ZOOM, MAX_ZOOM)
+        if (next == previous) return
+        zoom = next
+        // The point under the fingers stays under the fingers.
+        zoomOffsetX = focusX - (focusX - zoomOffsetX) * next / previous
+        zoomOffsetY = focusY - (focusY - zoomOffsetY) * next / previous
+        clampZoom()
+        invalidate()
+    }
+
+    /** The zoomed sheet stays in the reader. */
+    private fun clampZoom() {
+        val sheet = currentSheet() ?: return
+        val contentWidth = maxScrollX() + width
+        val contentHeight = maxScrollY() + height - tabStripHeight
+        val scaledWidth = contentWidth * zoom
+        val scaledHeight = contentHeight * zoom
+        zoomOffsetX = if (scaledWidth <= width) {
+            (width - scaledWidth) / 2f
+        } else {
+            zoomOffsetX.coerceIn(width - scaledWidth, 0f)
+        }
+        zoomOffsetY = if (scaledHeight <= height - tabStripHeight) {
+            (height - tabStripHeight - scaledHeight) / 2f
+        } else {
+            zoomOffsetY.coerceIn(height - tabStripHeight - scaledHeight, 0f)
+        }
     }
 
     private fun drawTabs(canvas: Canvas) {
@@ -296,8 +389,9 @@ class XlsxPreviewView @JvmOverloads constructor(
         }
         val baseline = rect.centerY() - (cellTextPaint.descent() + cellTextPaint.ascent()) / 2f
 
+        val text = textOf(cell)
         if (style.wrapText) {
-            val builder = SpannableStringBuilder(cell.value)
+            val builder = SpannableStringBuilder(text)
             if (style.italic) {
                 builder.setSpan(
                     StyleSpan(Typeface.ITALIC),
@@ -319,9 +413,18 @@ class XlsxPreviewView @JvmOverloads constructor(
             layout.draw(canvas)
             canvas.restore()
         } else {
-            canvas.drawText(cell.value, textX, baseline, cellTextPaint)
+            canvas.drawText(text, textX, baseline, cellTextPaint)
         }
     }
+
+    /**
+     * The text of a cell.
+     *
+     * The format of the file decides how a number is written: a date is a
+     * date, a percentage is a percentage.
+     */
+    private fun textOf(cell: XlsxCell): String =
+        CellNumberFormat.format(cell.rawValue, cell.style.numberFormat) ?: cell.value
 
     private fun alignmentOf(horizontal: String?): Layout.Alignment = when (horizontal) {
         "center" -> Layout.Alignment.ALIGN_CENTER
@@ -345,6 +448,8 @@ class XlsxPreviewView @JvmOverloads constructor(
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
+        scaleDetector.onTouchEvent(event)
+        longPressDetector.onTouchEvent(event)
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
                 downX = event.x
@@ -362,8 +467,15 @@ class XlsxPreviewView @JvmOverloads constructor(
                     dragging = true
                 }
                 if (dragging) {
-                    scrollX = (scrollX - dx).coerceIn(0f, maxScrollX())
-                    scrollY = (scrollY - dy).coerceIn(0f, maxScrollY())
+                    if (zoom > 1f && !scaling) {
+                        // The sheet is zoomed, the finger moves it.
+                        zoomOffsetX += dx
+                        zoomOffsetY += dy
+                        clampZoom()
+                    } else {
+                        scrollX = (scrollX - dx).coerceIn(0f, maxScrollX())
+                        scrollY = (scrollY - dy).coerceIn(0f, maxScrollY())
+                    }
                     invalidate()
                 }
                 lastX = event.x
@@ -398,12 +510,29 @@ class XlsxPreviewView @JvmOverloads constructor(
             }
             return
         }
-        val sheet = currentSheet() ?: return
+        val cell = cellAt(x, y) ?: return
+        selectedCell = cell.row to cell.column
+        onCellTapped?.invoke(cell.row, cell.column)
+        invalidate()
+    }
+
+    /**
+     * The cell at the given point of the sheet.
+     *
+     * The point is taken out of the zoom, so the cell is found even when the
+     * sheet is zoomed.
+     */
+    private fun cellAt(x: Float, y: Float): XlsxCell? {
+        val sheet = currentSheet() ?: return null
+        if (y <= tabStripHeight + headerHeight) return null
+        // The point in the space of the sheet, without the zoom.
+        val contentX = (x - zoomOffsetX) / zoom
+        val contentY = (y - tabStripHeight - zoomOffsetY) / zoom + tabStripHeight
         val columns = columnWidths(sheet)
         var rowTop = tabStripHeight + headerHeight - scrollY
         for (row in sheet.rows) {
             val rowHeight = max(dp(18f), row.heightDp * density)
-            if (y in rowTop..(rowTop + rowHeight)) {
+            if (contentY in rowTop..(rowTop + rowHeight)) {
                 var columnLeft = -scrollX
                 for (cell in row.cells) {
                     if (cell.isCovered) continue
@@ -413,18 +542,50 @@ class XlsxPreviewView @JvmOverloads constructor(
                         cellWidth += columns[index]
                     }
                     if (cellWidth <= 0f) cellWidth = dp(64f)
-                    if (x in columnLeft..(columnLeft + cellWidth)) {
-                        selectedCell = cell.row to cell.column
-                        onCellTapped?.invoke(cell.row, cell.column)
-                        invalidate()
-                        return
+                    if (contentX in columnLeft..(columnLeft + cellWidth)) {
+                        return cell
                     }
                     columnLeft += cellWidth
                 }
-                return
+                return null
             }
             rowTop += rowHeight
         }
+        return null
+    }
+
+    /**
+     * The value of a cell of the sheet that is on the screen.
+     *
+     * The editor of the app shows the value in its own field, so it needs the
+     * value the way the sheet shows it.
+     */
+    fun valueOf(row: Int, column: Int): String? {
+        val sheet = currentSheet() ?: return null
+        sheet.rows.forEach { line ->
+            if (line.index != row) return@forEach
+            val cell = line.cells.firstOrNull { it.column == column } ?: return null
+            return textOf(cell)
+        }
+        return null
+    }
+
+    private companion object {
+        /** The sheet is never smaller than it is. */
+        const val MIN_ZOOM = 1f
+
+        /** The sheet is never bigger than five times. */
+        const val MAX_ZOOM = 5f
+
+        /**
+         * The zoom of a double tap.
+         *
+         * A second tap on the sheet brings it back to the normal size.
+         */
+        const val DOUBLE_TAP_ZOOM = 2.5f
+
+        /** The difference below which the zoom counts as the normal size. */
+        const val ZOOM_EPSILON = 0.01f
     }
 
     private fun maxScrollX(): Float {

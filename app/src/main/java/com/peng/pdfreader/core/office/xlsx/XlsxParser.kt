@@ -146,6 +146,13 @@ object XlsxParser {
         /** The name of the sheet with the given index. */
         fun sheetName(position: Int): String = index.getOrNull(position)?.name.orEmpty()
 
+        /**
+         * The part of the sheet with the given index.
+         *
+         * The editor needs it to write a changed cell back into the file.
+         */
+        fun sheetPart(position: Int): String? = index.getOrNull(position)?.part
+
         /** The index of the sheet that is shown first. */
         val activeSheetIndex: Int
             get() {

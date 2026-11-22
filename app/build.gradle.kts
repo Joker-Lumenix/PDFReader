@@ -117,6 +117,9 @@ implementation(libs.androidx.lifecycle.process)
     implementation(libs.play.services.ads)
     implementation(libs.poi)
     implementation(libs.poi.scratchpad)
+    // The text, the outline and the annotations of a PDF are read and written
+    // with PDFBox, the pages themselves are drawn by the framework.
+    implementation(libs.pdfbox.android)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.crashlytics)

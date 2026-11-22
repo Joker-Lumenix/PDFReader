@@ -50,7 +50,16 @@ internal class DocxBodyReader(
         const val TAG = "DocxReader"
     }
 
+    /** The counters of the numbered lists. */
     private val counters = HashMap<String, IntArray>()
+
+    /**
+     * The number of the paragraphs that were read.
+     *
+     * The number is the place of the paragraph in the document, it is used to
+     * write a changed text back into the file.
+     */
+    private var paragraphCounter = 0
 
     /** The tables that are open, the last one is the current one. */
     private val tables = ArrayList<TableBuilder>()
@@ -75,6 +84,24 @@ internal class DocxBodyReader(
 
     /** Whether the parser is inside the text of a run. */
     private var inText = false
+
+    /**
+     * The text of the text boxes of the drawing that is read at the moment.
+     *
+     * A text box holds a text of its own, it is not part of the paragraph
+     * that carries the drawing. The text is read and shown as a block of its
+     * own, otherwise the content of the document would be incomplete.
+     */
+    private val textBoxes = ArrayList<String>()
+
+    /** The text of the text box that is read at the moment. */
+    private var textBox: StringBuilder? = null
+
+    /** Whether the parser is inside the fallback of a drawing. */
+    private var inFallback = false
+
+    /** The number of the text boxes when the fallback began. */
+    private var fallbackStart = 0
 
     /**
      * Reads the body of the document.
@@ -165,12 +192,22 @@ internal class DocxBodyReader(
             return
         }
         // Inside a drawing only the picture itself is of interest, the text
-        // boxes of a drawing are not part of the paragraph.
+        // boxes of a drawing are read as well - they hold a text of their own
+        // that would be lost otherwise.
         if (picture != null) {
             when (name) {
                 "extent" -> picture?.readExtent(attributes())
                 "blip" -> picture?.readBlip(attributes())
                 "imagedata" -> picture?.readImageData(attributes())
+                "txbxContent" -> textBox = StringBuilder()
+                "p" -> textBox?.append('\n')
+                "Fallback" -> {
+                    // The fallback of a drawing holds the same text boxes as
+                    // its choice, it is only used by the readers that do not
+                    // know the choice.
+                    inFallback = true
+                    fallbackStart = textBoxes.size
+                }
             }
             return
         }
@@ -207,7 +244,11 @@ internal class DocxBodyReader(
             return
         }
         if (picture != null) {
-            if (name == "drawing" || name == "pict") endPicture()
+            when (name) {
+                "drawing", "pict" -> endPicture()
+                "txbxContent" -> endTextBox()
+                "Fallback" -> endFallback()
+            }
             return
         }
         when (name) {
@@ -223,6 +264,12 @@ internal class DocxBodyReader(
     /** The text of the document. */
     private fun onText(value: String) {
         collector?.text(value)
+        // The text of a text box belongs to the box, not to the paragraph
+        // that carries the drawing.
+        if (textBox != null) {
+            textBox?.append(value)
+            return
+        }
         if (inText && runDepth == 1) run?.appendText(value)
     }
 
@@ -248,7 +295,13 @@ internal class DocxBodyReader(
 
     private fun startParagraph() {
         paragraphDepth++
-        if (paragraphDepth == 1) paragraph = ParagraphBuilder()
+        if (paragraphDepth == 1) {
+            paragraph = ParagraphBuilder()
+            // The paragraphs are numbered in the order they are read, the
+            // editor counts them the same way when it writes a changed text
+            // back into the document.
+            paragraph?.sourceIndex = paragraphCounter++
+        }
     }
 
     private fun endParagraph() {
@@ -262,6 +315,47 @@ internal class DocxBodyReader(
             fallbackTitle = current.plainText().trim().takeIf { it.isNotEmpty() }
         }
         attach(current.build())
+        current.image?.let { image ->
+            attach(
+                DocxBlock.Image(
+                    bytes = image.bytes,
+                    widthPt = image.widthPt,
+                    heightPt = image.heightPt,
+                    alignment = "left",
+                ),
+            )
+        }
+        // The text boxes of the drawing hold a text of their own, they are
+        // shown as the paragraphs that follow the drawing.
+        attachTextBoxes()
+    }
+
+    /**
+     * Attaches the text of the text boxes of a drawing.
+     *
+     * The text boxes are not part of the flow of the document - they float
+     * over it - so they are shown after the paragraph that carries them.
+     */
+    private fun attachTextBoxes() {
+        if (textBoxes.isEmpty()) return
+        val boxes = ArrayList(textBoxes)
+        textBoxes.clear()
+        boxes.forEach { text ->
+            attach(
+                DocxBlock.Paragraph(
+                    runs = listOf(DocxRun(text = text)),
+                    styleId = null,
+                    headingLevel = 0,
+                    alignment = "left",
+                    indentLevel = 0,
+                    listLabel = null,
+                    spaceBeforePt = 0f,
+                    spaceAfterPt = 0f,
+                    lineSpacing = 1f,
+                    pageBreakBefore = false,
+                ),
+            )
+        }
     }
 
     private fun attach(block: DocxBlock) {
@@ -312,17 +406,9 @@ internal class DocxBodyReader(
             )
         }
         current.image?.let { image ->
-            target.runs += DocxRun(
-                text = "",
-                bold = props.bold == true,
-                italic = props.italic == true,
-                color = props.color,
-                sizePt = props.sizePt,
-                fontFamily = props.fontFamily,
-                imageBytes = image.bytes,
-                imageWidthPt = image.widthPt,
-                imageHeightPt = image.heightPt,
-            )
+            // The picture of a run is a block of its own, the reader draws
+            // the blocks of a page one after the other.
+            target.image = DocxParsedImage(image.bytes, image.widthPt, image.heightPt)
         }
         if (current.pageBreak) target.pageBreakBefore = true
     }
@@ -336,6 +422,23 @@ internal class DocxBodyReader(
         val relationship = current.relationshipId ?: return
         val bytes = images.bytes(relationship) ?: return
         target.image = DocxParsedImage(bytes, current.widthPt, current.heightPt)
+    }
+
+    /** Closes a text box of a drawing. */
+    private fun endTextBox() {
+        val current = textBox ?: return
+        textBox = null
+        val text = current.toString().trim()
+        if (text.isEmpty()) return
+        textBoxes += text
+    }
+
+    /** Closes the fallback of a drawing, its text boxes are dropped. */
+    private fun endFallback() {
+        inFallback = false
+        while (textBoxes.size > fallbackStart) {
+            textBoxes.removeAt(textBoxes.size - 1)
+        }
     }
 
     // ----------------------------------------------------------------- tables
@@ -352,6 +455,9 @@ internal class DocxBodyReader(
 
         val runs = ArrayList<DocxRun>()
 
+        /** The number of the paragraph in the document. */
+        var sourceIndex: Int = -1
+
         var rawStyleId: String? = null
         var styleId: String? = null
         var headingLevel = 0
@@ -359,6 +465,7 @@ internal class DocxBodyReader(
         var alignment = "left"
         var indentLevel = 0
         var listLabel: String? = null
+        var image: DocxParsedImage? = null
         var spaceBeforePt = 0f
         var spaceAfterPt = 0f
         var lineSpacing = 1f
@@ -408,6 +515,7 @@ internal class DocxBodyReader(
             spaceAfterPt = spaceAfterPt,
             lineSpacing = lineSpacing,
             pageBreakBefore = pageBreakBefore,
+            sourceIndex = sourceIndex,
         )
     }
 
