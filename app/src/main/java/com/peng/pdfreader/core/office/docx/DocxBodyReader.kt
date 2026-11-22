@@ -639,7 +639,72 @@ internal class DocxBodyReader(
                     widths = List(count) { if (total > 0f) total / count else 72f }
                 }
             }
-            return DocxBlock.Table(rows = rows, columnWidthsPt = widths)
+            return DocxBlock.Table(rows = mergeRows(), columnWidthsPt = widths)
+        }
+
+        /**
+         * The rows of the table with the merged cells.
+         *
+         * A cell that is merged with the cells below it stands over all of
+         * them - it is the way the office software draws it. The cells that
+         * belong to the cell above them get the number zero, the reader does
+         * not draw them.
+         */
+        private fun mergeRows(): List<List<DocxCell>> {
+            if (rows.isEmpty()) return rows
+            // The column of every cell of every row.
+            val columns = ArrayList<IntArray>()
+            rows.forEach { row ->
+                val line = IntArray(row.size)
+                var column = 0
+                row.forEachIndexed { index, cell ->
+                    line[index] = column
+                    column += cell.columnSpan
+                }
+                columns += line
+            }
+            // The cells that stand over the rows below them.
+            val spans = HashMap<Pair<Int, Int>, Int>()
+            // The cells that belong to the cell above them.
+            val covered = HashSet<Pair<Int, Int>>()
+            rows.forEachIndexed { rowIndex, row ->
+                row.forEachIndexed { cellIndex, cell ->
+                    if (cell.vMerge != "restart") return@forEachIndexed
+                    val column = columns[rowIndex][cellIndex]
+                    var span = 1
+                    var next = rowIndex + 1
+                    while (next < rows.size) {
+                        val found = cellAt(next, column, columns) ?: break
+                        if (found.second.vMerge != "continue") break
+                        covered += next to found.first
+                        span++
+                        next++
+                    }
+                    spans[rowIndex to column] = span
+                }
+            }
+            return rows.mapIndexed { rowIndex, row ->
+                row.mapIndexed { cellIndex, cell ->
+                    val column = columns[rowIndex][cellIndex]
+                    val span = spans[rowIndex to column] ?: 1
+                    cell.copy(rowSpan = if (covered.contains(rowIndex to cellIndex)) 0 else span)
+                }
+            }
+        }
+
+        /** The cell of a row that stands in the given column. */
+        private fun cellAt(
+            rowIndex: Int,
+            column: Int,
+            columns: List<IntArray>,
+        ): Pair<Int, DocxCell>? {
+            val row = rows.getOrNull(rowIndex) ?: return null
+            val line = columns.getOrNull(rowIndex) ?: return null
+            row.forEachIndexed { index, cell ->
+                val start = line[index]
+                if (column >= start && column < start + cell.columnSpan) return index to cell
+            }
+            return null
         }
     }
 
@@ -653,10 +718,24 @@ internal class DocxBodyReader(
         var verticalAlignment = "top"
         var columnSpan = 1
 
+        /**
+         * How the cell is merged with the cells below it.
+         *
+         * It is "restart" for the first cell of a merge and "continue" for
+         * the cells that belong to it.
+         */
+        var vMerge = ""
+
         fun applyProperties(node: XmlNode?) {
             if (node == null) return
             node.child("gridSpan")?.attr("val")?.trim()?.toIntOrNull()?.let {
                 columnSpan = it.coerceAtLeast(1)
+            }
+            // A cell that is merged with the cells below it names it.
+            node.child("vMerge")?.let { merge ->
+                // The value of the merge is "continue" when it is left out.
+                vMerge = merge.attr("val")?.trim()?.lowercase()?.takeIf { it.isNotEmpty() }
+                    ?: "continue"
             }
             node.child("shd")?.attr("fill")?.trim()
                 ?.takeIf { it.isNotEmpty() && !it.equals("auto", true) }
@@ -677,6 +756,7 @@ internal class DocxBodyReader(
             background = background,
             verticalAlignment = verticalAlignment,
             columnSpan = columnSpan,
+            vMerge = vMerge,
         )
     }
 }

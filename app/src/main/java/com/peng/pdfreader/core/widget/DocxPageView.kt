@@ -126,20 +126,24 @@ internal class DocxPageView(context: Context) : View(context) {
     }
 
     private fun drawTable(canvas: Canvas, item: DocxLayoutEngine.Item.Table) {
-        item.rows.forEach { row ->
+        val rows = item.rows
+        rows.forEachIndexed { rowIndex, row ->
             row.cells.forEach { cell ->
                 val left = item.left + cell.left
                 val top = item.top + row.top
+                // A cell that is merged with the rows below it stands over
+                // all of them, it is drawn as one cell.
+                val height = heightOfMergedCell(rows, rowIndex, cell)
                 if (cell.background != null) {
                     fillPaint.color = cell.background
-                    canvas.drawRect(left, top, left + cell.width, top + row.height, fillPaint)
+                    canvas.drawRect(left, top, left + cell.width, top + height, fillPaint)
                 }
                 val textHeight = cell.layouts.sumOf { it.height.toDouble() }.toFloat()
                 var textTop = top + dp(4f)
                 if (cell.vertical == "center") {
-                    textTop = top + (row.height - textHeight) / 2f
+                    textTop = top + (height - textHeight) / 2f
                 } else if (cell.vertical == "bottom") {
-                    textTop = top + row.height - textHeight - dp(4f)
+                    textTop = top + height - textHeight - dp(4f)
                 }
                 cell.layouts.forEach { text ->
                     canvas.save()
@@ -148,9 +152,28 @@ internal class DocxPageView(context: Context) : View(context) {
                     canvas.restore()
                     textTop += text.height
                 }
-                canvas.drawRect(left, top, left + cell.width, top + row.height, borderPaint)
+                canvas.drawRect(left, top, left + cell.width, top + height, borderPaint)
             }
         }
+    }
+
+    /**
+     * The height of a cell of a row.
+     *
+     * A cell that is merged with the rows below it stands over all of them,
+     * the height of the rows it stands over is added up.
+     */
+    private fun heightOfMergedCell(
+        rows: List<DocxLayoutEngine.Row>,
+        rowIndex: Int,
+        cell: DocxLayoutEngine.Cell,
+    ): Float {
+        var height = rows.getOrNull(rowIndex)?.height ?: 0f
+        for (index in 1 until cell.rowSpan.coerceAtLeast(1)) {
+            val next = rows.getOrNull(rowIndex + index) ?: break
+            height += next.height
+        }
+        return height
     }
 
     private fun drawPicture(canvas: Canvas, item: DocxLayoutEngine.Item.Picture) {

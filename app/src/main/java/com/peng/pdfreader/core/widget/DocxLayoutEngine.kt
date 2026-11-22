@@ -94,6 +94,13 @@ internal class DocxLayoutEngine(
         val background: Int?,
         val layouts: List<StaticLayout>,
         val vertical: String,
+        /**
+         * The number of the rows the cell stands over.
+         *
+         * A cell that is merged with the cells below it stands over all of
+         * them, the reader draws it as one cell.
+         */
+        val rowSpan: Int = 1,
     )
 
     /**
@@ -108,9 +115,10 @@ internal class DocxLayoutEngine(
         val layouts: List<StaticLayout>,
         val vertical: String,
         val height: Float,
+        val rowSpan: Int,
     ) {
         /** The cell of the page that is drawn. */
-        fun toCell(): Cell = Cell(left, width, background, layouts, vertical)
+        fun toCell(): Cell = Cell(left, width, background, layouts, vertical, rowSpan)
     }
 
     /** The part of a block that did not fit on the page before. */
@@ -608,7 +616,7 @@ internal class DocxLayoutEngine(
         /** Measures one row of the table. */
         private fun measureRow(rowCells: List<DocxCell>, rowTop: Float): Row {
             var cells = measureCells(rowCells, 1f)
-            var height = cells.maxOfOrNull { cell -> cell.height } ?: 0f
+            var height = rowHeightOf(cells)
             // A row that is taller than the page would be cut off, its text
             // would be lost. The text of the row is made smaller until it
             // fits onto the page.
@@ -616,10 +624,19 @@ internal class DocxLayoutEngine(
             while (height > textHeight && factor > MIN_ROW_FACTOR) {
                 factor *= ROW_SHRINK_FACTOR
                 cells = measureCells(rowCells, factor)
-                height = cells.maxOfOrNull { cell -> cell.height } ?: 0f
+                height = rowHeightOf(cells)
             }
             return Row(rowTop, height, cells.map { it.toCell() })
         }
+
+        /**
+         * The height of a row.
+         *
+         * A cell that is merged with the cells below it shares its height
+         * with them, so it only needs a part of it for the row.
+         */
+        private fun rowHeightOf(cells: List<MeasuredCell>): Float =
+            cells.maxOfOrNull { cell -> cell.height / cell.rowSpan.coerceAtLeast(1) } ?: 0f
 
         /** Measures the cells of one row of the table. */
         private fun measureCells(rowCells: List<DocxCell>, factor: Float): List<MeasuredCell> {
@@ -632,6 +649,10 @@ internal class DocxLayoutEngine(
                     width += widths[index]
                 }
                 if (width <= 0f) width = textWidth / widths.size
+                column += span
+                // A cell that belongs to the cell above it is covered by it,
+                // it is not drawn.
+                if (cell.rowSpan == 0) continue
                 val padding = dp(4f)
                 val inner = (width - padding * 2).toInt().coerceAtLeast(dp(24f).toInt())
                 val layouts = cell.blocks
@@ -639,14 +660,14 @@ internal class DocxLayoutEngine(
                     .map { layoutOf(it, inner, baseSizeFor(it) * factor) }
                 val cellHeight = layouts.sumOf { it.height.toDouble() }.toFloat() + padding * 2
                 cells += MeasuredCell(
-                    left = columnOffset(column, widths),
+                    left = columnOffset(column - span, widths),
                     width = width,
                     background = cell.background?.let { OfficeColors.toAndroid(it) },
                     layouts = layouts,
                     vertical = cell.verticalAlignment,
                     height = cellHeight,
+                    rowSpan = cell.rowSpan,
                 )
-                column += span
             }
             return cells
         }

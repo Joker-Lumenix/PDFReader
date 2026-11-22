@@ -93,6 +93,22 @@ data class DocxCell(
     val background: OfficeColor?,
     val verticalAlignment: String,
     val columnSpan: Int,
+    /**
+     * How the cell is merged with the cells below it.
+     *
+     * It is "restart" for the first cell of a merge and "continue" for the
+     * cells that belong to it. The reader uses it to find the cells that
+     * stand over the rows below them.
+     */
+    val vMerge: String = "",
+    /**
+     * The number of the rows the cell stands over.
+     *
+     * A cell that is merged with the cells below it stands over all of them.
+     * A cell that belongs to the cell above it has the number zero, the
+     * reader does not draw it.
+     */
+    val rowSpan: Int = 1,
 )
 
 /** A formatted text (or picture) fragment inside a paragraph. */
